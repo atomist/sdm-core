@@ -1,0 +1,22 @@
+fragment CoreRepoFieldsAndChannels on Repo {
+  owner
+  name
+  org {
+    owner
+    ownerType
+    provider @required {
+      providerId
+      providerType
+      apiUrl
+      url
+    }
+  }
+  channels {
+    team {
+      id
+    }
+    name
+    id
+  }
+  defaultBranch
+}

@@ -1,0 +1,5 @@
+subscription OnAnySuccessStatus {
+  Status(state: success) {
+    ...StatusForExecuteGoal
+  }
+}

@@ -1,0 +1,12 @@
+fragment CoreCommitFields on Commit {
+  sha
+  message
+  timestamp
+  committer {
+    person {
+      chatId {
+        screenName
+      }
+    }
+  }
+}

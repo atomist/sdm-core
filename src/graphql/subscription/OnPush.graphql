@@ -1,0 +1,22 @@
+subscription OnPush($branch: String!) {
+  Push(branch: $branch) {
+    id
+    repo {
+      ...CoreRepoFieldsAndChannels
+    }
+    commits {
+      sha
+      message
+      author {
+        _id
+        login
+        name
+        person {
+          chatId {
+            screenName
+          }
+        }
+      }
+    }
+  }
+}

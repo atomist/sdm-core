@@ -1,0 +1,5 @@
+subscription OnAnyPendingStatus {
+  Status(state: pending) {
+    ...StatusForExecuteGoal
+  }
+}
