@@ -32,8 +32,8 @@ import { HasAtomistBuildFile } from "../../../src/pack/node/nodePushTests";
 import { IsTypeScript } from "../../../src/pack/node/tsPushTests";
 import { NoGoals } from "../../../src/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "../../../src/pack/well-known-goals/httpServiceGoals";
-import { fakePush } from "../../api/dsl/decisionTreeTest";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
+import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 
 const AddThingAutofix: AutofixRegistration = {
     name: "AddThing",
