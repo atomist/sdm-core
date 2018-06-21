@@ -15,8 +15,8 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { ArtifactStore, DeployableArtifact, StoredArtifact } from "../../../spi/artifact/ArtifactStore";
-import { AppInfo } from "../../../spi/deploy/Deployment";
+import { ArtifactStore, DeployableArtifact, StoredArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 
 /**
  * Store the artifact on local disk, relying on in memory cache.

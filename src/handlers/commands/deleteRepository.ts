@@ -30,7 +30,7 @@ import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
 import { Attachment, SlackMessage } from "@atomist/slack-messages";
-import { ExecuteGoalWithLog, RunWithLogContext } from "../../api/goal/ExecuteGoalWithLog";
+import { ExecuteGoalWithLog, RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { deleteRepository } from "../../util/github/ghub";
 import { fetchProvider } from "../../util/github/gitHubProvider";
 

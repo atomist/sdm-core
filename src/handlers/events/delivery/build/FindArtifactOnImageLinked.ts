@@ -24,18 +24,18 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { findSdmGoalOnCommit } from "../../../../api-helper/goal/fetchGoalsOnCommit";
-import { updateGoal } from "../../../../api-helper/goal/storeGoals";
-import { addressChannelsFor } from "../../../../api/context/addressChannels";
-import { Goal } from "../../../../api/goal/Goal";
+import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { Goal } from "@atomist/sdm/api/goal/Goal";
 import {
     ArtifactListenerInvocation,
     ArtifactListenerRegisterable,
     toArtifactListenerRegistration,
-} from "../../../../api/listener/ArtifactListener";
-import { PushListenerInvocation } from "../../../../api/listener/PushListener";
-import { SoftwareDeliveryMachineOptions } from "../../../../api/machine/SoftwareDeliveryMachineOptions";
-import { OnImageLinked } from "../../../../typings/types";
+} from "@atomist/sdm/api/listener/ArtifactListener";
+import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
+import { SoftwareDeliveryMachineOptions } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import { OnImageLinked } from "@atomist/sdm/typings/types";
 
 @EventHandler("Scan when artifact is found", subscription("OnImageLinked"))
 export class FindArtifactOnImageLinked implements HandleEvent<OnImageLinked.Subscription> {

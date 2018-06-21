@@ -26,18 +26,18 @@ import {
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import * as _ from "lodash";
-import { fetchGoalsForCommit } from "../../../../api-helper/goal/fetchGoalsOnCommit";
-import { preconditionsAreMet } from "../../../../api-helper/goal/goalPreconditions";
-import { goalKeyString } from "../../../../api-helper/goal/sdmGoal";
-import { updateGoal } from "../../../../api-helper/goal/storeGoals";
-import { SdmGoal, SdmGoalKey } from "../../../../api/goal/SdmGoal";
-import { SdmGoalImplementationMapper } from "../../../../api/goal/support/SdmGoalImplementationMapper";
+import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
+import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
+import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
+import { SdmGoal, SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     OnAnySuccessfulSdmGoal,
     ScmProvider,
-} from "../../../../typings/types";
+} from "@atomist/sdm/typings/types";
 
 /**
  * Respond to a failure status by failing downstream goals

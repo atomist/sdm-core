@@ -15,11 +15,11 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { createEphemeralProgressLog } from "../api-helper/log/EphemeralProgressLog";
-import { firstAvailableProgressLog } from "../api-helper/log/firstAvailableProgressLog";
-import { LoggingProgressLog } from "../api-helper/log/LoggingProgressLog";
-import { WriteToAllProgressLog } from "../api-helper/log/WriteToAllProgressLog";
-import { ProgressLogFactory } from "../spi/log/ProgressLog";
+import { createEphemeralProgressLog } from "@atomist/sdm/api-helper/log/EphemeralProgressLog";
+import { firstAvailableProgressLog } from "@atomist/sdm/api-helper/log/firstAvailableProgressLog";
+import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
+import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
+import { ProgressLogFactory } from "@atomist/sdm/spi/log/ProgressLog";
 import {DashboardDisplayProgressLog} from "./DashboardDisplayProgressLog";
 
 /**

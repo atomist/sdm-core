@@ -15,8 +15,8 @@
  */
 
 import {HandlerContext} from "@atomist/automation-client";
-import {SdmGoal} from "../api/goal/SdmGoal";
-import {ProgressLog} from "../spi/log/ProgressLog";
+import {SdmGoal} from "@atomist/sdm/api/goal/SdmGoal";
+import {ProgressLog} from "@atomist/sdm/spi/log/ProgressLog";
 import {RolarProgressLog} from "./RolarProgressLog";
 
 /**

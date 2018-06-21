@@ -19,14 +19,14 @@ import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { gitBranchToNpmTag } from "@jessitron/git-branch-to-npm-tag/lib";
 import * as fs from "fs-extra";
 import * as p from "path";
-import { spawnAndWatch } from "../../../../../api-helper/misc/spawned";
-import { ExecuteGoalResult } from "../../../../../api/goal/ExecuteGoalResult";
+import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoalWithLog,
     PrepareForGoalExecution,
     RunWithLogContext,
-} from "../../../../../api/goal/ExecuteGoalWithLog";
-import { ProjectLoader } from "../../../../../spi/project/ProjectLoader";
+} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { createStatus } from "../../../../../util/github/ghub";
 import { ProjectIdentifier } from "../projectIdentifier";
 import { NpmPreparations } from "./npmBuilder";

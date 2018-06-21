@@ -16,13 +16,13 @@
 
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { addressChannelsFor } from "../../../../api/context/addressChannels";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import Status = OnSuccessStatus.Status;
-import { VerifiedDeploymentListener, VerifiedDeploymentListenerInvocation } from "../../../../api/listener/VerifiedDeploymentListener";
-import { StagingVerifiedGoal } from "../../../../api/machine/wellKnownGoals";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { OnSuccessStatus } from "../../../../typings/types";
+import { VerifiedDeploymentListener, VerifiedDeploymentListenerInvocation } from "@atomist/sdm/api/listener/VerifiedDeploymentListener";
+import { StagingVerifiedGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { OnSuccessStatus } from "@atomist/sdm/typings/types";
 
 /**
  * React to a verified deployment

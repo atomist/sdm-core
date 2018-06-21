@@ -18,17 +18,17 @@ import {
     HandlerContext,
 } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { branchFromCommit } from "../../api-helper/goal/executeBuild";
-import { spawnAndWatch } from "../../api-helper/misc/spawned";
-import { ExecuteGoalResult } from "../../api/goal/ExecuteGoalResult";
+import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
+import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoalWithLog,
     PrepareForGoalExecution,
     RunWithLogContext,
-} from "../../api/goal/ExecuteGoalWithLog";
+} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
-import { ProjectLoader } from "../../spi/project/ProjectLoader";
-import { StatusForExecuteGoal } from "../../typings/types";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
 
 export interface DockerOptions {

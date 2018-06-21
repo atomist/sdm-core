@@ -15,13 +15,13 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { allOf } from "../../api/dsl/allOf";
-import { MessageGoal } from "../../api/goal/common/MessageGoal";
-import { executeSendMessageToSlack } from "../../api/goal/support/executeSendMessageToSlack";
-import { PushListenerInvocation } from "../../api/listener/PushListener";
-import { ExtensionPack } from "../../api/machine/ExtensionPack";
-import { PushTest } from "../../api/mapping/PushTest";
-import { CommandHandlerRegistration } from "../../api/registration/CommandHandlerRegistration";
+import { allOf } from "@atomist/sdm/api/dsl/allOf";
+import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
+import { executeSendMessageToSlack } from "@atomist/sdm/api/goal/support/executeSendMessageToSlack";
+import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
+import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
+import { PushTest } from "@atomist/sdm/api/mapping/PushTest";
+import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
 
 /**
  * Goal to explain a deployment freeze to the user.

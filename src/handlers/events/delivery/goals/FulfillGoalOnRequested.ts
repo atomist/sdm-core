@@ -29,32 +29,32 @@ import {
     ValueDeclaration,
 } from "@atomist/automation-client/metadata/automationMetadata";
 import * as stringify from "json-stringify-safe";
-import { executeGoal } from "../../../../api-helper/goal/executeGoal";
-import { fetchCommitForSdmGoal } from "../../../../api-helper/goal/fetchGoalsOnCommit";
-import { LoggingProgressLog } from "../../../../api-helper/log/LoggingProgressLog";
-import { WriteToAllProgressLog } from "../../../../api-helper/log/WriteToAllProgressLog";
-import { addressChannelsFor } from "../../../../api/context/addressChannels";
-import { RunWithLogContext } from "../../../../api/goal/ExecuteGoalWithLog";
+import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
+import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
+import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import {
     SdmGoal,
     SdmGoalState,
-} from "../../../../api/goal/SdmGoal";
-import { SdmGoalImplementationMapper } from "../../../../api/goal/support/SdmGoalImplementationMapper";
+} from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import {
     ProgressLog,
     ProgressLogFactory,
-} from "../../../../spi/log/ProgressLog";
-import { ProjectLoader } from "../../../../spi/project/ProjectLoader";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm/spi/log/ProgressLog";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     CommitForSdmGoal,
     OnAnyRequestedSdmGoal,
     SdmGoalFields,
     StatusForExecuteGoal,
-} from "../../../../typings/types";
+} from "@atomist/sdm/typings/types";
 import { fetchProvider } from "../../../../util/github/gitHubProvider";
 import { formatDuration } from "../../../../util/misc/time";
 

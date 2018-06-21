@@ -20,15 +20,15 @@ import { RemoteRepoRef } from "@atomist/automation-client/operations/common/Repo
 import * as slack from "@atomist/slack-messages/SlackMessages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";
-import { findSdmGoalOnCommit } from "../../../../api-helper/goal/fetchGoalsOnCommit";
-import { descriptionFromState, updateGoal } from "../../../../api-helper/goal/storeGoals";
-import { reportFailureInterpretation } from "../../../../api-helper/misc/reportFailureInterpretation";
-import { AddressChannels, addressChannelsFor } from "../../../../api/context/addressChannels";
-import { Goal } from "../../../../api/goal/Goal";
-import { SdmGoal, SdmGoalState } from "../../../../api/goal/SdmGoal";
-import { LogInterpretation } from "../../../../spi/log/InterpretedLog";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { BuildStatus, OnBuildComplete } from "../../../../typings/types";
+import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { descriptionFromState, updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
+import { reportFailureInterpretation } from "@atomist/sdm/api-helper/misc/reportFailureInterpretation";
+import { AddressChannels, addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { Goal } from "@atomist/sdm/api/goal/Goal";
+import { SdmGoal, SdmGoalState } from "@atomist/sdm/api/goal/SdmGoal";
+import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { BuildStatus, OnBuildComplete } from "@atomist/sdm/typings/types";
 
 /**
  * Set build status on complete build

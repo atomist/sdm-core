@@ -22,11 +22,11 @@ import * as _ from "lodash";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { Project } from "@atomist/automation-client/project/Project";
-import { DeployableArtifact } from "../../spi/artifact/ArtifactStore";
-import { Deployer } from "../../spi/deploy/Deployer";
-import { InterpretedLog } from "../../spi/log/InterpretedLog";
-import { ProgressLog } from "../../spi/log/ProgressLog";
-import { ProjectLoader } from "../../spi/project/ProjectLoader";
+import { DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import { Deployer } from "@atomist/sdm/spi/deploy/Deployer";
+import { InterpretedLog } from "@atomist/sdm/spi/log/InterpretedLog";
+import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { CloudFoundryApi, initializeCloudFoundry } from "./CloudFoundryApi";
 import { Manifest } from "./CloudFoundryManifest";
 import { CloudFoundryPusher } from "./CloudFoundryPusher";

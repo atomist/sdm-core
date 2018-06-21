@@ -18,9 +18,9 @@ import { Success } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { ExecuteGoalResult } from "../../../api/goal/ExecuteGoalResult";
-import { ExecuteGoalWithLog, RunWithLogContext } from "../../../api/goal/ExecuteGoalWithLog";
-import { ProjectLoader } from "../../../spi/project/ProjectLoader";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
+import { ExecuteGoalWithLog, RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { createTag, createTagReference, Tag } from "../../../util/github/ghub";
 import { readSdmVersion } from "./local/projectVersioner";
 

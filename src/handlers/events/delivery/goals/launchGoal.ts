@@ -30,12 +30,12 @@ import { guid } from "@atomist/automation-client/internal/util/string";
 import { AutomationEventListenerSupport } from "@atomist/automation-client/server/AutomationEventListener";
 import { QueryNoCacheOptions } from "@atomist/automation-client/spi/graph/GraphClient";
 import * as cluster from "cluster";
-import { SdmGoalImplementationMapper } from "../../../../api/goal/support/SdmGoalImplementationMapper";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
-import { ProgressLogFactory } from "../../../../spi/log/ProgressLog";
-import { ProjectLoader } from "../../../../spi/project/ProjectLoader";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { SdmGoalById } from "../../../../typings/types";
+import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { ProgressLogFactory } from "@atomist/sdm/spi/log/ProgressLog";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { SdmGoalById } from "@atomist/sdm/typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {

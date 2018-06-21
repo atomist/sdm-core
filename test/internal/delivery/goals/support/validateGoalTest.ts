@@ -15,7 +15,7 @@
  */
 
 import * as assert from "power-assert";
-import { SdmGoal } from "../../../../../src/api/goal/SdmGoal";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { isGoalRelevant } from "../../../../../src/internal/delivery/goals/support/validateGoal";
 
 describe("isGoalRelevant", () => {

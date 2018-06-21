@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExtensionPack } from "../../api/machine/ExtensionPack";
+import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
 import { OnDryRunBuildComplete } from "./support/OnDryRunBuildComplete";
 
 /**

@@ -17,14 +17,14 @@
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { chooseAndSetGoals } from "../../../../api-helper/goal/chooseAndSetGoals";
-import { SdmGoalImplementationMapper } from "../../../../api/goal/support/SdmGoalImplementationMapper";
-import { GoalsSetListener } from "../../../../api/listener/GoalsSetListener";
-import { GoalSetter } from "../../../../api/mapping/GoalSetter";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
-import { ProjectLoader } from "../../../../spi/project/ProjectLoader";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { OnPushToAnyBranch } from "../../../../typings/types";
+import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
+import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
+import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
+import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { OnPushToAnyBranch } from "@atomist/sdm/typings/types";
 
 /**
  * Set up goalSet on a push (e.g. for delivery).

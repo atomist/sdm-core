@@ -18,11 +18,11 @@ import { HandlerContext, success } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { lastLinesLogInterpreter } from "../../../../api-helper/log/logInterpreters";
-import { AddressChannels } from "../../../../api/context/addressChannels";
-import { Builder, PushThatTriggersBuild } from "../../../../spi/build/Builder";
-import { InterpretLog, LogInterpretation } from "../../../../spi/log/InterpretedLog";
-import { ProgressLog } from "../../../../spi/log/ProgressLog";
+import { lastLinesLogInterpreter } from "@atomist/sdm/api-helper/log/logInterpreters";
+import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
+import { Builder, PushThatTriggersBuild } from "@atomist/sdm/spi/build/Builder";
+import { InterpretLog, LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
+import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { createStatus } from "../../../../util/github/ghub";
 
 const K8AutomationBuildContext = "build/atomist/k8s";

@@ -17,13 +17,13 @@
 import { logger } from "@atomist/automation-client";
 import { Success } from "@atomist/automation-client/Handlers";
 import { Fingerprint } from "@atomist/automation-client/project/fingerprint/Fingerprint";
-import { computeFingerprints } from "../../../../api-helper/listener/computeFingerprints";
-import { createPushImpactListenerInvocation } from "../../../../api-helper/listener/createPushImpactListenerInvocation";
-import { relevantCodeActions } from "../../../../api-helper/listener/relevantCodeActions";
-import { ExecuteGoalWithLog, RunWithLogContext } from "../../../../api/goal/ExecuteGoalWithLog";
-import { FingerprintListener } from "../../../../api/listener/FingerprintListener";
-import { FingerprinterRegistration } from "../../../../api/registration/FingerprinterRegistration";
-import { ProjectLoader } from "../../../../spi/project/ProjectLoader";
+import { computeFingerprints } from "@atomist/sdm/api-helper/listener/computeFingerprints";
+import { createPushImpactListenerInvocation } from "@atomist/sdm/api-helper/listener/createPushImpactListenerInvocation";
+import { relevantCodeActions } from "@atomist/sdm/api-helper/listener/relevantCodeActions";
+import { ExecuteGoalWithLog, RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
+import { FingerprinterRegistration } from "@atomist/sdm/api/registration/FingerprinterRegistration";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 
 /**
  * Execute fingerprinting and send fingerprints to Atomist

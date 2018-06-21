@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { spawnedCommandAutofix } from "../../api-helper/code/autofix/spawnedCommandAutofix";
-import { asSpawnCommand } from "../../api-helper/misc/spawned";
-import { hasFile } from "../../api/mapping/support/commonPushTests";
-import { allSatisfied } from "../../api/mapping/support/pushTestUtils";
-import { AutofixRegistration } from "../../api/registration/AutofixRegistration";
+import { spawnedCommandAutofix } from "@atomist/sdm/api-helper/code/autofix/spawnedCommandAutofix";
+import { asSpawnCommand } from "@atomist/sdm/api-helper/misc/spawned";
+import { hasFile } from "@atomist/sdm/api/mapping/support/commonPushTests";
+import { allSatisfied } from "@atomist/sdm/api/mapping/support/pushTestUtils";
+import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
 import {
     DevelopmentEnvOptions,
     Install,

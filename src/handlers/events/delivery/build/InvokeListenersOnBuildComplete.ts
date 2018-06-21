@@ -16,11 +16,11 @@
 
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { AddressChannels, addressChannelsFor } from "../../../../api/context/addressChannels";
-import { BuildListener, BuildListenerInvocation } from "../../../../api/listener/BuildListener";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { OnBuildComplete } from "../../../../typings/types";
+import { AddressChannels, addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { BuildListener, BuildListenerInvocation } from "@atomist/sdm/api/listener/BuildListener";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { OnBuildComplete } from "@atomist/sdm/typings/types";
 
 /**
  * Invoke listeners on complete build. Not a part of our delivery flow:

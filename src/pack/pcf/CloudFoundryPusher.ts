@@ -18,7 +18,7 @@ import * as _ from "lodash";
 
 import {ReadStream} from "fs";
 import randomWord = require("random-word");
-import {ProgressLog} from "../../spi/log/ProgressLog";
+import {ProgressLog} from "@atomist/sdm/spi/log/ProgressLog";
 import {CloudFoundryApi} from "./CloudFoundryApi";
 import {ManifestApplication} from "./CloudFoundryManifest";
 import {CloudFoundryDeployment} from "./CloudFoundryTarget";

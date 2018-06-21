@@ -15,8 +15,8 @@
  */
 
 import { OnCommand } from "@atomist/automation-client/onCommand";
-import { SoftwareDeliveryMachine } from "../../api/machine/SoftwareDeliveryMachine";
-import { CommandHandlerRegistration } from "../../api/registration/CommandHandlerRegistration";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
 
 /**
  * Return a command handler that can describe the present software delivery machine

@@ -15,7 +15,7 @@
  */
 
 import { ChildProcess } from "child_process";
-import { Deployment } from "../../../../spi/deploy/Deployment";
+import { Deployment } from "@atomist/sdm/spi/deploy/Deployment";
 
 export interface StartupInfo {
 

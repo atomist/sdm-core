@@ -16,10 +16,10 @@
 
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { UserJoiningChannelListener, UserJoiningChannelListenerInvocation } from "../../../api/listener/UserJoiningChannelListener";
-import { CredentialsResolver } from "../../../spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "../../../spi/repo-ref/RepoRefResolver";
-import * as schema from "../../../typings/types";
+import { UserJoiningChannelListener, UserJoiningChannelListenerInvocation } from "@atomist/sdm/api/listener/UserJoiningChannelListener";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/typings/types";
 
 /**
  * A user joined a channel

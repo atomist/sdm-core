@@ -17,16 +17,16 @@
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import * as _ from "lodash";
-import { addressChannelsFor } from "../../../../api/context/addressChannels";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     FingerprintDifference,
     FingerprintDifferenceListener,
     FingerprintDifferenceListenerInvocation,
     FingerprintValue,
-} from "../../../../api/listener/FingerprintDifferenceListener";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import * as schema from "../../../../typings/types";
+} from "@atomist/sdm/api/listener/FingerprintDifferenceListener";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/typings/types";
 
 /**
  * React to a PushImpact event to react to semantic diffs

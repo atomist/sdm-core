@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ArtifactStore } from "../../../../../spi/artifact/ArtifactStore";
-import { ProjectLoader } from "../../../../../spi/project/ProjectLoader";
+import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { SpawnBuilder } from "../SpawnBuilder";
 import { npmBuilderOptionsFromFile } from "./npmBuilder";
 

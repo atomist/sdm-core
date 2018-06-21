@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { PredicatePushTest } from "../../api/mapping/PushTest";
-import { hasFile, hasFileWithExtension } from "../../api/mapping/support/commonPushTests";
+import { PredicatePushTest } from "@atomist/sdm/api/mapping/PushTest";
+import { hasFile, hasFileWithExtension } from "@atomist/sdm/api/mapping/support/commonPushTests";
 
 export const IsClojure: PredicatePushTest = hasFileWithExtension("clj");
 

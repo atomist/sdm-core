@@ -15,7 +15,7 @@
  */
 
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { CredentialsResolver } from "../../../../spi/credentials/CredentialsResolver";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 import {
@@ -29,12 +29,12 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { fetchCommitForSdmGoal, fetchGoalsForCommit } from "../../../../api-helper/goal/fetchGoalsOnCommit";
-import { addressChannelsFor } from "../../../../api/context/addressChannels";
-import { SdmGoal } from "../../../../api/goal/SdmGoal";
-import { GoalCompletionListener, GoalCompletionListenerInvocation } from "../../../../api/listener/GoalsSetListener";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
+import { fetchCommitForSdmGoal, fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { GoalCompletionListener, GoalCompletionListenerInvocation } from "@atomist/sdm/api/listener/GoalsSetListener";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { OnAnyCompletedSdmGoal } from "@atomist/sdm/typings/types";
 
 /**
  * Respond to a failure or success status by running listeners

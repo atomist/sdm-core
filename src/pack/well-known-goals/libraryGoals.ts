@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Goals } from "../../api/goal/Goals";
-import { JustBuildGoal, ReviewGoal } from "../../api/machine/wellKnownGoals";
+import { Goals } from "@atomist/sdm/api/goal/Goals";
+import { JustBuildGoal, ReviewGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 
 /**
  * Flow to build a library

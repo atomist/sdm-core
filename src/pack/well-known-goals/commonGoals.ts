@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Goal, GoalWithPrecondition } from "../../api/goal/Goal";
-import { Goals } from "../../api/goal/Goals";
-import { IndependentOfEnvironment, ProjectDisposalEnvironment } from "../../api/goal/support/environment";
-import { BuildGoal, LocalDeploymentGoal, NoGoal } from "../../api/machine/wellKnownGoals";
+import { Goal, GoalWithPrecondition } from "@atomist/sdm/api/goal/Goal";
+import { Goals } from "@atomist/sdm/api/goal/Goals";
+import { IndependentOfEnvironment, ProjectDisposalEnvironment } from "@atomist/sdm/api/goal/support/environment";
+import { BuildGoal, LocalDeploymentGoal, NoGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 
 export const VersionGoal = new Goal({
     uniqueName: "Version",

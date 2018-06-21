@@ -17,8 +17,8 @@
 // tslint:disable:max-file-line-count
 
 import * as assert from "power-assert";
-import { goalKeyEquals } from "../../src/api-helper/goal/sdmGoal";
-import { SdmGoal } from "../../src/api/goal/SdmGoal";
+import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { sumSdmGoalEventsByOverride } from "../../src/handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 
 describe("Putting SdmGoal events together", () => {

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { executeImmaterial } from "../../api-helper/goal/chooseAndSetGoals";
-import { executeAutofixes } from "../../api-helper/listener/executeAutofixes";
-import { executePushReactions } from "../../api-helper/listener/executePushReactions";
-import { executeReview } from "../../api-helper/listener/executeReview";
-import { LogSuppressor } from "../../api-helper/log/logInterpreters";
-import { ExtensionPack } from "../../api/machine/ExtensionPack";
-import { SoftwareDeliveryMachine } from "../../api/machine/SoftwareDeliveryMachine";
+import { executeImmaterial } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
+import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofixes";
+import { executePushReactions } from "@atomist/sdm/api-helper/listener/executePushReactions";
+import { executeReview } from "@atomist/sdm/api-helper/listener/executeReview";
+import { LogSuppressor } from "@atomist/sdm/api-helper/log/logInterpreters";
+import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import {
     ArtifactGoal,
     AutofixGoal,
@@ -30,8 +30,8 @@ import {
     NoGoal,
     PushReactionGoal,
     ReviewGoal,
-} from "../../api/machine/wellKnownGoals";
-import { AnyPush } from "../../api/mapping/support/commonPushTests";
+} from "@atomist/sdm/api/machine/wellKnownGoals";
+import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { offerToDeleteRepository } from "../../handlers/commands/deleteRepository";
 import { executeFingerprinting } from "../../internal/delivery/code/fingerprint/executeFingerprinting";
 

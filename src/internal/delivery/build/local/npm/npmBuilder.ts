@@ -17,16 +17,16 @@
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { Project } from "@atomist/automation-client/project/Project";
-import { branchFromCommit } from "../../../../../api-helper/goal/executeBuild";
+import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
 import {
     asSpawnCommand,
     spawnAndWatch,
     SpawnCommand,
-} from "../../../../../api-helper/misc/spawned";
-import { ExecuteGoalResult } from "../../../../../api/goal/ExecuteGoalResult";
-import { RunWithLogContext } from "../../../../../api/goal/ExecuteGoalWithLog";
-import { AppInfo } from "../../../../../spi/deploy/Deployment";
-import { ProjectLoader } from "../../../../../spi/project/ProjectLoader";
+} from "@atomist/sdm/api-helper/misc/spawned";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
+import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { readSdmVersion } from "../projectVersioner";
 import { SpawnBuilder, SpawnBuilderOptions } from "../SpawnBuilder";
 import { NpmLogInterpreter } from "./npmLogInterpreter";

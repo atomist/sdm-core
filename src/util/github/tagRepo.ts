@@ -16,7 +16,7 @@
 
 import { isGitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { Tagger } from "@atomist/automation-client/operations/tagger/Tagger";
-import { PushListener } from "../../api/listener/PushListener";
+import { PushListener } from "@atomist/sdm/api/listener/PushListener";
 import { publishTags } from "../../internal/repo/publishTags";
 
 /**

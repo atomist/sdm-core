@@ -20,7 +20,7 @@ import {
 } from "@atomist/automation-client";
 import { RepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import * as https from "https";
-import { LastEndpoint } from "../typings/types";
+import { LastEndpoint } from "@atomist/sdm/typings/types";
 
 const K8TargetBase = "deploy/atomist/k8s/";
 

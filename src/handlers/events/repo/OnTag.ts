@@ -16,11 +16,11 @@
 
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { addressChannelsFor } from "../../../api/context/addressChannels";
-import { TagListener, TagListenerInvocation } from "../../../api/listener/TagListener";
-import { CredentialsResolver } from "../../../spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "../../../spi/repo-ref/RepoRefResolver";
-import * as schema from "../../../typings/types";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { TagListener, TagListenerInvocation } from "@atomist/sdm/api/listener/TagListener";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/typings/types";
 
 /**
  * A new tag has been created

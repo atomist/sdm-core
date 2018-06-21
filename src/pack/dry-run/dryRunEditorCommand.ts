@@ -22,13 +22,13 @@ import { GitHubFallbackReposParameters } from "@atomist/automation-client/operat
 import { EditorCommandDetails, editorHandler } from "@atomist/automation-client/operations/edit/editorToCommand";
 import { AnyProjectEditor } from "@atomist/automation-client/operations/edit/projectEditor";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
-import { allReposInTeam } from "../../api-helper/command/editor/allReposInTeam";
-import { toEditorOrReviewerParametersMaker } from "../../api-helper/command/editor/editorCommand";
-import { chattyEditorFactory } from "../../api-helper/command/editor/editorWrappers";
-import { projectLoaderRepoLoader } from "../../api-helper/machine/projectLoaderRepoLoader";
-import { MachineOrMachineOptions, toMachineOptions } from "../../api-helper/machine/toMachineOptions";
-import { EditModeSuggestion } from "../../api/command/editor/EditModeSuggestion";
-import { EmptyParameters } from "../../api/command/support/EmptyParameters";
+import { allReposInTeam } from "@atomist/sdm/api-helper/command/editor/allReposInTeam";
+import { toEditorOrReviewerParametersMaker } from "@atomist/sdm/api-helper/command/editor/editorCommand";
+import { chattyEditorFactory } from "@atomist/sdm/api-helper/command/editor/editorWrappers";
+import { projectLoaderRepoLoader } from "@atomist/sdm/api-helper/machine/projectLoaderRepoLoader";
+import { MachineOrMachineOptions, toMachineOptions } from "@atomist/sdm/api-helper/machine/toMachineOptions";
+import { EditModeSuggestion } from "@atomist/sdm/api/command/editor/EditModeSuggestion";
+import { EmptyParameters } from "@atomist/sdm/api/command/support/EmptyParameters";
 import { Status } from "../../util/github/ghub";
 import { NewBranchWithStatus } from "./support/NewBranchWithStatus";
 

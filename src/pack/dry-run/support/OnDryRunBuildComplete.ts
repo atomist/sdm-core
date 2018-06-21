@@ -18,8 +18,8 @@ import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, l
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { raiseIssue } from "@atomist/automation-client/util/gitHub";
-import { RepoRefResolver } from "../../../spi/repo-ref/RepoRefResolver";
-import { OnBuildCompleteForDryRun } from "../../../typings/types";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { OnBuildCompleteForDryRun } from "@atomist/sdm/typings/types";
 import { createStatus } from "../../../util/github/ghub";
 import { DryRunContext } from "../dryRunEditorCommand";
 

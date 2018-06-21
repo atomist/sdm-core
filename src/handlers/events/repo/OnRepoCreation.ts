@@ -16,11 +16,11 @@
 
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { AddressNoChannels } from "../../../api/context/addressChannels";
-import { RepoCreationListener, RepoCreationListenerInvocation } from "../../../api/listener/RepoCreationListener";
-import { CredentialsResolver } from "../../../spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "../../../spi/repo-ref/RepoRefResolver";
-import * as schema from "../../../typings/types";
+import { AddressNoChannels } from "@atomist/sdm/api/context/addressChannels";
+import { RepoCreationListener, RepoCreationListenerInvocation } from "@atomist/sdm/api/listener/RepoCreationListener";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/typings/types";
 
 /**
  * A new repo has been created. We don't know if it has code.

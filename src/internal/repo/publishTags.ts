@@ -21,7 +21,7 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/operatio
 import { Tagger, Tags } from "@atomist/automation-client/operations/tagger/Tagger";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
-import { AddressChannels } from "../../api/context/addressChannels";
+import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
 import { listTopics } from "../../util/github/ghub";
 import { GitHubTagRouter } from "../../util/github/gitHubTagRouter";
 

@@ -15,7 +15,7 @@
  */
 
 import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
-import { predicatePushTest, PredicatePushTest } from "../../api/mapping/PushTest";
+import { predicatePushTest, PredicatePushTest } from "@atomist/sdm/api/mapping/PushTest";
 import { CloudFoundryManifestPath } from "./CloudFoundryTarget";
 
 export const HasCloudFoundryManifest: PredicatePushTest = predicatePushTest(

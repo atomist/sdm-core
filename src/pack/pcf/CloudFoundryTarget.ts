@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Deployment, TargetInfo } from "../../spi/deploy/Deployment";
+import { Deployment, TargetInfo } from "@atomist/sdm/spi/deploy/Deployment";
 
 /**
  * Path to Cloud Foundry manifest within deployable projects

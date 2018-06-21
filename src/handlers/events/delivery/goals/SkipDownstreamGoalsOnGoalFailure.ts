@@ -24,13 +24,13 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { fetchGoalsForCommit } from "../../../../api-helper/goal/fetchGoalsOnCommit";
-import { goalKeyEquals } from "../../../../api-helper/goal/sdmGoal";
-import { updateGoal } from "../../../../api-helper/goal/storeGoals";
-import { SdmGoal, SdmGoalKey } from "../../../../api/goal/SdmGoal";
+import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
+import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
+import { SdmGoal, SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { RepoRefResolver } from "../../../../spi/repo-ref/RepoRefResolver";
-import { OnAnyFailedSdmGoal } from "../../../../typings/types";
+import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { OnAnyFailedSdmGoal } from "@atomist/sdm/typings/types";
 import { fetchScmProvider, sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 /**

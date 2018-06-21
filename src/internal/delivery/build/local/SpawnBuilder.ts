@@ -29,12 +29,12 @@ import {
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
-} from "../../../../api-helper/misc/spawned";
-import { ArtifactStore } from "../../../../spi/artifact/ArtifactStore";
-import { AppInfo } from "../../../../spi/deploy/Deployment";
-import { InterpretLog, LogInterpretation } from "../../../../spi/log/InterpretedLog";
-import { ProgressLog } from "../../../../spi/log/ProgressLog";
-import { ProjectLoader } from "../../../../spi/project/ProjectLoader";
+} from "@atomist/sdm/api-helper/misc/spawned";
+import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
+import { InterpretLog, LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
+import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { LocalBuilder, LocalBuildInProgress } from "./LocalBuilder";
 
 export interface SpawnBuilderOptions {

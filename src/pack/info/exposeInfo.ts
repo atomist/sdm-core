@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExtensionPack } from "../../api/machine/ExtensionPack";
+import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
 import { CreateRepoHandler } from "./createRepo";
 import { ListGeneratorsHandler } from "./listGenerators";
 import { SelfDescribeHandler } from "./SelfDescribe";

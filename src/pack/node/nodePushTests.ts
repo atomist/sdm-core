@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { predicatePushTest, PredicatePushTest } from "../../api/mapping/PushTest";
-import { hasFile } from "../../api/mapping/support/commonPushTests";
+import { predicatePushTest, PredicatePushTest } from "@atomist/sdm/api/mapping/PushTest";
+import { hasFile } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { AtomistBuildFile } from "../../internal/delivery/build/local/npm/NpmDetectBuildMapping";
 
 export const IsNode: PredicatePushTest = predicatePushTest("Is Node", async p => {

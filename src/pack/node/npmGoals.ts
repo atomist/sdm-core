@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { GoalWithPrecondition } from "../../api/goal/Goal";
-import { Goals } from "../../api/goal/Goals";
-import { IndependentOfEnvironment, ProductionEnvironment, StagingEnvironment } from "../../api/goal/support/environment";
-import { ArtifactGoal, AutofixGoal, BuildGoal, ReviewGoal, StagingEndpointGoal } from "../../api/machine/wellKnownGoals";
-import { StagingDeploymentGoal } from "../../api/machine/wellKnownGoals";
+import { GoalWithPrecondition } from "@atomist/sdm/api/goal/Goal";
+import { Goals } from "@atomist/sdm/api/goal/Goals";
+import { IndependentOfEnvironment, ProductionEnvironment, StagingEnvironment } from "@atomist/sdm/api/goal/support/environment";
+import { ArtifactGoal, AutofixGoal, BuildGoal, ReviewGoal, StagingEndpointGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
+import { StagingDeploymentGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { DockerBuildGoal, TagGoal, VersionGoal } from "../well-known-goals/commonGoals";
 
 export const NpmPublishGoal = new GoalWithPrecondition({

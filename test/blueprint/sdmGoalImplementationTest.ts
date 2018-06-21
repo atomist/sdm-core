@@ -20,20 +20,20 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/operatio
 import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
 
 import * as assert from "power-assert";
-import { determineGoals } from "../../src/api-helper/goal/chooseAndSetGoals";
-import { SingleProjectLoader } from "../../src/api-helper/test/SingleProjectLoader";
-import { whenPushSatisfies } from "../../src/api/dsl/goalDsl";
-import { Goal } from "../../src/api/goal/Goal";
-import { Goals } from "../../src/api/goal/Goals";
+import { determineGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
+import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
+import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
+import { Goal } from "@atomist/sdm/api/goal/Goal";
+import { Goals } from "@atomist/sdm/api/goal/Goals";
 import {
     SoftwareDeliveryMachineConfiguration,
     SoftwareDeliveryMachineOptions,
-} from "../../src/api/machine/SoftwareDeliveryMachineOptions";
-import { AutofixGoal } from "../../src/api/machine/wellKnownGoals";
-import { AnyPush } from "../../src/api/mapping/support/commonPushTests";
+} from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import { AutofixGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
+import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { DefaultRepoRefResolver } from "../../src/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../src/machine/machineFactory";
-import { PushFields } from "../../src/typings/types";
+import { PushFields } from "@atomist/sdm/typings/types";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",

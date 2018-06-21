@@ -15,8 +15,8 @@
  */
 
 import * as df from "dateformat";
-import { branchFromCommit } from "../../../../../api-helper/goal/executeBuild";
-import { spawnAndWatch } from "../../../../../api-helper/misc/spawned";
+import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
+import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ProjectVersioner } from "../projectVersioner";
 
 export const NodeProjectVersioner: ProjectVersioner = async (status, p, log) => {
