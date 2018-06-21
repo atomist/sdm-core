@@ -1,12 +1,12 @@
 {
-  "name": "@atomist/sdm",
+  "name": "@atomist/sdm-core",
   "version": "0.2.4",
   "description": "Atomist Software Delivery Machine",
   "author": "Atomist, Inc.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atomist/sdm.git"
+    "url": "https://github.com/atomist/sdm-core.git"
   },
   "keywords": [
     "atomist",
@@ -15,9 +15,9 @@
     "ci",
     "cd"
   ],
-  "homepage": "https://github.com/atomist/sdm#readme",
+  "homepage": "https://github.com/atomist/sdm-core#readme",
   "bugs": {
-    "url": "https://github.com/atomist/sdm/issues"
+    "url": "https://github.com/atomist/sdm-core/issues"
   },
   "dependencies": {
     "@atomist/slack-messages": "^0.12.1",
@@ -44,10 +44,12 @@
     "xml2js": "^0.4.19"
   },
   "peerDependencies": {
-    "@atomist/automation-client": "^0.17.1"
+    "@atomist/automation-client": "^0.17.1",
+    "@atomist/sdm": "^0.3.0"
   },
   "devDependencies": {
     "@atomist/automation-client": "^0.17.2-20180613153815",
+    "@atomist/sdm": "0.2.4-nortissej.break-out-api.20180621181311",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^2.2.48",
     "@types/node": "^8.10.17",
