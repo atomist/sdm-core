@@ -67,3 +67,5 @@ RepositoryDeletionGoals,
 UndeployEverywhereGoals } from "./pack/well-known-goals/httpServiceGoals";
 export { LibraryGoals } from "./pack/well-known-goals/libraryGoals";
 export { NodeProjectIdentifier } from "./internal/delivery/build/local/npm/nodeProjectIdentifier";
+export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
+export { renderCommitMessage } from "./util/slack/diffRendering";
