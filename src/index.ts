@@ -36,21 +36,21 @@ export { isDeployEnabledCommand } from "./handlers/commands/DisplayDeployEnablem
 export {
     disableDeploy,
     enableDeploy,
-    setDeployEnablement
+    setDeployEnablement,
 } from "./handlers/commands/SetDeployEnablement";
 export {
     authHeaders,
-    updateIssue
+    updateIssue,
 } from "./util/github/ghub";
 export { lookFor200OnEndpointRootGet } from "./util/verify/lookFor200OnEndpointRootGet";
 export {
     ConfigureOptions,
-    configureSdm
+    configureSdm,
 } from "./internal/machine/configureSdm";
 export {
     ExplainDeploymentFreezeGoal,
     deploymentFreeze,
-    isDeploymentFrozen
+    isDeploymentFrozen,
 } from "./pack/freeze/deploymentFreeze";
 export { summarizeGoalsInGitHubStatus } from "./internal/delivery/goals/support/githubStatusSummarySupport";
 export { requestDeployToK8s } from "./handlers/events/delivery/deploy/k8s/RequestK8sDeploys";
@@ -61,25 +61,25 @@ export { HasDockerfile } from "./pack/docker/dockerPushTests";
 export { DryRunEditing } from "./pack/dry-run/dryRunEditorSupport";
 export {
     HasAtomistBuildFile,
-    IsNode
+    IsNode,
 } from "./pack/node/nodePushTests";
 export {
     NpmBuildGoals,
     NpmDeployGoals,
     NpmDockerGoals,
-    NpmKubernetesDeployGoals
+    NpmKubernetesDeployGoals,
 } from "./pack/node/npmGoals";
 export { IsTypeScript } from "./pack/node/tsPushTests";
 export { tslintFix } from "./pack/node/tslintFix";
 export {
     CloudFoundryInfo,
-    CloudFoundryManifestPath
+    CloudFoundryManifestPath,
 } from "./pack/pcf/CloudFoundryTarget";
 export { HasCloudFoundryManifest } from "./pack/pcf/cloudFoundryManifestPushTest";
 export {
     HttpServiceGoals,
     RepositoryDeletionGoals,
-    UndeployEverywhereGoals
+    UndeployEverywhereGoals,
 } from "./pack/well-known-goals/httpServiceGoals";
 export { LibraryGoals } from "./pack/well-known-goals/libraryGoals";
 export { NodeProjectIdentifier } from "./internal/delivery/build/local/npm/nodeProjectIdentifier";
