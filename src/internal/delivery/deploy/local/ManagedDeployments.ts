@@ -23,10 +23,16 @@ import axios from "axios";
 import { ChildProcess } from "child_process";
 import * as https from "https";
 
+/**
+ * @ModuleExport
+ */
 export interface ManagedDeploymentTargetInfo extends TargetInfo {
     managedDeploymentKey: RemoteRepoRef;
 }
 
+/**f
+ * @ModuleExport
+ */
 export const ManagedDeploymentTargeter: Targeter<ManagedDeploymentTargetInfo> = (id: RemoteRepoRef, branch: string) => {
     const branchId = {...id, branch};
     return {
@@ -38,6 +44,7 @@ export const ManagedDeploymentTargeter: Targeter<ManagedDeploymentTargetInfo> = 
 
 /**
  * Strategy for looking up a service
+ * @ModuleExport
  */
 export enum LookupStrategy {
     service = "service",
@@ -47,6 +54,7 @@ export enum LookupStrategy {
 
 /**
  * Ports will be reused for the same app
+ * @ModuleExport
  */
 export interface DeployedApp {
 
@@ -66,6 +74,7 @@ export interface DeployedApp {
  * Manages local deployments to the automation server node
  * This is not intended for production use
  * @type {Array}
+ * @ModuleExport
  */
 export class ManagedDeployments {
 

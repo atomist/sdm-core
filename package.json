@@ -91,7 +91,7 @@
     "debug": "node $NODE_DEBUG_OPTION node_modules/@atomist/automation-client/start.client.js",
     "fmt": "npm-run-all fmt:ts fmt:gql",
     "fmt:ts": "tsfmt --replace",
-    "fmt:gql": "prettier --write \"**/*.graphql\"",
+    "fmt:gql": "echo 'skipping: prettier --write \"**/*.graphql\"'",
     "generate:barrels": "barrelsby --delete -d src --i 'api/.*' --i 'spi/.*' --i typings/.*",
     "git:info": "atomist git",
     "gql:copy": "copyfiles \"./src/**/*.graphql\" build",

@@ -37,11 +37,14 @@ import { createTagForStatus } from "../executeTag";
 import { readSdmVersion } from "./projectVersioner";
 import SdmBuildIdentifier = SdmBuildIdentifierForRepo.SdmBuildIdentifier;
 
+/**
+ * @ModuleExport
+ */
 export interface LocalBuildInProgress {
 
     readonly buildResult: Promise<ChildProcessResult>;
 
-    readonly repoRef: RemoteRepoRef;
+    readonly repoRef: RemoteRepoRef; i;
 
     readonly team: string;
 
@@ -56,6 +59,7 @@ export interface LocalBuildInProgress {
 /**
  * Superclass for build implemented on the automation client itself, emitting appropriate events to Atomist.
  * Allows listening to a Running build
+ * @ModuleExport
  */
 export abstract class LocalBuilder implements Builder {
 

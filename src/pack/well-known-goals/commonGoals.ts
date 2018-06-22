@@ -19,6 +19,9 @@ import { Goals } from "@atomist/sdm/api/goal/Goals";
 import { IndependentOfEnvironment, ProjectDisposalEnvironment } from "@atomist/sdm/api/goal/support/environment";
 import { BuildGoal, LocalDeploymentGoal, NoGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 
+/**
+ * @ModuleExport
+ */
 export const VersionGoal = new Goal({
     uniqueName: "Version",
     environment: IndependentOfEnvironment,
@@ -27,6 +30,9 @@ export const VersionGoal = new Goal({
     completedDescription: "Versioned",
 });
 
+/**
+ * @ModuleExport
+ */
 export const DockerBuildGoal = new GoalWithPrecondition({
     uniqueName: "DockerBuild",
     environment: IndependentOfEnvironment,
@@ -38,6 +44,9 @@ export const DockerBuildGoal = new GoalWithPrecondition({
     isolated: true,
 }, BuildGoal);
 
+/**
+ * @ModuleExport
+ */
 export const TagGoal = new GoalWithPrecondition({
     uniqueName: "Tag",
     environment: IndependentOfEnvironment,
@@ -48,6 +57,9 @@ export const TagGoal = new GoalWithPrecondition({
     failedDescription: "Failed to create Tag",
 }, DockerBuildGoal, BuildGoal);
 
+/**
+ * @ModuleExport
+ */
 export const StagingUndeploymentGoal = new Goal({
     uniqueName: "UndeployFromTest",
     environment: ProjectDisposalEnvironment,
@@ -56,6 +68,9 @@ export const StagingUndeploymentGoal = new Goal({
     completedDescription: "not deployed in test",
 });
 
+/**
+ * @ModuleExport
+ */
 export const LocalUndeploymentGoal = new Goal({
     uniqueName: "UndeployHere",
     environment: ProjectDisposalEnvironment,
@@ -64,6 +79,9 @@ export const LocalUndeploymentGoal = new Goal({
     completedDescription: "not deployed locally",
 });
 
+/**
+ * @ModuleExport
+ */
 // not an enforced precondition, but it's real enough to graph
 export const LocalEndpointGoal = new GoalWithPrecondition({
     uniqueName: "FindLocalEndpoint",
@@ -78,6 +96,7 @@ export const LocalEndpointGoal = new GoalWithPrecondition({
  * Special Goals object to be returned if changes are immaterial.
  * The identity of this object is important.
  * @type {Goals}
+ * @ModuleExport
  */
 export const NoGoals = new Goals(
     "No action needed",

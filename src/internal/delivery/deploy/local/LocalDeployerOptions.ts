@@ -17,6 +17,9 @@
 import { Deployment } from "@atomist/sdm/spi/deploy/Deployment";
 import { ChildProcess } from "child_process";
 
+/**
+ * @ModuleExport
+ */
 export interface StartupInfo {
 
     port: number;
@@ -26,11 +29,17 @@ export interface StartupInfo {
     contextRoot: string;
 }
 
+/**
+ * @ModuleExport
+ */
 export interface SpawnedDeployment extends Deployment {
 
     childProcess: ChildProcess;
 }
 
+/**
+ * @ModuleExport
+ */
 export interface LocalDeployerOptions {
 
     /**
@@ -59,6 +68,9 @@ export interface LocalDeployerOptions {
     successPatterns: RegExp[];
 }
 
+/**
+ * @ModuleExport
+ */
 export const DefaultLocalDeployerOptions: Partial<LocalDeployerOptions> = {
     lowerPort: 8080,
 };

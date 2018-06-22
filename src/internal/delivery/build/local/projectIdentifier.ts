@@ -23,5 +23,6 @@ export interface ProjectIdentification {
 
 /**
  * Return identification of this project or undefined if it can't be identified
+ * @ModuleExport
  */
 export type ProjectIdentifier = (p: Project) => Promise<ProjectIdentification | undefined>;
