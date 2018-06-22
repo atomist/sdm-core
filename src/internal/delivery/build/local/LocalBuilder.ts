@@ -44,7 +44,7 @@ export interface LocalBuildInProgress {
 
     readonly buildResult: Promise<ChildProcessResult>;
 
-    readonly repoRef: RemoteRepoRef; i;
+    readonly repoRef: RemoteRepoRef;
 
     readonly team: string;
 
