@@ -1,0 +1,30 @@
+subscription OnClosedIssue {
+  Issue(state: closed) {
+    number
+    title
+    body
+    openedBy {
+      login
+      person {
+        ...PersonFields
+      }
+    }
+    closedBy {
+      login
+      person {
+        ...PersonFields
+      }
+    }
+    createdAt
+    updatedAt
+    repo {
+      ...CoreRepoFieldsAndChannels
+    }
+    assignees {
+      login
+      person {
+        ...PersonFields
+      }
+    }
+  }
+}

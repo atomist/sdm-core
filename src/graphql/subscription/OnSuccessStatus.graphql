@@ -1,0 +1,23 @@
+subscription OnSuccessStatus($context: String!) {
+  Status(state: success, context: $context) {
+    commit {
+      sha
+      message
+      statuses {
+        context
+        description
+        state
+      }
+      repo {
+        ...CoreRepoFieldsAndChannels
+      }
+      pushes {
+        branch
+      }
+    }
+    state
+    targetUrl
+    context
+    description
+  }
+}

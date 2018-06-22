@@ -1,0 +1,29 @@
+subscription OnBuildComplete {
+  Build {
+    buildId
+    buildUrl
+    compareUrl
+    name
+    status
+    jobId
+    startedAt
+    timestamp
+    push {
+      ...PushFields
+    }
+    commit {
+      sha
+      message
+      timestamp
+      repo {
+        ...CoreRepoFieldsAndChannels
+      }
+      statuses {
+        context
+        description
+        state
+        targetUrl
+      }
+    }
+  }
+}

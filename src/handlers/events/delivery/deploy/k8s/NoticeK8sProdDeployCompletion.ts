@@ -19,7 +19,7 @@ import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { Goal } from "@atomist/sdm/api/goal/Goal";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { OnAParticularStatus } from "@atomist/sdm/typings/types";
+import { OnAParticularStatus } from "../../../../../typings/types";
 import { createStatus } from "../../../../../util/github/ghub";
 import { k8AutomationDeployContext, K8TargetBase } from "./RequestK8sDeploys";
 

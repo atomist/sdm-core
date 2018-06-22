@@ -18,7 +18,7 @@ import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, l
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { Goal } from "@atomist/sdm/api/goal/Goal";
-import { OnAParticularStatus } from "@atomist/sdm/typings/types";
+import { OnAParticularStatus } from "../../../../../typings/types";
 import { createStatus } from "../../../../../util/github/ghub";
 import { k8AutomationDeployContext, K8TargetBase } from "./RequestK8sDeploys";
 
