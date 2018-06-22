@@ -15,8 +15,8 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import axios from "axios";
 import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
+import axios from "axios";
 
 /**
  * Publish the given fingerprint to Atomist in the given team

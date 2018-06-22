@@ -22,6 +22,7 @@ import { publishTags } from "../../internal/repo/publishTags";
 /**
  * Tag the repo using the given tagger
  * @param {Tagger} tagger
+ * @ModuleExport
  */
 export function tagRepo(tagger: Tagger): PushListener {
     return async pInv =>

@@ -16,7 +16,6 @@
 
 import { Configuration, HandleCommand, HandleEvent } from "@atomist/automation-client";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
-import * as _ from "lodash";
 import { SdmGoalImplementationMapperImpl } from "@atomist/sdm/api-helper/goal/SdmGoalImplementationMapperImpl";
 import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/api-helper/machine/AbstractSoftwareDeliveryMachine";
 import { FunctionalUnit } from "@atomist/sdm/api/machine/FunctionalUnit";
@@ -24,6 +23,7 @@ import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/S
 import { ArtifactGoal, BuildGoal, JustBuildGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { PushRules } from "@atomist/sdm/api/mapping/support/PushRules";
+import * as _ from "lodash";
 import { deleteRepositoryCommand } from "../../handlers/commands/deleteRepository";
 import { disposeCommand } from "../../handlers/commands/disposeCommand";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";

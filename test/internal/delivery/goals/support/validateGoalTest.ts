@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from "power-assert";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import * as assert from "power-assert";
 import { isGoalRelevant } from "../../../../../src/internal/delivery/goals/support/validateGoal";
 
 describe("isGoalRelevant", () => {

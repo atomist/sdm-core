@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ChildProcess } from "child_process";
 import { Deployment } from "@atomist/sdm/spi/deploy/Deployment";
+import { ChildProcess } from "child_process";
 
 export interface StartupInfo {
 

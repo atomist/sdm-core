@@ -24,8 +24,8 @@ import { HandlerContext } from "@atomist/automation-client/Handlers";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
-import { SlackMessage } from "@atomist/slack-messages";
 import { isDeployEnabled } from "@atomist/sdm/api/mapping/support/deployPushTests";
+import { SlackMessage } from "@atomist/slack-messages";
 import { SetDeployEnablementParameters } from "./SetDeployEnablement";
 
 function displayDeployEnablement() {

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as df from "dateformat";
 import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
+import * as df from "dateformat";
 import { ProjectVersioner } from "../projectVersioner";
 
 export const NodeProjectVersioner: ProjectVersioner = async (status, p, log) => {

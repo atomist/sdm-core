@@ -18,7 +18,8 @@ import { BaseParameter } from "@atomist/automation-client/internal/metadata/deco
 
 /**
  * Validation pattern for Java identifiers
- * @type {{description: string; pattern: RegExp; validInput: string; minLength: number; maxLength: number}}
+ * @type BaseParameter
+ * @ModuleExport
  */
 export const JavaIdentifierRegExp: Partial<BaseParameter> = {
     description: "valid Java identifier name",
@@ -28,6 +29,11 @@ export const JavaIdentifierRegExp: Partial<BaseParameter> = {
     maxLength: 150,
 };
 
+/**
+ * A useful parameter definition
+ * @type BaseParameter
+ * @ModuleExport
+ */
 export const JavaPackageRegExp: Partial<BaseParameter> = {
     displayName: "Root Package",
     description: "root package for your generated source, often this will be namespaced under the group ID",
@@ -37,6 +43,11 @@ export const JavaPackageRegExp: Partial<BaseParameter> = {
     maxLength: 150,
 };
 
+/**
+ * A useful parameter definition
+ * @type BaseParameter
+ * @ModuleExport
+ */
 export const MavenArtifactIdRegExp: Partial<BaseParameter> = {
     displayName: "Maven Artifact ID",
     description: "Maven artifact identifier, i.e., the name of the jar without the version." +
@@ -48,6 +59,11 @@ export const MavenArtifactIdRegExp: Partial<BaseParameter> = {
     maxLength: 50,
 };
 
+/**
+ * A useful parameter definition
+ * @type BaseParameter
+ * @ModuleExport
+ */
 export const MavenGroupIdRegExp: Partial<BaseParameter> = {
     displayName: "Maven Group ID",
     description: "Maven group identifier, often used to provide a namespace for your project," +

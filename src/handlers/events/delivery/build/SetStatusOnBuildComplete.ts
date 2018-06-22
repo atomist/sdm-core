@@ -17,9 +17,6 @@
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import * as slack from "@atomist/slack-messages/SlackMessages";
-import axios from "axios";
-import * as stringify from "json-stringify-safe";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { descriptionFromState, updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { reportFailureInterpretation } from "@atomist/sdm/api-helper/misc/reportFailureInterpretation";
@@ -29,6 +26,9 @@ import { SdmGoal, SdmGoalState } from "@atomist/sdm/api/goal/SdmGoal";
 import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { BuildStatus, OnBuildComplete } from "@atomist/sdm/typings/types";
+import * as slack from "@atomist/slack-messages/SlackMessages";
+import axios from "axios";
+import * as stringify from "json-stringify-safe";
 
 /**
  * Set build status on complete build

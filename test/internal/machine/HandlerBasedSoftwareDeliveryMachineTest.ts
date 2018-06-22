@@ -17,14 +17,15 @@
 import { InMemoryFile } from "@atomist/automation-client/project/mem/InMemoryFile";
 import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
 import { toFactory } from "@atomist/automation-client/util/constructionUtils";
-import * as assert from "power-assert";
 import { when } from "@atomist/sdm/api-helper/dsl/buildDsl";
+import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
 import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
 import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
+import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../src/handlers/events/delivery/goals/SetGoalsOnPush";
 import { npmCustomBuilder } from "../../../src/internal/delivery/build/local/npm/NpmDetectBuildMapping";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../src/internal/machine/HandlerBasedSoftwareDeliveryMachine";
@@ -33,7 +34,6 @@ import { IsTypeScript } from "../../../src/pack/node/tsPushTests";
 import { NoGoals } from "../../../src/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "../../../src/pack/well-known-goals/httpServiceGoals";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
-import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 
 const AddThingAutofix: AutofixRegistration = {
     name: "AddThing",

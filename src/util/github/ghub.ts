@@ -20,8 +20,8 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/operatio
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { Issue } from "@atomist/automation-client/util/gitHub";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
-import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import { toToken } from "@atomist/sdm/api-helper/misc/credentials/toToken";
+import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 
 export type State = "error" | "failure" | "pending" | "success";
 

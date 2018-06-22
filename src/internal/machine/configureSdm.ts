@@ -16,11 +16,11 @@
 
 import { Configuration } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
-import * as _ from "lodash";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import {
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/launchGoal";
 import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
 

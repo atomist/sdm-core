@@ -19,6 +19,9 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
+import { toToken } from "@atomist/sdm/api-helper/misc/credentials/toToken";
+import { ArtifactStore, DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import * as GitHubApi from "@octokit/rest";
 import axios from "axios";
 import * as fs from "fs";
@@ -26,9 +29,6 @@ import * as p from "path";
 import * as tmp from "tmp-promise";
 import * as URL from "url";
 import { promisify } from "util";
-import { toToken } from "@atomist/sdm/api-helper/misc/credentials/toToken";
-import { ArtifactStore, DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { authHeaders, createRelease, createTag, Release, Tag } from "../../../util/github/ghub";
 
 /**

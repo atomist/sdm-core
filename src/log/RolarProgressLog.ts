@@ -16,8 +16,8 @@
 
 import * as _ from "lodash";
 
-import axios from "axios";
 import {ProgressLog} from "@atomist/sdm/spi/log/ProgressLog";
+import axios from "axios";
 
 import {logger} from "@atomist/automation-client";
 import { doWithRetry } from "@atomist/automation-client/util/retry";

@@ -28,9 +28,9 @@ import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCo
 import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { SdmGoal, SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { OnAnyFailedSdmGoal } from "@atomist/sdm/typings/types";
+import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { fetchScmProvider, sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 /**

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 import {

@@ -16,10 +16,10 @@
 
 import { logger } from "@atomist/automation-client";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
+import { EndpointVerificationInvocation, EndpointVerificationListener } from "@atomist/sdm/api/listener/EndpointVerificationListener";
 import axios from "axios";
 import * as https from "https";
 import { WrapOptions } from "retry";
-import { EndpointVerificationInvocation, EndpointVerificationListener } from "@atomist/sdm/api/listener/EndpointVerificationListener";
 
 /**
  * Make an HTTP request to the reported endpoint to check

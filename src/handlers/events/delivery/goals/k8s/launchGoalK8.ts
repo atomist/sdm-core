@@ -22,13 +22,13 @@ import {
 } from "@atomist/automation-client";
 import { configurationValue } from "@atomist/automation-client/configuration";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import * as fs from "fs-extra";
-import * as path from "path";
 import { StringCapturingProgressLog } from "@atomist/sdm/api-helper/log/StringCapturingProgressLog";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
+import * as fs from "fs-extra";
+import * as path from "path";
 
 /**
  * Launch a goal as a kubernetes job

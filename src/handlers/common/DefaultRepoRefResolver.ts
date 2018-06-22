@@ -20,9 +20,9 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 
-import * as _ from "lodash";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { CoreRepoFieldsAndChannels, OnPushToAnyBranch, ProviderType, ScmProvider, StatusForExecuteGoal } from "@atomist/sdm/typings/types";
+import * as _ from "lodash";
 
 export class DefaultRepoRefResolver implements RepoRefResolver {
 

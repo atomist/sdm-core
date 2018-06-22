@@ -28,7 +28,6 @@ import {
     EventHandlerMetadata,
     ValueDeclaration,
 } from "@atomist/automation-client/metadata/automationMetadata";
-import * as stringify from "json-stringify-safe";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
@@ -40,8 +39,6 @@ import {
     SdmGoalState,
 } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
-import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import {
     ProgressLog,
@@ -55,6 +52,9 @@ import {
     SdmGoalFields,
     StatusForExecuteGoal,
 } from "@atomist/sdm/typings/types";
+import * as stringify from "json-stringify-safe";
+import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
+import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { fetchProvider } from "../../../../util/github/gitHubProvider";
 import { formatDuration } from "../../../../util/misc/time";
 

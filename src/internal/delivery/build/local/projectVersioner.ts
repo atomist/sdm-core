@@ -20,22 +20,22 @@ import {
 } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
-import * as _ from "lodash";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoalWithLog,
     RunWithLogContext,
 } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
-import {
-    SdmVersion,
-    SdmVersionRootType,
-} from "../../../../ingesters/sdmVersionIngester";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import {
     SdmVersionForCommit,
     StatusForExecuteGoal,
 } from "@atomist/sdm/typings/types";
+import * as _ from "lodash";
+import {
+    SdmVersion,
+    SdmVersionRootType,
+} from "../../../../ingesters/sdmVersionIngester";
 
 export type ProjectVersioner =
     (status: StatusForExecuteGoal.Fragment, p: GitProject, log: ProgressLog) => Promise<string>;

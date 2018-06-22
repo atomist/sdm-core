@@ -17,12 +17,12 @@
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
-import * as _ from "lodash";
 import {AddressChannels, AddressNoChannels} from "@atomist/sdm/api/context/addressChannels";
 import { PushListener, PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as schema from "@atomist/sdm/typings/types";
+import * as _ from "lodash";
 
 /**
  * A new repo has been created, and it has some code in it.

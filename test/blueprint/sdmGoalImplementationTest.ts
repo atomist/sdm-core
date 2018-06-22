@@ -19,7 +19,6 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
 
-import * as assert from "power-assert";
 import { determineGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
@@ -31,9 +30,10 @@ import {
 } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import { AutofixGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
+import { PushFields } from "@atomist/sdm/typings/types";
+import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../src/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../src/machine/machineFactory";
-import { PushFields } from "@atomist/sdm/typings/types";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",

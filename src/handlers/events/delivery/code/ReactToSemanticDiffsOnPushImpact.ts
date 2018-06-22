@@ -16,7 +16,6 @@
 
 import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import * as _ from "lodash";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     FingerprintDifference,
@@ -27,6 +26,7 @@ import {
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as schema from "@atomist/sdm/typings/types";
+import * as _ from "lodash";
 
 /**
  * React to a PushImpact event to react to semantic diffs
