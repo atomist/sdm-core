@@ -45,11 +45,12 @@
   },
   "peerDependencies": {
     "@atomist/automation-client": "^0.17.1",
-    "@atomist/sdm": "^0.3.0"
+    "@atomist/sdm": "^0.3.0",
+    "@atomist/sdm-core": "^0.3.0"
   },
   "devDependencies": {
     "@atomist/automation-client": "^0.17.2-20180613153815",
-    "@atomist/sdm": "^0.2.4-nortissej.break-out-api.20180621212047",
+    "@atomist/sdm": "0.3.0-nortissej.break-out-api.20180622000216",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^2.2.48",
     "@types/node": "^8.10.17",
@@ -71,7 +72,8 @@
     "tslint": "^5.10.0",
     "typedoc": "^0.11.1",
     "typescript": "^2.8.3",
-    "typescript-formatter": "^7.2.0"
+    "typescript-formatter": "^7.2.0",
+    "@atomist/sdm-core": "0.3.1-20180622172537"
   },
   "directories": {
     "test": "test"
