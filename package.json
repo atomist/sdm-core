@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@atomist/automation-client": "^0.17.2-20180613153815",
-    "@atomist/sdm": "^0.2.4-nortissej.break-out-api.20180621212047",
+    "@atomist/sdm": "0.3.0-nortissej.break-out-api.20180624172126",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^2.2.48",
     "@types/node": "^8.10.17",
