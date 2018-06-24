@@ -21,7 +21,7 @@ import { ChannelLinkListener, ChannelLinkListenerInvocation } from "@atomist/sdm
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "@atomist/sdm/typings/types";
+import * as schema from "../../../typings/types";
 
 /**
  * A new channel has been linked to a repo

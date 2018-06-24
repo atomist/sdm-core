@@ -34,7 +34,7 @@ import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { GoalCompletionListener, GoalCompletionListenerInvocation } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { OnAnyCompletedSdmGoal } from "@atomist/sdm/typings/types";
+import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
 /**
  * Respond to a failure or success status by running listeners

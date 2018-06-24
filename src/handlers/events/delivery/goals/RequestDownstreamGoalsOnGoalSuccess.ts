@@ -35,7 +35,7 @@ import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     OnAnySuccessfulSdmGoal,
     ScmProvider,
-} from "@atomist/sdm/typings/types";
+} from "../../../../typings/types";
 import * as _ from "lodash";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 

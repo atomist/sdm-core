@@ -21,7 +21,7 @@ import { AddressChannels, addressChannelsFor } from "@atomist/sdm/api/context/ad
 import { ProjectListener, ProjectListenerInvocation } from "@atomist/sdm/api/listener/ProjectListener";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "@atomist/sdm/typings/types";
+import * as schema from "../../../typings/types";
 
 /**
  * A repo has been onboarded

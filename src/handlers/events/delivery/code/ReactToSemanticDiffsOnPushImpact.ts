@@ -25,7 +25,7 @@ import {
 } from "@atomist/sdm/api/listener/FingerprintDifferenceListener";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "@atomist/sdm/typings/types";
+import * as schema from "../../../../typings/types";
 import * as _ from "lodash";
 
 /**
