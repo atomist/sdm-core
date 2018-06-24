@@ -86,3 +86,19 @@ export { NodeProjectIdentifier } from "./internal/delivery/build/local/npm/nodeP
 export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
 export { renderCommitMessage } from "./util/slack/diffRendering";
 export { GraphGoals } from "./pack/graph-goals/graphGoals";
+export { createRelease,
+createStatus } from "./util/github/ghub";
+export { DefaultDockerImageNameCreator,
+DockerOptions,
+executeDockerBuild } from "./pack/docker/executeDockerBuild";
+export { createTagForStatus,
+executeTag } from "./internal/delivery/build/executeTag";
+export { executeVersioner,
+readSdmVersion } from "./internal/delivery/build/local/projectVersioner";
+export { NpmOptions,
+executePublish } from "./internal/delivery/build/local/npm/executePublish";
+export { createKubernetesData } from "./handlers/events/delivery/goals/k8s/launchGoalK8";
+export { IsAtomistAutomationClient } from "./pack/node/nodePushTests";
+export { NodeProjectVersioner } from "./internal/delivery/build/local/npm/nodeProjectVersioner";
+export { DevelopmentEnvOptions,
+NpmPreparations } from "./internal/delivery/build/local/npm/npmBuilder";
