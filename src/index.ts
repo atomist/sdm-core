@@ -102,3 +102,4 @@ export { IsAtomistAutomationClient } from "./pack/node/nodePushTests";
 export { NodeProjectVersioner } from "./internal/delivery/build/local/npm/nodeProjectVersioner";
 export { DevelopmentEnvOptions,
 NpmPreparations } from "./internal/delivery/build/local/npm/npmBuilder";
+export { postLinkImageWebhook } from "./util/webhook/ImageLink";
