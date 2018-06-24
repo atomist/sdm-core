@@ -32,12 +32,12 @@ import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { SdmGoal, SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import * as _ from "lodash";
+import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
     OnAnySuccessfulSdmGoal,
     ScmProvider,
 } from "../../../../typings/types";
-import * as _ from "lodash";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 
 /**
  * Respond to a failure status by failing downstream goals

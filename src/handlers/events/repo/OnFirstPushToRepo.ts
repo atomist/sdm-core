@@ -21,8 +21,8 @@ import {AddressChannels, AddressNoChannels} from "@atomist/sdm/api/context/addre
 import { PushListener, PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "../../../typings/types";
 import * as _ from "lodash";
+import * as schema from "../../../typings/types";
 
 /**
  * A new repo has been created, and it has some code in it.
