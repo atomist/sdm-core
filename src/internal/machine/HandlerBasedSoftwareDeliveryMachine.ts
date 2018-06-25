@@ -121,7 +121,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
              return {
                  eventHandlers: [],
                  commandHandlers: [],
-             }
+             };
         }
     }
 
