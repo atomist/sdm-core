@@ -100,7 +100,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
         // this should not happen but it does: automation-api#395
         if (sdmGoal.state !== SdmGoalState.requested) {
-            logger.warn(`Goal ${sdmGoal.name}: Received '${sdmGoal.state}' on ${status.context}, while looking for 'requested'`);
+            logger.debug(`Goal ${sdmGoal.name}: Received '${sdmGoal.state}' on ${status.context}, while looking for 'requested'`);
             return Success;
         }
 
