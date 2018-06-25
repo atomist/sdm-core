@@ -17,7 +17,7 @@
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
-import { SdmGoal, SdmGoalState } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
@@ -26,6 +26,7 @@ import {
 } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { StatusState } from "@atomist/sdm/typings/types";
+import { SdmGoalState } from "../../../../../typings/types";
 import { createStatus } from "../../../../../util/github/ghub";
 
 export function createPendingGitHubStatusOnGoalSet(credentialsFactory: CredentialsResolver): GoalsSetListener {

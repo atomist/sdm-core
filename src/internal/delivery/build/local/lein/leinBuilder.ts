@@ -16,11 +16,17 @@
 
 import { Project } from "@atomist/automation-client/project/Project";
 import { Microgrammar } from "@atomist/microgrammar/Microgrammar";
-import { asSpawnCommand, SpawnCommand } from "@atomist/sdm/api-helper/misc/spawned";
+import {
+    asSpawnCommand,
+    SpawnCommand,
+} from "@atomist/sdm/api-helper/misc/spawned";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { InterpretLog } from "@atomist/sdm/spi/log/InterpretedLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { SpawnBuilder, SpawnBuilderOptions } from "../SpawnBuilder";
+import {
+    SpawnBuilder,
+    SpawnBuilderOptions,
+} from "../SpawnBuilder";
 
 export const RunBuild: SpawnCommand = asSpawnCommand("lein");
 

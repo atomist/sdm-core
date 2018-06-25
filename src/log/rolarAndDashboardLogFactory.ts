@@ -20,7 +20,7 @@ import { firstAvailableProgressLog } from "@atomist/sdm/api-helper/log/firstAvai
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { ProgressLogFactory } from "@atomist/sdm/spi/log/ProgressLog";
-import {DashboardDisplayProgressLog} from "./DashboardDisplayProgressLog";
+import { DashboardDisplayProgressLog } from "./DashboardDisplayProgressLog";
 
 /**
  * Create a progress log that will use Rolar logging service if available,

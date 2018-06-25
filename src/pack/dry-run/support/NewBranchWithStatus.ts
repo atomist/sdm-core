@@ -16,13 +16,14 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import {
-    ProjectOperationCredentials,
-} from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
+import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { BranchCommit } from "@atomist/automation-client/operations/edit/editModes";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { Project } from "@atomist/automation-client/project/Project";
-import { createStatus, Status } from "../../../util/github/ghub";
+import {
+    createStatus,
+    Status,
+} from "../../../util/github/ghub";
 
 /**
  * Create a new branch, setting a GitHub commit status

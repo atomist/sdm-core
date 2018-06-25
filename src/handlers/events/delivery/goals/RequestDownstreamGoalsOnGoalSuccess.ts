@@ -29,7 +29,10 @@ import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCo
 import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { SdmGoal, SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
+import {
+    SdmGoal,
+    SdmGoalKey,
+} from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as _ from "lodash";
@@ -37,6 +40,7 @@ import { isGoalRelevant } from "../../../../internal/delivery/goals/support/vali
 import {
     OnAnySuccessfulSdmGoal,
     ScmProvider,
+    SdmGoalState,
 } from "../../../../typings/types";
 
 /**
@@ -65,7 +69,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             return Success;
         }
 
-        if (sdmGoal.state !== "success") { // atomisthq/automation-api#395
+        if (sdmGoal.state !== SdmGoalState.success) { // atomisthq/automation-api#395
             logger.debug(`Nevermind: success reported when the state was=[${sdmGoal.state}]`);
             return Promise.resolve(Success);
         }
@@ -101,7 +105,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             }
 
             return updateGoal(context, g, {
-                state: "requested",
+                state: SdmGoalState.requested,
                 description: `Ready to ` + g.name,
                 data: g.data,
             });

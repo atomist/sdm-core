@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-import { Configuration, HandleCommand, HandleEvent } from "@atomist/automation-client";
+import {
+    Configuration,
+    HandleCommand,
+    HandleEvent,
+} from "@atomist/automation-client";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
 import { SdmGoalImplementationMapperImpl } from "@atomist/sdm/api-helper/goal/SdmGoalImplementationMapperImpl";
 import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/api-helper/machine/AbstractSoftwareDeliveryMachine";
 import { FunctionalUnit } from "@atomist/sdm/api/machine/FunctionalUnit";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
-import { ArtifactGoal, BuildGoal, JustBuildGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
+import {
+    ArtifactGoal,
+    BuildGoal,
+    JustBuildGoal,
+} from "@atomist/sdm/api/machine/wellKnownGoals";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { PushRules } from "@atomist/sdm/api/mapping/support/PushRules";
 import * as _ from "lodash";

@@ -16,7 +16,10 @@
 
 import { logger } from "@atomist/automation-client";
 import { configurationValue } from "@atomist/automation-client/configuration";
-import { CloudFoundryInfo, PivotalWebServices } from "./CloudFoundryTarget";
+import {
+    CloudFoundryInfo,
+    PivotalWebServices,
+} from "./CloudFoundryTarget";
 
 /**
  * Configure cloud foundry from environment variables.

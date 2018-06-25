@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { Secret, Secrets } from "@atomist/automation-client";
+import {
+    Secret,
+    Secrets,
+} from "@atomist/automation-client";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 

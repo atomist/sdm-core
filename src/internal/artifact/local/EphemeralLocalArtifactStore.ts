@@ -15,7 +15,11 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { ArtifactStore, DeployableArtifact, StoredArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import {
+    ArtifactStore,
+    DeployableArtifact,
+    StoredArtifact,
+} from "@atomist/sdm/spi/artifact/ArtifactStore";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 
 /**

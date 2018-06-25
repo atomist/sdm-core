@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
+import {
+    EventFired,
+    EventHandler,
+    HandleEvent,
+    HandlerContext,
+    HandlerResult,
+    logger,
+    Success,
+} from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { DeploymentListener, DeploymentListenerInvocation } from "@atomist/sdm/api/listener/DeploymentListener";
+import {
+    DeploymentListener,
+    DeploymentListenerInvocation,
+} from "@atomist/sdm/api/listener/DeploymentListener";
 import { StagingDeploymentGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";

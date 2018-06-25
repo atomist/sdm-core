@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@atomist/slack-messages": "^0.12.1",
-    "@jessitron/git-branch-to-npm-tag": "^1.0.1",
     "archiver": "^2.1.1",
     "axios": "^0.18.0",
     "base64-js": "^1.2.3",
@@ -44,12 +43,12 @@
     "xml2js": "^0.4.19"
   },
   "peerDependencies": {
-    "@atomist/automation-client": "^0.17.1",
+    "@atomist/automation-client": "^0.17.3",
     "@atomist/sdm": "^0.3.0"
   },
   "devDependencies": {
-    "@atomist/automation-client": "^0.17.2-20180613153815",
-    "@atomist/sdm": "0.3.0-nortissej.break-out-api.20180624172126",
+    "@atomist/automation-client": "^0.17.3",
+    "@atomist/sdm": "0.3.0-nortissej.break-out-api.20180625080552",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^2.2.48",
     "@types/node": "^8.10.17",

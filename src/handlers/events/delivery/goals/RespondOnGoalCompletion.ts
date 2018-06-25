@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
-
 import {
     EventFired,
     EventHandler,
@@ -29,12 +25,24 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { fetchCommitForSdmGoal, fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import {
+    fetchCommitForSdmGoal,
+    fetchGoalsForCommit,
+} from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
-import { GoalCompletionListener, GoalCompletionListenerInvocation } from "@atomist/sdm/api/listener/GoalsSetListener";
+import {
+    GoalCompletionListener,
+    GoalCompletionListenerInvocation,
+} from "@atomist/sdm/api/listener/GoalsSetListener";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
+import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import {
+    OnAnyCompletedSdmGoal,
+    SdmGoalState,
+} from "../../../../typings/types";
+import { sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 /**
  * Respond to a failure or success status by running listeners
@@ -59,7 +67,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             return Success;
         }
 
-        if (sdmGoal.state !== "failure" && sdmGoal.state !== "success") { // atomisthq/automation-api#395
+        if (sdmGoal.state !== SdmGoalState.failure && sdmGoal.state !== SdmGoalState.success) { // atomisthq/automation-api#395
             return Promise.resolve(Success);
         }
 

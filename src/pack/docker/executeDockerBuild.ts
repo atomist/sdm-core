@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    HandlerContext,
-} from "@atomist/automation-client";
+import { HandlerContext } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";

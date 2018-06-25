@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { failure, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
+import {
+    failure,
+    HandlerContext,
+    HandlerResult,
+    logger,
+    Success,
+} from "@atomist/automation-client";
 import { configurationValue } from "@atomist/automation-client/configuration";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
@@ -24,14 +30,17 @@ import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { ChildProcessResult } from "@atomist/sdm/api-helper/misc/spawned";
 import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
 import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { Builder, PushThatTriggersBuild } from "@atomist/sdm/spi/build/Builder";
+import {
+    Builder,
+    PushThatTriggersBuild,
+} from "@atomist/sdm/spi/build/Builder";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { InterpretLog } from "@atomist/sdm/spi/log/InterpretedLog";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { SdmBuildIdentifierForRepo } from "@atomist/sdm/typings/types";
 import axios from "axios";
 import { sprintf } from "sprintf-js";
+import { SdmBuildIdentifierForRepo } from "../../../../typings/types";
 import { postLinkImageWebhook } from "../../../../util/webhook/ImageLink";
 import { createTagForStatus } from "../executeTag";
 import { readSdmVersion } from "./projectVersioner";

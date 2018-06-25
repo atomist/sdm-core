@@ -18,7 +18,10 @@ import { HandlerContext } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { EditorOrReviewerParameters } from "@atomist/automation-client/operations/common/params/BaseEditorOrReviewerParameters";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { Tagger, Tags } from "@atomist/automation-client/operations/tagger/Tagger";
+import {
+    Tagger,
+    Tags,
+} from "@atomist/automation-client/operations/tagger/Tagger";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";

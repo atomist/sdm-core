@@ -18,7 +18,10 @@ import { logger } from "@atomist/automation-client";
 import { computeShaOf } from "@atomist/sdm/api-helper/misc/sha";
 import { PushImpactListenerInvocation } from "@atomist/sdm/api/listener/PushImpactListener";
 import { PushTest } from "@atomist/sdm/api/mapping/PushTest";
-import { FingerprinterRegistration, FingerprinterResult } from "@atomist/sdm/api/registration/FingerprinterRegistration";
+import {
+    FingerprinterRegistration,
+    FingerprinterResult,
+} from "@atomist/sdm/api/registration/FingerprinterRegistration";
 import { IsNode } from "./nodePushTests";
 
 /**

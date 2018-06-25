@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-import { CloudFoundryInfo } from "./CloudFoundryTarget";
+import { doWithRetry } from "@atomist/automation-client/util/retry";
 
-import { AxiosResponse } from "axios";
-
-import axios from "axios";
-import FormData = require("form-data");
-import {ReadStream} from "fs";
+import axios, { AxiosResponse } from "axios";
+import { ReadStream } from "fs";
 import * as _ from "lodash";
-import request = require("request");
-import {ManifestApplication} from "./CloudFoundryManifest";
-
-import {doWithRetry} from "@atomist/automation-client/util/retry";
+import { ManifestApplication } from "./CloudFoundryManifest";
+import { CloudFoundryInfo } from "./CloudFoundryTarget";
 import cfClient = require("cf-client");
+import FormData = require("form-data");
+import request = require("request");
 
 export interface CloudFoundryClientV2 {
     api_url: string;

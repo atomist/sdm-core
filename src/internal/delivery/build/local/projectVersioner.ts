@@ -27,15 +27,13 @@ import {
 } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import {
-    SdmVersionForCommit,
-    StatusForExecuteGoal,
-} from "@atomist/sdm/typings/types";
+import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import * as _ from "lodash";
 import {
     SdmVersion,
     SdmVersionRootType,
 } from "../../../../ingesters/sdmVersionIngester";
+import { SdmVersionForCommit } from "../../../../typings/types";
 
 export type ProjectVersioner =
     (status: StatusForExecuteGoal.Fragment, p: GitProject, log: ProgressLog) => Promise<string>;

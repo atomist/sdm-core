@@ -34,10 +34,7 @@ import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressL
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
-import {
-    SdmGoal,
-    SdmGoalState,
-} from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import {
@@ -55,6 +52,7 @@ import {
 import * as stringify from "json-stringify-safe";
 import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { SdmGoalState } from "../../../../typings/types";
 import { fetchProvider } from "../../../../util/github/gitHubProvider";
 import { formatDuration } from "../../../../util/misc/time";
 
@@ -101,7 +99,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const status: StatusForExecuteGoal.Fragment = convertForNow(sdmGoal, commit);
 
         // this should not happen but it does: automation-api#395
-        if (sdmGoal.state !== "requested") {
+        if (sdmGoal.state !== SdmGoalState.requested) {
             logger.warn(`Goal ${sdmGoal.name}: Received '${sdmGoal.state}' on ${status.context}, while looking for 'requested'`);
             return Success;
         }
@@ -151,7 +149,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 function convertForNow(sdmGoal: SdmGoalFields.Fragment, commit: CommitForSdmGoal.Commit): StatusForExecuteGoal.Fragment {
     return {
         commit,
-        state: sdmGoalStateToGitHubStatusState(sdmGoal.state as SdmGoalState),
+        state: sdmGoalStateToGitHubStatusState(sdmGoal.state),
         targetUrl: sdmGoal.url, // not handling approval weirdness
         context: sdmGoal.externalKey,
         description: sdmGoal.description,

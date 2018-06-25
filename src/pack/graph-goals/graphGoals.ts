@@ -16,7 +16,10 @@
 
 import { logger } from "@atomist/automation-client";
 import { configurationValue } from "@atomist/automation-client/configuration";
-import { Goal, GoalWithPrecondition } from "@atomist/sdm/api/goal/Goal";
+import {
+    Goal,
+    GoalWithPrecondition,
+} from "@atomist/sdm/api/goal/Goal";
 import { Goals } from "@atomist/sdm/api/goal/Goals";
 import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import * as slack from "@atomist/slack-messages/SlackMessages";

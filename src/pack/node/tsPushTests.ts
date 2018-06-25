@@ -16,7 +16,10 @@
 
 import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
 import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
-import { PushTest, pushTest } from "@atomist/sdm/api/mapping/PushTest";
+import {
+    PushTest,
+    pushTest,
+} from "@atomist/sdm/api/mapping/PushTest";
 
 export const IsTypeScript: PushTest = pushTest(
     "Is TypeScript",

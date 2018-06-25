@@ -16,10 +16,24 @@
 
 import { GoalWithPrecondition } from "@atomist/sdm/api/goal/Goal";
 import { Goals } from "@atomist/sdm/api/goal/Goals";
-import { IndependentOfEnvironment, ProductionEnvironment, StagingEnvironment } from "@atomist/sdm/api/goal/support/environment";
-import { ArtifactGoal, AutofixGoal, BuildGoal, ReviewGoal, StagingEndpointGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
-import { StagingDeploymentGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
-import { DockerBuildGoal, TagGoal, VersionGoal } from "../well-known-goals/commonGoals";
+import {
+    IndependentOfEnvironment,
+    ProductionEnvironment,
+    StagingEnvironment,
+} from "@atomist/sdm/api/goal/support/environment";
+import {
+    ArtifactGoal,
+    AutofixGoal,
+    BuildGoal,
+    ReviewGoal,
+    StagingDeploymentGoal,
+    StagingEndpointGoal,
+} from "@atomist/sdm/api/machine/wellKnownGoals";
+import {
+    DockerBuildGoal,
+    TagGoal,
+    VersionGoal,
+} from "../well-known-goals/commonGoals";
 
 export const NpmPublishGoal = new GoalWithPrecondition({
     uniqueName: "Publish",

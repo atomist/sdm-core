@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, Success } from "@atomist/automation-client";
+import {
+    EventFired,
+    EventHandler,
+    HandleEvent,
+    HandlerContext,
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
-import { AddressChannels, addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { ProjectListener, ProjectListenerInvocation } from "@atomist/sdm/api/listener/ProjectListener";
+import {
+    AddressChannels,
+    addressChannelsFor,
+} from "@atomist/sdm/api/context/addressChannels";
+import {
+    ProjectListener,
+    ProjectListenerInvocation,
+} from "@atomist/sdm/api/listener/ProjectListener";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as schema from "../../../typings/types";

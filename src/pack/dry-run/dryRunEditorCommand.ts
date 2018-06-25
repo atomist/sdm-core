@@ -14,19 +14,28 @@
  * limitations under the License.
  */
 
-import { HandleCommand, logger } from "@atomist/automation-client";
+import {
+    HandleCommand,
+    logger,
+} from "@atomist/automation-client";
 import { EditorOrReviewerParameters } from "@atomist/automation-client/operations/common/params/BaseEditorOrReviewerParameters";
 import { EditOneOrAllParameters } from "@atomist/automation-client/operations/common/params/EditOneOrAllParameters";
 import { FallbackParams } from "@atomist/automation-client/operations/common/params/FallbackParams";
 import { GitHubFallbackReposParameters } from "@atomist/automation-client/operations/common/params/GitHubFallbackReposParameters";
-import { EditorCommandDetails, editorHandler } from "@atomist/automation-client/operations/edit/editorToCommand";
+import {
+    EditorCommandDetails,
+    editorHandler,
+} from "@atomist/automation-client/operations/edit/editorToCommand";
 import { AnyProjectEditor } from "@atomist/automation-client/operations/edit/projectEditor";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
 import { allReposInTeam } from "@atomist/sdm/api-helper/command/editor/allReposInTeam";
 import { toEditorOrReviewerParametersMaker } from "@atomist/sdm/api-helper/command/editor/editorCommand";
 import { chattyEditorFactory } from "@atomist/sdm/api-helper/command/editor/editorWrappers";
 import { projectLoaderRepoLoader } from "@atomist/sdm/api-helper/machine/projectLoaderRepoLoader";
-import { MachineOrMachineOptions, toMachineOptions } from "@atomist/sdm/api-helper/machine/toMachineOptions";
+import {
+    MachineOrMachineOptions,
+    toMachineOptions,
+} from "@atomist/sdm/api-helper/machine/toMachineOptions";
 import { EditModeSuggestion } from "@atomist/sdm/api/command/editor/EditModeSuggestion";
 import { EmptyParameters } from "@atomist/sdm/api/command/support/EmptyParameters";
 import { Status } from "../../util/github/ghub";

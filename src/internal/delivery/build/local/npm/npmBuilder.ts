@@ -28,7 +28,10 @@ import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { readSdmVersion } from "../projectVersioner";
-import { SpawnBuilder, SpawnBuilderOptions } from "../SpawnBuilder";
+import {
+    SpawnBuilder,
+    SpawnBuilderOptions,
+} from "../SpawnBuilder";
 import { NpmLogInterpreter } from "./npmLogInterpreter";
 
 /**

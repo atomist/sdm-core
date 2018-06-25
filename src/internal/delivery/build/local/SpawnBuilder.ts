@@ -29,13 +29,19 @@ import {
 } from "@atomist/sdm/api-helper/misc/spawned";
 import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
-import { InterpretLog, LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
+import {
+    InterpretLog,
+    LogInterpretation,
+} from "@atomist/sdm/spi/log/InterpretedLog";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";
-import { LocalBuilder, LocalBuildInProgress } from "./LocalBuilder";
+import {
+    LocalBuilder,
+    LocalBuildInProgress,
+} from "./LocalBuilder";
 
 export interface SpawnBuilderOptions {
 

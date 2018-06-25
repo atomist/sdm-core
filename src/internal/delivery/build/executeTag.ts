@@ -19,9 +19,16 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { ExecuteGoalWithLog, RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import {
+    ExecuteGoalWithLog,
+    RunWithLogContext,
+} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { createTag, createTagReference, Tag } from "../../../util/github/ghub";
+import {
+    createTag,
+    createTagReference,
+    Tag,
+} from "../../../util/github/ghub";
 import { readSdmVersion } from "./local/projectVersioner";
 
 export function executeTag(projectLoader: ProjectLoader): ExecuteGoalWithLog {

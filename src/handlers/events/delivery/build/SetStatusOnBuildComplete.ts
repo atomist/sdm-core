@@ -14,21 +14,39 @@
  * limitations under the License.
  */
 
-import { EventFired, EventHandler, HandleEvent, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
+import {
+    EventFired,
+    EventHandler,
+    HandleEvent,
+    HandlerContext,
+    HandlerResult,
+    logger,
+    Success,
+} from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
-import { descriptionFromState, updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
+import {
+    descriptionFromState,
+    updateGoal,
+} from "@atomist/sdm/api-helper/goal/storeGoals";
 import { reportFailureInterpretation } from "@atomist/sdm/api-helper/misc/reportFailureInterpretation";
-import { AddressChannels, addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import {
+    AddressChannels,
+    addressChannelsFor,
+} from "@atomist/sdm/api/context/addressChannels";
 import { Goal } from "@atomist/sdm/api/goal/Goal";
-import { SdmGoal, SdmGoalState } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { BuildStatus, OnBuildComplete } from "@atomist/sdm/typings/types";
+import {
+    BuildStatus,
+    OnBuildComplete,
+} from "@atomist/sdm/typings/types";
 import * as slack from "@atomist/slack-messages/SlackMessages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";
+import { SdmGoalState } from "../../../../typings/types";
 
 /**
  * Set build status on complete build
@@ -97,13 +115,13 @@ function linkToSha(id: RemoteRepoRef) {
 function buildStatusToSdmGoalState(buildStatus: BuildStatus): SdmGoalState {
     switch (buildStatus) {
         case "passed":
-            return "success";
+            return SdmGoalState.success;
         case "broken":
         case "failed":
         case "canceled":
-            return "failure";
+            return SdmGoalState.failure;
         default:
-            return "in_process"; // in_process
+            return SdmGoalState.in_process;
     }
 }
 

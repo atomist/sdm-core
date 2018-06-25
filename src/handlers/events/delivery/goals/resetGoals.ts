@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-import { HandleCommand, HandlerContext, MappedParameter, MappedParameters, Parameter, Secret, Secrets, Success } from "@atomist/automation-client";
+import {
+    HandleCommand,
+    HandlerContext,
+    MappedParameter,
+    MappedParameters,
+    Parameter,
+    Secret,
+    Secrets,
+    Success,
+} from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
@@ -25,8 +34,12 @@ import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { PushFields, PushForCommit, RepoBranchTips } from "@atomist/sdm/typings/types";
+import { PushFields } from "@atomist/sdm/typings/types";
 import * as stringify from "json-stringify-safe";
+import {
+    PushForCommit,
+    RepoBranchTips,
+} from "../../../../typings/types";
 
 @Parameters()
 export class ResetGoalsParameters {

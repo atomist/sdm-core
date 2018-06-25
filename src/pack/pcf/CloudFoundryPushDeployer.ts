@@ -16,9 +16,6 @@
 
 import { logger } from "@atomist/automation-client";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import * as yaml from "js-yaml";
-
-import * as _ from "lodash";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { Project } from "@atomist/automation-client/project/Project";
@@ -27,10 +24,20 @@ import { Deployer } from "@atomist/sdm/spi/deploy/Deployer";
 import { InterpretedLog } from "@atomist/sdm/spi/log/InterpretedLog";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { CloudFoundryApi, initializeCloudFoundry } from "./CloudFoundryApi";
+import * as yaml from "js-yaml";
+
+import * as _ from "lodash";
+import {
+    CloudFoundryApi,
+    initializeCloudFoundry,
+} from "./CloudFoundryApi";
 import { Manifest } from "./CloudFoundryManifest";
 import { CloudFoundryPusher } from "./CloudFoundryPusher";
-import { CloudFoundryDeployment, CloudFoundryInfo, CloudFoundryManifestPath } from "./CloudFoundryTarget";
+import {
+    CloudFoundryDeployment,
+    CloudFoundryInfo,
+    CloudFoundryManifestPath,
+} from "./CloudFoundryTarget";
 import { ProjectArchiver } from "./ProjectArchiver";
 
 /**

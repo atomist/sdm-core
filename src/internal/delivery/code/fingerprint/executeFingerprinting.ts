@@ -20,7 +20,10 @@ import { Fingerprint } from "@atomist/automation-client/project/fingerprint/Fing
 import { computeFingerprints } from "@atomist/sdm/api-helper/listener/computeFingerprints";
 import { createPushImpactListenerInvocation } from "@atomist/sdm/api-helper/listener/createPushImpactListenerInvocation";
 import { relevantCodeActions } from "@atomist/sdm/api-helper/listener/relevantCodeActions";
-import { ExecuteGoalWithLog, RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import {
+    ExecuteGoalWithLog,
+    RunWithLogContext,
+} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
 import { FingerprinterRegistration } from "@atomist/sdm/api/registration/FingerprinterRegistration";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";

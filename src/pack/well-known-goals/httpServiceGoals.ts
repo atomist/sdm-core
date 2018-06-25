@@ -18,14 +18,23 @@ import { Goals } from "@atomist/sdm/api/goal/Goals";
 import {
     ArtifactGoal,
     AutofixGoal,
-    BuildGoal, DeleteAfterUndeploysGoal, DeleteRepositoryGoal,
-    FingerprintGoal, LocalDeploymentGoal, ProductionDeploymentGoal, ProductionEndpointGoal,
+    BuildGoal,
+    DeleteAfterUndeploysGoal,
+    DeleteRepositoryGoal,
+    FingerprintGoal,
+    LocalDeploymentGoal,
+    ProductionDeploymentGoal,
+    ProductionEndpointGoal,
     ProductionUndeploymentGoal,
-    PushReactionGoal, ReviewGoal,
-    StagingDeploymentGoal, StagingEndpointGoal, StagingVerifiedGoal,
+    PushReactionGoal,
+    ReviewGoal,
+    StagingDeploymentGoal,
+    StagingEndpointGoal,
+    StagingVerifiedGoal,
 } from "@atomist/sdm/api/machine/wellKnownGoals";
 import {
-    LocalEndpointGoal, LocalUndeploymentGoal,
+    LocalEndpointGoal,
+    LocalUndeploymentGoal,
     StagingUndeploymentGoal,
 } from "./commonGoals";
 

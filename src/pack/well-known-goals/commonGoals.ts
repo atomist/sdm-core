@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-import { Goal, GoalWithPrecondition } from "@atomist/sdm/api/goal/Goal";
+import {
+    Goal,
+    GoalWithPrecondition,
+} from "@atomist/sdm/api/goal/Goal";
 import { Goals } from "@atomist/sdm/api/goal/Goals";
-import { IndependentOfEnvironment, ProjectDisposalEnvironment } from "@atomist/sdm/api/goal/support/environment";
-import { BuildGoal, LocalDeploymentGoal, NoGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
+import {
+    IndependentOfEnvironment,
+    ProjectDisposalEnvironment,
+} from "@atomist/sdm/api/goal/support/environment";
+import {
+    BuildGoal,
+    LocalDeploymentGoal,
+    NoGoal,
+} from "@atomist/sdm/api/machine/wellKnownGoals";
 
 /**
  * @ModuleExport

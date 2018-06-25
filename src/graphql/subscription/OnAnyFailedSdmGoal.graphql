@@ -1,5 +1,5 @@
 subscription OnAnyFailedSdmGoal {
-  SdmGoal(state: ["failure"]) {
+  SdmGoal {
     ...SdmGoalFields
     ...SdmGoalRepo
   }

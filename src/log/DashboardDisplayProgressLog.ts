@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {HandlerContext} from "@atomist/automation-client";
-import {SdmGoal} from "@atomist/sdm/api/goal/SdmGoal";
-import {ProgressLog} from "@atomist/sdm/spi/log/ProgressLog";
-import {RolarProgressLog} from "./RolarProgressLog";
+import { HandlerContext } from "@atomist/automation-client";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { RolarProgressLog } from "./RolarProgressLog";
 
 /**
  * Persistent Rolar log that displays in the Dashboard

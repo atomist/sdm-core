@@ -15,13 +15,19 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef, isGitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import {
+    GitHubRepoRef,
+    isGitHubRepoRef,
+} from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { Issue } from "@atomist/automation-client/util/gitHub";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { toToken } from "@atomist/sdm/api-helper/misc/credentials/toToken";
-import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
+import axios, {
+    AxiosPromise,
+    AxiosRequestConfig,
+} from "axios";
 
 export type State = "error" | "failure" | "pending" | "success";
 

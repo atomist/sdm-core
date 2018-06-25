@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { HandleCommand, MappedParameter, MappedParameters, Parameter, Secret, Secrets, Success } from "@atomist/automation-client";
+import {
+    HandleCommand,
+    MappedParameter,
+    MappedParameters,
+    Parameter,
+    Secret,
+    Secrets,
+    Success,
+} from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { HandlerContext } from "@atomist/automation-client/Handlers";
 import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
@@ -22,8 +30,8 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
 import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
-import { BuildUrlBySha } from "@atomist/sdm/typings/types";
 import * as _ from "lodash";
+import { BuildUrlBySha } from "../../typings/types";
 import { tipOfDefaultBranch } from "../../util/github/ghub";
 import { DefaultRepoRefResolver } from "../common/DefaultRepoRefResolver";
 import { displayBuildLogFailure } from "../events/delivery/build/SetStatusOnBuildComplete";

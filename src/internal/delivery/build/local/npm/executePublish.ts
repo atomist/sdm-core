@@ -24,7 +24,6 @@ import {
     RunWithLogContext,
 } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { gitBranchToNpmTag } from "@jessitron/git-branch-to-npm-tag/lib";
 import * as fs from "fs-extra";
 import * as p from "path";
 import { createStatus } from "../../../../../util/github/ghub";
@@ -121,4 +120,9 @@ export interface NpmOptions {
     access?: "public" | "restricted";
     /** Optional publication tag, use NPM default if not present, currently "latest" */
     tag?: string;
+}
+
+export function gitBranchToNpmTag(branchName: string) {
+    const safeName = branchName.replace(/\//g, ":");
+    return "branch:" + safeName;
 }

@@ -27,11 +27,20 @@ import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { SdmGoal, SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
+import {
+    SdmGoal,
+    SdmGoalKey,
+} from "@atomist/sdm/api/goal/SdmGoal";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { OnAnyFailedSdmGoal } from "../../../../typings/types";
-import { fetchScmProvider, sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
+import {
+    OnAnyFailedSdmGoal,
+    SdmGoalState,
+} from "../../../../typings/types";
+import {
+    fetchScmProvider,
+    sumSdmGoalEventsByOverride,
+} from "./RequestDownstreamGoalsOnGoalSuccess";
 
 /**
  * Respond to a failure status by failing downstream goals
@@ -57,7 +66,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             return Success;
         }
 
-        if (failedGoal.state !== "failure") { // atomisthq/automation-api#395
+        if (failedGoal.state !== SdmGoalState.failure) { // atomisthq/automation-api#395
             logger.debug(`Nevermind: failure reported when the state was=[${failedGoal.state}]`);
             return Promise.resolve(Success);
         }
@@ -71,7 +80,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             .filter(g => g.state === "planned");
 
         await Promise.all(goalsToSkip.map(g => updateGoal(context, g, {
-            state: "skipped",
+            state: SdmGoalState.skipped,
             description: `Skipped ${g.name} because ${failedGoal.name} failed`,
         })));
 
