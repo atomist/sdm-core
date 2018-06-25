@@ -21,8 +21,8 @@ describe("git branch to npm tag", () => {
 
     it("prefixes it with branch", () => {
         const input = "hello";
-        const result = gitBranchToNpmTag(input)
-        assert.equal(result, "branch-" + input)
+        const result = gitBranchToNpmTag(input);
+        assert.equal(result, "branch-" + input);
     });
 
     it("replaces slash with something", () => {
