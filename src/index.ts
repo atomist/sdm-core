@@ -103,3 +103,6 @@ export { NodeProjectVersioner } from "./internal/delivery/build/local/npm/nodePr
 export { DevelopmentEnvOptions,
 NpmPreparations } from "./internal/delivery/build/local/npm/npmBuilder";
 export { postLinkImageWebhook } from "./util/webhook/ImageLink";
+export { EphemeralLocalArtifactStore } from "./internal/artifact/local/EphemeralLocalArtifactStore";
+export { selfDescribingHandlers } from "./pack/info/support/commandSearch";
+export { WellKnownGoals } from "./pack/well-known-goals/addWellKnownGoals";
