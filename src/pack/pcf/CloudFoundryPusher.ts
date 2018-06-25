@@ -17,10 +17,10 @@
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ReadStream } from "fs";
 import * as _ from "lodash";
+import randomWord = require("random-word");
 import { CloudFoundryApi } from "./CloudFoundryApi";
 import { ManifestApplication } from "./CloudFoundryManifest";
 import { CloudFoundryDeployment } from "./CloudFoundryTarget";
-import randomWord = require("random-word");
 
 export interface ServicesModifications {
     servicesToAdd: any[];
