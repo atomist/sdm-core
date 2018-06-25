@@ -101,21 +101,28 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     }
 
     private get goalSetting(): FunctionalUnit {
-        return {
-            eventHandlers: [() => new SetGoalsOnPush(
-                this.configuration.sdm.projectLoader,
-                this.configuration.sdm.repoRefResolver,
-                this.pushMapping,
-                this.goalsSetListeners,
-                this.goalFulfillmentMapper, this.configuration.sdm.credentialsResolver)],
-            commandHandlers: [() => resetGoalsCommand({
-                projectLoader: this.configuration.sdm.projectLoader,
-                repoRefResolver: this.configuration.sdm.repoRefResolver,
-                goalsListeners: this.goalsSetListeners,
-                goalSetter: this.pushMapping,
-                implementationMapping: this.goalFulfillmentMapper,
-            })],
-        };
+        if (this.pushMapping) {
+            return {
+                eventHandlers: [() => new SetGoalsOnPush(
+                    this.configuration.sdm.projectLoader,
+                    this.configuration.sdm.repoRefResolver,
+                    this.pushMapping,
+                    this.goalsSetListeners,
+                    this.goalFulfillmentMapper, this.configuration.sdm.credentialsResolver)],
+                commandHandlers: [() => resetGoalsCommand({
+                    projectLoader: this.configuration.sdm.projectLoader,
+                    repoRefResolver: this.configuration.sdm.repoRefResolver,
+                    goalsListeners: this.goalsSetListeners,
+                    goalSetter: this.pushMapping,
+                    implementationMapping: this.goalFulfillmentMapper,
+                })],
+            };
+        } else {
+             return {
+                 eventHandlers: [],
+                 commandHandlers: [],
+             }
+        }
     }
 
     private get goalConsequences(): FunctionalUnit {
