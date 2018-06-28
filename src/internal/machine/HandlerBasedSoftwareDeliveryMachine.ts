@@ -126,18 +126,25 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     }
 
     private get goalConsequences(): FunctionalUnit {
-        return {
-            eventHandlers: [
-                () => new SkipDownstreamGoalsOnGoalFailure(this.configuration.sdm.repoRefResolver),
-                () => new RequestDownstreamGoalsOnGoalSuccess(
-                    this.goalFulfillmentMapper,
-                    this.configuration.sdm.repoRefResolver),
-                () => new RespondOnGoalCompletion(
-                    this.configuration.sdm.repoRefResolver,
-                    this.configuration.sdm.credentialsResolver,
-                    this.goalCompletionListeners)],
-            commandHandlers: [],
-        };
+        if (this.pushMapping) {
+            return {
+                eventHandlers: [
+                    () => new SkipDownstreamGoalsOnGoalFailure(this.configuration.sdm.repoRefResolver),
+                    () => new RequestDownstreamGoalsOnGoalSuccess(
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.repoRefResolver),
+                    () => new RespondOnGoalCompletion(
+                        this.configuration.sdm.repoRefResolver,
+                        this.configuration.sdm.credentialsResolver,
+                        this.goalCompletionListeners) ],
+                commandHandlers: [],
+            };
+        } else {
+            return {
+                eventHandlers: [],
+                commandHandlers: [],
+            };
+        }
     }
 
     private readonly artifactFinder = () => new FindArtifactOnImageLinked(
