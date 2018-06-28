@@ -32,10 +32,10 @@ export { NoticeK8sTestDeployCompletionOnStatus } from "./handlers/events/deliver
 export { NoticeK8sProdDeployCompletionOnStatus } from "./handlers/events/delivery/deploy/k8s/NoticeK8sProdDeployCompletion";
 export { constructLogPath } from "./log/DashboardDisplayProgressLog";
 export { createSoftwareDeliveryMachine } from "./machine/machineFactory";
-export { isDeployEnabledCommand } from "./handlers/commands/DisplayDeployEnablement";
+export { DisplayDeployEnablement } from "./handlers/commands/DisplayDeployEnablement";
 export {
-    disableDeploy,
-    enableDeploy,
+    DisableDeploy,
+    EnableDeploy,
     setDeployEnablement,
 } from "./handlers/commands/SetDeployEnablement";
 export {
