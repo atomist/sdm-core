@@ -116,11 +116,13 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     goalSetter: this.pushMapping,
                     implementationMapping: this.goalFulfillmentMapper,
                 })],
+                ingesters: [],
             };
         } else {
              return {
                  eventHandlers: [],
                  commandHandlers: [],
+                 ingesters: [],
              };
         }
     }
@@ -138,11 +140,13 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                         this.configuration.sdm.credentialsResolver,
                         this.goalCompletionListeners) ],
                 commandHandlers: [],
+                ingesters: [],
             };
         } else {
             return {
                 eventHandlers: [],
                 commandHandlers: [],
+                ingesters: [],
             };
         }
     }
@@ -182,6 +186,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 }),
                 deleteRepositoryCommand],
             eventHandlers: [],
+            ingesters: [],
         };
     }
 
@@ -275,6 +280,12 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     get commandHandlers(): Array<Maker<HandleCommand>> {
         return this.registrationManager.commandHandlers
             .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.commandHandlers)))
+            .filter(m => !!m);
+    }
+
+    get ingesters(): string[] {
+        return this.registrationManager.ingesters
+            .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.ingesters)))
             .filter(m => !!m);
     }
 
