@@ -35,6 +35,7 @@ import { BuildUrlBySha } from "../../typings/types";
 import { tipOfDefaultBranch } from "../../util/github/ghub";
 import { DefaultRepoRefResolver } from "../common/DefaultRepoRefResolver";
 import { displayBuildLogFailure } from "../events/delivery/build/SetStatusOnBuildComplete";
+import { CommandHandlerRegistration } from "@atomist/sdm";
 
 @Parameters()
 export class DisplayBuildLogParameters {
@@ -84,9 +85,11 @@ async function fetchBuildUrl(context: HandlerContext, id: RemoteRepoRef): Promis
     return queryResult.Commit[0].builds.sort((b1, b2) => b2.timestamp.localeCompare(b1.timestamp))[0];
 }
 
-export function displayBuildLogHandler(logInterpretation?: LogInterpretation): HandleCommand<DisplayBuildLogParameters> {
-    return commandHandlerFrom(displayBuildLogForCommit(logInterpretation),
-        DisplayBuildLogParameters, "DisplayBuildLog",
-        "interpret and report on a build log",
-        "show build log");
+export function displayBuildLogHandler(logInterpretation?: LogInterpretation): CommandHandlerRegistration<DisplayBuildLogParameters> {
+    return {
+        name: "DisplayBuildLog",
+        intent: "show build log",
+        description: "interpret and report on a build log",
+        paramsMaker: DisplayBuildLogParameters,
+    };
 }

@@ -66,6 +66,6 @@ export function createSoftwareDeliveryMachine(config: MachineConfiguration<Softw
     const machine = new HandlerBasedSoftwareDeliveryMachine(config.name, config.configuration,
         goalSetters);
     return machine
-        .addSupportingCommands(() => displayBuildLogHandler())
+        .addCommand(displayBuildLogHandler)
         .addExtensionPacks(ExposeInfo);
 }

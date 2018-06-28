@@ -66,7 +66,7 @@ describe("SDM handler creation", () => {
                 [whenPushSatisfies(AnyPush)
                     .itMeans("do nothing")
                     .setGoals(NoGoals)]);
-            sdm.addGoalsSetListeners(gl);
+            sdm.addGoalsSetListener(gl);
             assert(sdm.eventHandlers.length > 0);
             const sgop = sdm.eventHandlers.map(h => toFactory(h)()).find(h => !!(h as SetGoalsOnPush).goalsListeners) as SetGoalsOnPush;
             assert(sgop.goalsListeners.length >= 1);
@@ -161,7 +161,7 @@ describe("SDM handler creation", () => {
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
                     .setGoals(HttpServiceGoals)]);
-            sdm.addAutofixes(AddThingAutofix);
+            sdm.addAutofix(AddThingAutofix);
             assert(!sdm.observesOnly);
         });
 

@@ -52,10 +52,9 @@ export function deploymentFreeze(dsm: DeploymentStatusManager): ExtensionPack {
         vendor: "Atomist",
         version: "0.1.0",
         configure: sdm => {
-            sdm.addCommands(
-                freezeCommand(dsm),
-                unfreezeCommand(dsm),
-            );
+            sdm.addCommand(
+                freezeCommand(dsm))
+                .addCommand(unfreezeCommand(dsm));
             sdm.addGoalImplementation("ExplainDeploymentFreezeGoal",
                 ExplainDeploymentFreezeGoal,
                 executeSendMessageToSlack("*Attention*: Not deploying as deployment is currently frozen :no_entry:"));

@@ -15,7 +15,6 @@
  */
 
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { CreateRepoHandler } from "./createRepo";
 import { ListGeneratorsHandler } from "./listGenerators";
 import { SelfDescribeHandler } from "./SelfDescribe";
 
@@ -27,10 +26,7 @@ export const ExposeInfo: ExtensionPack = {
     vendor: "Atomist",
     version: "0.1.0",
     configure: sdm => {
-        sdm.addCommands(
-            SelfDescribeHandler,
-            ListGeneratorsHandler,
-            CreateRepoHandler,
-        );
+        sdm.addCommand(SelfDescribeHandler)
+            .addCommand(ListGeneratorsHandler);
     },
 };
