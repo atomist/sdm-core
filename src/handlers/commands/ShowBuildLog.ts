@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import {
-    HandleCommand,
-    MappedParameter,
-    MappedParameters,
-    Parameter,
-    Secret,
-    Secrets,
-    Success,
-} from "@atomist/automation-client";
+import { MappedParameter, MappedParameters, Parameter, Secret, Secrets, Success } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { HandlerContext } from "@atomist/automation-client/Handlers";
-import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { CommandHandlerRegistration } from "@atomist/sdm";
 import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
 import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import * as _ from "lodash";
@@ -35,7 +27,6 @@ import { BuildUrlBySha } from "../../typings/types";
 import { tipOfDefaultBranch } from "../../util/github/ghub";
 import { DefaultRepoRefResolver } from "../common/DefaultRepoRefResolver";
 import { displayBuildLogFailure } from "../events/delivery/build/SetStatusOnBuildComplete";
-import { CommandHandlerRegistration } from "@atomist/sdm";
 
 @Parameters()
 export class DisplayBuildLogParameters {
@@ -48,7 +39,7 @@ export class DisplayBuildLogParameters {
     @MappedParameter(MappedParameters.GitHubRepository)
     public repo: string;
 
-    @Parameter({required: false})
+    @Parameter({ required: false })
     public sha?: string;
 }
 
@@ -60,7 +51,7 @@ function displayBuildLogForCommit(interpreter?: LogInterpretation) {
             await tipOfDefaultBranch(params.githubToken, new GitHubRepoRef(params.owner, params.repo)); // TODO: use fetchDefaultBranchTip
 
         // TODO get rid of hard coding
-        const id = new DefaultRepoRefResolver().toRemoteRepoRef(params, {sha});
+        const id = new DefaultRepoRefResolver().toRemoteRepoRef(params, { sha });
         const ac: AddressChannels = (msg, opts) => ctx.messageClient.respond(msg, opts);
         const build = await fetchBuildUrl(ctx, id);
 
@@ -73,7 +64,7 @@ function displayBuildLogForCommit(interpreter?: LogInterpretation) {
 async function fetchBuildUrl(context: HandlerContext, id: RemoteRepoRef): Promise<{ buildUrl?: string }> {
     const queryResult = await context.graphClient.query<BuildUrlBySha.Query, BuildUrlBySha.Variables>({
         name: "BuildUrlBySha",
-        variables: {sha: id.sha},
+        variables: { sha: id.sha },
     });
     const commit: BuildUrlBySha.Commit = _.get(queryResult, "Commit[0]");
     if (!commit) {
@@ -91,5 +82,6 @@ export function displayBuildLogHandler(logInterpretation?: LogInterpretation): C
         intent: "show build log",
         description: "interpret and report on a build log",
         paramsMaker: DisplayBuildLogParameters,
+        createCommand: () => displayBuildLogForCommit(logInterpretation),
     };
 }
