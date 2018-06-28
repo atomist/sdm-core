@@ -19,8 +19,10 @@ import { guid } from "@atomist/automation-client/internal/util/string";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";
+import * as path from "path";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/launchGoal";
 import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import * as appRoot from "app-root-path";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -88,6 +90,8 @@ export function configureSdm(
             }
             mergedConfig.events.push(...machine.eventHandlers);
         }
+
+        registerMetadata(mergedConfig, machine);
         return mergedConfig;
     };
 }
@@ -103,5 +107,17 @@ function validateConfiguration(config: Configuration, options: ConfigureOptions)
         throw new Error(
             `Missing configuration values. Please add the following values to your client configuration: '${
                 missingValues.join(", ")}'`);
+    }
+}
+
+function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
+    const sdmPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm", "package.json"));
+    const sdmCorePj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm-core", "package.json"));
+
+    config.metadata = {
+        ...config.metadata,
+        "atomist.sdm": `${sdmPj.name}:${sdmPj.version}`,
+        "atomist.sdm-core": `${sdmCorePj.name}:${sdmCorePj.version}`,
+        "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
     }
 }
