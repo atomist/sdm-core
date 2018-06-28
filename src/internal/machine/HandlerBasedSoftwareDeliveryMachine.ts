@@ -258,7 +258,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.onRepoCreation,
                 this.onNewRepoWithCode,
                 this.semanticDiffReactor,
-                this.onBuildComplete,
+                this.pushMapping ? this.onBuildComplete : undefined,
                 this.notifyOnDeploy,
                 this.onVerifiedStatus,
                 this.artifactFinder,
