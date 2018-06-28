@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-import {
-    failure,
-    HandleCommand,
-    HandlerResult,
-    MappedParameter,
-    MappedParameters,
-    Success,
-} from "@atomist/automation-client";
+import { failure, HandlerResult, MappedParameter, MappedParameters, Success } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { HandlerContext } from "@atomist/automation-client/Handlers";
-import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
-import {
-    DeployEnablementRootType,
-    SdmDeployEnablement,
-} from "../../ingesters/sdmDeployEnablement";
+import { CommandHandlerRegistration } from "@atomist/sdm";
+import { DeployEnablementRootType, SdmDeployEnablement } from "../../ingesters/sdmDeployEnablement";
 import { success } from "../../util/slack/messages";
 
 @Parameters()
@@ -68,22 +58,18 @@ export function setDeployEnablement(enable: boolean) {
     };
 }
 
-export function enableDeploy(): HandleCommand<SetDeployEnablementParameters> {
-    return commandHandlerFrom(
-        setDeployEnablement(true),
-        SetDeployEnablementParameters,
-        "EnableDeploy",
-        "Enable deployment via Atomist SDM",
-        "enable deploy",
-    );
-}
+export const EnableDeploy: CommandHandlerRegistration<SetDeployEnablementParameters> = {
+    name: "EnableDeploy",
+    intent: "enable deploy",
+    description: "Enable deployment via Atomist SDM",
+    paramsMaker: SetDeployEnablementParameters,
+    listener: async () => setDeployEnablement(true),
+};
 
-export function disableDeploy(): HandleCommand<SetDeployEnablementParameters> {
-    return commandHandlerFrom(
-        setDeployEnablement(false),
-        SetDeployEnablementParameters,
-        "DisableDeploy",
-        "Disable deployment via Atomist SDM",
-        "disable deploy",
-    );
-}
+export const DisableDeploy: CommandHandlerRegistration<SetDeployEnablementParameters> = {
+    name: "DisableDeploy",
+    intent: "disable deploy",
+    description: "Disable deployment via Atomist SDM",
+    paramsMaker: SetDeployEnablementParameters,
+    listener: async () => setDeployEnablement(false),
+};
