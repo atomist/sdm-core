@@ -18,11 +18,11 @@ import { Configuration } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import * as appRoot from "app-root-path";
 import * as _ from "lodash";
 import * as path from "path";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/launchGoal";
 import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
-import * as appRoot from "app-root-path";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -119,5 +119,5 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
         "atomist.sdm": `${sdmPj.name}:${sdmPj.version}`,
         "atomist.sdm-core": `${sdmCorePj.name}:${sdmCorePj.version}`,
         "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
-    }
+    };
 }
