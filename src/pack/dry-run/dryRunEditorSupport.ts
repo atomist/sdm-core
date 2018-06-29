@@ -17,7 +17,10 @@
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { onDryRunBuildComplete } from "./support/OnDryRunBuildComplete";
+import {
+    onDryRunBuildComplete,
+    OnDryRunBuildCompleteParameters,
+} from "./support/OnDryRunBuildComplete";
 
 /**
  * Core extension pack to add dry run editing support. It's necessary to add this pack
@@ -30,6 +33,7 @@ export const DryRunEditing: ExtensionPack = {
             name: "OnDryRunBuildComplete",
             description: "React to result of a dry run build",
             subscription: subscription("OnBuildCompleteForDryRun"),
+            paramsMaker: OnDryRunBuildCompleteParameters,
             listener: onDryRunBuildComplete(sdm.configuration.sdm.repoRefResolver),
         });
     },
