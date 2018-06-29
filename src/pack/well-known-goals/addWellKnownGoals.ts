@@ -19,6 +19,7 @@ import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofi
 import { executePushReactions } from "@atomist/sdm/api-helper/listener/executePushReactions";
 import { executeReview } from "@atomist/sdm/api-helper/listener/executeReview";
 import { LogSuppressor } from "@atomist/sdm/api-helper/log/logInterpreters";
+import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import {
@@ -40,9 +41,7 @@ import { executeFingerprinting } from "../../internal/delivery/code/fingerprint/
  * @param {SoftwareDeliveryMachine} sdm
  */
 export const WellKnownGoals: ExtensionPack = {
-    name: "WellKnownGoals",
-    vendor: "Atomist",
-    version: "0.1.0",
+    ...metadata("well-known-goals"),
     configure,
 };
 

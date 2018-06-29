@@ -89,6 +89,11 @@ export function configureSdm(
                 mergedConfig.events = [];
             }
             mergedConfig.events.push(...machine.eventHandlers);
+
+            if (!mergedConfig.ingesters) {
+                mergedConfig.ingesters = [];
+            }
+            mergedConfig.ingesters.push(...machine.ingesters);
         }
 
         registerMetadata(mergedConfig, machine);
@@ -118,6 +123,7 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
         ...config.metadata,
         "atomist.sdm": `${sdmPj.name}:${sdmPj.version}`,
         "atomist.sdm-core": `${sdmCorePj.name}:${sdmCorePj.version}`,
+        "atomist.sdm.name": machine.name,
         "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
     };
 }

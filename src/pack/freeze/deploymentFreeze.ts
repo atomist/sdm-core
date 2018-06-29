@@ -15,6 +15,7 @@
  */
 
 import { logger } from "@atomist/automation-client";
+import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { allOf } from "@atomist/sdm/api/dsl/allOf";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
 import { executeSendMessageToSlack } from "@atomist/sdm/api/goal/support/executeSendMessageToSlack";
@@ -48,14 +49,11 @@ export interface DeploymentStatusManager {
  */
 export function deploymentFreeze(dsm: DeploymentStatusManager): ExtensionPack {
     return {
-        name: "deploymentFreeze",
-        vendor: "Atomist",
-        version: "0.1.0",
+        ...metadata("deployment-freeze"),
         configure: sdm => {
-            sdm.addCommands(
-                freezeCommand(dsm),
-                unfreezeCommand(dsm),
-            );
+            sdm.addCommand(
+                freezeCommand(dsm))
+                .addCommand(unfreezeCommand(dsm));
             sdm.addGoalImplementation("ExplainDeploymentFreezeGoal",
                 ExplainDeploymentFreezeGoal,
                 executeSendMessageToSlack("*Attention*: Not deploying as deployment is currently frozen :no_entry:"));
