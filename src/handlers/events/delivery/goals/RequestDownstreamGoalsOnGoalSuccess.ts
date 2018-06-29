@@ -69,11 +69,6 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             return Success;
         }
 
-        if (sdmGoal.state !== SdmGoalState.success) { // atomisthq/automation-api#395
-            logger.debug(`Nevermind: success reported when the state was=[${sdmGoal.state}]`);
-            return Promise.resolve(Success);
-        }
-
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchScmProvider(context, sdmGoal.repo.providerId));
         const goals: SdmGoal[] = sumSdmGoalEventsByOverride(
             await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);

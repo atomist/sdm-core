@@ -67,10 +67,6 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             return Success;
         }
 
-        if (sdmGoal.state !== SdmGoalState.failure && sdmGoal.state !== SdmGoalState.success) { // atomisthq/automation-api#395
-            return Promise.resolve(Success);
-        }
-
         const commit = await fetchCommitForSdmGoal(context, sdmGoal);
         const push = commit.pushes[0];
         const id = this.repoRefResolver.repoRefFromPush(push);

@@ -98,12 +98,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
         const status: StatusForExecuteGoal.Fragment = convertForNow(sdmGoal, commit);
 
-        // this should not happen but it does: automation-api#395
-        if (sdmGoal.state !== SdmGoalState.requested) {
-            logger.debug(`Goal ${sdmGoal.name}: Received '${sdmGoal.state}' on ${status.context}, while looking for 'requested'`);
-            return Success;
-        }
-
         if (sdmGoal.fulfillment.method !== "SDM fulfill on requested") {
             logger.info("Goal %s: Implementation method is '%s'; not fulfilling", sdmGoal.name, sdmGoal.fulfillment.method);
             return Success;
