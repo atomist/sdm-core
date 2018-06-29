@@ -4,4 +4,3 @@ subscription OnAnyCompletedSdmGoal {
     ...SdmGoalRepo
   }
 }
-
