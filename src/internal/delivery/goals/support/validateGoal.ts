@@ -23,6 +23,6 @@ export function isGoalRelevant(sdmGoal: SdmGoal,
     if (!sdmGoal.provenance || sdmGoal.provenance.length === 0) {
         return true;
     }
-    const provenances = sdmGoal.provenance.sort((p1, p2) => p1.ts - p2.ts);
+    const provenances = [...sdmGoal.provenance].sort((p1, p2) => p1.ts - p2.ts);
     return provenances[0].registration === registration || registration.startsWith(`${provenances[0].registration}-job`);
 }
