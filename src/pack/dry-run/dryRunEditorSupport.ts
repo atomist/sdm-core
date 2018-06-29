@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
+import { subscription } from "@atomist/automation-client/graph/graphQL";
+import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { OnDryRunBuildComplete } from "./support/OnDryRunBuildComplete";
+import { onDryRunBuildComplete } from "./support/OnDryRunBuildComplete";
 
 /**
  * Core extension pack to add dry run editing support. It's necessary to add this pack
  * to have dry run editorCommand function respond to builds.
  */
 export const DryRunEditing: ExtensionPack = {
-    name: "DryRunEditing",
-    vendor: "Atomist",
-    version: "0.1.0",
+    ...metadata("dry-run-editing"),
     configure: sdm => {
-        sdm.addSupportingEvents(
-            () => new OnDryRunBuildComplete(sdm.configuration.sdm.repoRefResolver),
-        );
+        sdm.addEvent({
+            name: "OnDryRunBuildComplete",
+            description: "React to result of a dry run build",
+            subscription: subscription("OnBuildCompleteForDryRun"),
+            listener: onDryRunBuildComplete(sdm.configuration.sdm.repoRefResolver),
+        });
     },
 };

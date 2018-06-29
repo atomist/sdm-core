@@ -22,7 +22,7 @@ import {
 } from "./github/gitHubStatusSetters";
 
 export function summarizeGoalsInGitHubStatus(sdm: SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration>): SoftwareDeliveryMachine {
-    sdm.addGoalsSetListeners(createPendingGitHubStatusOnGoalSet(sdm.configuration.sdm.credentialsResolver));
-    sdm.addGoalCompletionListeners(SetGitHubStatusOnGoalCompletion());
+    sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm.configuration.sdm.credentialsResolver));
+    sdm.addGoalCompletionListener(SetGitHubStatusOnGoalCompletion());
     return sdm;
 }

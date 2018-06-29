@@ -116,11 +116,13 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     goalSetter: this.pushMapping,
                     implementationMapping: this.goalFulfillmentMapper,
                 })],
+                ingesters: [],
             };
         } else {
              return {
                  eventHandlers: [],
                  commandHandlers: [],
+                 ingesters: [],
              };
         }
     }
@@ -138,11 +140,13 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                         this.configuration.sdm.credentialsResolver,
                         this.goalCompletionListeners) ],
                 commandHandlers: [],
+                ingesters: [],
             };
         } else {
             return {
                 eventHandlers: [],
                 commandHandlers: [],
+                ingesters: [],
             };
         }
     }
@@ -182,6 +186,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 }),
                 deleteRepositoryCommand],
             eventHandlers: [],
+            ingesters: [],
         };
     }
 
@@ -199,12 +204,12 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
 
     get eventHandlers(): Array<Maker<HandleEvent<any>>> {
         return this.registrationManager.eventHandlers
-            .concat(() => new FulfillGoalOnRequested(
+            .concat(this.pushMapping ? () => new FulfillGoalOnRequested(
                 this.goalFulfillmentMapper,
                 this.configuration.sdm.projectLoader,
                 this.configuration.sdm.repoRefResolver,
                 this.configuration.sdm.credentialsResolver,
-                this.configuration.sdm.logFactory))
+                this.configuration.sdm.logFactory) : undefined)
             .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.eventHandlers)))
             .concat([
                 this.userJoiningChannelListeners.length > 0 ?
@@ -278,6 +283,12 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             .filter(m => !!m);
     }
 
+    get ingesters(): string[] {
+        return this.registrationManager.ingesters
+            .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.ingesters)))
+            .filter(m => !!m);
+    }
+
     /**
      * Construct a new software delivery machine, with zero or
      * more goal setters.
@@ -290,7 +301,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
         // This hits the Atomist service
-        this.addFingerprintListeners(SendFingerprintToAtomist);
+        this.addFingerprintListener(SendFingerprintToAtomist);
         this.addExtensionPacks(WellKnownGoals);
     }
 
