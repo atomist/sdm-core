@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-import { failure, HandlerResult, MappedParameter, MappedParameters, Success } from "@atomist/automation-client";
+import {
+    failure,
+    MappedParameter,
+    MappedParameters,
+    Success,
+} from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
-import { HandlerContext } from "@atomist/automation-client/Handlers";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
-import { CommandHandlerRegistration } from "@atomist/sdm";
-import { DeployEnablementRootType, SdmDeployEnablement } from "../../ingesters/sdmDeployEnablement";
+import {
+    CommandHandlerRegistration,
+    CommandListenerInvocation,
+} from "@atomist/sdm";
+import {
+    DeployEnablementRootType,
+    SdmDeployEnablement,
+} from "../../ingesters/sdmDeployEnablement";
 import { success } from "../../util/slack/messages";
 
 @Parameters()
@@ -41,21 +51,19 @@ export class SetDeployEnablementParameters {
  * @param {boolean} enable
  * @return {(ctx: HandlerContext, params: SetDeployEnablementParameters) => Promise<HandlerResult>}
  */
-export function setDeployEnablement(enable: boolean) {
-    return (ctx: HandlerContext, params: SetDeployEnablementParameters): Promise<HandlerResult> => {
-        const deployEnablement: SdmDeployEnablement = {
-            state: enable ? "requested" : "disabled",
-            owner: params.owner,
-            repo: params.repo,
-            providerId: params.providerId,
-        };
-        return ctx.messageClient.send(deployEnablement, addressEvent(DeployEnablementRootType))
-            .then(() => ctx.messageClient.respond(
-                success(
-                    "Deploy Enablement",
-                    `Successfully ${enable ? "enabled" : "disabled"} deployment`)))
-            .then(() => Success, failure);
+export function setDeployEnablement(cli: CommandListenerInvocation, enable: boolean) {
+    const deployEnablement: SdmDeployEnablement = {
+        state: enable ? "requested" : "disabled",
+        owner: cli.parameters.owner,
+        repo: cli.parameters.repo,
+        providerId: cli.parameters.providerId,
     };
+    return cli.context.messageClient.send(deployEnablement, addressEvent(DeployEnablementRootType))
+        .then(() => cli.context.messageClient.respond(
+            success(
+                "Deploy Enablement",
+                `Successfully ${enable ? "enabled" : "disabled"} deployment`)))
+        .then(() => Success, failure);
 }
 
 export const EnableDeploy: CommandHandlerRegistration<SetDeployEnablementParameters> = {
@@ -63,7 +71,7 @@ export const EnableDeploy: CommandHandlerRegistration<SetDeployEnablementParamet
     intent: "enable deploy",
     description: "Enable deployment via Atomist SDM",
     paramsMaker: SetDeployEnablementParameters,
-    listener: async () => setDeployEnablement(true),
+    listener: async cli => setDeployEnablement(cli,true),
 };
 
 export const DisableDeploy: CommandHandlerRegistration<SetDeployEnablementParameters> = {
@@ -71,5 +79,5 @@ export const DisableDeploy: CommandHandlerRegistration<SetDeployEnablementParame
     intent: "disable deploy",
     description: "Disable deployment via Atomist SDM",
     paramsMaker: SetDeployEnablementParameters,
-    listener: async () => setDeployEnablement(false),
+    listener: async cli => setDeployEnablement(cli,false),
 };
