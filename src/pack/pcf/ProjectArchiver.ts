@@ -17,9 +17,9 @@
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import archiver = require("archiver");
 import * as fs from "fs";
 import { ReadStream } from "fs";
-import archiver = require("archiver");
 
 export class ProjectArchiver {
 
