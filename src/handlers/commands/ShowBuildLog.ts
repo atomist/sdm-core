@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import { MappedParameter, MappedParameters, Parameter, Secret, Secrets, Success } from "@atomist/automation-client";
+import {
+    MappedParameter,
+    MappedParameters,
+    Parameter,
+    Secret,
+    Secrets,
+    Success,
+} from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { HandlerContext } from "@atomist/automation-client/Handlers";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";

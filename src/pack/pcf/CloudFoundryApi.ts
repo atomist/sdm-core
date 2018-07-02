@@ -17,13 +17,13 @@
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 
 import axios, { AxiosResponse } from "axios";
-import cfClient = require("cf-client");
-import FormData = require("form-data");
 import { ReadStream } from "fs";
 import * as _ from "lodash";
-import request = require("request");
 import { ManifestApplication } from "./CloudFoundryManifest";
 import { CloudFoundryInfo } from "./CloudFoundryTarget";
+import cfClient = require("cf-client");
+import FormData = require("form-data");
+import request = require("request");
 
 export interface CloudFoundryClientV2 {
     api_url: string;

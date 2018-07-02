@@ -38,9 +38,7 @@ import {
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import {
-    OnAnyCompletedSdmGoal,
-} from "../../../../typings/types";
+import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 import { sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 /**

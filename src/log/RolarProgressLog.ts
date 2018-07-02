@@ -20,8 +20,8 @@ import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import axios, { AxiosInstance } from "axios";
 import * as _ from "lodash";
-import os = require("os");
 import { WrapOptions } from "retry";
+import os = require("os");
 
 function* timestampGenerator() {
     while (true) {

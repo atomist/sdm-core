@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { failure, HandlerResult, Success } from "@atomist/automation-client";
+import {
+    failure,
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client";
 import { HandlerContext } from "@atomist/automation-client/Handlers";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
