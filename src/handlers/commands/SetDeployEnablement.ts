@@ -71,7 +71,7 @@ export const EnableDeploy: CommandHandlerRegistration<SetDeployEnablementParamet
     intent: "enable deploy",
     description: "Enable deployment via Atomist SDM",
     paramsMaker: SetDeployEnablementParameters,
-    listener: async cli => setDeployEnablement(cli,true),
+    listener: async cli => setDeployEnablement(cli, true),
 };
 
 export const DisableDeploy: CommandHandlerRegistration<SetDeployEnablementParameters> = {
@@ -79,5 +79,5 @@ export const DisableDeploy: CommandHandlerRegistration<SetDeployEnablementParame
     intent: "disable deploy",
     description: "Disable deployment via Atomist SDM",
     paramsMaker: SetDeployEnablementParameters,
-    listener: async cli => setDeployEnablement(cli,false),
+    listener: async cli => setDeployEnablement(cli, false),
 };
