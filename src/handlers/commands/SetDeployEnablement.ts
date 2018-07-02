@@ -16,6 +16,8 @@
 
 import {
     failure,
+    HandlerError,
+    HandlerResult,
     MappedParameter,
     MappedParameters,
     Success,
@@ -48,10 +50,12 @@ export class SetDeployEnablementParameters {
 
 /**
  * Command to set deploy enablement on the currently mapped repo
+ * @param {CommandListenerInvocation} cli
  * @param {boolean} enable
- * @return {(ctx: HandlerContext, params: SetDeployEnablementParameters) => Promise<HandlerResult>}
+ * @returns {Promise<HandlerResult | HandlerError>}
  */
-export function setDeployEnablement(cli: CommandListenerInvocation, enable: boolean) {
+export function setDeployEnablement(cli: CommandListenerInvocation,
+                                    enable: boolean): Promise<HandlerResult | HandlerError> {
     const deployEnablement: SdmDeployEnablement = {
         state: enable ? "requested" : "disabled",
         owner: cli.parameters.owner,
