@@ -40,7 +40,7 @@ import { SetGoalOnBuildComplete } from "../../handlers/events/delivery/build/Set
 import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery/code/ReactToSemanticDiffsOnPushImpact";
 import { OnDeployStatus } from "../../handlers/events/delivery/deploy/OnDeployStatus";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
-import { KubernetesIsolatedGoalLauncher } from "../../handlers/events/delivery/goals/k8s/launchGoalK8";
+import { createKubernetesGoalLauncher } from "../../handlers/events/delivery/goals/k8s/launchGoalK8";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { resetGoalsCommand } from "../../handlers/events/delivery/goals/resetGoals";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
@@ -71,7 +71,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
      */
     public readonly goalFulfillmentMapper = new SdmGoalImplementationMapperImpl(
         // For now we only support kube or in process
-        process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes" ? KubernetesIsolatedGoalLauncher : undefined); // public for testing
+        process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes" ? createKubernetesGoalLauncher() : undefined); // public for testing
 
     private get onRepoCreation(): Maker<OnRepoCreation> {
         return this.repoCreationListeners.length > 0 ?
