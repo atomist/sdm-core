@@ -19,10 +19,10 @@ import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
-    ExecuteGoalWithLog,
+    ExecuteGoal,
     PrepareForGoalExecution,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    GoalInvocation,
+} from "@atomist/sdm/api/goal/GoalInvocation";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import * as fs from "fs-extra";
 import * as p from "path";
@@ -38,20 +38,20 @@ import { NpmPreparations } from "./npmBuilder";
  * @param {ProjectLoader} projectLoader
  * @param {ProjectIdentifier} projectIdentifier
  * @param {PrepareForGoalExecution[]} preparations
- * @return {ExecuteGoalWithLog}
+ * @return {ExecuteGoal}
  */
 export function executePublish(
     projectLoader: ProjectLoader,
     projectIdentifier: ProjectIdentifier,
     preparations: PrepareForGoalExecution[] = NpmPreparations,
     options: NpmOptions,
-): ExecuteGoalWithLog {
+): ExecuteGoal {
 
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { credentials, id, context } = rwlc;
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { credentials, id, context } = goalInvocation;
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async project => {
             for (const preparation of preparations) {
-                const pResult = await preparation(project, rwlc);
+                const pResult = await preparation(project, goalInvocation);
                 if (pResult.code !== 0) {
                     return pResult;
                 }
@@ -77,7 +77,7 @@ export function executePublish(
             const result: ExecuteGoalResult = await spawnAndWatch(
                 { command: "bash", args },
                 { cwd: project.baseDir },
-                rwlc.progressLog,
+                goalInvocation.progressLog,
             );
 
             if (result.code === 0) {

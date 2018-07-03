@@ -22,9 +22,9 @@ import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm/api/goal/GoalInvocation";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
@@ -43,9 +43,9 @@ export type ProjectVersioner =
  * @param projectLoader used to load projects
  */
 export function executeVersioner(projectLoader: ProjectLoader,
-                                 projectVersioner: ProjectVersioner): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context, progressLog } = rwlc;
+                                 projectVersioner: ProjectVersioner): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { status, credentials, id, context, progressLog } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
             const version = await projectVersioner(status, p, progressLog);

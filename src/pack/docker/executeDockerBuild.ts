@@ -24,7 +24,7 @@ import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
 import { ExecuteGoal, PrepareForGoalExecution } from "@atomist/sdm/api/goal/GoalInvocation";
-import { RunWithLogContext } from "@atomist/sdm";
+import { GoalInvocation } from "@atomist/sdm";
 
 export interface DockerOptions {
     registry: string;
@@ -44,19 +44,19 @@ export type DockerImageNameCreator = (p: GitProject,
  * @param {ProjectLoader} projectLoader
  * @param {DockerImageNameCreator} imageNameCreator
  * @param {DockerOptions} options
- * @returns {ExecuteGoalWithLog}
+ * @returns {ExecuteGoal}
  */
 export function executeDockerBuild(projectLoader: ProjectLoader,
                                    imageNameCreator: DockerImageNameCreator,
                                    preparations: PrepareForGoalExecution[] = [],
                                    options: DockerOptions): ExecuteGoal {
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context, progressLog } = rwlc;
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { status, credentials, id, context, progressLog } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
 
             for (const preparation of preparations) {
-                const pResult = await preparation(p, rwlc);
+                const pResult = await preparation(p, goalInvocation);
                 if (pResult.code !== 0) {
                     return pResult;
                 }

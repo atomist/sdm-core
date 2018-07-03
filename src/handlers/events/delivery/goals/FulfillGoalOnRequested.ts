@@ -33,7 +33,7 @@ import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOn
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import { GoalInvocation } from "@atomist/sdm/api/goal/GoalInvocation";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
@@ -115,7 +115,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
-        const rwlc: RunWithLogContext = {status, progressLog, context: ctx, addressChannels, id, credentials};
+        const goalInvocation: GoalInvocation = {status, progressLog, context: ctx, addressChannels, id, credentials};
 
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
@@ -128,7 +128,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             const start = Date.now();
 
             return executeGoal({projectLoader: params.projectLoader},
-                goalExecutor, rwlc, sdmGoal, goal, logInterpreter)
+                goalExecutor, goalInvocation, sdmGoal, goal, logInterpreter)
                 .then(async res => {
                     await reportEndAndClose(res, start, progressLog);
                     return res;

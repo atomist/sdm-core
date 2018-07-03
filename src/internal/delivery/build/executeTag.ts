@@ -20,9 +20,9 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/operatio
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm/api/goal/GoalInvocation";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import {
     createTag,
@@ -31,9 +31,9 @@ import {
 } from "../../../util/github/ghub";
 import { readSdmVersion } from "./local/projectVersioner";
 
-export function executeTag(projectLoader: ProjectLoader): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context } = rwlc;
+export function executeTag(projectLoader: ProjectLoader): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { status, credentials, id, context } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
             const commit = status.commit;
