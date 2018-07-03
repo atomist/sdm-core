@@ -33,14 +33,12 @@ import { readSdmVersion } from "./local/projectVersioner";
 
 export function executeTag(projectLoader: ProjectLoader): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context } = goalInvocation;
+        const { sdmGoal, credentials, id, context } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
-            const commit = status.commit;
-
-            const version = await readSdmVersion(commit.repo.owner, commit.repo.name,
-                commit.repo.org.provider.providerId, commit.sha, id.branch, context);
-            await createTagForStatus(id, commit.sha, commit.message, version, credentials);
+            const version = await readSdmVersion(sdmGoal.repo.owner, sdmGoal.repo.name,
+                sdmGoal.repo.providerId, sdmGoal.sha, id.branch, context);
+            await createTagForStatus(id, sdmGoal.sha, sdmGoal.push.after.message, version, credentials);
 
             return Success;
         });
