@@ -24,6 +24,7 @@ import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoal,
     GoalInvocation,
+    SdmGoalEvent,
 } from "@atomist/sdm";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
@@ -36,27 +37,28 @@ import {
 import { SdmVersionForCommit } from "../../../../typings/types";
 
 export type ProjectVersioner =
-    (status: StatusForExecuteGoal.Fragment, p: GitProject, log: ProgressLog) => Promise<string>;
+    (status: SdmGoalEvent, p: GitProject, log: ProgressLog) => Promise<string>;
 
 /**
  * Version the project with a build specific version number
  * @param projectLoader used to load projects
+ * @param projectVersioner decides on the version string
  */
 export function executeVersioner(projectLoader: ProjectLoader,
                                  projectVersioner: ProjectVersioner): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context, progressLog } = goalInvocation;
+        const { sdmGoal, credentials, id, context, progressLog } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
-            const version = await projectVersioner(status, p, progressLog);
+            const version = await projectVersioner(sdmGoal, p, progressLog);
             const sdmVersion: SdmVersion = {
-                sha: status.commit.sha,
+                sha: sdmGoal.sha,
                 branch: id.branch,
                 version,
                 repo: {
-                    owner: status.commit.repo.owner,
-                    name: status.commit.repo.name,
-                    providerId: status.commit.repo.org.provider.providerId,
+                    owner: sdmGoal.repo.owner,
+                    name: sdmGoal.repo.name,
+                    providerId: sdmGoal.repo.providerId,
                 },
             };
             await context.messageClient.send(sdmVersion, addressEvent(SdmVersionRootType));

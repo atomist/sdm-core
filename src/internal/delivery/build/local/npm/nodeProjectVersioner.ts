@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import * as df from "dateformat";
 import { ProjectVersioner } from "../projectVersioner";
 
-export const NodeProjectVersioner: ProjectVersioner = async (status, p, log) => {
+export const NodeProjectVersioner: ProjectVersioner = async (sdmGoal, p, log) => {
     const pjFile = await p.getFile("package.json");
     const pj = JSON.parse(await pjFile.getContent());
-    const branch = branchFromCommit(status.commit).split("/").join(".");
-    const branchSuffix = branch !== status.commit.repo.defaultBranch ? `${branch}.` : "";
+    const branch = sdmGoal.branch.split("/").join(".");
+    const branchSuffix = branch !== sdmGoal.push.repo.defaultBranch ? `${branch}.` : "";
     const version = `${pj.version}-${branchSuffix}${df(new Date(), "yyyymmddHHMMss")}`;
 
     await spawnAndWatch({
