@@ -22,14 +22,8 @@ import { hasFile } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { AtomistBuildFile } from "../../internal/delivery/build/local/npm/NpmDetectBuildMapping";
 
 export const IsNode: PredicatePushTest = predicatePushTest("Is Node", async p => {
-    try {
-        const f = await p.findFile("package.json");
-        const contents = await f.getContent();
-        JSON.parse(contents);
-        return true;
-    } catch (err) {
-        return false;
-    }
+    const f = await p.getFile("package.json");
+    return !!f;
 });
 
 export const IsAtomistAutomationClient = hasFile("src/atomist.config.ts");
