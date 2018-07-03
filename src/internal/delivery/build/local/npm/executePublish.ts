@@ -16,13 +16,13 @@
 
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
-import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoal,
-    PrepareForGoalExecution,
     GoalInvocation,
+    PrepareForGoalExecution,
 } from "@atomist/sdm";
+import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import * as fs from "fs-extra";
 import * as p from "path";

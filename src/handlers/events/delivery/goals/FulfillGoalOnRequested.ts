@@ -28,13 +28,14 @@ import {
     EventHandlerMetadata,
     ValueDeclaration,
 } from "@atomist/automation-client/metadata/automationMetadata";
+import { GoalInvocation } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { GoalInvocation } from "@atomist/sdm";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import {
@@ -52,9 +53,7 @@ import {
 import * as stringify from "json-stringify-safe";
 import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { fetchProvider } from "../../../../util/github/gitHubProvider";
 import { formatDuration } from "../../../../util/misc/time";
-import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 
 /**
  * Handle an SDM request goal. Used for many implementation types.
