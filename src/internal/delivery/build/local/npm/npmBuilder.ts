@@ -104,13 +104,13 @@ export async function npmInstallPreparation(p: GitProject, goalInvocation: GoalI
 }
 
 export async function npmVersionPreparation(p: GitProject, goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> {
-    const commit = goalInvocation.status.commit;
+    const sdmGoal = goalInvocation.sdmGoal;
     const version = await readSdmVersion(
-        commit.repo.owner,
-        commit.repo.name,
-        commit.repo.org.provider.providerId,
-        commit.sha,
-        branchFromCommit(commit),
+        sdmGoal.repo.owner,
+        sdmGoal.repo.name,
+        sdmGoal.repo.providerId,
+        sdmGoal.sha,
+        sdmGoal.branch,
         goalInvocation.context);
     return spawnAndWatch({
             command: "npm",
