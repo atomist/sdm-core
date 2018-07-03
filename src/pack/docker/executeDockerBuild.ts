@@ -19,15 +19,12 @@ import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import {
-    ExecuteGoalWithLog,
-    PrepareForGoalExecution,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
+import { ExecuteGoal, PrepareForGoalExecution } from "@atomist/sdm/api/goal/GoalInvocation";
+import { RunWithLogContext } from "@atomist/sdm";
 
 export interface DockerOptions {
     registry: string;
@@ -52,7 +49,7 @@ export type DockerImageNameCreator = (p: GitProject,
 export function executeDockerBuild(projectLoader: ProjectLoader,
                                    imageNameCreator: DockerImageNameCreator,
                                    preparations: PrepareForGoalExecution[] = [],
-                                   options: DockerOptions): ExecuteGoalWithLog {
+                                   options: DockerOptions): ExecuteGoal {
     return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
         const { status, credentials, id, context, progressLog } = rwlc;
 

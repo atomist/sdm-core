@@ -35,12 +35,12 @@ import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
     OnAnyFailedSdmGoal,
-    SdmGoalState,
 } from "../../../../typings/types";
 import {
     fetchScmProvider,
     sumSdmGoalEventsByOverride,
 } from "./RequestDownstreamGoalsOnGoalSuccess";
+import { SdmGoalState } from "@atomist/sdm";
 
 /**
  * Respond to a failure status by failing downstream goals

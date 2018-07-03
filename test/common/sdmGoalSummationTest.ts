@@ -23,7 +23,7 @@ import { sumSdmGoalEventsByOverride } from "../../src/handlers/events/delivery/g
 
 describe("Putting SdmGoal events together", () => {
    it("Lets the event we just received override out-of-date query results", () => {
-       const successfulSdmGoal = successEvent.data.SdmGoal[0] as SdmGoal;
+       const successfulSdmGoal = successEvent.data.SdmGoal[0] as any as SdmGoal;
        const result = sumSdmGoalEventsByOverride(queryResult.SdmGoal as any as SdmGoal[],
            [successfulSdmGoal]);
 
