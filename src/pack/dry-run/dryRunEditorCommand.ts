@@ -27,6 +27,7 @@ import {
     editorHandler,
 } from "@atomist/automation-client/operations/edit/editorToCommand";
 import { AnyProjectEditor } from "@atomist/automation-client/operations/edit/projectEditor";
+import { NoParameters } from "@atomist/automation-client/SmartParameters";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
 import { allReposInTeam } from "@atomist/sdm/api-helper/command/editor/allReposInTeam";
 import { toEditorOrReviewerParametersMaker } from "@atomist/sdm/api-helper/command/editor/editorCommand";
@@ -39,7 +40,6 @@ import {
 import { EditModeSuggestion } from "@atomist/sdm/api/command/editor/EditModeSuggestion";
 import { Status } from "../../util/github/ghub";
 import { NewBranchWithStatus } from "./support/NewBranchWithStatus";
-import { NoParameters } from "@atomist/automation-client/SmartParameters";
 
 export const DryRunContext = "atomist-dry-run";
 
