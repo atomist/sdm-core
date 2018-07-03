@@ -52,7 +52,7 @@ export class SetDeployEnablementParameters {
  * Command to set deploy enablement on the currently mapped repo
  * @param {CommandListenerInvocation} cli
  * @param {boolean} enable
- * @returns {Promise<HandlerResult | HandlerError>}
+ * @returns {Promise<HandlerResult | HandlerError>}IsnOde
  */
 export function setDeployEnablement(cli: CommandListenerInvocation,
                                     enable: boolean): Promise<HandlerResult | HandlerError> {
