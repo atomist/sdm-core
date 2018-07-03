@@ -110,7 +110,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const log = await this.logFactory(ctx, sdmGoal);
         const progressLog = new WriteToAllProgressLog(sdmGoal.name, new LoggingProgressLog(sdmGoal.name, "debug"), log);
         const addressChannels = addressChannelsFor(commit.repo, ctx);
-        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchProvider(ctx, undefined));
+        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
