@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - EditorRegistration supports general editorCommand customizations, instead of specifically dryRun.
 If you were setting `dryRun = true`, set `editorCommandFactory = dryRunEditorCommand` instead.
+- ProjectVersioner function type receives an SdmGoalEvent instead of a Status fragment.
 
 ## [0.2.3][https://github.com/atomist/sdm/compare/0.2.2...0.2.3] - 2018-06-18
 
