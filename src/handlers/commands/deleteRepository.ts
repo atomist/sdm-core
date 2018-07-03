@@ -32,7 +32,7 @@ import { buttonForCommand } from "@atomist/automation-client/spi/message/Message
 import {
     ExecuteGoal,
     GoalInvocation,
-} from "@atomist/sdm/api/goal/GoalInvocation";
+} from "@atomist/sdm";
 import {
     Attachment,
     SlackMessage,

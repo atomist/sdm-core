@@ -33,7 +33,7 @@ import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOn
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { GoalInvocation } from "@atomist/sdm/api/goal/GoalInvocation";
+import { GoalInvocation } from "@atomist/sdm";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";

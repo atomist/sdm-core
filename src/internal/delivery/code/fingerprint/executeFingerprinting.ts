@@ -23,7 +23,7 @@ import { relevantCodeActions } from "@atomist/sdm/api-helper/listener/relevantCo
 import {
     ExecuteGoal,
     GoalInvocation,
-} from "@atomist/sdm/api/goal/GoalInvocation";
+} from "@atomist/sdm";
 import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
 import { FingerprinterRegistration } from "@atomist/sdm/api/registration/FingerprinterRegistration";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";

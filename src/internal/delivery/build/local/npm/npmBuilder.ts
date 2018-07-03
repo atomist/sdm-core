@@ -24,7 +24,7 @@ import {
     SpawnCommand,
 } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { GoalInvocation } from "@atomist/sdm/api/goal/GoalInvocation";
+import { GoalInvocation } from "@atomist/sdm";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { readSdmVersion } from "../projectVersioner";

@@ -23,7 +23,7 @@ import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
-import { ExecuteGoal, PrepareForGoalExecution, GoalInvocation } from "@atomist/sdm/api/goal/GoalInvocation";
+import { ExecuteGoal, PrepareForGoalExecution, GoalInvocation } from "@atomist/sdm";
 
 export interface DockerOptions {
     registry: string;

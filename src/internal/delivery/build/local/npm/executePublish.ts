@@ -22,7 +22,7 @@ import {
     ExecuteGoal,
     PrepareForGoalExecution,
     GoalInvocation,
-} from "@atomist/sdm/api/goal/GoalInvocation";
+} from "@atomist/sdm";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import * as fs from "fs-extra";
 import * as p from "path";
