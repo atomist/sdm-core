@@ -24,7 +24,7 @@ import {
     SpawnCommand,
 } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+import { GoalInvocation } from "@atomist/sdm/api/goal/GoalInvocation";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { readSdmVersion } from "../projectVersioner";
@@ -89,7 +89,7 @@ export function npmBuilderOptionsFromFile(commandFile: string): SpawnBuilderOpti
 
 export const NpmPreparations = [npmInstallPreparation, npmVersionPreparation, npmCompilePreparation];
 
-export async function npmInstallPreparation(p: GitProject, rwlc: RunWithLogContext): Promise<ExecuteGoalResult> {
+export async function npmInstallPreparation(p: GitProject, goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> {
     const hasPackageLock = p.fileExistsSync("package-lock.json");
     return spawnAndWatch({
         command: "npm",
@@ -97,21 +97,21 @@ export async function npmInstallPreparation(p: GitProject, rwlc: RunWithLogConte
     }, {
             cwd: p.baseDir,
             ...DevelopmentEnvOptions,
-        }, rwlc.progressLog,
+        }, goalInvocation.progressLog,
         {
             errorFinder: code => code != null,
         });
 }
 
-export async function npmVersionPreparation(p: GitProject, rwlc: RunWithLogContext): Promise<ExecuteGoalResult> {
-    const commit = rwlc.status.commit;
+export async function npmVersionPreparation(p: GitProject, goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> {
+    const commit = goalInvocation.status.commit;
     const version = await readSdmVersion(
         commit.repo.owner,
         commit.repo.name,
         commit.repo.org.provider.providerId,
         commit.sha,
         branchFromCommit(commit),
-        rwlc.context);
+        goalInvocation.context);
     return spawnAndWatch({
             command: "npm",
             args: ["--no-git-tag-version", "version", version],
@@ -119,20 +119,20 @@ export async function npmVersionPreparation(p: GitProject, rwlc: RunWithLogConte
         {
             cwd: p.baseDir,
         },
-        rwlc.progressLog,
+        goalInvocation.progressLog,
         {
             errorFinder: code => code !== 0,
         });
 }
 
-export async function npmCompilePreparation(p: GitProject, rwlc: RunWithLogContext): Promise<ExecuteGoalResult> {
+export async function npmCompilePreparation(p: GitProject, goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> {
     return spawnAndWatch({
         command: "npm",
         args: ["run", "compile"],
     }, {
             cwd: p.baseDir,
             ...DevelopmentEnvOptions,
-        }, rwlc.progressLog,
+        }, goalInvocation.progressLog,
         {
             errorFinder: code => code != null,
         });

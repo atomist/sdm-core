@@ -30,9 +30,9 @@ import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm/api/goal/GoalInvocation";
 import {
     Attachment,
     SlackMessage,
@@ -84,10 +84,10 @@ function deleteRepositoryPlease() {
     };
 }
 
-export function offerToDeleteRepository(): ExecuteGoalWithLog {
+export function offerToDeleteRepository(): ExecuteGoal {
     const GitHubDotComProviderId = "zjlmxjzwhurspem";
-    return async (rwlc: RunWithLogContext) => {
-        const {addressChannels, id} = rwlc;
+    return async (goalInvocation: GoalInvocation) => {
+        const {addressChannels, id} = goalInvocation;
 
         const params = new DeleteRepositoryParameters();
         params.owner = id.owner;

@@ -23,9 +23,9 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm/api/goal/GoalInvocation";
 import { createStatus } from "../../../../../util/github/ghub";
 
 export type K8Target = "testing" | "production";
@@ -36,9 +36,9 @@ export function k8AutomationDeployContext(target: K8Target): string {
     return `${K8TargetBase}${target}`;
 }
 
-export function requestDeployToK8s(target: K8Target): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext) => {
-        const { status, id, credentials } = rwlc;
+export function requestDeployToK8s(target: K8Target): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation) => {
+        const { status, id, credentials } = goalInvocation;
         const commit = status.commit;
         const image = status.commit.image;
 
