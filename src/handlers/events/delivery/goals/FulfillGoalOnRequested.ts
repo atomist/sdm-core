@@ -115,7 +115,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
-        const goalInvocation: GoalInvocation = {status, progressLog, context: ctx, addressChannels, id, credentials};
+        const goalInvocation: GoalInvocation = {sdmGoal, status, progressLog, context: ctx, addressChannels, id, credentials};
 
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
