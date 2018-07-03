@@ -24,6 +24,7 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
+import { SdmGoalState } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
@@ -40,7 +41,6 @@ import {
     fetchScmProvider,
     sumSdmGoalEventsByOverride,
 } from "./RequestDownstreamGoalsOnGoalSuccess";
-import { SdmGoalState } from "@atomist/sdm";
 
 /**
  * Respond to a failure status by failing downstream goals

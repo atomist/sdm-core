@@ -18,18 +18,16 @@ import { logger } from "@atomist/automation-client";
 import { BitBucketServerRepoRef } from "@atomist/automation-client/operations/common/BitBucketServerRepoRef";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     CoreRepoFieldsAndChannels,
     OnPushToAnyBranch,
     ProviderType,
-    ScmProvider,
     StatusForExecuteGoal,
 } from "@atomist/sdm/typings/types";
 import * as _ from "lodash";
-import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 
 export class DefaultRepoRefResolver implements RepoRefResolver {
 

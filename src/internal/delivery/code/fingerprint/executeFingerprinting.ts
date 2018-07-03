@@ -17,13 +17,13 @@
 import { logger } from "@atomist/automation-client";
 import { Success } from "@atomist/automation-client/Handlers";
 import { Fingerprint } from "@atomist/automation-client/project/fingerprint/Fingerprint";
-import { computeFingerprints } from "@atomist/sdm/api-helper/listener/computeFingerprints";
-import { createPushImpactListenerInvocation } from "@atomist/sdm/api-helper/listener/createPushImpactListenerInvocation";
-import { relevantCodeActions } from "@atomist/sdm/api-helper/listener/relevantCodeActions";
 import {
     ExecuteGoal,
     GoalInvocation,
 } from "@atomist/sdm";
+import { computeFingerprints } from "@atomist/sdm/api-helper/listener/computeFingerprints";
+import { createPushImpactListenerInvocation } from "@atomist/sdm/api-helper/listener/createPushImpactListenerInvocation";
+import { relevantCodeActions } from "@atomist/sdm/api-helper/listener/relevantCodeActions";
 import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
 import { FingerprinterRegistration } from "@atomist/sdm/api/registration/FingerprinterRegistration";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
