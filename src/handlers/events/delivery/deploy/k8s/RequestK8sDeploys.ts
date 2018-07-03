@@ -38,16 +38,15 @@ export function k8AutomationDeployContext(target: K8Target): string {
 
 export function requestDeployToK8s(target: K8Target): ExecuteGoal {
     return async (goalInvocation: GoalInvocation) => {
-        const { status, id, credentials } = goalInvocation;
-        const commit = status.commit;
-        const image = status.commit.image;
+        const { sdmGoal, id, credentials } = goalInvocation;
+        const image = sdmGoal.push.after.image;
 
         if (!image) {
-            logger.warn(`No image found on commit ${commit.sha}; can't deploy`);
+            logger.warn(`No image found on commit ${sdmGoal.sha}; can't deploy`);
             return Promise.resolve(failure(new Error("No image linked")));
         }
 
-        logger.info(`Requesting deploy. Triggered by ${status.state} status: ${status.context}: ${status.description}`);
+        logger.info(`Requesting deploy. Triggered by ${sdmGoal.name} ${sdmGoal.state} ${sdmGoal.description}`);
         // we want this to communicate via the status directly.
         await createStatus(credentials, id as GitHubRepoRef, {
             context: k8AutomationDeployContext(target),
