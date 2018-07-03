@@ -54,6 +54,7 @@ import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/g
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { fetchProvider } from "../../../../util/github/gitHubProvider";
 import { formatDuration } from "../../../../util/misc/time";
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 
 /**
  * Handle an SDM request goal. Used for many implementation types.
@@ -109,7 +110,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const log = await this.logFactory(ctx, sdmGoal);
         const progressLog = new WriteToAllProgressLog(sdmGoal.name, new LoggingProgressLog(sdmGoal.name, "debug"), log);
         const addressChannels = addressChannelsFor(commit.repo, ctx);
-        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchProvider(ctx, sdmGoal.repo.providerId));
+        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchProvider(ctx, undefined));
 
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
@@ -149,9 +150,9 @@ function convertForNow(sdmGoal: SdmGoalFields.Fragment, commit: CommitForSdmGoal
     };
 }
 
-async function reportStart(sdmGoal: SdmGoal, progressLog: ProgressLog) {
+async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
     progressLog.write(`---`);
-    progressLog.write(`Repository: ${sdmGoal.repo.owner}/${sdmGoal.repo.name}#${sdmGoal.branch}`);
+    progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}#${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
     progressLog.write(`Goal: ${sdmGoal.name} - ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);

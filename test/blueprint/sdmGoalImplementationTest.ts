@@ -34,6 +34,7 @@ import { PushFields } from "@atomist/sdm/typings/types";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../src/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../src/machine/machineFactory";
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",
@@ -82,7 +83,7 @@ describe("implementing goals in the SDM", () => {
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
 
-        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal);
+        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
         assert.equal(myImpl.implementationName, "Autofix");
     });
 
@@ -123,7 +124,7 @@ describe("implementing goals in the SDM", () => {
         assert(determinedGoals.goals.includes(customGoal));
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
-        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal);
+        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
         assert.equal(myImpl.implementationName, "Cornelius");
         await myImpl.goalExecutor(undefined);
         assert(executed);

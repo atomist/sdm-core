@@ -37,8 +37,8 @@ import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
 import { SoftwareDeliveryMachineOptions } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import {
     OnImageLinked,
-    SdmGoalState,
 } from "../../../../typings/types";
+import { SdmGoalState } from "@atomist/sdm";
 
 @EventHandler("Scan when artifact is found", subscription("OnImageLinked"))
 export class FindArtifactOnImageLinked implements HandleEvent<OnImageLinked.Subscription> {
