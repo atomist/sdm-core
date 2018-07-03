@@ -22,7 +22,7 @@ import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoal,
     GoalInvocation,
-} from "@atomist/sdm/api/goal/GoalInvocation";
+} from "@atomist/sdm";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import {
     createTag,

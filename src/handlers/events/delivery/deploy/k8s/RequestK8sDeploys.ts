@@ -25,7 +25,7 @@ import { RemoteRepoRef } from "@atomist/automation-client/operations/common/Repo
 import {
     ExecuteGoal,
     GoalInvocation,
-} from "@atomist/sdm/api/goal/GoalInvocation";
+} from "@atomist/sdm";
 import { createStatus } from "../../../../../util/github/ghub";
 
 export type K8Target = "testing" | "production";
