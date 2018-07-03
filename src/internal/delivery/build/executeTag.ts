@@ -18,11 +18,11 @@ import { Success } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import {
     createTag,
@@ -31,16 +31,14 @@ import {
 } from "../../../util/github/ghub";
 import { readSdmVersion } from "./local/projectVersioner";
 
-export function executeTag(projectLoader: ProjectLoader): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context } = rwlc;
+export function executeTag(projectLoader: ProjectLoader): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { sdmGoal, credentials, id, context } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
-            const commit = status.commit;
-
-            const version = await readSdmVersion(commit.repo.owner, commit.repo.name,
-                commit.repo.org.provider.providerId, commit.sha, id.branch, context);
-            await createTagForStatus(id, commit.sha, commit.message, version, credentials);
+            const version = await readSdmVersion(sdmGoal.repo.owner, sdmGoal.repo.name,
+                sdmGoal.repo.providerId, sdmGoal.sha, id.branch, context);
+            await createTagForStatus(id, sdmGoal.sha, sdmGoal.push.after.message, version, credentials);
 
             return Success;
         });

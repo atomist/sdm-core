@@ -28,6 +28,7 @@ describe("DashboardDisplayProgressLog", () => {
     };
 
     const goal: SdmGoal = {
+        push: {},
         repo: {
             owner: "RepoOwner",
             name: "RepoName",

@@ -18,14 +18,13 @@ import { logger } from "@atomist/automation-client";
 import { BitBucketServerRepoRef } from "@atomist/automation-client/operations/common/BitBucketServerRepoRef";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     CoreRepoFieldsAndChannels,
     OnPushToAnyBranch,
     ProviderType,
-    ScmProvider,
     StatusForExecuteGoal,
 } from "@atomist/sdm/typings/types";
 import * as _ from "lodash";
@@ -95,13 +94,14 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
         return status.commit.repo.org.provider.providerId;
     }
 
-    public repoRefFromSdmGoal(sdmGoal: SdmGoal, provider: ScmProvider.ScmProvider): RemoteRepoRef {
+    public repoRefFromSdmGoal(sdmGoal: SdmGoalEvent): RemoteRepoRef {
+        const provider = sdmGoal.push.repo.org.provider;
         switch (provider.providerType) {
             case ProviderType.github_com:
             case ProviderType.ghe:
                 return GitHubRepoRef.from({
-                    owner: sdmGoal.repo.owner,
-                    repo: sdmGoal.repo.name,
+                    owner: sdmGoal.push.repo.owner,
+                    repo: sdmGoal.push.repo.name,
                     sha: sdmGoal.sha,
                     branch: sdmGoal.branch,
                     rawApiBase: provider.apiUrl,
@@ -110,8 +110,8 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                 const providerUrl = provider.url;
                 return this.toBitBucketServerRepoRef({
                     providerUrl,
-                    owner: sdmGoal.repo.owner,
-                    name: sdmGoal.repo.name,
+                    owner: sdmGoal.push.repo.owner,
+                    name: sdmGoal.push.repo.name,
                     sha: sdmGoal.sha,
                     branch: sdmGoal.branch,
                 });

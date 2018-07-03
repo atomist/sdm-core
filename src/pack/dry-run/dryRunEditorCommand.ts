@@ -27,6 +27,7 @@ import {
     editorHandler,
 } from "@atomist/automation-client/operations/edit/editorToCommand";
 import { AnyProjectEditor } from "@atomist/automation-client/operations/edit/projectEditor";
+import { NoParameters } from "@atomist/automation-client/SmartParameters";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
 import { allReposInTeam } from "@atomist/sdm/api-helper/command/editor/allReposInTeam";
 import { toEditorOrReviewerParametersMaker } from "@atomist/sdm/api-helper/command/editor/editorCommand";
@@ -37,7 +38,6 @@ import {
     toMachineOptions,
 } from "@atomist/sdm/api-helper/machine/toMachineOptions";
 import { EditModeSuggestion } from "@atomist/sdm/api/command/editor/EditModeSuggestion";
-import { EmptyParameters } from "@atomist/sdm/api/command/support/EmptyParameters";
 import { Status } from "../../util/github/ghub";
 import { NewBranchWithStatus } from "./support/NewBranchWithStatus";
 
@@ -57,11 +57,11 @@ export const DryRunContext = "atomist-dry-run";
  * @param targets targets parameters. Allows targeting to other source control systems
  * Add intent "try edit <name>"
  */
-export function dryRunEditorCommand<PARAMS = EmptyParameters>(
+export function dryRunEditorCommand<PARAMS = NoParameters>(
     sdm: MachineOrMachineOptions,
     edd: (params: PARAMS) => AnyProjectEditor,
     name: string,
-    paramsMaker: Maker<PARAMS> = EmptyParameters as Maker<PARAMS>,
+    paramsMaker: Maker<PARAMS> = NoParameters as Maker<PARAMS>,
     details: Partial<EditorCommandDetails<PARAMS>> = {},
     targets: FallbackParams =
         new GitHubFallbackReposParameters()): HandleCommand<EditOneOrAllParameters> {

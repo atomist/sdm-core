@@ -17,13 +17,13 @@
 import { logger } from "@atomist/automation-client";
 import { Success } from "@atomist/automation-client/Handlers";
 import { Fingerprint } from "@atomist/automation-client/project/fingerprint/Fingerprint";
+import {
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm";
 import { computeFingerprints } from "@atomist/sdm/api-helper/listener/computeFingerprints";
 import { createPushImpactListenerInvocation } from "@atomist/sdm/api-helper/listener/createPushImpactListenerInvocation";
 import { relevantCodeActions } from "@atomist/sdm/api-helper/listener/relevantCodeActions";
-import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
 import { FingerprinterRegistration } from "@atomist/sdm/api/registration/FingerprinterRegistration";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
@@ -36,16 +36,16 @@ import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
  */
 export function executeFingerprinting(projectLoader: ProjectLoader,
                                       fingerprinters: FingerprinterRegistration[],
-                                      listeners: FingerprintListener[]): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext) => {
-        const {id, credentials, context} = rwlc;
+                                      listeners: FingerprintListener[]): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation) => {
+        const {id, credentials, context} = goalInvocation;
         if (fingerprinters.length === 0) {
             return Success;
         }
 
         logger.debug("About to fingerprint %j using %d fingerprinters", id, fingerprinters.length);
         await projectLoader.doWithProject({credentials, id, readOnly: true}, async project => {
-            const cri = await createPushImpactListenerInvocation(rwlc, project);
+            const cri = await createPushImpactListenerInvocation(goalInvocation, project);
             const relevantFingerprinters: FingerprinterRegistration[] = await relevantCodeActions(fingerprinters, cri);
             logger.info("Will invoke %d eligible fingerprinters of %d to %j",
                 relevantFingerprinters.length, fingerprinters.length, cri.project.id);

@@ -24,6 +24,7 @@ import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectL
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
 import { Goal } from "@atomist/sdm/api/goal/Goal";
 import { Goals } from "@atomist/sdm/api/goal/Goals";
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import {
     SoftwareDeliveryMachineConfiguration,
     SoftwareDeliveryMachineOptions,
@@ -82,7 +83,7 @@ describe("implementing goals in the SDM", () => {
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
 
-        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal);
+        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
         assert.equal(myImpl.implementationName, "Autofix");
     });
 
@@ -123,7 +124,7 @@ describe("implementing goals in the SDM", () => {
         assert(determinedGoals.goals.includes(customGoal));
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
-        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal);
+        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
         assert.equal(myImpl.implementationName, "Cornelius");
         await myImpl.goalExecutor(undefined);
         assert(executed);

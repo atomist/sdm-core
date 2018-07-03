@@ -41,12 +41,11 @@ import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     BuildStatus,
-    OnBuildComplete,
+    OnBuildComplete, SdmGoalState,
 } from "@atomist/sdm/typings/types";
 import * as slack from "@atomist/slack-messages/SlackMessages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";
-import { SdmGoalState } from "../../../../typings/types";
 
 /**
  * Set build status on complete build

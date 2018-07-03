@@ -20,14 +20,14 @@ import {
 } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
-import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+    SdmGoalEvent,
+} from "@atomist/sdm";
+import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import * as _ from "lodash";
 import {
     SdmVersion,
@@ -36,27 +36,28 @@ import {
 import { SdmVersionForCommit } from "../../../../typings/types";
 
 export type ProjectVersioner =
-    (status: StatusForExecuteGoal.Fragment, p: GitProject, log: ProgressLog) => Promise<string>;
+    (status: SdmGoalEvent, p: GitProject, log: ProgressLog) => Promise<string>;
 
 /**
  * Version the project with a build specific version number
  * @param projectLoader used to load projects
+ * @param projectVersioner decides on the version string
  */
 export function executeVersioner(projectLoader: ProjectLoader,
-                                 projectVersioner: ProjectVersioner): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context, progressLog } = rwlc;
+                                 projectVersioner: ProjectVersioner): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { sdmGoal, credentials, id, context, progressLog } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
-            const version = await projectVersioner(status, p, progressLog);
+            const version = await projectVersioner(sdmGoal, p, progressLog);
             const sdmVersion: SdmVersion = {
-                sha: status.commit.sha,
+                sha: sdmGoal.sha,
                 branch: id.branch,
                 version,
                 repo: {
-                    owner: status.commit.repo.owner,
-                    name: status.commit.repo.name,
-                    providerId: status.commit.repo.org.provider.providerId,
+                    owner: sdmGoal.repo.owner,
+                    name: sdmGoal.repo.name,
+                    providerId: sdmGoal.repo.providerId,
                 },
             };
             await context.messageClient.send(sdmVersion, addressEvent(SdmVersionRootType));

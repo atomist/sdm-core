@@ -1,4 +1,4 @@
-# Change Log
+# ChangeLog
 
 All notable changes to this project will be documented in this file.
 
@@ -7,19 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/0.2.4...HEAD)
 
-### BREAKING
+### Fixed
 
--   EditorRegistration supports general editorCommand customizations, instead of specifically dryRun.
+-   **BREAKING** EditorRegistration supports general editorCommand customizations, instead of specifically dryRun.
 
 ### Added
 
 -   Cleanup scheduled goal jobs on Kubernetes [#4](https://github.com/atomist/sdm-core/issues/4)
+-   EditorRegistration supports general editorCommand customizations, instead of specifically dryRun. If you were setting `dryRun = true`, set `editorCommandFactory = dryRunEditorCommand` instead.
+-   ProjectVersioner function type receives an SdmGoalEvent instead of a Status fragment.
 
-## [0.2.3][https://github.com/atomist/sdm/compare/0.2.2...0.2.3] - 2018-06-18
+## [0.2.3](https://github.com/atomist/sdm/compare/0.2.2...0.2.3) - 2018-06-18
 
-### BREAKING
+### Fixed
 
--   SeedDrivenGeneratorSupport allows you to override the seed. This fixes a bug with overriding the seed name,
+-   **BREAKING**  SeedDrivenGeneratorSupport allows you to override the seed. This fixes a bug with overriding the seed name,
 
 ## Earlier
 

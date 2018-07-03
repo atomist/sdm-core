@@ -24,6 +24,7 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
+import { SdmGoalState } from "@atomist/sdm";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
@@ -37,7 +38,6 @@ import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
 import { SoftwareDeliveryMachineOptions } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import {
     OnImageLinked,
-    SdmGoalState,
 } from "../../../../typings/types";
 
 @EventHandler("Scan when artifact is found", subscription("OnImageLinked"))

@@ -16,14 +16,10 @@
 
 import { HandlerContext } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
+import { ExecuteGoal, GoalInvocation, PrepareForGoalExecution } from "@atomist/sdm";
 import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import {
-    ExecuteGoalWithLog,
-    PrepareForGoalExecution,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
@@ -47,19 +43,19 @@ export type DockerImageNameCreator = (p: GitProject,
  * @param {ProjectLoader} projectLoader
  * @param {DockerImageNameCreator} imageNameCreator
  * @param {DockerOptions} options
- * @returns {ExecuteGoalWithLog}
+ * @returns {ExecuteGoal}
  */
 export function executeDockerBuild(projectLoader: ProjectLoader,
                                    imageNameCreator: DockerImageNameCreator,
                                    preparations: PrepareForGoalExecution[] = [],
-                                   options: DockerOptions): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context, progressLog } = rwlc;
+                                   options: DockerOptions): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
+        const { status, credentials, id, context, progressLog } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
 
             for (const preparation of preparations) {
-                const pResult = await preparation(p, rwlc);
+                const pResult = await preparation(p, goalInvocation);
                 if (pResult.code !== 0) {
                     return pResult;
                 }

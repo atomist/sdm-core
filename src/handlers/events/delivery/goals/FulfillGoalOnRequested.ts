@@ -28,13 +28,14 @@ import {
     EventHandlerMetadata,
     ValueDeclaration,
 } from "@atomist/automation-client/metadata/automationMetadata";
+import { GoalInvocation } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { RunWithLogContext } from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import {
@@ -52,7 +53,6 @@ import {
 import * as stringify from "json-stringify-safe";
 import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { fetchProvider } from "../../../../util/github/gitHubProvider";
 import { formatDuration } from "../../../../util/misc/time";
 
 /**
@@ -109,12 +109,12 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const log = await this.logFactory(ctx, sdmGoal);
         const progressLog = new WriteToAllProgressLog(sdmGoal.name, new LoggingProgressLog(sdmGoal.name, "debug"), log);
         const addressChannels = addressChannelsFor(commit.repo, ctx);
-        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchProvider(ctx, sdmGoal.repo.providerId));
+        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
-        const rwlc: RunWithLogContext = {status, progressLog, context: ctx, addressChannels, id, credentials};
+        const goalInvocation: GoalInvocation = {sdmGoal, status, progressLog, context: ctx, addressChannels, id, credentials};
 
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
@@ -127,7 +127,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             const start = Date.now();
 
             return executeGoal({projectLoader: params.projectLoader},
-                goalExecutor, rwlc, sdmGoal, goal, logInterpreter)
+                goalExecutor, goalInvocation, sdmGoal, goal, logInterpreter)
                 .then(async res => {
                     await reportEndAndClose(res, start, progressLog);
                     return res;
@@ -149,9 +149,9 @@ function convertForNow(sdmGoal: SdmGoalFields.Fragment, commit: CommitForSdmGoal
     };
 }
 
-async function reportStart(sdmGoal: SdmGoal, progressLog: ProgressLog) {
+async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
     progressLog.write(`---`);
-    progressLog.write(`Repository: ${sdmGoal.repo.owner}/${sdmGoal.repo.name}#${sdmGoal.branch}`);
+    progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}#${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
     progressLog.write(`Goal: ${sdmGoal.name} - ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);

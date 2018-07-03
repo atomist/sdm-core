@@ -23,9 +23,9 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import {
-    ExecuteGoalWithLog,
-    RunWithLogContext,
-} from "@atomist/sdm/api/goal/ExecuteGoalWithLog";
+    ExecuteGoal,
+    GoalInvocation,
+} from "@atomist/sdm";
 import { createStatus } from "../../../../../util/github/ghub";
 
 export type K8Target = "testing" | "production";
@@ -36,18 +36,17 @@ export function k8AutomationDeployContext(target: K8Target): string {
     return `${K8TargetBase}${target}`;
 }
 
-export function requestDeployToK8s(target: K8Target): ExecuteGoalWithLog {
-    return async (rwlc: RunWithLogContext) => {
-        const { status, id, credentials } = rwlc;
-        const commit = status.commit;
-        const image = status.commit.image;
+export function requestDeployToK8s(target: K8Target): ExecuteGoal {
+    return async (goalInvocation: GoalInvocation) => {
+        const { sdmGoal, id, credentials } = goalInvocation;
+        const image = sdmGoal.push.after.image;
 
         if (!image) {
-            logger.warn(`No image found on commit ${commit.sha}; can't deploy`);
+            logger.warn(`No image found on commit ${sdmGoal.sha}; can't deploy`);
             return Promise.resolve(failure(new Error("No image linked")));
         }
 
-        logger.info(`Requesting deploy. Triggered by ${status.state} status: ${status.context}: ${status.description}`);
+        logger.info(`Requesting deploy. Triggered by ${sdmGoal.name} ${sdmGoal.state} ${sdmGoal.description}`);
         // we want this to communicate via the status directly.
         await createStatus(credentials, id as GitHubRepoRef, {
             context: k8AutomationDeployContext(target),
