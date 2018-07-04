@@ -18,7 +18,6 @@ import { MachineConfiguration } from "@atomist/sdm/api/machine/MachineConfigurat
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
-import { displayBuildLogHandler } from "../handlers/commands/ShowBuildLog";
 import { HandlerBasedSoftwareDeliveryMachine } from "../internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { ExposeInfo } from "../pack/info/exposeInfo";
 
@@ -55,8 +54,8 @@ import { ExposeInfo } from "../pack/info/exposeInfo";
  *
  * ```
  * softwareDeliveryMachine
- *    .addPushReactions(async pu => ...)
- *    .addNewIssueListeners(async i => ...)
+ *    .addPushReaction(async pu => ...)
+ *    .addNewIssueListener(async i => ...)
  *    .add...;
  * ```
  */
@@ -66,7 +65,5 @@ export function createSoftwareDeliveryMachine(config: MachineConfiguration<Softw
     const machine = new HandlerBasedSoftwareDeliveryMachine(config.name, config.configuration,
         goalSetters);
     return machine
-        // TODO we should probably pass the log interpreter here
-        .addCommand(displayBuildLogHandler())
         .addExtensionPacks(ExposeInfo);
 }

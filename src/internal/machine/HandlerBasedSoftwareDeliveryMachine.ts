@@ -30,10 +30,7 @@ import {
     JustBuildGoal,
 } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
-import { PushRules } from "@atomist/sdm/api/mapping/support/PushRules";
 import * as _ from "lodash";
-import { deleteRepositoryCommand } from "../../handlers/commands/deleteRepository";
-import { disposeCommand } from "../../handlers/commands/disposeCommand";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";
 import { SetGoalOnBuildComplete } from "../../handlers/events/delivery/build/SetStatusOnBuildComplete";
@@ -174,6 +171,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             undefined;
     }
 
+    /* TODO CD move this into a pack that can installed
     private get disposal(): FunctionalUnit {
         return {
             commandHandlers: [
@@ -188,7 +186,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             eventHandlers: [],
             ingesters: [],
         };
-    }
+    }*/
 
     private readonly onBuildComplete: Maker<SetGoalOnBuildComplete> =
         () => new SetGoalOnBuildComplete([BuildGoal, JustBuildGoal], this.configuration.sdm.repoRefResolver)
@@ -198,7 +196,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             .concat([
                 this.goalSetting,
                 this.goalConsequences,
-                this.disposal,
             ]);
     }
 
@@ -270,11 +267,11 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.onRepoCreation,
                 this.onNewRepoWithCode,
                 this.semanticDiffReactor,
-                this.pushMapping ? this.onBuildComplete : undefined,
                 this.notifyOnDeploy,
                 this.onVerifiedStatus,
-                this.pushMapping ? this.artifactFinder : undefined,
-            ]).filter(m => !!m);
+            ])
+            .concat(this.pushMapping ? [this.onBuildComplete, this.artifactFinder] : [])
+            .filter(m => !!m);
     }
 
     get commandHandlers(): Array<Maker<HandleCommand>> {

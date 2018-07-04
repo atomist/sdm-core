@@ -16,8 +16,7 @@
 
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { ListGeneratorsHandler } from "./listGenerators";
-import { SelfDescribeHandler } from "./SelfDescribe";
+import { selfDescribeHandler } from "./SelfDescribe";
 
 /**
  * Expose information about this machine
@@ -25,7 +24,6 @@ import { SelfDescribeHandler } from "./SelfDescribe";
 export const ExposeInfo: ExtensionPack = {
     ...metadata("info"),
     configure: sdm => {
-        sdm.addCommand(SelfDescribeHandler)
-            .addCommand(ListGeneratorsHandler);
+        sdm.addCommand(selfDescribeHandler(sdm.name));
     },
 };
