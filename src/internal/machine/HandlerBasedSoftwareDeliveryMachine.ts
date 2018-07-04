@@ -273,7 +273,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.pushMapping ? this.onBuildComplete : undefined,
                 this.notifyOnDeploy,
                 this.onVerifiedStatus,
-                this.artifactFinder,
+                this.pushMapping ? this.artifactFinder : undefined,
             ]).filter(m => !!m);
     }
 
