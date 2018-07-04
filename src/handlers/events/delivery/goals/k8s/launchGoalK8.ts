@@ -24,11 +24,13 @@ import {
 import { configurationValue } from "@atomist/automation-client/configuration";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { IsolatedGoalLauncher } from "@atomist/sdm";
+import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { StringCapturingProgressLog } from "@atomist/sdm/api-helper/log/StringCapturingProgressLog";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
+import * as cluster from "cluster";
 import * as fs from "fs-extra";
 import * as path from "path";
 
@@ -39,12 +41,14 @@ import * as path from "path";
  */
 export function createKubernetesGoalLauncher(): IsolatedGoalLauncher {
 
-    setInterval(() => {
-        return cleanCompletedJobs()
-            .then(() => {
-                logger.debug("Finished cleaning scheduled goal jobs");
-            });
-    }, 1000 * 60 * 10);
+    if (cluster.isMaster) {
+        setInterval(() => {
+            return cleanCompletedJobs()
+                .then(() => {
+                    logger.debug("Finished cleaning scheduled goal jobs");
+                });
+        }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 10));
+    }
 
     return KubernetesIsolatedGoalLauncher;
 }
@@ -57,7 +61,7 @@ export async function cleanCompletedJobs() {
     const deploymentName = process.env.ATOMIST_DEPLOYMENT_NAME || configurationValue<string>("name");
     const deploymentNamespace = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
-    const log = new StringCapturingProgressLog();
+    let log = new StringCapturingProgressLog();
 
     await spawnAndWatch({
             command: "kubectl",
@@ -78,13 +82,15 @@ export async function cleanCompletedJobs() {
 
     logger.info(`Deleting the following goal jobs from namespace '${deploymentNamespace}': ${completedSdmJobs.join(", ")}`);
 
+    log = new LoggingProgressLog("");
+
     for (const completedSdmJob of completedSdmJobs) {
         await spawnAndWatch({
                 command: "kubectl",
                 args: ["delete", "job", completedSdmJob, "-n" , deploymentNamespace],
             },
             {},
-            new StringCapturingProgressLog(),
+            log,
             {
                 errorFinder: code => code !== 0,
             },
