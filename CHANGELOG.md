@@ -7,19 +7,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/0.2.4...HEAD)
 
-### Fixed
-
--   **BREAKING** EditorRegistration supports general editorCommand customizations, instead of specifically dryRun.
-
 ### Added
 
 -   Cleanup scheduled goal jobs on Kubernetes [#4](https://github.com/atomist/sdm-core/issues/4)
 -   EditorRegistration supports general editorCommand customizations, instead of specifically dryRun. If you were setting `dryRun = true`, set `editorCommandFactory = dryRunEditorCommand` instead.
 -   ProjectVersioner function type receives an SdmGoalEvent instead of a Status fragment.
 
+### Changed
+
+-   Remove disposal command from default list of registered commands. [#5](https://github.com/atomist/sdm-core/issues/5)
+
 ### Deprecated
 
 -   Rename to GoalInvocation; deprecate status [#2](https://github.com/atomist/sdm-core/issues/2)
+
+### Fixed
+
+-   **BREAKING** EditorRegistration supports general editorCommand customizations, instead of specifically dryRun.
 
 ## [0.2.3](https://github.com/atomist/sdm/compare/0.2.2...0.2.3) - 2018-06-18
 
