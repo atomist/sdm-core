@@ -42,4 +42,7 @@ fragment SdmGoalFields on SdmGoal {
     channelId
   }
   data
+  push {
+    ...PushFields
+  }
 }
