@@ -47,7 +47,7 @@ export function createKubernetesGoalLauncher(): IsolatedGoalLauncher {
                 .then(() => {
                     logger.debug("Finished cleaning scheduled goal jobs");
                 });
-        }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 30));
+        }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 60 * 2));
     }
 
     return KubernetesIsolatedGoalLauncher;
