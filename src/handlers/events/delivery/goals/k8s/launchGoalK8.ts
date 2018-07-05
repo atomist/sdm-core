@@ -47,7 +47,7 @@ export function createKubernetesGoalLauncher(): IsolatedGoalLauncher {
                 .then(() => {
                     logger.debug("Finished cleaning scheduled goal jobs");
                 });
-        }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 10));
+        }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 30));
     }
 
     return KubernetesIsolatedGoalLauncher;
@@ -80,21 +80,24 @@ export async function cleanCompletedJobs() {
         sdmJobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0)
             .map(j => j.metadata.name);
 
-    logger.info(`Deleting the following goal jobs from namespace '${deploymentNamespace}': ${completedSdmJobs.join(", ")}`);
+    if (completedSdmJobs.length > 0) {
+        logger.info(`Deleting the following goal jobs from namespace '${deploymentNamespace}': ${
+            completedSdmJobs.join(", ")}`);
 
-    log = new LoggingProgressLog("");
+        log = new LoggingProgressLog("");
 
-    for (const completedSdmJob of completedSdmJobs) {
-        await spawnAndWatch({
-                command: "kubectl",
-                args: ["delete", "job", completedSdmJob, "-n" , deploymentNamespace],
-            },
-            {},
-            log,
-            {
-                errorFinder: code => code !== 0,
-            },
-        );
+        for (const completedSdmJob of completedSdmJobs) {
+            await spawnAndWatch({
+                    command: "kubectl",
+                    args: ["delete", "job", completedSdmJob, "-n" , deploymentNamespace],
+                },
+                {},
+                log,
+                {
+                    errorFinder: code => code !== 0,
+                },
+            );
+        }
     }
 }
 
