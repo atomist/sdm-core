@@ -119,7 +119,9 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
         if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
-            return isolatedGoalLauncher(sdmGoal, ctx, progressLog);
+            const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
+            await progressLog.close();
+            return result;
         } else {
             delete (sdmGoal as any).id;
 
