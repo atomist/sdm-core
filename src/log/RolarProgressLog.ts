@@ -99,22 +99,29 @@ export class RolarProgressLog implements ProgressLog {
     private async postLogs(isClosed: boolean): Promise<any> {
         const postingLogs = this.localLogs;
         this.localLogs = [];
+
         const closedRequestParam = isClosed ? "?closed=true" : "";
         const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
-        const result = await doWithRetry(() => this.axiosInstance.post(url, {
-                host: os.hostname(),
-                content: postingLogs,
-            }, {
-                headers: { "Content-Type": "application/json" },
-            }).catch(axiosError =>
-                Promise.reject(new Error(`Failure post to ${url}: ${axiosError.message}`))),
-            `post log to Rolar`,
-            this.retryOptions).catch(e => {
-                this.localLogs = postingLogs.concat(this.localLogs);
-                logger.error(e);
-            },
-        );
-        return result;
+
+        logger.debug(url);
+
+        if (postingLogs && postingLogs.length > 0) {
+            const result = await doWithRetry(() => this.axiosInstance.post(url, {
+                    host: os.hostname(),
+                    content: postingLogs,
+                }, {
+                    headers: { "Content-Type": "application/json" },
+                }).catch(axiosError =>
+                    Promise.reject(new Error(`Failure post to ${url}: ${axiosError.message}`))),
+                `post log to Rolar`,
+                this.retryOptions).catch(e => {
+                    this.localLogs = postingLogs.concat(this.localLogs);
+                    logger.error(e);
+                },
+            );
+            return result;
+        }
+        return Promise.resolve();
     }
 
     private constructUtcTimestamp(): string {
