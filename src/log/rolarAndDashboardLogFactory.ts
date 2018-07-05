@@ -34,7 +34,7 @@ export function rolarAndDashboardLogFactory(rolarBaseUrl?: string,
                                             flushInterval: number = 2000): ProgressLogFactory {
     let persistentLogFactory = (context, sdmGoal, fallback) => firstAvailableProgressLog(fallback);
     if (rolarBaseUrl) {
-        logger.info("Logging with Rolar at " + rolarBaseUrl);
+        logger.info("Logging with Rolar: " + rolarBaseUrl);
         persistentLogFactory = (context, sdmGoal, fallback) => {
             return firstAvailableProgressLog(
                 new DashboardDisplayProgressLog(rolarBaseUrl, bufferSize, flushInterval, context, sdmGoal),
