@@ -109,6 +109,7 @@ export interface SpawnBuilderOptions {
 export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
 
     private readonly options: SpawnBuilderOptions;
+    protected readonly sdm: SoftwareDeliveryMachine;
 
     constructor(params: {
         sdm: SoftwareDeliveryMachine,
@@ -116,6 +117,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
     }) {
         super(params.options.name, params.sdm);
         this.options = params.options;
+        this.sdm = params.sdm;
         if (!this.options.commands && !this.options.commandFile) {
             throw new Error("Please supply either commands or a path to a file in the project containing them");
         }
