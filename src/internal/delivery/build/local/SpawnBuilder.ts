@@ -109,7 +109,6 @@ export interface SpawnBuilderOptions {
 export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
 
     private readonly options: SpawnBuilderOptions;
-    protected readonly sdm: SoftwareDeliveryMachine;
 
     constructor(params: {
         sdm: SoftwareDeliveryMachine,
@@ -117,7 +116,6 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
     }) {
         super(params.options.name, params.sdm);
         this.options = params.options;
-        this.sdm = params.sdm;
         if (!this.options.commands && !this.options.commandFile) {
             throw new Error("Please supply either commands or a path to a file in the project containing them");
         }
@@ -134,7 +132,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
         const errorFinder = this.options.errorFinder;
         logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
             this.options.commandFile);
-        return this.sdm.configuration.projectLoader.doWithProject({credentials, id, readOnly: true}, async p => {
+        return this.sdm.configuration.sdm.projectLoader.doWithProject({credentials, id, readOnly: true}, async p => {
             const commands: SpawnCommand[] = this.options.commands || await loadCommandsFromFile(p, this.options.commandFile);
 
             const appId: AppInfo = await this.options.projectToAppInfo(p);
