@@ -100,12 +100,11 @@ export class RolarProgressLog implements ProgressLog {
         const postingLogs = this.localLogs;
         this.localLogs = [];
 
-        const closedRequestParam = isClosed ? "?closed=true" : "";
-        const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
-
-        logger.debug(url);
-
         if (postingLogs && postingLogs.length > 0) {
+
+            const closedRequestParam = isClosed ? "?closed=true" : "";
+            const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
+
             const result = await doWithRetry(() => this.axiosInstance.post(url, {
                     host: os.hostname(),
                     content: postingLogs,
