@@ -17,7 +17,7 @@
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { Project } from "@atomist/automation-client/project/Project";
-import { GoalInvocation } from "@atomist/sdm";
+import { GoalInvocation, SoftwareDeliveryMachine } from "@atomist/sdm";
 import {
     asSpawnCommand,
     spawnAndWatch,
@@ -25,7 +25,6 @@ import {
 } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { readSdmVersion } from "../projectVersioner";
 import {
     SpawnBuilder,
@@ -45,9 +44,9 @@ export const DevelopmentEnvOptions = {
 
 export const Install: SpawnCommand = asSpawnCommand("npm ci", DevelopmentEnvOptions);
 
-export function nodeBuilder(projectLoader: ProjectLoader, ...commands: string[]) {
+export function nodeBuilder(sdm: SoftwareDeliveryMachine, ...commands: string[]) {
     return new SpawnBuilder({
-        projectLoader,
+        sdm,
         options: npmBuilderOptions(commands.map(cmd => asSpawnCommand(cmd, DevelopmentEnvOptions))),
     });
 }

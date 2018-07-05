@@ -19,6 +19,7 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/operatio
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { Project } from "@atomist/automation-client/project/Project";
+import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import {
     asSpawnCommand,
     ChildProcessResult,
@@ -27,14 +28,12 @@ import {
     SpawnCommand,
     stringifySpawnCommand,
 } from "@atomist/sdm/api-helper/misc/spawned";
-import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import {
     InterpretLog,
     LogInterpretation,
 } from "@atomist/sdm/spi/log/InterpretedLog";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";
@@ -112,11 +111,10 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
     private readonly options: SpawnBuilderOptions;
 
     constructor(params: {
-        artifactStore?: ArtifactStore,
-        projectLoader: ProjectLoader,
+        sdm: SoftwareDeliveryMachine,
         options: SpawnBuilderOptions,
     }) {
-        super(params.options.name, params.artifactStore, params.projectLoader);
+        super(params.options.name, params.sdm);
         this.options = params.options;
         if (!this.options.commands && !this.options.commandFile) {
             throw new Error("Please supply either commands or a path to a file in the project containing them");
@@ -134,8 +132,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
         const errorFinder = this.options.errorFinder;
         logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
             this.options.commandFile);
-        return this.projectLoader.doWithProject({credentials, id, readOnly: true}, async p => {
-
+        return this.sdm.configuration.projectLoader.doWithProject({credentials, id, readOnly: true}, async p => {
             const commands: SpawnCommand[] = this.options.commands || await loadCommandsFromFile(p, this.options.commandFile);
 
             const appId: AppInfo = await this.options.projectToAppInfo(p);

@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import { SpawnBuilder } from "../SpawnBuilder";
 import { npmBuilderOptionsFromFile } from "./npmBuilder";
 
 export const AtomistBuildFile = ".atomist/build.sh";
 
-export function npmCustomBuilder(artifactStore: ArtifactStore, projectLoader: ProjectLoader) {
-    return new SpawnBuilder({ artifactStore,
-        projectLoader, options: npmBuilderOptionsFromFile(AtomistBuildFile)});
+export function npmCustomBuilder(sdm: SoftwareDeliveryMachine) {
+    return new SpawnBuilder({ sdm, options: npmBuilderOptionsFromFile(AtomistBuildFile) });
 }

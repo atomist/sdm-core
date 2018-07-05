@@ -172,7 +172,7 @@ describe("SDM handler creation", () => {
                     .setGoals(HttpServiceGoals)]);
             sdm.addBuildRules(when(HasAtomistBuildFile)
                 .itMeans("Custom build script")
-                .set(npmCustomBuilder(sdm.configuration.artifactStore, sdm.configuration.projectLoader)));
+                .set(npmCustomBuilder(sdm)));
             assert(!sdm.observesOnly);
         });
 
