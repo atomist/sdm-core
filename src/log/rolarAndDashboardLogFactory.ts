@@ -29,13 +29,15 @@ import { DashboardDisplayProgressLog } from "./DashboardDisplayProgressLog";
  * @param {string} dashboardBaseUrl
  * @return {ProgressLogFactory}
  */
-export function rolarAndDashboardLogFactory(rolarBaseUrl?: string, dashboardBaseUrl?: string): ProgressLogFactory {
+export function rolarAndDashboardLogFactory(rolarBaseUrl?: string,
+                                            bufferSize: number = 1000,
+                                            flushInterval: number = 2000): ProgressLogFactory {
     let persistentLogFactory = (context, sdmGoal, fallback) => firstAvailableProgressLog(fallback);
     if (rolarBaseUrl) {
         logger.info("Logging with Rolar at " + rolarBaseUrl);
         persistentLogFactory = (context, sdmGoal, fallback) => {
             return firstAvailableProgressLog(
-                new DashboardDisplayProgressLog(dashboardBaseUrl, rolarBaseUrl, context, sdmGoal),
+                new DashboardDisplayProgressLog(rolarBaseUrl, bufferSize, flushInterval, context, sdmGoal),
                 fallback,
             );
         };

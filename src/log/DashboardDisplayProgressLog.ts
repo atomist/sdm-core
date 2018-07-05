@@ -15,7 +15,7 @@
  */
 
 import { HandlerContext } from "@atomist/automation-client";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalEvent } from "@atomist/sdm";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { RolarProgressLog } from "./RolarProgressLog";
 
@@ -26,11 +26,13 @@ export class DashboardDisplayProgressLog implements ProgressLog {
 
     private readonly rolarProgressLog: RolarProgressLog;
 
-    constructor(private readonly dashboardBaseUrl: string,
-                rolarBaseUrl: string,
+    constructor(rolarBaseUrl: string,
+                bufferSize: number,
+                flushInterval: number,
                 private readonly context: HandlerContext,
-                private readonly sdmGoal: SdmGoal) {
-        this.rolarProgressLog = new RolarProgressLog(rolarBaseUrl, constructLogPath(context, sdmGoal));
+                private readonly sdmGoal: SdmGoalEvent) {
+        this.rolarProgressLog =
+            new RolarProgressLog(rolarBaseUrl, constructLogPath(context, sdmGoal), bufferSize, flushInterval);
     }
 
     get name() {
@@ -38,12 +40,8 @@ export class DashboardDisplayProgressLog implements ProgressLog {
     }
 
     get url() {
-        if (this.dashboardBaseUrl) {
-            const path = constructLogPath(this.context, this.sdmGoal);
-            return `${this.dashboardBaseUrl}/workspace/${path[0]}/logs/${path.slice(1).join("/")}`;
-        } else {
-            return this.rolarProgressLog.url;
-        }
+        const path = constructLogPath(this.context, this.sdmGoal);
+        return `https://app.atomist.com/workspace/${path[0]}/logs/${path.slice(1).join("/")}`;
     }
 
     public async isAvailable(): Promise<boolean> {
@@ -64,7 +62,7 @@ export class DashboardDisplayProgressLog implements ProgressLog {
 
 }
 
-export function constructLogPath(context: HandlerContext, sdmGoal: SdmGoal): string[] {
+export function constructLogPath(context: HandlerContext, sdmGoal: SdmGoalEvent): string[] {
     return [
         context.teamId,
         sdmGoal.repo.owner,

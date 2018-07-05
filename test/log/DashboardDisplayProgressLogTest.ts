@@ -50,17 +50,10 @@ describe("DashboardDisplayProgressLog", () => {
     };
 
     it("should construct dashboard log URL", () => {
-        const log = new DashboardDisplayProgressLog("http://dashboardhost", "http://rolarhost",
+        const log = new DashboardDisplayProgressLog("http://rolarhost", 1000, 0,
             context, goal);
         assert.equal(log.url,
-            "http://dashboardhost/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/GoalName/GoalSetId/CorrelationID");
-    });
-
-    it("should delegate to Rolar URL if dashboard base URL is not specified", () => {
-        const log = new DashboardDisplayProgressLog(undefined, "http://rolarhost",
-            context, goal);
-        assert.equal(log.url,
-            "http://rolarhost/logs/TeamID/RepoOwner/RepoName/SHA1/ENV/GoalName/GoalSetId/CorrelationID");
+            "https://app.atomist.com/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/GoalName/GoalSetId/CorrelationID");
     });
 
 });
