@@ -70,12 +70,13 @@ export function resetGoalsCommand(rules: {
     goalsListeners: GoalsSetListener[],
     goalSetter: GoalSetter,
     implementationMapping: SdmGoalImplementationMapper,
+    name: string,
 }): HandleCommand {
     return commandHandlerFrom(resetGoalsOnCommit(rules),
         ResetGoalsParameters,
         "ResetGoalsOnCommit",
         "Set goals",
-        "reset goals");
+        [`reset goals "${name}"`, "reset goals"]);
 }
 
 function resetGoalsOnCommit(rules: {
