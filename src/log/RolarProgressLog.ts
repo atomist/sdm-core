@@ -35,14 +35,19 @@ function* timestampGenerator() {
 export class RolarProgressLog implements ProgressLog {
 
     private localLogs: LogData[] = [];
+    private readonly timer: any;
 
     constructor(private readonly rolarBaseUrl: string,
                 private readonly logPath: string[],
                 private readonly bufferSizeLimit: number = 1000,
+                private readonly timerInterval: number = 0,
                 private readonly logLevel: string = "info",
                 private readonly timestamper: Iterator<Date> = timestampGenerator(),
                 private readonly retryOptions: WrapOptions = {},
                 private readonly axiosInstance: AxiosInstance = axios) {
+        if (this.timerInterval > 0) {
+            this.timer = setInterval(() => this.flush(), 2000);
+        }
     }
 
     get name() {
@@ -85,21 +90,24 @@ export class RolarProgressLog implements ProgressLog {
     }
 
     public close(): Promise<any> {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
         return this.postLogs(true);
     }
 
     private async postLogs(isClosed: boolean): Promise<any> {
-        const closedRequestParam = isClosed ? "?closed=true" : "";
-        const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
         const postingLogs = this.localLogs;
         this.localLogs = [];
+        const closedRequestParam = isClosed ? "?closed=true" : "";
+        const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
         const result = await doWithRetry(() => this.axiosInstance.post(url, {
                 host: os.hostname(),
                 content: postingLogs,
             }, {
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
             }).catch(axiosError =>
-                 Promise.reject(new Error(`Failure post to ${url}: ${axiosError.message}`))),
+                Promise.reject(new Error(`Failure post to ${url}: ${axiosError.message}`))),
             `post log to Rolar`,
             this.retryOptions).catch(e => {
                 this.localLogs = postingLogs.concat(this.localLogs);

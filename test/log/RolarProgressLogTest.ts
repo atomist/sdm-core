@@ -30,7 +30,7 @@ describe("RolarProgressLog", () => {
 
     it("should be available if returning http 200", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "info", fakeTimestampGenerator(), { retries: 0 },
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"info", fakeTimestampGenerator(), { retries: 0 },
             axiosInstance);
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onHead("http://fakehost/api/logs").replyOnce(200);
@@ -40,7 +40,7 @@ describe("RolarProgressLog", () => {
 
     it("should not be available if returning http 404", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "info", fakeTimestampGenerator(), { retries: 0 },
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"info", fakeTimestampGenerator(), { retries: 0 },
             axiosInstance);
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onHead("http://fakehost/api/logs").replyOnce(404);
@@ -49,7 +49,7 @@ describe("RolarProgressLog", () => {
     });
 
     it("should write logs to memory", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"info", fakeTimestampGenerator());
 
         log.write("I'm a lumberjack and I'm OK");
         log.write("I sleep all night and I work all day");
@@ -70,7 +70,7 @@ describe("RolarProgressLog", () => {
 
     it("should flush logs", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "info", fakeTimestampGenerator(), { retries: 0 },
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"info", fakeTimestampGenerator(), { retries: 0 },
             axiosInstance);
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test")
@@ -101,7 +101,7 @@ describe("RolarProgressLog", () => {
 
     it("should not clear logs if flush fails", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "info", fakeTimestampGenerator(), { retries: 0 },
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"info", fakeTimestampGenerator(), { retries: 0 },
             axiosInstance);
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test")
@@ -127,7 +127,7 @@ describe("RolarProgressLog", () => {
 
     it("should close logs", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "info", fakeTimestampGenerator(), { retries: 0 },
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"info", fakeTimestampGenerator(), { retries: 0 },
             axiosInstance);
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test?closed=true")
@@ -152,7 +152,7 @@ describe("RolarProgressLog", () => {
 
     it("should flush logs automatically", async () => {
         const axiosInstance = axios.create();
-        const smallBufferLog = new RolarProgressLog("http://fakehost", ["test"], 50, "info", fakeTimestampGenerator(),
+        const smallBufferLog = new RolarProgressLog("http://fakehost", ["test"], 50, 0,"info", fakeTimestampGenerator(),
             { retries: 0 }, axiosInstance);
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test")
@@ -179,16 +179,17 @@ describe("RolarProgressLog", () => {
         smallBufferLog.write("On Wednesdays he goes shopping and has buttered scones for tea");
 
         assert.deepEqual((smallBufferLog as any).localLogs, []);
+        await smallBufferLog.close();
     });
 
     it("should provide a link to the log", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test", "it"], 10000, "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog("http://fakehost", ["test", "it"], 10000, 0,"info", fakeTimestampGenerator());
 
         assert.equal(log.url, "http://fakehost/logs/test/it");
     });
 
     it("should log as debug", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "debug", fakeTimestampGenerator());
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"debug", fakeTimestampGenerator());
 
         log.write("I'm a lumberjack and I'm OK");
         log.write("I sleep all night and I work all day");
@@ -208,7 +209,7 @@ describe("RolarProgressLog", () => {
     });
 
     it("should log without timestamp", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, "", null);
+        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0,"", null);
 
         log.write("I'm a lumberjack and I'm OK");
         log.write("I sleep all night and I work all day");
