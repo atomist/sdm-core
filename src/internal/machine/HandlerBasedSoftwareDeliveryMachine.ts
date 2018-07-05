@@ -112,6 +112,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     goalsListeners: this.goalsSetListeners,
                     goalSetter: this.pushMapping,
                     implementationMapping: this.goalFulfillmentMapper,
+                    name: this.configuration.name,
                 })],
                 ingesters: [],
             };
