@@ -74,7 +74,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
-        // .filter(expectToBeFulfilledAfterRequest)
+            .filter(expectToBeFulfilledAfterRequest)
             .filter(shouldBePlannedOrSkipped)
             .filter(g => preconditionsAreMet(g, {goalsForCommit: goals}));
 
