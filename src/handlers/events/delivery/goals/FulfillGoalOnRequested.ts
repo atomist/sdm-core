@@ -48,7 +48,6 @@ import {
     CommitForSdmGoal,
     OnAnyRequestedSdmGoal,
     SdmGoalFields,
-    StatusForExecuteGoal,
 } from "@atomist/sdm/typings/types";
 import * as stringify from "json-stringify-safe";
 import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
@@ -95,8 +94,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
         const commit = await fetchCommitForSdmGoal(ctx, sdmGoal);
 
-        const status: StatusForExecuteGoal.Fragment = convertForNow(sdmGoal, commit);
-
         if (sdmGoal.fulfillment.method !== "SDM fulfill on requested") {
             logger.info("Goal %s: Implementation method is '%s'; not fulfilling", sdmGoal.name, sdmGoal.fulfillment.method);
             return Success;
@@ -114,7 +111,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
-        const goalInvocation: GoalInvocation = {sdmGoal, status, progressLog, context: ctx, addressChannels, id, credentials};
+        const goalInvocation: GoalInvocation = {sdmGoal, progressLog, context: ctx, addressChannels, id, credentials};
 
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
@@ -139,16 +136,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 });
         }
     }
-}
-
-function convertForNow(sdmGoal: SdmGoalFields.Fragment, commit: CommitForSdmGoal.Commit): StatusForExecuteGoal.Fragment {
-    return {
-        commit,
-        state: sdmGoalStateToGitHubStatusState(sdmGoal.state),
-        targetUrl: sdmGoal.url, // not handling approval weirdness
-        context: sdmGoal.externalKey,
-        description: sdmGoal.description,
-    };
 }
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
