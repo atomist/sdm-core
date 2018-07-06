@@ -45,12 +45,9 @@ import {
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
-    CommitForSdmGoal,
     OnAnyRequestedSdmGoal,
-    SdmGoalFields,
 } from "@atomist/sdm/typings/types";
 import * as stringify from "json-stringify-safe";
-import { sdmGoalStateToGitHubStatusState } from "../../../../internal/delivery/goals/support/github/gitHubStatusSetters";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { formatDuration } from "../../../../util/misc/time";
 
