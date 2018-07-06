@@ -93,7 +93,7 @@ export abstract class LocalBuilder implements Builder {
                                push: PushThatTriggersBuild,
                                log: ProgressLog,
                                context: HandlerContext): Promise<HandlerResult> {
-        const as = this.sdm.configuration.artifactStore;
+        const as = this.sdm.configuration.sdm.artifactStore;
         const atomistTeam = context.teamId;
         const buildNumber = await this.obtainBuildIdentifier(push, context);
 
