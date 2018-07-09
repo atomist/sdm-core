@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { automationClientInstance } from "@atomist/automation-client";
 import { executeImmaterial } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofixes";
 import { executePushReactions } from "@atomist/sdm/api-helper/listener/executePushReactions";
@@ -35,7 +36,6 @@ import {
 import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { offerToDeleteRepository } from "../../handlers/commands/deleteRepository";
 import { executeFingerprinting } from "../../internal/delivery/code/fingerprint/executeFingerprinting";
-import { automationClientInstance } from "@atomist/automation-client";
 
 /**
  * Add well known goals to the given SDM
