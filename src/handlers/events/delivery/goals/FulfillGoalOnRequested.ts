@@ -30,7 +30,6 @@ import {
 } from "@atomist/automation-client/metadata/automationMetadata";
 import { GoalInvocation } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
-import { fetchCommitForSdmGoal } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
@@ -44,9 +43,7 @@ import {
 } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import {
-    OnAnyRequestedSdmGoal,
-} from "@atomist/sdm/typings/types";
+import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
 import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { formatDuration } from "../../../../util/misc/time";
@@ -89,8 +86,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        const commit = await fetchCommitForSdmGoal(ctx, sdmGoal);
-
         if (sdmGoal.fulfillment.method !== "SDM fulfill on requested") {
             logger.info("Goal %s: Implementation method is '%s'; not fulfilling", sdmGoal.name, sdmGoal.fulfillment.method);
             return Success;
@@ -102,7 +97,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
         const log = await this.logFactory(ctx, sdmGoal);
         const progressLog = new WriteToAllProgressLog(sdmGoal.name, new LoggingProgressLog(sdmGoal.name, "debug"), log);
-        const addressChannels = addressChannelsFor(commit.repo, ctx);
+        const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
         (this.credentialsResolver as any).githubToken = params.githubToken;
