@@ -24,7 +24,6 @@ import {
     Success,
     Value,
 } from "@atomist/automation-client";
-import { configurationValue } from "@atomist/automation-client/configuration";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { SdmGoalEvent } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
