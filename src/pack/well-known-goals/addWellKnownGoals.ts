@@ -35,6 +35,7 @@ import {
 import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { offerToDeleteRepository } from "../../handlers/commands/deleteRepository";
 import { executeFingerprinting } from "../../internal/delivery/code/fingerprint/executeFingerprinting";
+import { automationClientInstance } from "@atomist/automation-client";
 
 /**
  * Add well known goals to the given SDM
@@ -69,5 +70,5 @@ function configure(sdm: SoftwareDeliveryMachine) {
             offerToDeleteRepository())
         .addGoalImplementation("OfferToDeleteRepoAfterUndeploys", DeleteAfterUndeploysGoal,
             offerToDeleteRepository());
-    sdm.addKnownSideEffect(ArtifactGoal, "from ImageLinked", AnyPush);
+    sdm.addKnownSideEffect(ArtifactGoal, automationClientInstance().configuration.name, AnyPush);
 }

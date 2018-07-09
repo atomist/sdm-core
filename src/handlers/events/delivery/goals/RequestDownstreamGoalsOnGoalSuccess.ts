@@ -15,6 +15,7 @@
  */
 
 import {
+    automationClientInstance,
     EventFired,
     EventHandler,
     HandleEvent,
@@ -74,7 +75,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
-            .filter(expectToBeFulfilledAfterRequest)
+            // .filter(expectToBeFulfilledAfterRequest)
             .filter(shouldBePlannedOrSkipped)
             .filter(g => preconditionsAreMet(g, {goalsForCommit: goals}));
 
@@ -159,7 +160,7 @@ function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoal) {
         case "SDM fulfill on requested":
             return true;
         case "side-effect":
-            return false;
+            return dependentGoal.fulfillment.name !== automationClientInstance().configuration.name;
         case "other":
             // legacy behavior
             return true;
