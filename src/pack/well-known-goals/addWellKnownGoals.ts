@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { configurationValue } from "@atomist/automation-client/configuration";
 import { executeImmaterial } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofixes";
 import { executePushReactions } from "@atomist/sdm/api-helper/listener/executePushReactions";
@@ -70,5 +69,5 @@ function configure(sdm: SoftwareDeliveryMachine) {
             offerToDeleteRepository())
         .addGoalImplementation("OfferToDeleteRepoAfterUndeploys", DeleteAfterUndeploysGoal,
             offerToDeleteRepository());
-    sdm.addKnownSideEffect(ArtifactGoal, configurationValue<string>("name", sdm.name), AnyPush);
+    sdm.addKnownSideEffect(ArtifactGoal, sdm.configuration.name, AnyPush);
 }

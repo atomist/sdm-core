@@ -40,9 +40,9 @@ import {
 } from "../../../../typings/types";
 
 /**
- * Respond to a failure status by failing downstream goals
+ * Move downstream goals from 'planned' to 'requested' when preconditions are met.
  */
-@EventHandler("Move downstream goals from 'planned' to 'success' when preconditions are met",
+@EventHandler("Move downstream goals from 'planned' to 'requested' when preconditions are met",
     subscription("OnAnySuccessfulSdmGoal"))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
@@ -124,8 +124,7 @@ function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: stri
         case "SDM fulfill on requested":
             return true;
         case "side-effect":
-            const fulfilledOutsideSDM = dependentGoal.fulfillment.name !== name;
-            return fulfilledOutsideSDM;
+            return dependentGoal.fulfillment.name !== name;
         case "other":
             // legacy behavior
             return true;
