@@ -58,7 +58,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             return Success;
         }
 
-        const id = params.repoRefResolver.repoRefFromPush(failedGoal.push)
+        const id = params.repoRefResolver.repoRefFromPush(failedGoal.push);
         const goals = await fetchGoalsForCommit(context, id, failedGoal.repo.providerId, failedGoal.goalSetId);
 
         const goalsToSkip = goals.filter(g => isDependentOn(failedGoal, g, mapKeyToGoal(goals)))
