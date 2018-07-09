@@ -158,8 +158,7 @@ function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: stri
         case "SDM fulfill on requested":
             return true;
         case "side-effect":
-            const sdmName = configurationValue<string>("name", name);
-            const fulfilledOutsideSDM = dependentGoal.fulfillment.name !== sdmName;
+            const fulfilledOutsideSDM = dependentGoal.fulfillment.name !== name;
             return fulfilledOutsideSDM;
         case "other":
             // legacy behavior
