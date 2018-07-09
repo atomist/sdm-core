@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   Remove disposal command from default list of registered commands. [#5](https://github.com/atomist/sdm-core/issues/5)
+-   **BREAKING** Removed "dry run" support. See `makeBuildAware` in `sdm`
 
 ### Deprecated
 
