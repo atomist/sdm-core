@@ -73,10 +73,10 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         const goals: SdmGoalEvent[] = sumSdmGoalEventsByOverride(
             await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoalEvent[], [sdmGoal]);
 
-        const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
-            .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
-            .filter(shouldBePlannedOrSkipped)
-            .filter(g => preconditionsAreMet(g, {goalsForCommit: goals}));
+        let goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g));
+        goalsToRequest = goalsToRequest.filter(g => expectToBeFulfilledAfterRequest(g, this.name));
+        goalsToRequest = goalsToRequest.filter(shouldBePlannedOrSkipped);
+        goalsToRequest = goalsToRequest.filter(g => preconditionsAreMet(g, {goalsForCommit: goals}));
 
         if (goalsToRequest.length > 0) {
             logger.info("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
