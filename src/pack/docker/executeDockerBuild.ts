@@ -16,12 +16,11 @@
 
 import { HandlerContext } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { ExecuteGoal, GoalInvocation, PrepareForGoalExecution } from "@atomist/sdm";
-import { branchFromCommit } from "@atomist/sdm/api-helper/goal/executeBuild";
+import { ExecuteGoal, GoalInvocation, PrepareForGoalExecution,
+    SdmGoalEvent } from "@atomist/sdm";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { StatusForExecuteGoal } from "@atomist/sdm/typings/types";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
 
@@ -34,7 +33,7 @@ export interface DockerOptions {
 }
 
 export type DockerImageNameCreator = (p: GitProject,
-                                      status: StatusForExecuteGoal.Fragment,
+                                      sdmGoal: SdmGoalEvent,
                                       options: DockerOptions,
                                       ctx: HandlerContext) => Promise<{ registry: string, name: string, version: string }>;
 
@@ -50,7 +49,7 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
                                    preparations: PrepareForGoalExecution[] = [],
                                    options: DockerOptions): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { status, credentials, id, context, progressLog } = goalInvocation;
+        const { sdmGoal, credentials, id, context, progressLog } = goalInvocation;
 
         return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
 
@@ -69,7 +68,7 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
                 errorFinder: code => code !== 0,
             };
 
-            const imageName = await imageNameCreator(p, status, options, context);
+            const imageName = await imageNameCreator(p, sdmGoal, options, context);
             const image = `${imageName.registry}/${imageName.name}:${imageName.version}`;
             const dockerfilePath = await (options.dockerfileFinder ? options.dockerfileFinder(p) : "Dockerfile");
 
@@ -122,9 +121,9 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
 
             // 4. create image link
             if (await postLinkImageWebhook(
-                status.commit.repo.owner,
-                status.commit.repo.name,
-                status.commit.sha,
+                sdmGoal.repo.owner,
+                sdmGoal.repo.name,
+                sdmGoal.sha,
                 image,
                 context.teamId)) {
                 return result;
@@ -135,11 +134,10 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
     };
 }
 
-export const DefaultDockerImageNameCreator: DockerImageNameCreator = async (p, status, options, context) => {
+export const DefaultDockerImageNameCreator: DockerImageNameCreator = async (p, sdmGoal, options, context) => {
     const name = p.name;
-    const commit = status.commit;
-    const version = await readSdmVersion(commit.repo.owner, commit.repo.name,
-        commit.repo.org.provider.providerId, commit.sha, branchFromCommit(commit), context);
+    const version = await readSdmVersion(sdmGoal.repo.owner, sdmGoal.repo.name,
+        sdmGoal.repo.providerId, sdmGoal.sha, sdmGoal.branch, context);
     return {
         registry: options.registry,
         name,

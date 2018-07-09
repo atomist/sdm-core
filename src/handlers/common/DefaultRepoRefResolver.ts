@@ -25,7 +25,6 @@ import {
     CoreRepoFieldsAndChannels,
     OnPushToAnyBranch,
     ProviderType,
-    StatusForExecuteGoal,
 } from "@atomist/sdm/typings/types";
 import * as _ from "lodash";
 
@@ -88,10 +87,6 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
 
     public providerIdFromPush(push: OnPushToAnyBranch.Push) {
         return push.repo.org.provider.providerId;
-    }
-
-    public providerIdFromStatus(status: StatusForExecuteGoal.Fragment) {
-        return status.commit.repo.org.provider.providerId;
     }
 
     public repoRefFromSdmGoal(sdmGoal: SdmGoalEvent): RemoteRepoRef {
