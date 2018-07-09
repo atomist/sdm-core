@@ -38,9 +38,9 @@ import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoa
 const AddThingAutofix: AutofixRegistration = {
     name: "AddThing",
     pushTest: IsTypeScript,
-    action: async cri => {
-        await cri.project.addFile("thing", "1");
-        return { edited: true, success: true, target: cri.project };
+    transform: async (p, cri) => {
+        await p.addFile("thing", "1");
+        return { edited: true, success: true, target: p };
     },
 };
 
