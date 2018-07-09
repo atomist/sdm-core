@@ -131,6 +131,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 eventHandlers: [
                     () => new SkipDownstreamGoalsOnGoalFailure(this.configuration.sdm.repoRefResolver),
                     () => new RequestDownstreamGoalsOnGoalSuccess(
+                        this.configuration.name,
                         this.goalFulfillmentMapper,
                         this.configuration.sdm.repoRefResolver),
                     () => new RespondOnGoalCompletion(

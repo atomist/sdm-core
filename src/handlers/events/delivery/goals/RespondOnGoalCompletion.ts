@@ -25,12 +25,9 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import {
-    fetchCommitForSdmGoal,
-    fetchGoalsForCommit,
-} from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { SdmGoalEvent } from "@atomist/sdm";
+import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
@@ -39,7 +36,6 @@ import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsRes
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
-import { sumSdmGoalEventsByOverride } from "./RequestDownstreamGoalsOnGoalSuccess";
 
 /**
  * Respond to a failure or success status by running listeners
@@ -57,18 +53,15 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
     public async handle(event: EventFired<OnAnyCompletedSdmGoal.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
-        const sdmGoal: SdmGoal = event.data.SdmGoal[0] as SdmGoal;
+        const sdmGoal: SdmGoalEvent = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
             return Success;
         }
 
-        const commit = await fetchCommitForSdmGoal(context, sdmGoal);
-        const push = commit.pushes[0];
-        const id = this.repoRefResolver.repoRefFromPush(push);
-        const allGoals: SdmGoal[] = sumSdmGoalEventsByOverride(
-            await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);
+        const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const allGoals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
 
         (this.credentialsFactory as any).githubToken = this.token;
 
@@ -76,7 +69,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             id,
             context,
             credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
-            addressChannels: addressChannelsFor(push.repo, context),
+            addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
             allGoals,
             completedGoal: sdmGoal,
         };

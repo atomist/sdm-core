@@ -25,65 +25,59 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
+import { SdmGoalEvent } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import {
-    SdmGoal,
-    SdmGoalKey,
-} from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as _ from "lodash";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
     OnAnySuccessfulSdmGoal,
-    ScmProvider,
     SdmGoalState,
 } from "../../../../typings/types";
 
 /**
- * Respond to a failure status by failing downstream goals
+ * Move downstream goals from 'planned' to 'requested' when preconditions are met.
  */
-@EventHandler("Move downstream goals from 'planned' to 'success' when preconditions are met",
+@EventHandler("Move downstream goals from 'planned' to 'requested' when preconditions are met",
     subscription("OnAnySuccessfulSdmGoal"))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
     @Value("token")
     public githubToken: string;
 
-    constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
+    constructor(private readonly name,
+                private readonly implementationMapper: SdmGoalImplementationMapper,
                 private readonly repoRefResolver: RepoRefResolver) {
     }
 
-    // #98: GitHub Status->SdmGoal: I believe all the goal state updates in this SDM
-    // are now happening on the SdmGoal. This subscription can change to be on SdmGoal state.
     public async handle(event: EventFired<OnAnySuccessfulSdmGoal.Subscription>,
                         context: HandlerContext,
                         params: this): Promise<HandlerResult> {
-        const sdmGoal = event.data.SdmGoal[0] as SdmGoal;
+        const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
             return Success;
         }
 
-        const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchScmProvider(context, sdmGoal.repo.providerId));
-        const goals: SdmGoal[] = sumSdmGoalEventsByOverride(
-            await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);
+        const id = params.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const goals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
-        // .filter(expectToBeFulfilledAfterRequest)
+            .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
             .filter(shouldBePlannedOrSkipped)
-            .filter(g => preconditionsAreMet(g, {goalsForCommit: goals}));
+            .filter(g => preconditionsAreMet(g, { goalsForCommit: goals }));
 
         if (goalsToRequest.length > 0) {
             logger.info("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
                 goalsToRequest.map(goalKeyString).join(", "));
         }
 
-        const credentials = {token: this.githubToken};
+        const credentials = { token: this.githubToken };
 
         /*
          * #294 Intention: for custom descriptions per goal, we need to look up the Goal.
@@ -109,35 +103,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
     }
 }
 
-export function sumSdmGoalEventsByOverride(some: SdmGoal[], more: SdmGoal[]): SdmGoal[] {
-    // For some reason this won't compile with the obvious fix
-    // tslint:disable-next-line:no-unnecessary-callback-wrapper
-    const byKey = _.groupBy(some.concat(more), sg => goalKeyString(sg));
-    const summedGoals = Object.keys(byKey).map(k => sumEventsForOneSdmGoal(byKey[k]));
-    return summedGoals;
-}
-
-function sumEventsForOneSdmGoal(events: SdmGoal[]): SdmGoal {
-    if (events.length === 1) {
-        return events[0];
-    }
-    // here, I could get clever and sort by timestamp, or someday build a graph if they link to prior versions,
-    // or get smart about statuses. Let me be lazy.
-    logger.debug("Found %d events for %s. Taking the last one, which has state %s", events.length, goalKeyString(events[0]),
-        events[events.length - 1].state);
-    return events[events.length - 1];
-}
-
-export async function fetchScmProvider(context: HandlerContext, providerId: string): Promise<ScmProvider.ScmProvider> {
-    const result = await context.graphClient.query<ScmProvider.Query, ScmProvider.Variables>(
-        {name: "SCMProvider", variables: {providerId}});
-    if (!result || !result.SCMProvider || result.SCMProvider.length === 0) {
-        throw new Error(`Provider not found: ${providerId}`);
-    }
-    return result.SCMProvider[0];
-}
-
-function shouldBePlannedOrSkipped(dependentGoal: SdmGoal) {
+function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
     if (dependentGoal.state === "planned") {
         return true;
     }
@@ -153,13 +119,12 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoal) {
     return false;
 }
 
-// tslint:disable-next-line:no-unused-variable
-function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoal) {
+function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: string) {
     switch (dependentGoal.fulfillment.method) {
         case "SDM fulfill on requested":
             return true;
         case "side-effect":
-            return false;
+            return dependentGoal.fulfillment.name !== name;
         case "other":
             // legacy behavior
             return true;
@@ -175,7 +140,7 @@ function mapKeyToGoal<T extends SdmGoalKey>(goals: T[]): (SdmGoalKey) => T {
     };
 }
 
-function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoal): boolean {
+function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoalEvent): boolean {
     if (!goal) {
         logger.warn("Internal error: Trying to work out if %j is dependent on null or undefined goal", successfulGoal);
         return false;

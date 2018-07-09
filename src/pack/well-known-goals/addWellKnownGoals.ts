@@ -69,5 +69,5 @@ function configure(sdm: SoftwareDeliveryMachine) {
             offerToDeleteRepository())
         .addGoalImplementation("OfferToDeleteRepoAfterUndeploys", DeleteAfterUndeploysGoal,
             offerToDeleteRepository());
-    sdm.addKnownSideEffect(ArtifactGoal, "from ImageLinked", AnyPush);
+    sdm.addKnownSideEffect(ArtifactGoal, sdm.configuration.name, AnyPush);
 }
