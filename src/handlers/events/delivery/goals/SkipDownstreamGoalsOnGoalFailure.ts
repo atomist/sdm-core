@@ -24,7 +24,10 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { SdmGoalState } from "@atomist/sdm";
+import {
+    SdmGoalEvent,
+    SdmGoalState,
+} from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
@@ -34,13 +37,7 @@ import {
 } from "@atomist/sdm/api/goal/SdmGoal";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import {
-    OnAnyFailedSdmGoal,
-} from "../../../../typings/types";
-import {
-    fetchScmProvider,
-    sumSdmGoalEventsByOverride,
-} from "./RequestDownstreamGoalsOnGoalSuccess";
+import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
 /**
  * Respond to a failure status by failing downstream goals
@@ -50,26 +47,19 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
 
     constructor(private readonly repoRefResolver: RepoRefResolver) {}
 
-    // #98: GitHub Status->SdmGoal: We still have to respond to failure on status,
-    // until we change all the failure updates to happen on SdmGoal.
-    // but we can update the SdmGoals, and let that propagate to the statuses.
-    // we can count on all of the statuses we need to update to exist as SdmGoals.
-    // however, we can't count on the SdmGoal to have the latest state, so check the Status for that.
     public async handle(event: EventFired<OnAnyFailedSdmGoal.Subscription>,
                         context: HandlerContext,
                         params: this): Promise<HandlerResult> {
 
-        const failedGoal = event.data.SdmGoal[0] as SdmGoal;
+        const failedGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(failedGoal)) {
             logger.debug(`Goal ${failedGoal.name} skipped because not relevant for this SDM`);
             return Success;
         }
 
-        const id = params.repoRefResolver.repoRefFromSdmGoal(failedGoal, await fetchScmProvider(context, failedGoal.repo.providerId));
-        const goals: SdmGoal[] = sumSdmGoalEventsByOverride(
-            await fetchGoalsForCommit(context, id, failedGoal.repo.providerId, failedGoal.goalSetId) as SdmGoal[],
-            [failedGoal]);
+        const id = params.repoRefResolver.repoRefFromPush(failedGoal.push)
+        const goals = await fetchGoalsForCommit(context, id, failedGoal.repo.providerId, failedGoal.goalSetId);
 
         const goalsToSkip = goals.filter(g => isDependentOn(failedGoal, g, mapKeyToGoal(goals)))
             .filter(g => g.state === "planned");
