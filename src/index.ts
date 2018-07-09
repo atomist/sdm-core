@@ -58,7 +58,6 @@ export { npmCustomBuilder } from "./internal/delivery/build/local/npm/NpmDetectB
 export { nodeBuilder } from "./internal/delivery/build/local/npm/npmBuilder";
 export { ToPublicRepo } from "./mapping/pushtest/toPublicRepo";
 export { HasDockerfile } from "./pack/docker/dockerPushTests";
-export { DryRunEditing } from "./pack/dry-run/dryRunEditorSupport";
 export {
     HasAtomistBuildFile,
     IsNode,
