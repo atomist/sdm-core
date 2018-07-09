@@ -15,7 +15,6 @@
  */
 
 import {
-    automationClientInstance,
     EventFired,
     EventHandler,
     HandleEvent,
@@ -25,7 +24,9 @@ import {
     Success,
     Value,
 } from "@atomist/automation-client";
+import { configurationValue } from "@atomist/automation-client/configuration";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
+import { SdmGoalEvent } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
@@ -54,7 +55,8 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
     @Value("token")
     public githubToken: string;
 
-    constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
+    constructor(private readonly name,
+                private readonly implementationMapper: SdmGoalImplementationMapper,
                 private readonly repoRefResolver: RepoRefResolver) {
     }
 
@@ -75,7 +77,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
-            // .filter(expectToBeFulfilledAfterRequest)
+            .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
             .filter(shouldBePlannedOrSkipped)
             .filter(g => preconditionsAreMet(g, {goalsForCommit: goals}));
 
@@ -154,13 +156,12 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoal) {
     return false;
 }
 
-// tslint:disable-next-line:no-unused-variable
-function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoal) {
+function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: string) {
     switch (dependentGoal.fulfillment.method) {
         case "SDM fulfill on requested":
             return true;
         case "side-effect":
-            return dependentGoal.fulfillment.name !== automationClientInstance().configuration.name;
+            return dependentGoal.fulfillment.name !== configurationValue<string>("name", name);
         case "other":
             // legacy behavior
             return true;
