@@ -25,6 +25,7 @@ import {
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { SdmGoalEvent } from "@atomist/sdm";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import {
     descriptionFromState,
@@ -36,7 +37,6 @@ import {
     addressChannelsFor,
 } from "@atomist/sdm/api/context/addressChannels";
 import { Goal } from "@atomist/sdm/api/goal/Goal";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
@@ -126,7 +126,7 @@ function buildStatusToSdmGoalState(buildStatus: BuildStatus): SdmGoalState {
 
 async function setBuiltContext(ctx: HandlerContext,
                                goal: Goal,
-                               sdmGoal: SdmGoal,
+                               sdmGoal: SdmGoalEvent,
                                state: BuildStatus,
                                url: string): Promise<any> {
     const newState = buildStatusToSdmGoalState(state);

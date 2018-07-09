@@ -31,10 +31,7 @@ import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCo
 import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import {
-    SdmGoal,
-    SdmGoalKey,
-} from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as _ from "lodash";
@@ -65,7 +62,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
     public async handle(event: EventFired<OnAnySuccessfulSdmGoal.Subscription>,
                         context: HandlerContext,
                         params: this): Promise<HandlerResult> {
-        const sdmGoal = event.data.SdmGoal[0] as SdmGoal;
+        const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
@@ -73,8 +70,8 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         }
 
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal, await fetchScmProvider(context, sdmGoal.repo.providerId));
-        const goals: SdmGoal[] = sumSdmGoalEventsByOverride(
-            await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoal[], [sdmGoal]);
+        const goals: SdmGoalEvent[] = sumSdmGoalEventsByOverride(
+            await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId) as SdmGoalEvent[], [sdmGoal]);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
             .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
@@ -112,7 +109,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
     }
 }
 
-export function sumSdmGoalEventsByOverride(some: SdmGoal[], more: SdmGoal[]): SdmGoal[] {
+export function sumSdmGoalEventsByOverride(some: SdmGoalEvent[], more: SdmGoalEvent[]): SdmGoalEvent[] {
     // For some reason this won't compile with the obvious fix
     // tslint:disable-next-line:no-unnecessary-callback-wrapper
     const byKey = _.groupBy(some.concat(more), sg => goalKeyString(sg));
@@ -120,7 +117,7 @@ export function sumSdmGoalEventsByOverride(some: SdmGoal[], more: SdmGoal[]): Sd
     return summedGoals;
 }
 
-function sumEventsForOneSdmGoal(events: SdmGoal[]): SdmGoal {
+function sumEventsForOneSdmGoal(events: SdmGoalEvent[]): SdmGoalEvent {
     if (events.length === 1) {
         return events[0];
     }
@@ -140,7 +137,7 @@ export async function fetchScmProvider(context: HandlerContext, providerId: stri
     return result.SCMProvider[0];
 }
 
-function shouldBePlannedOrSkipped(dependentGoal: SdmGoal) {
+function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
     if (dependentGoal.state === "planned") {
         return true;
     }
@@ -177,7 +174,7 @@ function mapKeyToGoal<T extends SdmGoalKey>(goals: T[]): (SdmGoalKey) => T {
     };
 }
 
-function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoal): boolean {
+function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoalEvent): boolean {
     if (!goal) {
         logger.warn("Internal error: Trying to work out if %j is dependent on null or undefined goal", successfulGoal);
         return false;
