@@ -76,7 +76,7 @@ export function resetGoalsCommand(rules: {
         ResetGoalsParameters,
         "ResetGoalsOnCommit",
         "Set goals",
-        [`reset goals "${rules.name}"`, "reset goals"]);
+        [`reset goals '${rules.name}'`, "reset goals"]);
 }
 
 function resetGoalsOnCommit(rules: {

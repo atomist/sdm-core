@@ -28,7 +28,7 @@ export function selfDescribeHandler(name: string): CommandHandlerRegistration {
         name: "SelfDescribe",
         createCommand,
         description: "Describe this SDM",
-        intent: [`describe sdm "${name}"`, "describe sdm"],
+        intent: [`describe sdm '${name}'`, "describe sdm"],
     };
 }
 
