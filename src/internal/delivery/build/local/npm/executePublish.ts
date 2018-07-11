@@ -80,7 +80,7 @@ export function executePublish(
                 goalInvocation.progressLog,
             );
 
-            if (result.code === 0) {
+            if (result.code === 0 && options.status) {
                 const pi = await projectIdentifier(project);
                 const url = `${options.registry}/${pi.name}/-/${pi.name}-${pi.version}.tgz`;
                 await createStatus(
@@ -120,6 +120,8 @@ export interface NpmOptions {
     access?: "public" | "restricted";
     /** Optional publication tag, use NPM default if not present, currently "latest" */
     tag?: string;
+    /** Optional flag, to indicate if a status should be created on the SCM containing a link to the package */
+    status?: boolean;
 }
 
 export function gitBranchToNpmTag(branchName: string) {
