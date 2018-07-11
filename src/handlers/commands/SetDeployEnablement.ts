@@ -20,6 +20,7 @@ import {
     HandlerResult,
     MappedParameter,
     MappedParameters,
+    Parameter,
     Success,
     Value,
 } from "@atomist/automation-client";
@@ -38,6 +39,9 @@ import { success } from "../../util/slack/messages";
 
 @Parameters()
 export class SetDeployEnablementParameters {
+
+    @Parameter({ required: false, displayable: false })
+    public msgId?: string;
 
     @MappedParameter(MappedParameters.GitHubOwner)
     public owner: string;
@@ -76,8 +80,8 @@ export function setDeployEnablement(cli: CommandListenerInvocation,
                 `Successfully ${enable ? "enabled" : "disabled"} deployment of ${
                     bold(`${cli.parameters.owner}/${cli.parameters.repo}`)}`,
                 {
-                    footer: `${cli.parameters.name}/${cli.parameters.version}`,
-                })))
+                    footer: `${cli.parameters.name}:${cli.parameters.version}`,
+                }), { id: cli.parameters.msgId }))
         .then(() => Success, failure);
 }
 

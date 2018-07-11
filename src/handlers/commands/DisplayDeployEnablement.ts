@@ -24,33 +24,40 @@ import { guid } from "@atomist/automation-client/internal/util/string";
 import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
 import { CommandHandlerRegistration } from "@atomist/sdm";
 import { isDeployEnabled } from "@atomist/sdm/api/mapping/support/deployPushTests";
-import { SlackMessage } from "@atomist/slack-messages";
+import {
+    bold,
+    SlackMessage,
+} from "@atomist/slack-messages";
 import { SetDeployEnablementParameters } from "./SetDeployEnablement";
 
-async function displayDeployEnablement() {
+function displayDeployEnablement() {
     return async (context: HandlerContext, params: SetDeployEnablementParameters): Promise<HandlerResult> => {
         const enabled = await isDeployEnabled({context, id: params});
+        const msgId = guid();
         return context.messageClient.respond(
-            reportDeployEnablement(params, enabled))
+            reportDeployEnablement(params, enabled, msgId), { id: msgId })
             .then(() => Success, failure);
     };
 }
 
-export function reportDeployEnablement(params: SetDeployEnablementParameters, enabled: boolean): SlackMessage {
-    const text = `SDM Deployment is currently ${enabled ? "enabled" : "disabled"} on ${params.owner}/${params.repo}`;
+export function reportDeployEnablement(params: SetDeployEnablementParameters,
+                                       enabled: boolean,
+                                       msgId: string): SlackMessage {
+    const text = `Deploy is currently ${enabled ? "enabled" : "disabled"} on ${bold(`${params.owner}/${params.repo}`)}`;
     const actions =
         [buttonForCommand({text: enabled ? "Disable" : "Enable"},
             enabled ? "DisableDeploy" : "EnableDeploy",
-            {...params})];
+            { ...params, msgId })];
     const msg: SlackMessage = {
         attachments: [{
             author_icon: `https://images.atomist.com/rug/check-circle.gif?gif=${guid()}`,
-            author_name: "SDM Deployment",
+            author_name: "Deploy Enablement",
             text,
             fallback: text,
             color: enabled ? "#45B254" : "#aaaaaa",
             mrkdwn_in: ["text"],
             actions,
+            footer: `${params.name}:${params.version}`,
         }],
     };
     return msg;
@@ -61,5 +68,5 @@ export const DisplayDeployEnablement: CommandHandlerRegistration<SetDeployEnable
     description: "Display whether deployment via Atomist SDM in enabled",
     intent: "is deploy enabled?",
     paramsMaker: SetDeployEnablementParameters,
-    listener: displayDeployEnablement,
+    createCommand: () => displayDeployEnablement(),
 };

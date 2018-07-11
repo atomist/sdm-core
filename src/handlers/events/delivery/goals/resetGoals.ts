@@ -131,7 +131,7 @@ function resetGoalsOnCommit(rules: {
                 `Successfully set goals on ${codeLine(sha.slice(0, 7))} of ${
                     bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
                 {
-                    footer: `${commandParams.name}/${commandParams.version}`,
+                    footer: `${commandParams.name}:${commandParams.version}`,
                 }));
         } else {
             await ctx.messageClient.respond(warning(
@@ -140,7 +140,7 @@ function resetGoalsOnCommit(rules: {
                     bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
                 ctx,
                 {
-                    footer: `${commandParams.name}/${commandParams.version}`,
+                    footer: `${commandParams.name}:${commandParams.version}`,
                 }));
         }
 
