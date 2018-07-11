@@ -21,6 +21,7 @@ import {
     MappedParameter,
     MappedParameters,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
@@ -28,6 +29,7 @@ import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
 } from "@atomist/sdm";
+import { bold } from "@atomist/slack-messages";
 import {
     DeployEnablementRootType,
     SdmDeployEnablement,
@@ -46,6 +48,8 @@ export class SetDeployEnablementParameters {
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
 
+    @Value("name")
+    public name: string;
 }
 
 /**
@@ -66,7 +70,11 @@ export function setDeployEnablement(cli: CommandListenerInvocation,
         .then(() => cli.context.messageClient.respond(
             success(
                 "Deploy Enablement",
-                `Successfully ${enable ? "enabled" : "disabled"} deployment`)))
+                `Successfully ${enable ? "enabled" : "disabled"} deployment of ${
+                    bold(`${cli.parameters.owner}/${cli.parameters.repo}`)}}`,
+                {
+                    footer: cli.parameters.name,
+                })))
         .then(() => Success, failure);
 }
 

@@ -17,13 +17,13 @@
 import { HandlerContext } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import {
-    Action,
+    Attachment,
     SlackMessage,
     url,
 } from "@atomist/slack-messages";
 import * as base64 from "../misc/base64";
 
-export function success(title: string, text: string, actions?: Action[]): SlackMessage {
+export function success(title: string, text: string, options: Partial<Attachment> = {}): SlackMessage {
     const msg: SlackMessage = {
         attachments: [{
             author_icon: `https://images.atomist.com/rug/check-circle.gif?gif=${guid()}`,
@@ -32,13 +32,13 @@ export function success(title: string, text: string, actions?: Action[]): SlackM
             fallback: text,
             color: "#45B254",
             mrkdwn_in: [ "text" ],
-            actions,
+            ...options,
         }],
     };
     return msg;
 }
 
-export function warning(title: string, text: string, ctx: HandlerContext, actions?: Action[]): SlackMessage {
+export function warning(title: string, text: string, ctx: HandlerContext, options: Partial<Attachment> = {}): SlackMessage {
     const msg: SlackMessage = {
         attachments: [{
             author_icon: `https://images.atomist.com/rug/warning-yellow.png`,
@@ -48,13 +48,13 @@ export function warning(title: string, text: string, ctx: HandlerContext, action
             color: "#ffcc00",
             mrkdwn_in: [ "text" ],
             footer: supportLink(ctx),
-            actions,
+            ...options,
         }],
     };
     return msg;
 }
 
-export function error(title: string, text: string, ctx: HandlerContext, actions?: Action[]): SlackMessage {
+export function error(title: string, text: string, ctx: HandlerContext, options: Partial<Attachment> = {}): SlackMessage {
     const msg: SlackMessage = {
         attachments: [{
             author_icon: "https://images.atomist.com/rug/error-circle.png",
@@ -64,7 +64,7 @@ export function error(title: string, text: string, ctx: HandlerContext, actions?
             color: "#D94649",
             mrkdwn_in: [ "text" ],
             footer: supportLink(ctx),
-            actions,
+            ...options,
         }],
     };
     return msg;

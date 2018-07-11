@@ -35,11 +35,20 @@ import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { PushFields } from "@atomist/sdm/typings/types";
+import {
+    bold,
+    codeLine,
+    italic,
+} from "@atomist/slack-messages";
 import * as stringify from "json-stringify-safe";
 import {
     PushForCommit,
     RepoBranchTips,
 } from "../../../../typings/types";
+import {
+    success,
+    warning,
+} from "../../../../util/slack/messages";
 
 @Parameters()
 export class ResetGoalsParameters {
@@ -85,6 +94,7 @@ function resetGoalsOnCommit(rules: {
     goalsListeners: GoalsSetListener[],
     goalSetter: GoalSetter,
     implementationMapping: SdmGoalImplementationMapper,
+    name: string,
 }) {
     const {projectLoader, goalsListeners, goalSetter, implementationMapping, repoRefResolver} = rules;
     return async (ctx: HandlerContext, commandParams: ResetGoalsParameters) => {
@@ -110,9 +120,22 @@ function resetGoalsOnCommit(rules: {
         });
 
         if (goals) {
-            await ctx.messageClient.respond(`Set goals on ${sha} to ${goals.name}`);
+            await ctx.messageClient.respond(success(
+                "Reset Goals",
+                `Successfully set goals on ${codeLine(sha.slice(0, 7))} of ${
+                    bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
+                {
+                    footer: rules.name,
+                }));
         } else {
-            await ctx.messageClient.respond(`No goals found for ${sha}`);
+            await ctx.messageClient.respond(warning(
+                "Reset Goals",
+                `No goals found for ${codeLine(sha.slice(0, 7))} of ${
+                    bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
+                ctx,
+                {
+                    footer: rules.name,
+                }));
         }
 
         return Success;
