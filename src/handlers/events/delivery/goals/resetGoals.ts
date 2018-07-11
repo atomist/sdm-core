@@ -140,7 +140,7 @@ function resetGoalsOnCommit(rules: {
                     bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
                 ctx,
                 {
-                    footer: rules.name,
+                    footer: `${commandParams.name}/${commandParams.version}`,
                 }));
         }
 
