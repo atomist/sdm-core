@@ -23,6 +23,7 @@ import {
     Secret,
     Secrets,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
@@ -71,6 +72,12 @@ export class ResetGoalsParameters {
     @Parameter({required: false})
     public branch: string;
 
+    @Value("name")
+    public name: string;
+
+    @Value("version")
+    public version: string;
+
 }
 
 export function resetGoalsCommand(rules: {
@@ -94,7 +101,6 @@ function resetGoalsOnCommit(rules: {
     goalsListeners: GoalsSetListener[],
     goalSetter: GoalSetter,
     implementationMapping: SdmGoalImplementationMapper,
-    name: string,
 }) {
     const {projectLoader, goalsListeners, goalSetter, implementationMapping, repoRefResolver} = rules;
     return async (ctx: HandlerContext, commandParams: ResetGoalsParameters) => {
@@ -125,7 +131,7 @@ function resetGoalsOnCommit(rules: {
                 `Successfully set goals on ${codeLine(sha.slice(0, 7))} of ${
                     bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
                 {
-                    footer: rules.name,
+                    footer: `${commandParams.name}/${commandParams.version}`,
                 }));
         } else {
             await ctx.messageClient.respond(warning(

@@ -50,6 +50,9 @@ export class SetDeployEnablementParameters {
 
     @Value("name")
     public name: string;
+
+    @Value("version")
+    public version: string;
 }
 
 /**
@@ -71,9 +74,9 @@ export function setDeployEnablement(cli: CommandListenerInvocation,
             success(
                 "Deploy Enablement",
                 `Successfully ${enable ? "enabled" : "disabled"} deployment of ${
-                    bold(`${cli.parameters.owner}/${cli.parameters.repo}`)}}`,
+                    bold(`${cli.parameters.owner}/${cli.parameters.repo}`)}`,
                 {
-                    footer: cli.parameters.name,
+                    footer: `${cli.parameters.name}/${cli.parameters.version}`,
                 })))
         .then(() => Success, failure);
 }
