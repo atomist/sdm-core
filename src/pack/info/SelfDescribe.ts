@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
+import {
+    automationClientInstance,
+    Success,
+} from "@atomist/automation-client";
+import { info } from "@atomist/automation-client/internal/util/info";
 import { OnCommand } from "@atomist/automation-client/onCommand";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
+import {
+    bold,
+    codeLine,
+    SlackMessage,
+} from "@atomist/slack-messages";
+import * as appRoot from "app-root-path";
+import * as path from "path";
 
 /**
  * Return a command handler that can describe the present software delivery machine
@@ -28,14 +40,63 @@ export function selfDescribeHandler(name: string): CommandHandlerRegistration {
         name: "SelfDescribe",
         createCommand,
         description: "Describe this SDM",
-        intent: [`describe sdm ${name}`, "describe sdm"],
+        intent: [ `describe sdm ${name}`, "describe sdm" ],
     };
 }
 
 function createCommand(sdm: SoftwareDeliveryMachine): OnCommand {
     return async ctx => {
-        const message = `I am a brilliant SDM, eager to work for you.\nMy name is _${sdm.name}_`;
-        await ctx.messageClient.respond(message);
-        return { code: 0, message };
+        const pj = require(path.join(appRoot.path, "package.json"));
+        const clientPj = require(path.join(appRoot.path, "node_modules", "@atomist", "automation-client", "package.json"));
+        const sdmPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm", "package.json"));
+        const sdmCorePj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm-core", "package.json"));
+        const gitInfo = info(automationClientInstance().automations.automations);
+
+        const msg: SlackMessage = {
+            attachments: [ {
+                author_name: pj.author && pj.author.name ? pj.author.name : pj.author,
+                title: sdm.name,
+                title_link: pj.homepage,
+                fallback: sdm.name,
+                text: `${pj.description}
+Version: ${codeLine(sdm.configuration.version)} - License: ${codeLine(pj.license)}`,
+            }, {
+                author_name: "Details",
+                fallback: "Details",
+                text: `Sha: ${codeLine(gitInfo.git && gitInfo.git.sha ? gitInfo.git.sha.slice(0, 7) : "n/a")}
+Repository: ${codeLine(gitInfo.git && gitInfo.git.repository ? gitInfo.git.repository : "n/a")}
+Policy: ${codeLine(sdm.configuration.policy)}
+Environment: ${codeLine(sdm.configuration.environment)}
+Cluster: ${codeLine(sdm.configuration.cluster.enabled ? "enabled" : "disabled")}`,
+            }, {
+                author_name: "Dependencies",
+                fallback: "Dependencies",
+                text: `${codeLine(`${clientPj.name}:${clientPj.version}`)}
+${codeLine(`${sdmPj.name}:${sdmPj.version}`)}
+${codeLine(`${sdmCorePj.name}:${sdmCorePj.version}`)}`,
+            }, {
+                author_name: "Extension Packs",
+                fallback: "Extension Packs",
+                text: sdm.extensionPacks
+                    .sort((e1, e2) => e1.name.localeCompare(e2.name))
+                    .map(e => `${codeLine(`${e.name}:${e.version}`)} ${e.vendor}`).join("\n"),
+            }, {
+                author_name: "Events",
+                fallback: "Events",
+                text: automationClientInstance().automations.automations.events
+                    .sort((e1, e2) => e1.name.localeCompare(e2.name))
+                    .map(e => `${bold(e.name)} ${e.description}`).join("\n"),
+            }, {
+                author_name: "Commands",
+                fallback: "Commands",
+                text: automationClientInstance().automations.automations.commands
+                    .sort((e1, e2) => e1.name.localeCompare(e2.name))
+                    .map(e => `${bold(e.name)} ${e.intent.map(i => codeLine(i)).join(", ")} ${e.description}`).join("\n"),
+                footer: `${sdm.configuration.name}:${sdm.configuration.version}`,
+            } ],
+        };
+
+        await ctx.messageClient.respond(msg);
+        return Success;
     };
 }

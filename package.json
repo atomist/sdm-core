@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@atomist/slack-messages": "^0.12.1",
+    "app-root-path": "^2.1.0",
     "archiver": "^2.1.1",
     "axios": "^0.18.0",
     "base64-js": "^1.2.3",
@@ -47,7 +48,7 @@
     "@atomist/sdm": "^0.3.1"
   },
   "devDependencies": {
-    "@atomist/automation-client": "0.18.0-20180704102519",
+    "@atomist/automation-client": "0.18.0-20180710131258",
     "@atomist/sdm": "0.3.2-20180709125009",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^2.2.48",
