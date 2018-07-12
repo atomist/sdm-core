@@ -30,11 +30,9 @@ import {
 } from "@atomist/automation-client/metadata/automationMetadata";
 import { GoalInvocation } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
-import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { ReportProgress } from "@atomist/sdm/api/goal/progress/ReportProgress";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
@@ -61,7 +59,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public name: string;
     public description: string;
     // public secrets = [{name: "githubToken", uri: Secrets.OrgToken}];
-    public values = [{ path: "token", name: "githubToken", required: true }] as any[] as ValueDeclaration[];
+    public values = [ { path: "token", name: "githubToken", required: true } ] as any[] as ValueDeclaration[];
 
     public githubToken: string;
 
@@ -73,7 +71,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const implementationName = "FulfillGoal";
         this.subscriptionName = "OnAnyRequestedSdmGoal";
         this.subscription =
-            subscription({name: "OnAnyRequestedSdmGoal"});
+            subscription({ name: "OnAnyRequestedSdmGoal" });
         this.name = implementationName + "OnAnyRequestedSdmGoal";
         this.description = `Fulfill a goal when it reaches 'requested' state`;
     }
@@ -81,7 +79,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
                         ctx: HandlerContext,
                         params: this): Promise<HandlerResult> {
-        const sdmGoal = event.data.SdmGoal[0] as SdmGoal;
+        const sdmGoal = event.data.SdmGoal[ 0 ] as SdmGoal;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
@@ -93,29 +91,19 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        const {goal, goalExecutor, logInterpreter, progressReporter} = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
+        const { goal, goalExecutor, logInterpreter, progressReporter } = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
 
-        const log = await this.logFactory(ctx, sdmGoal);
-        let progressLog;
-        if (progressReporter) {
-            progressLog = new WriteToAllProgressLog(
-                sdmGoal.name,
-                new LoggingProgressLog(sdmGoal.name, "debug"),
-                log,
-                new ProgressReportingProgressLog(progressReporter, sdmGoal, ctx));
-        } else {
-            progressLog = new WriteToAllProgressLog(
-                sdmGoal.name,
-                new LoggingProgressLog(sdmGoal.name, "debug"),
-                log);
-        }
+        const progressLog = new WriteToAllProgressLog(
+            sdmGoal.name,
+            new LoggingProgressLog(sdmGoal.name, "debug"),
+            await this.logFactory(ctx, sdmGoal));
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
-        const goalInvocation: GoalInvocation = {sdmGoal, progressLog, context: ctx, addressChannels, id, credentials};
+        const goalInvocation: GoalInvocation = { sdmGoal, progressLog, context: ctx, addressChannels, id, credentials };
 
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
@@ -129,8 +117,14 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
-            return executeGoal({projectLoader: params.projectLoader},
-                goalExecutor, goalInvocation, sdmGoal, goal, logInterpreter)
+            return executeGoal(
+                { projectLoader: params.projectLoader },
+                goalExecutor,
+                goalInvocation,
+                sdmGoal,
+                goal,
+                logInterpreter,
+                progressReporter)
                 .then(async res => {
                     await reportEndAndClose(res, start, progressLog);
                     return res;
@@ -162,46 +156,3 @@ async function reportEndAndClose(result: any, start: number, progressLog: Progre
     await progressLog.close();
 }
 
-class ProgressReportingProgressLog implements ProgressLog {
-
-    public log: string;
-    public readonly name: string;
-    public url: string;
-
-    constructor(private readonly progressReporter: ReportProgress,
-                private readonly sdmGoal: SdmGoalEvent,
-                private readonly context: HandlerContext) {
-        this.name = sdmGoal.name;
-    }
-
-    public close(): Promise<any> {
-        return  Promise.resolve();
-    }
-
-    public flush(): Promise<any> {
-        return Promise.resolve();
-    }
-
-    public isAvailable(): Promise<boolean> {
-        return Promise.resolve(true);
-    }
-
-    public write(what: string): void {
-        const progress = this.progressReporter(what, this.sdmGoal);
-        if (progress && progress.message) {
-            updateGoal(
-                this.context,
-                this.sdmGoal,
-                {
-                    state: this.sdmGoal.state,
-                    description: `${this.sdmGoal.description} | ${progress.message}`,
-                }).then(() => {
-                    // Intentionally empty
-                })
-                .catch(err => {
-                    logger.warn(`Error occurred reporting progress: %s`, err.message);
-                });
-        }
-    }
-
-}
