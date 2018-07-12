@@ -30,9 +30,11 @@ import {
 } from "@atomist/automation-client/metadata/automationMetadata";
 import { GoalInvocation } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
+import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { ReportProgress } from "@atomist/sdm/api/goal/progress/ReportProgress";
 import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
@@ -91,12 +93,22 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        logger.info("Executing FulfillGoalOnRequested with '%s'", sdmGoal.fulfillment.name); // take this out when automation-api#395 is fixed
-
-        const {goal, goalExecutor, logInterpreter} = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
+        const {goal, goalExecutor, logInterpreter, progressReporter} = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
 
         const log = await this.logFactory(ctx, sdmGoal);
-        const progressLog = new WriteToAllProgressLog(sdmGoal.name, new LoggingProgressLog(sdmGoal.name, "debug"), log);
+        let progressLog;
+        if (progressReporter) {
+            progressLog = new WriteToAllProgressLog(
+                sdmGoal.name,
+                new LoggingProgressLog(sdmGoal.name, "debug"),
+                log,
+                new ProgressReportingProgressLog(progressReporter, sdmGoal, ctx));
+        } else {
+            progressLog = new WriteToAllProgressLog(
+                sdmGoal.name,
+                new LoggingProgressLog(sdmGoal.name, "debug"),
+                log);
+        }
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
@@ -117,6 +129,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
+
+
             return executeGoal({projectLoader: params.projectLoader},
                 goalExecutor, goalInvocation, sdmGoal, goal, logInterpreter)
                 .then(async res => {
@@ -132,12 +146,12 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
     progressLog.write(`---`);
-    progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}#${sdmGoal.branch}`);
+    progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}/${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
     progressLog.write(`Goal: ${sdmGoal.name} - ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);
     progressLog.write(
-        `SDM: ${automationClientInstance().configuration.name}@${automationClientInstance().configuration.version}`);
+        `SDM: ${automationClientInstance().configuration.name}:${automationClientInstance().configuration.version}`);
     progressLog.write(`---`);
     await progressLog.flush();
 }
@@ -148,4 +162,51 @@ async function reportEndAndClose(result: any, start: number, progressLog: Progre
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
     progressLog.write(`---`);
     await progressLog.close();
+}
+
+class ProgressReportingProgressLog implements ProgressLog {
+
+    public log: string;
+    public readonly name: string;
+    public url: string;
+
+    constructor(private readonly progressReporter: ReportProgress,
+                private readonly sdmGoal: SdmGoalEvent,
+                private readonly context: HandlerContext) {
+        this.name = sdmGoal.name;
+    }
+
+    public close(): Promise<any> {
+        return  Promise.resolve();
+    }
+
+    public flush(): Promise<any> {
+        return Promise.resolve();
+    }
+
+    public isAvailable(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
+
+    public write(what: string): void {
+        this.progressReporter.report(what, this.sdmGoal)
+            .then(result => {
+                if (result && result.message) {
+                    return updateGoal(
+                        this.context,
+                        this.sdmGoal,
+                        {
+                            state: this.sdmGoal.state,
+                            description: `${this.sdmGoal.description} | ${result.message}`,
+                        });
+                }
+            })
+            .then(() => {
+                // Intentionally empty
+            })
+            .catch(err => {
+                logger.warn(`Error occurred reporting progress: %s`, err.message);
+            });
+    }
+
 }
