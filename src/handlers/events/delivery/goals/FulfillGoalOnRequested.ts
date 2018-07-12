@@ -155,4 +155,3 @@ async function reportEndAndClose(result: any, start: number, progressLog: Progre
     progressLog.write(`---`);
     await progressLog.close();
 }
-
