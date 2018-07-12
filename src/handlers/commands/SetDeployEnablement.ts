@@ -65,7 +65,7 @@ export class SetDeployEnablementParameters {
  * @param {boolean} enable
  * @returns {Promise<HandlerResult | HandlerError>}
  */
-export function setDeployEnablement(cli: CommandListenerInvocation,
+export function setDeployEnablement(cli: CommandListenerInvocation<SetDeployEnablementParameters>,
                                     enable: boolean): Promise<HandlerResult | HandlerError> {
     const deployEnablement: SdmDeployEnablement = {
         state: enable ? "requested" : "disabled",
