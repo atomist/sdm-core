@@ -80,19 +80,22 @@ export function executePublish(
                 goalInvocation.progressLog,
             );
 
-            if (result.code === 0 && options.status) {
+            if (result.code === 0) {
                 const pi = await projectIdentifier(project);
                 const url = `${options.registry}/${pi.name}/-/${pi.name}-${pi.version}.tgz`;
-                await createStatus(
-                    credentials,
-                    id as GitHubRepoRef,
-                    {
-                        context: "npm/atomist/package",
-                        description: "NPM package",
-                        target_url: url,
-                        state: "success",
-                    });
                 result.targetUrl = url;
+
+                if (options.status) {
+                    await createStatus(
+                        credentials,
+                        id as GitHubRepoRef,
+                        {
+                            context: "npm/atomist/package",
+                            description: "NPM package",
+                            target_url: url,
+                            state: "success",
+                        });
+                }
             }
 
             return result;
