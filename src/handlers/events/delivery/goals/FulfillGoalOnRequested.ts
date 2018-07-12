@@ -129,8 +129,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
-
-
             return executeGoal({projectLoader: params.projectLoader},
                 goalExecutor, goalInvocation, sdmGoal, goal, logInterpreter)
                 .then(async res => {
