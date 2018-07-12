@@ -21,11 +21,11 @@ import { successOn } from "@atomist/automation-client/action/ActionResult";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofixes";
+import { fakeGoalInvocation } from "@atomist/sdm/api-helper/test/fakeGoalInvocation";
 import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../../src/handlers/common/DefaultRepoRefResolver";
 import { tslintFix } from "../../../src/pack/node/tslintFix";
-import { fakeGoalInvocation } from "@atomist/sdm/api-helper/test/fakeGoalInvocation";
 
 describe("tsLintFix", () => {
 
