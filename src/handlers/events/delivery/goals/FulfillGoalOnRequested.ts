@@ -187,24 +187,21 @@ class ProgressReportingProgressLog implements ProgressLog {
     }
 
     public write(what: string): void {
-        this.progressReporter.report(what, this.sdmGoal)
-            .then(result => {
-                if (result && result.message) {
-                    return updateGoal(
-                        this.context,
-                        this.sdmGoal,
-                        {
-                            state: this.sdmGoal.state,
-                            description: `${this.sdmGoal.description} | ${result.message}`,
-                        });
-                }
-            })
-            .then(() => {
-                // Intentionally empty
-            })
-            .catch(err => {
-                logger.warn(`Error occurred reporting progress: %s`, err.message);
-            });
+        const progress = this.progressReporter(what, this.sdmGoal);
+        if (progress && progress.message) {
+            updateGoal(
+                this.context,
+                this.sdmGoal,
+                {
+                    state: this.sdmGoal.state,
+                    description: `${this.sdmGoal.description} | ${progress.message}`,
+                }).then(() => {
+                    // Intentionally empty
+                })
+                .catch(err => {
+                    logger.warn(`Error occurred reporting progress: %s`, err.message);
+                });
+        }
     }
 
 }
