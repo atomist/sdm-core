@@ -127,7 +127,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         log,
         {
             errorFinder: SuccessIsReturn0ErrorFinder,
-            logCommand: false
+            logCommand: false,
         },
     );
 
