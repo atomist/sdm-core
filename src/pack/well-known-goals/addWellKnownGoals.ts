@@ -61,7 +61,7 @@ function configure(sdm: SoftwareDeliveryMachine) {
                 sdm.fingerprinterRegistrations,
                 sdm.fingerprintListeners))
         .addGoalImplementation("CodeReactions", PushReactionGoal,
-            executePushReactions(sdm.configuration.sdm.projectLoader, sdm.pushReactionRegistrations))
+            executePushReactions(sdm.configuration.sdm.projectLoader, sdm.pushImpactListenerRegistrations))
         .addGoalImplementation("Reviews", ReviewGoal,
             executeReview(sdm.configuration.sdm.projectLoader, sdm.reviewerRegistrations, sdm.reviewListeners))
         .addVerifyImplementation()
