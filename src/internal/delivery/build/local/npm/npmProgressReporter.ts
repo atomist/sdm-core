@@ -42,4 +42,4 @@ export const NpmProgressTests: ProgressTest[] = [{
     label: "pushing Docker image",
 }];
 
-export const NpmProgressReporter = testProgressReporter(NpmProgressTests);
+export const NpmProgressReporter = testProgressReporter(...NpmProgressTests);
