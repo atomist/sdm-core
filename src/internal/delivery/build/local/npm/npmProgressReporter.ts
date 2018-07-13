@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import {
     ProgressTest,
     testProgressReporter,
@@ -32,7 +31,7 @@ export const NpmProgressTests: ProgressTest[] = [{
 }, {
     test: /> nyc mocha/g,
     label: "testing",
-},{
+}, {
     test: /> mocha --exit/g,
     label: "testing",
 }, {
@@ -40,7 +39,7 @@ export const NpmProgressTests: ProgressTest[] = [{
     label: "building Docker image",
 }, {
     test: /The push refers to a repository/g,
-    label: "pushing Docker image"
+    label: "pushing Docker image",
 }];
 
 export const NpmProgressReporter = testProgressReporter(NpmProgressTests);
