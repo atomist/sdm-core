@@ -36,7 +36,7 @@ export const VersionGoal = new Goal({
     uniqueName: "Version",
     environment: IndependentOfEnvironment,
     orderedName: "0.1-version",
-    workingDescription: "Calculating project version...",
+    workingDescription: "Calculating project version",
     completedDescription: "Versioned",
 });
 
@@ -48,7 +48,7 @@ export const DockerBuildGoal = new GoalWithPrecondition({
     environment: IndependentOfEnvironment,
     orderedName: "3-docker",
     displayName: "docker build",
-    workingDescription: "Running Docker build...",
+    workingDescription: "Running Docker build",
     completedDescription: "Docker build successful",
     failedDescription: "Failed to build Docker image",
     isolated: true,
@@ -62,7 +62,7 @@ export const TagGoal = new GoalWithPrecondition({
     environment: IndependentOfEnvironment,
     orderedName: "4-tag",
     displayName: "tag",
-    workingDescription: "Tagging...",
+    workingDescription: "Tagging",
     completedDescription: "Tagged",
     failedDescription: "Failed to create Tag",
 }, DockerBuildGoal, BuildGoal);

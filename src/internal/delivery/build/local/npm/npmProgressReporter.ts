@@ -21,25 +21,25 @@ import {
 
 export const NpmProgressTests: ProgressTest[] = [{
     test: /Invoking goal hook: pre/g,
-    label: "installing dependencies",
+    phase: "installing dependencies",
 }, {
     test: /> atomist git/g,
-    label: "generating resources",
+    phase: "generating resources",
 }, {
     test: /> tsc --project \./g,
-    label: "compiling sources",
+    phase: "compiling sources",
 }, {
     test: /> nyc mocha/g,
-    label: "testing",
+    phase: "testing",
 }, {
     test: /> mocha --exit/g,
-    label: "testing",
+    phase: "testing",
 }, {
     test: /Sending build context to Docker daemon/g,
-    label: "building Docker image",
+    phase: "building Docker image",
 }, {
     test: /The push refers to a repository/g,
-    label: "pushing Docker image",
+    phase: "pushing Docker image",
 }];
 
 export const NpmProgressReporter = testProgressReporter(...NpmProgressTests);
