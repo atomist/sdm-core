@@ -25,16 +25,22 @@ export const NpmProgressTests: ProgressTest[] = [{
     phase: "installing dependencies",
 }, {
     test: /> atomist git/g,
-    phase: "generating resources",
+    phase: "generating",
+}, {
+    test: /> tslint\./g,
+    phase: "linting",
 }, {
     test: /> tsc --project \./g,
-    phase: "compiling sources",
+    phase: "compiling",
 }, {
     test: /> nyc mocha/g,
-    phase: "testing",
+    phase: "running tests",
 }, {
     test: /> mocha --exit/g,
-    phase: "testing",
+    phase: "running tests",
+}, {
+    test: /> mocha --require/g,
+    phase: "running tests",
 }, {
     test: /Sending build context to Docker daemon/g,
     phase: "building Docker image",
