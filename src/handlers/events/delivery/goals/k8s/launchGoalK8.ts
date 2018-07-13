@@ -71,6 +71,7 @@ export async function cleanCompletedJobs() {
         log,
         {
             errorFinder: code => code !== 0,
+            logCommand: false,
         },
     );
 

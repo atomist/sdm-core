@@ -33,7 +33,6 @@ import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
@@ -79,7 +78,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
                         ctx: HandlerContext,
                         params: this): Promise<HandlerResult> {
-        const sdmGoal = event.data.SdmGoal[ 0 ] as SdmGoal;
+        const sdmGoal = event.data.SdmGoal[ 0 ] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
