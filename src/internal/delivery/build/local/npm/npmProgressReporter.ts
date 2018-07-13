@@ -22,31 +22,34 @@ import { ReportProgress } from "@atomist/sdm/api/goal/progress/ReportProgress";
 
 export const NpmProgressTests: ProgressTest[] = [{
     test: /Invoking goal hook: pre/g,
-    phase: "installing dependencies",
+    phase: "pre-hook",
 }, {
     test: /> atomist git/g,
     phase: "generating",
 }, {
     test: /> tslint\./g,
-    phase: "linting",
+    phase: "tslint",
 }, {
     test: /> tsc --project \./g,
-    phase: "compiling",
+    phase: "tsc",
 }, {
     test: /> nyc mocha/g,
-    phase: "running tests",
+    phase: "mocha",
 }, {
     test: /> mocha --exit/g,
-    phase: "running tests",
+    phase: "mocha",
 }, {
     test: /> mocha --require/g,
-    phase: "running tests",
+    phase: "mocha",
 }, {
     test: /Sending build context to Docker daemon/g,
-    phase: "building Docker image",
+    phase: "docker build",
 }, {
     test: /The push refers to a repository/g,
-    phase: "pushing Docker image",
+    phase: "docker push",
+}, {
+    test: /Invoking goal hook: post/g,
+    phase: "post-hook",
 }];
 
 export const NpmProgressReporter: ReportProgress = testProgressReporter(...NpmProgressTests);
