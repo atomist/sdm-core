@@ -16,7 +16,7 @@
 
 import { Configuration } from "@atomist/automation-client";
 import { RemoteGitProjectPersister } from "@atomist/automation-client/operations/generate/remoteGitProjectPersister";
-import { allReposInTeam } from "@atomist/sdm/api-helper/command/editor/allReposInTeam";
+import { allReposInTeam } from "@atomist/sdm/api-helper/command/transform/allReposInTeam";
 import { CachingProjectLoader } from "@atomist/sdm/api-helper/project/CachingProjectLoader";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";

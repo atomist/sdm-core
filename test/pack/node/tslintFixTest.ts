@@ -21,7 +21,7 @@ import { successOn } from "@atomist/automation-client/action/ActionResult";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofixes";
-import { fakeRunWithLogContext } from "@atomist/sdm/api-helper/test/fakeRunWithLogContext";
+import { fakeGoalInvocation } from "@atomist/sdm/api-helper/test/fakeGoalInvocation";
 import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../../src/handlers/common/DefaultRepoRefResolver";
@@ -44,7 +44,7 @@ describe("tsLintFix", () => {
         await p.addFile(f.path, f.content);
         assert(!!p.findFileSync(f.path));
 
-        await executeAutofixes(pl, [tslintFix], new DefaultRepoRefResolver())(fakeRunWithLogContext(p.id as RemoteRepoRef));
+        await executeAutofixes(pl, [tslintFix], new DefaultRepoRefResolver())(fakeGoalInvocation(p.id as RemoteRepoRef));
         const fileNow = p.findFileSync(f.path);
         assert(!!fileNow);
         assert(fileNow.getContentSync().startsWith("const foo;"));
