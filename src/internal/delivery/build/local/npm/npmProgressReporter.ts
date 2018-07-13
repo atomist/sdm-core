@@ -18,6 +18,7 @@ import {
     ProgressTest,
     testProgressReporter,
 } from "@atomist/sdm/api-helper/goal/progress/progress";
+import { ReportProgress } from "@atomist/sdm/api/goal/progress/ReportProgress";
 
 export const NpmProgressTests: ProgressTest[] = [{
     test: /Invoking goal hook: pre/g,
@@ -42,4 +43,4 @@ export const NpmProgressTests: ProgressTest[] = [{
     phase: "pushing Docker image",
 }];
 
-export const NpmProgressReporter = testProgressReporter(...NpmProgressTests);
+export const NpmProgressReporter: ReportProgress = testProgressReporter(...NpmProgressTests);
