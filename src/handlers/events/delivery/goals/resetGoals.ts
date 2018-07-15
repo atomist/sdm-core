@@ -92,7 +92,7 @@ export function resetGoalsCommand(rules: {
         ResetGoalsParameters,
         "ResetGoalsOnCommit",
         "Set goals",
-        [`reset goals ${rules.name}`, "reset goals"]);
+        [`plan goals ${rules.name}`, "plan goals", `reset goals ${rules.name}`, "reset goals"]);
 }
 
 function resetGoalsOnCommit(rules: {
@@ -127,15 +127,15 @@ function resetGoalsOnCommit(rules: {
 
         if (goals) {
             await ctx.messageClient.respond(success(
-                "Reset Goals",
-                `Successfully set goals on ${codeLine(sha.slice(0, 7))} of ${
+                "Plan Goals",
+                `Successfully planned goals on ${codeLine(sha.slice(0, 7))} of ${
                     bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
                 {
                     footer: `${commandParams.name}:${commandParams.version}`,
                 }));
         } else {
             await ctx.messageClient.respond(warning(
-                "Reset Goals",
+                "Plan Goals",
                 `No goals found for ${codeLine(sha.slice(0, 7))} of ${
                     bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
                 ctx,
