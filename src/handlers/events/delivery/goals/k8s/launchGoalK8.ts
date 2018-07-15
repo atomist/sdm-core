@@ -23,6 +23,7 @@ import {
 } from "@atomist/automation-client";
 import { configurationValue } from "@atomist/automation-client/configuration";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
+import { SuccessIsReturn0ErrorFinder } from "@atomist/automation-client/util/spawned";
 import { IsolatedGoalLauncher } from "@atomist/sdm";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { StringCapturingProgressLog } from "@atomist/sdm/api-helper/log/StringCapturingProgressLog";
@@ -70,7 +71,8 @@ export async function cleanCompletedJobs() {
         {},
         log,
         {
-            errorFinder: code => code !== 0,
+            errorFinder: SuccessIsReturn0ErrorFinder,
+            logCommand: false,
         },
     );
 
@@ -94,7 +96,7 @@ export async function cleanCompletedJobs() {
                 {},
                 log,
                 {
-                    errorFinder: code => code !== 0,
+                    errorFinder: SuccessIsReturn0ErrorFinder,
                 },
             );
         }
@@ -124,7 +126,8 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         {},
         log,
         {
-            errorFinder: code => code !== 0,
+            errorFinder: SuccessIsReturn0ErrorFinder,
+            logCommand: false,
         },
     );
 
@@ -181,7 +184,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         {},
         progressLog,
         {
-            errorFinder: code => code !== 0,
+            errorFinder: SuccessIsReturn0ErrorFinder,
         },
     );
 
@@ -193,7 +196,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
             {},
             progressLog,
             {
-                errorFinder: code => code !== 0,
+                errorFinder: SuccessIsReturn0ErrorFinder,
             },
         );
     } else {
@@ -204,7 +207,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
             {},
             progressLog,
             {
-                errorFinder: code => code !== 0,
+                errorFinder: SuccessIsReturn0ErrorFinder,
             },
         );
     }
