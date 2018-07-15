@@ -33,7 +33,7 @@ export function defaultSoftwareDeliveryMachineOptions(configuration: Configurati
             projectLoader: new CachingProjectLoader(),
             logFactory: rolarAndDashboardLogFactory(_.get(configuration, "sdm.rolar.url"),
                 _.get(configuration, "sdm.rolar.bufferSize", 1000),
-                _.get(configuration, "sdm.rolar.flushInterval", 2000)),
+                _.get(configuration, "sdm.rolar.flushInterval", 1000)),
             credentialsResolver: new GitHubCredentialsResolver(),
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),
