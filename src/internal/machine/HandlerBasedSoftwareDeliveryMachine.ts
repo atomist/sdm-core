@@ -80,9 +80,9 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     }
 
     private get onNewRepoWithCode(): Maker<OnFirstPushToRepo> {
-        return this.newRepoWithCodeActions.length > 0 ?
+        return this.newRepoWithCodeListeners.length > 0 ?
             () => new OnFirstPushToRepo(
-                this.newRepoWithCodeActions,
+                this.newRepoWithCodeListeners,
                 this.configuration.sdm.repoRefResolver,
                 this.configuration.sdm.credentialsResolver) :
             undefined;
