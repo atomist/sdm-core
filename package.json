@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@atomist/automation-client": "0.18.0-20180713091022",
-    "@atomist/sdm": "0.3.2-progress-report.20180713074226",
+    "@atomist/sdm": "0.3.2-progress-report.20180715101232",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^2.2.48",
     "@types/node": "^8.10.17",
