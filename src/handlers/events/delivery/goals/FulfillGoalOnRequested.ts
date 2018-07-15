@@ -33,7 +33,6 @@ import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
@@ -59,7 +58,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public name: string;
     public description: string;
     // public secrets = [{name: "githubToken", uri: Secrets.OrgToken}];
-    public values = [{ path: "token", name: "githubToken", required: true }] as any[] as ValueDeclaration[];
+    public values = [ { path: "token", name: "githubToken", required: true } ] as any[] as ValueDeclaration[];
 
     public githubToken: string;
 
@@ -71,7 +70,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const implementationName = "FulfillGoal";
         this.subscriptionName = "OnAnyRequestedSdmGoal";
         this.subscription =
-            subscription({name: "OnAnyRequestedSdmGoal"});
+            subscription({ name: "OnAnyRequestedSdmGoal" });
         this.name = implementationName + "OnAnyRequestedSdmGoal";
         this.description = `Fulfill a goal when it reaches 'requested' state`;
     }
@@ -79,7 +78,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
                         ctx: HandlerContext,
                         params: this): Promise<HandlerResult> {
-        const sdmGoal = event.data.SdmGoal[0] as SdmGoal;
+        const sdmGoal = event.data.SdmGoal[ 0 ] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
@@ -91,19 +90,19 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        logger.info("Executing FulfillGoalOnRequested with '%s'", sdmGoal.fulfillment.name); // take this out when automation-api#395 is fixed
+        const { goal, goalExecutor, logInterpreter, progressReporter } = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
 
-        const {goal, goalExecutor, logInterpreter} = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
-
-        const log = await this.logFactory(ctx, sdmGoal);
-        const progressLog = new WriteToAllProgressLog(sdmGoal.name, new LoggingProgressLog(sdmGoal.name, "debug"), log);
+        const progressLog = new WriteToAllProgressLog(
+            sdmGoal.name,
+            new LoggingProgressLog(sdmGoal.name, "debug"),
+            await this.logFactory(ctx, sdmGoal));
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
         (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
-        const goalInvocation: GoalInvocation = {sdmGoal, progressLog, context: ctx, addressChannels, id, credentials};
+        const goalInvocation: GoalInvocation = { sdmGoal, progressLog, context: ctx, addressChannels, id, credentials };
 
         const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
 
@@ -117,8 +116,14 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
-            return executeGoal({projectLoader: params.projectLoader},
-                goalExecutor, goalInvocation, sdmGoal, goal, logInterpreter)
+            return executeGoal(
+                { projectLoader: params.projectLoader },
+                goalExecutor,
+                goalInvocation,
+                sdmGoal,
+                goal,
+                logInterpreter,
+                progressReporter)
                 .then(async res => {
                     await reportEndAndClose(res, start, progressLog);
                     return res;
@@ -132,12 +137,12 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
     progressLog.write(`---`);
-    progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}#${sdmGoal.branch}`);
+    progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}/${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
     progressLog.write(`Goal: ${sdmGoal.name} - ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);
     progressLog.write(
-        `SDM: ${automationClientInstance().configuration.name}@${automationClientInstance().configuration.version}`);
+        `SDM: ${automationClientInstance().configuration.name}:${automationClientInstance().configuration.version}`);
     progressLog.write(`---`);
     await progressLog.flush();
 }
