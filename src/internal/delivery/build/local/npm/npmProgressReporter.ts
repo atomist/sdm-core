@@ -20,6 +20,10 @@ import {
 } from "@atomist/sdm/api-helper/goal/progress/progress";
 import { ReportProgress } from "@atomist/sdm/api/goal/progress/ReportProgress";
 
+/**
+ * Default progress tests for our NPM-based builds
+ * @type {{test: RegExp; phase: string}[]}
+ */
 export const NpmProgressTests: ProgressTest[] = [{
     test: /Invoking goal hook: pre/g,
     phase: "pre-hook",
@@ -52,4 +56,7 @@ export const NpmProgressTests: ProgressTest[] = [{
     phase: "post-hook",
 }];
 
+/**
+ * Default ReportProgress for our NPM-based builds
+ */
 export const NpmProgressReporter: ReportProgress = testProgressReporter(...NpmProgressTests);
