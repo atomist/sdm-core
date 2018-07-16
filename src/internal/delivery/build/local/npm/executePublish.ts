@@ -34,7 +34,7 @@ import { NpmPreparations } from "./npmBuilder";
 /**
  * Execute npm publish
  *
- * Tags with branch:name unless the `tag` option is specified
+ * Tags with branch-name unless the `tag` option is specified
  *
  * @param {ProjectLoader} projectLoader
  * @param {ProjectIdentifier} projectIdentifier
