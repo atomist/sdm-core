@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { automationClientInstance } from "@atomist/automation-client";
 import * as assert from "power-assert";
 import { parseCloudFoundryLogForEndpoint } from "../../../src/pack/pcf/cloudFoundryLogParser";
 
@@ -22,6 +23,25 @@ describe("CloudFoundryProgressLog", () => {
     it("parses real log", () => {
         const endpoint = parseCloudFoundryLogForEndpoint(l1);
         assert.equal(endpoint, "http://losgatos1-cataphractic-brink.cfapps.io");
+    });
+
+    it("parses real log with protocol overwrite", () => {
+        const previous = automationClientInstance();
+        (global as any).__runningAutomationClient = {
+            configuration: {
+                sdm: {
+                    cloudfoundry: {
+                        endpoint: {
+                            protocol: "https",
+                        },
+                    },
+                },
+            },
+        };
+
+        const endpoint = parseCloudFoundryLogForEndpoint(l1);
+        (global as any).__runningAutomationClient = previous;
+        assert.equal(endpoint, "https://losgatos1-cataphractic-brink.cfapps.io");
     });
 
 });

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { configurationValue } from "@atomist/automation-client/configuration";
 import { Microgrammar } from "@atomist/microgrammar/Microgrammar";
 import { isPatternMatch } from "@atomist/microgrammar/PatternMatch";
 
@@ -25,7 +26,7 @@ export function parseCloudFoundryLogForEndpoint(cfLog: string): string | undefin
     const r = routes.firstMatch(cfLog) || urls.firstMatch(cfLog);
     if (isPatternMatch(r)) {
         if (!r.endpoint.startsWith("http://")) {
-            return "http://" + r.endpoint;
+            return `${configurationValue<string>("sdm.cloudfoundry.endpoint.protocol", "http")}://${r.endpoint}`;
         }
         return r.endpoint;
     }
