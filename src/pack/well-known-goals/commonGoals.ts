@@ -48,9 +48,9 @@ export const DockerBuildGoal = new GoalWithPrecondition({
     environment: IndependentOfEnvironment,
     orderedName: "3-docker",
     displayName: "docker build",
-    workingDescription: "Running Docker build",
+    workingDescription: "Running docker build",
     completedDescription: "Docker build successful",
-    failedDescription: "Failed to build Docker image",
+    failedDescription: "Docker build failed",
     isolated: true,
 }, BuildGoal);
 
