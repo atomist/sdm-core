@@ -22,6 +22,7 @@ import {
     PrepareForGoalExecution,
 } from "@atomist/sdm";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
+import { projectConfigurationValue } from "@atomist/sdm/api-helper/project/configuration/projectConfiguration";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import * as fs from "fs-extra";
@@ -65,7 +66,8 @@ export function executePublish(
             if (options.registry) {
                 args.push("--registry", options.registry);
             }
-            if (options.access) {
+            const access = await projectConfigurationValue("npm.publish.access", project, options.access);
+            if (access) {
                 args.push("--access", options.access);
             }
             if (options.tag) {
