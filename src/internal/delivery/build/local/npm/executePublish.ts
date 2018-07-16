@@ -68,7 +68,7 @@ export function executePublish(
             }
             const access = await projectConfigurationValue("npm.publish.access", project, options.access);
             if (access) {
-                args.push("--access", options.access);
+                args.push("--access", access);
             }
             if (options.tag) {
                 args.push("--tag", options.tag);
