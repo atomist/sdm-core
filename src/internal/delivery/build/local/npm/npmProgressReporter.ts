@@ -54,6 +54,9 @@ export const NpmProgressTests: ProgressTest[] = [{
 }, {
     test: /Invoking goal hook: post/g,
     phase: "post-hook",
+}, {
+    test: /npm-publish.bash --registry/g,
+    phase: "npm publish",
 }];
 
 /**
