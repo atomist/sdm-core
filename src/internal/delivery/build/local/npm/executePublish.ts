@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
+import { SuccessIsReturn0ErrorFinder } from "@atomist/automation-client/util/spawned";
 import {
     ExecuteGoal,
     GoalInvocation,
     PrepareForGoalExecution,
 } from "@atomist/sdm";
+import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { projectConfigurationValue } from "@atomist/sdm/api-helper/project/configuration/projectConfiguration";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
@@ -30,6 +36,7 @@ import * as p from "path";
 import { createStatus } from "../../../../../util/github/ghub";
 import { ProjectIdentifier } from "../projectIdentifier";
 import { NpmPreparations } from "./npmBuilder";
+import * as tmp from "tmp-promise";
 
 /**
  * Execute npm publish
@@ -105,10 +112,34 @@ export function executePublish(
     };
 }
 
+export async function deleteBranchTag(branch: string, p: GitProject, options: NpmOptions): Promise<HandlerResult> {
+    const pj = await p.getFile("package.json");
+    if (pj) {
+        const tag = gitBranchToNpmTag(branch);
+        const name = JSON.parse(await pj.getContent()).name;
+
+        await configure(options, p);
+        const result = await spawnAndWatch({
+                command: "npm",
+                args: ["dist-tags", "rm", name, tag],
+            },
+            {
+                cwd: p.baseDir,
+            },
+            new LoggingProgressLog("npm dist-tag rm"),
+            {
+                errorFinder: SuccessIsReturn0ErrorFinder,
+            });
+
+        return result;
+    }
+    return Success;
+}
+
 /**
  * Create an npmrc file for the package.
  */
-async function configure(options: NpmOptions, project: GitProject): Promise<NpmOptions> {
+async function configure(options: NpmOptions, project: { baseDir: string }): Promise<NpmOptions> {
     await fs.writeFile(p.join(project.baseDir, ".npmrc"), options.npmrc, { mode: 0o600 });
     return options;
 }
