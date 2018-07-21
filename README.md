@@ -1,5 +1,7 @@
 # Software Delivery Machine
 
+[![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/sdm-core/e93405f2-a313-4da8-92fd-833de3b90cde)](https://app.atomist.com/workspace/T29E48P34) [![npm version](https://badge.fury.io/js/%40atomist%2Fsdm-core.svg)](https://badge.fury.io/js/%40atomist%2Fsdm-core)
+
 Atomist framework enabling you to control your delivery and development process in code. Think of it as Spring Boot for software delivery.
 
 ## What is a Software Delivery Machine?
