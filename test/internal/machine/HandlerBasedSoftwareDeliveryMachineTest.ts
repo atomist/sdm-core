@@ -39,7 +39,6 @@ import {
     PushListenerInvocation,
     pushTest,
     PushTest,
-    SoftwareDeliveryMachine
 } from "@atomist/sdm";
 import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
 
