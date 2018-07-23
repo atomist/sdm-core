@@ -23,17 +23,32 @@ import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
 import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
+import {
+    AnyPush,
+    hasFile
+} from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../src/handlers/events/delivery/goals/SetGoalsOnPush";
-import { npmCustomBuilder } from "../../../src/internal/delivery/build/local/npm/NpmDetectBuildMapping";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../src/internal/machine/HandlerBasedSoftwareDeliveryMachine";
-import { HasAtomistBuildFile } from "../../../src/pack/node/nodePushTests";
-import { IsTypeScript } from "../../../src/pack/node/tsPushTests";
 import { NoGoals } from "../../../src/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "../../../src/pack/well-known-goals/httpServiceGoals";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
+import {
+    Builder,
+    PushListenerInvocation,
+    pushTest,
+    PushTest,
+    SoftwareDeliveryMachine
+} from "@atomist/sdm";
+import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
+
+
+export const IsTypeScript: PushTest = pushTest(
+    "Is TypeScript",
+    async (pi: PushListenerInvocation) => fileExists(pi.project, "**/*.ts", () => true),
+);
+
 
 const AddThingAutofix: AutofixRegistration = {
     name: "AddThing",
@@ -42,6 +57,18 @@ const AddThingAutofix: AutofixRegistration = {
         await p.addFile("thing", "1");
         return { edited: true, success: true, target: p };
     },
+};
+
+const HasAtomistBuildFile = hasFile(".atomist/build.sh");
+
+const fakeBuilder: Builder = {
+    name: "fake",
+    async initiateBuild() {
+
+    },
+    logInterpreter:() => {
+        return null;
+    }
 };
 
 describe("SDM handler creation", () => {
@@ -172,7 +199,7 @@ describe("SDM handler creation", () => {
                     .setGoals(HttpServiceGoals)]);
             sdm.addBuildRules(when(HasAtomistBuildFile)
                 .itMeans("Custom build script")
-                .set(npmCustomBuilder(sdm)));
+                .set(fakeBuilder));
             assert(!sdm.observesOnly);
         });
 
