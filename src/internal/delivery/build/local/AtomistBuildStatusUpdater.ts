@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
+import {
+    HandlerContext,
+    logger,
+} from "@atomist/automation-client";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 import axios from "axios";
@@ -28,7 +31,8 @@ export class AtomistBuildStatusUpdater implements BuildStatusUpdater {
     public updateBuildStatus(runningBuild: { repoRef: RemoteRepoRef, url: string, team: string },
                              status: "started" | "failed" | "error" | "passed" | "canceled",
                              branch: string,
-                             buildNo: string): Promise<any> {
+                             buildNo: string,
+                             context: HandlerContext): Promise<any> {
         logger.info("Telling Atomist about a %s build on %s, sha %s, url %s",
             status, branch, runningBuild.repoRef.sha, runningBuild.url);
         const url = `https://webhook.atomist.com/atomist/build/teams/${runningBuild.team}`;
