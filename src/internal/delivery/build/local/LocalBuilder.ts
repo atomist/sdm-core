@@ -32,9 +32,9 @@ import { sprintf } from "sprintf-js";
 import { SdmBuildIdentifierForRepo } from "../../../../typings/types";
 import { postLinkImageWebhook } from "../../../../util/webhook/ImageLink";
 import { createTagForStatus } from "../executeTag";
-import SdmBuildIdentifier = SdmBuildIdentifierForRepo.SdmBuildIdentifier;
 import { AtomistBuildStatusUpdater } from "./AtomistBuildStatusUpdater";
 import { readSdmVersion } from "./projectVersioner";
+import SdmBuildIdentifier = SdmBuildIdentifierForRepo.SdmBuildIdentifier;
 
 /**
  * Implemented by types than can update build status
@@ -78,12 +78,13 @@ export interface LocalBuildInProgress {
  */
 export abstract class LocalBuilder implements Builder {
 
-    private readonly buildStatusUpdater: BuildStatusUpdater;
-
     protected constructor(public readonly name: string,
                           protected readonly sdm: SoftwareDeliveryMachine) {
-        this.buildStatusUpdater = isBuildStatusUpdater(sdm) ?
-            sdm :
+    }
+
+    private get buildStatusUpdater(): BuildStatusUpdater {
+        return isBuildStatusUpdater(this.sdm) ?
+            this.sdm :
             new AtomistBuildStatusUpdater();
     }
 
