@@ -25,7 +25,7 @@ const DesiredDot = `digraph HTTP_Service {
     edge [arrowhead="vee"];
     node [shape=box, fontname="Arial", style="rounded"];
 
-    code_fingerprint [label="fingerprint"]
+    code_fingerprint [label="Fingerprint"]
     code_autofix [label="autofix"]
     code_review [label="review"]
     code_react [label="react"]
