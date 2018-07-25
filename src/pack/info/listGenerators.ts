@@ -15,7 +15,8 @@
  */
 
 import { Success } from "@atomist/automation-client";
-import { OnCommand } from "@atomist/automation-client/onCommand";
+import { NoParameters } from "@atomist/automation-client/SmartParameters";
+import { CommandListener } from "@atomist/sdm";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
 import { commandHandlersWithTag } from "./support/commandSearch";
@@ -26,21 +27,23 @@ import { commandHandlersWithTag } from "./support/commandSearch";
  * @param {SoftwareDeliveryMachine} sdm
  * @return {HandleCommand<EmptyParameters>}
  */
-export const ListGeneratorsHandler: CommandHandlerRegistration = {
-    createCommand,
-    name: "listGenerators",
-    description: "List generators",
-    intent: ["list generators", "show generators"],
+export function listGeneratorsHandler(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
+    return {
+        listener: createListener(sdm),
+        name: "listGenerators",
+        description: "List generators",
+        intent: [ "list generators", "show generators" ],
+    };
 };
 
-function createCommand(sdm: SoftwareDeliveryMachine): OnCommand {
-    return async ctx => {
+function createListener(sdm: SoftwareDeliveryMachine): CommandListener<NoParameters> {
+    return async cli => {
         const generators = commandHandlersWithTag(sdm, "generator");
         let message = `${generators.length} generators in this software delivery machine\n`;
         generators.forEach(async hi => {
             message += `${hi.instance.intent.map(intent => "`" + intent + "`").join(", ")}\n`;
         });
-        await ctx.messageClient.respond(message);
+        await cli.context.messageClient.respond(message);
         return Success;
     };
 }

@@ -26,7 +26,10 @@ import { Parameters } from "@atomist/automation-client/decorators";
 import { HandlerContext } from "@atomist/automation-client/Handlers";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { CommandHandlerRegistration } from "@atomist/sdm";
+import {
+    CommandHandlerRegistration,
+    CommandListener,
+} from "@atomist/sdm";
 import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
 import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import * as _ from "lodash";
@@ -50,20 +53,19 @@ export class DisplayBuildLogParameters {
     public sha?: string;
 }
 
-function displayBuildLogForCommit(interpreter?: LogInterpretation) {
-    return async (ctx: HandlerContext,
-                  params: { githubToken: string, owner: string, repo: string, sha?: string }) => {
+function displayBuildLogForCommit(interpreter?: LogInterpretation): CommandListener<DisplayBuildLogParameters> {
+    return async cli => {
 
-        const sha = params.sha ? params.sha :
-            await tipOfDefaultBranch(params.githubToken, new GitHubRepoRef(params.owner, params.repo)); // TODO: use fetchDefaultBranchTip
+        const sha = cli.parameters.sha ? cli.parameters.sha :
+            await tipOfDefaultBranch(cli.parameters.githubToken, new GitHubRepoRef(cli.parameters.owner, cli.parameters.repo)); // TODO: use fetchDefaultBranchTip
 
         // TODO get rid of hard coding
-        const id = new DefaultRepoRefResolver().toRemoteRepoRef(params, { sha });
-        const ac: AddressChannels = (msg, opts) => ctx.messageClient.respond(msg, opts);
-        const build = await fetchBuildUrl(ctx, id);
+        const id = new DefaultRepoRefResolver().toRemoteRepoRef(cli.parameters, { sha });
+        const ac: AddressChannels = (msg, opts) => cli.context.messageClient.respond(msg, opts);
+        const build = await fetchBuildUrl(cli.context, id);
 
         await displayBuildLogFailure(id, build, ac, interpreter);
-        await ctx.messageClient.respond(":heavy_check_mark: Build log displayed for " + sha);
+        await cli.context.messageClient.respond(":heavy_check_mark: Build log displayed for " + sha);
         return Success;
     };
 }
@@ -89,6 +91,6 @@ export function displayBuildLogHandler(logInterpretation?: LogInterpretation): C
         intent: "show build log",
         description: "interpret and report on a build log",
         paramsMaker: DisplayBuildLogParameters,
-        createCommand: () => displayBuildLogForCommit(logInterpretation),
+        listener: displayBuildLogForCommit(logInterpretation),
     };
 }
