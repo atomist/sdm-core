@@ -24,6 +24,6 @@ import { selfDescribeHandler } from "./SelfDescribe";
 export const ExposeInfo: ExtensionPack = {
     ...metadata("info"),
     configure: sdm => {
-        sdm.addCommand(selfDescribeHandler(sdm.configuration.name));
+        sdm.addCommand(selfDescribeHandler(sdm));
     },
 };

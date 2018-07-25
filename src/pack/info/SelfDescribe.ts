@@ -19,7 +19,8 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { info } from "@atomist/automation-client/internal/util/info";
-import { OnCommand } from "@atomist/automation-client/onCommand";
+import { NoParameters } from "@atomist/automation-client/SmartParameters";
+import { CommandListener } from "@atomist/sdm/api/listener/CommandListener";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
 import {
@@ -35,17 +36,17 @@ import * as path from "path";
  * @param {SoftwareDeliveryMachine} sdm
  * @return {HandleCommand<EmptyParameters>}
  */
-export function selfDescribeHandler(name: string): CommandHandlerRegistration {
+export function selfDescribeHandler(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
     return {
         name: "SelfDescribe",
-        createCommand,
+        listener: selfDescribeListener(sdm),
         description: "Describe this SDM",
-        intent: [ `describe sdm ${name}`, "describe sdm" ],
+        intent: [ `describe sdm ${sdm.configuration.name}`, "describe sdm" ],
     };
 }
 
-function createCommand(sdm: SoftwareDeliveryMachine): OnCommand {
-    return async ctx => {
+function selfDescribeListener(sdm: SoftwareDeliveryMachine): CommandListener<NoParameters> {
+    return async cli => {
         const pj = require(path.join(appRoot.path, "package.json"));
         const clientPj = require(path.join(appRoot.path, "node_modules", "@atomist", "automation-client", "package.json"));
         const sdmPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm", "package.json"));
@@ -96,7 +97,7 @@ ${codeLine(`${sdmCorePj.name}:${sdmCorePj.version}`)}`,
             } ],
         };
 
-        await ctx.messageClient.respond(msg);
+        await cli.context.messageClient.respond(msg);
         return Success;
     };
 }
