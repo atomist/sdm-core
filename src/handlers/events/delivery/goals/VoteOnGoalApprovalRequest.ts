@@ -48,7 +48,7 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
  * If one voter denies the request, it will we discarded.
  */
 @EventHandler("Vote on approved goals",
-    subscription("OnWaitingForApprovalSdmGoal"))
+    subscription("OnAnyApprovedSdmGoal"))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
     @Value("token")
