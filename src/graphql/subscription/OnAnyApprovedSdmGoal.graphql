@@ -1,0 +1,6 @@
+subscription OnAnyApprovedSdmGoal {
+  SdmGoal(state: [approved]) {
+    ...SdmGoalFields
+    ...SdmGoalRepo
+  }
+}
