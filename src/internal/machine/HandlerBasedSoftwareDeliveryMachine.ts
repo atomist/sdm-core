@@ -43,6 +43,7 @@ import { resetGoalsCommand } from "../../handlers/events/delivery/goals/resetGoa
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
+import { VoteOnGoalApprovalRequest } from "../../handlers/events/delivery/goals/VoteOnGoalApprovalRequest";
 import { OnVerifiedDeploymentStatus } from "../../handlers/events/delivery/verify/OnVerifiedDeploymentStatus";
 import { ClosedIssueHandler } from "../../handlers/events/issue/ClosedIssueHandler";
 import { NewIssueHandler } from "../../handlers/events/issue/NewIssueHandler";
@@ -137,7 +138,11 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new RespondOnGoalCompletion(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalCompletionListeners) ],
+                        this.goalCompletionListeners),
+                    () => new VoteOnGoalApprovalRequest(
+                        this.configuration.sdm.repoRefResolver,
+                        this.configuration.sdm.credentialsResolver,
+                        this.goalApprovalRequestVoters) ],
                 commandHandlers: [],
                 ingesters: [],
             };
