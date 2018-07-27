@@ -37,14 +37,16 @@ import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as cluster from "cluster";
 import { SdmGoalById } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
+import { GoalExecutionListener } from "@atomist/sdm";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
 
     constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
                 private readonly projectLoader: ProjectLoader,
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentailsResolver: CredentialsResolver,
-                private readonly logFactory: ProgressLogFactory) {
+                private readonly credentialsResolver: CredentialsResolver,
+                private readonly logFactory: ProgressLogFactory,
+                private readonly goalExecutionListeners: GoalExecutionListener[]) {
         super();
     }
 
@@ -55,8 +57,9 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 this.implementationMapper,
                 this.projectLoader,
                 this.repoRefResolver,
-                this.credentailsResolver,
-                this.logFactory);
+                this.credentialsResolver,
+                this.logFactory,
+                this.goalExecutionListeners);
             automationClientInstance().withEventHandler(maker);
         }
     }
@@ -87,8 +90,9 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 this.implementationMapper,
                 this.projectLoader,
                 this.repoRefResolver,
-                this.credentailsResolver,
-                this.logFactory);
+                this.credentialsResolver,
+                this.logFactory,
+                this.goalExecutionListeners);
             automationClientInstance().withEventHandler(maker);
 
             // Create event and run event handler
