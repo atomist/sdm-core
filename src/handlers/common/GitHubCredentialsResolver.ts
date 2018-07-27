@@ -31,17 +31,29 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
     private readonly clientToken: string;
 
     public eventHandlerCredentials(): ProjectOperationCredentials {
-        if (!this.orgToken && !this.clientToken) {
-            throw new Error("orgToken and clientToken has not been injected");
-        }
-        return { token: this.orgToken ? this.orgToken : this.clientToken };
+        return this.credentials();
     }
 
     public commandHandlerCredentials(): ProjectOperationCredentials {
-        if (!this.orgToken && !this.clientToken) {
-            throw new Error("orgToken and clientToken has not been injected");
+        return this.credentials();
+    }
+
+    private credentials() {
+        if (this.hasToken(this.orgToken)) {
+            return { token: this.orgToken };
+        } else if (this.hasToken(this.clientToken)) {
+            return { token: this.clientToken };
         }
-        return { token: this.orgToken ? this.orgToken : this.clientToken };
+        throw new Error("orgToken and clientToken has not been injected");
+    }
+
+    private hasToken(token: string) {
+        if (!token) {
+            return false;
+        } else if (token === "null") { // "null" as string is being sent when the orgToken can't be determined by the api
+            return false;
+        }
+        return true;
     }
 
 }
