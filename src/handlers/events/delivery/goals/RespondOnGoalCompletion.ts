@@ -31,7 +31,7 @@ import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
-} from "@atomist/sdm/api/listener/GoalsSetListener";
+} from "@atomist/sdm";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";

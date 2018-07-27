@@ -28,7 +28,10 @@ import {
     EventHandlerMetadata,
     ValueDeclaration,
 } from "@atomist/automation-client/metadata/automationMetadata";
-import { GoalInvocation } from "@atomist/sdm";
+import {
+    GoalExecutionListener,
+    GoalInvocation
+} from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
@@ -66,7 +69,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 private readonly projectLoader: ProjectLoader,
                 private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsResolver: CredentialsResolver,
-                private readonly logFactory: ProgressLogFactory) {
+                private readonly logFactory: ProgressLogFactory,
+                private readonly goalExecutionListeners: GoalExecutionListener[]) {
         const implementationName = "FulfillGoal";
         this.subscriptionName = "OnAnyRequestedSdmGoal";
         this.subscription =
@@ -117,7 +121,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             const start = Date.now();
 
             return executeGoal(
-                { projectLoader: params.projectLoader },
+                { projectLoader: params.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
                 goalExecutor,
                 goalInvocation,
                 sdmGoal,

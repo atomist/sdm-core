@@ -208,7 +208,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.configuration.sdm.projectLoader,
                 this.configuration.sdm.repoRefResolver,
                 this.configuration.sdm.credentialsResolver,
-                this.configuration.sdm.logFactory) : undefined)
+                this.configuration.sdm.logFactory,
+                this.goalExecutionListeners) : undefined)
             .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.eventHandlers)))
             .concat([
                 this.userJoiningChannelListeners.length > 0 ?

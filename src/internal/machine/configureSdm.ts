@@ -21,8 +21,8 @@ import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/S
 import * as appRoot from "app-root-path";
 import * as _ from "lodash";
 import * as path from "path";
-import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/launchGoal";
 import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -55,28 +55,7 @@ export function configureSdm(
 
         const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
         if (forked) {
-            if (process.env.ATOMIST_JOB_NAME) {
-                mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
-            } else {
-                mergedConfig.name = `${mergedConfig.name}-${process.env.ATOMIST_GOAL_ID || guid()}`;
-            }
-
-            // Force ephemeral policy and no handlers or ingesters
-            mergedConfig.policy = "ephemeral";
-            mergedConfig.commands = [];
-            mergedConfig.events = [];
-            mergedConfig.ingesters = [];
-
-            mergedConfig.listeners.push(
-                new GoalAutomationEventListener(
-                    machine.goalFulfillmentMapper,
-                    machine.configuration.sdm.projectLoader,
-                    machine.configuration.sdm.repoRefResolver,
-                    machine.configuration.sdm.credentialsResolver,
-                    machine.configuration.sdm.logFactory));
-
-            // Disable app events for forked clients
-            mergedConfig.applicationEvents.enabled = false;
+           configureSdmToRunExactlyOneGoal(mergedConfig, machine);
         } else {
             validateConfiguration(mergedConfig, options);
 
@@ -99,6 +78,32 @@ export function configureSdm(
         registerMetadata(mergedConfig, machine);
         return mergedConfig;
     };
+}
+
+function configureSdmToRunExactlyOneGoal(mergedConfig : SoftwareDeliveryMachineConfiguration, machine: SoftwareDeliveryMachine) {
+    if (process.env.ATOMIST_JOB_NAME) {
+        mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
+    } else {
+        mergedConfig.name = `${mergedConfig.name}-${process.env.ATOMIST_GOAL_ID || guid()}`;
+    }
+
+    // Force ephemeral policy and no handlers or ingesters
+    mergedConfig.policy = "ephemeral";
+    mergedConfig.commands = [];
+    mergedConfig.events = [];
+    mergedConfig.ingesters = [];
+
+    mergedConfig.listeners.push(
+        new GoalAutomationEventListener(
+            machine.goalFulfillmentMapper,
+            machine.configuration.sdm.projectLoader,
+            machine.configuration.sdm.repoRefResolver,
+            machine.configuration.sdm.credentialsResolver,
+            machine.configuration.sdm.logFactory,
+            machine.goalExecutionListeners));
+
+    // Disable app events for forked clients
+    mergedConfig.applicationEvents.enabled = false;
 }
 
 function validateConfiguration(config: Configuration, options: ConfigureOptions) {

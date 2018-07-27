@@ -23,7 +23,7 @@ import {
     GoalCompletionListenerInvocation,
     GoalsSetListener,
     GoalsSetListenerInvocation,
-} from "@atomist/sdm/api/listener/GoalsSetListener";
+} from "@atomist/sdm";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { StatusState } from "@atomist/sdm/typings/types";
 import { SdmGoalState } from "../../../../../typings/types";
