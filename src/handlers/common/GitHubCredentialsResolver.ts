@@ -44,7 +44,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
         } else if (this.hasToken(this.clientToken)) {
             return { token: this.clientToken };
         }
-        throw new Error("orgToken and clientToken has not been injected");
+        throw new Error("neither orgToken nor clientToken has been injected");
     }
 
     private hasToken(token: string) {
