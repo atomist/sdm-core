@@ -36,7 +36,6 @@ import * as p from "path";
 import { createStatus } from "../../../../../util/github/ghub";
 import { ProjectIdentifier } from "../projectIdentifier";
 import { NpmPreparations } from "./npmBuilder";
-import * as tmp from "tmp-promise";
 
 /**
  * Execute npm publish

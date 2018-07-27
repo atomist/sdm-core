@@ -21,8 +21,8 @@ import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/S
 import * as appRoot from "app-root-path";
 import * as _ from "lodash";
 import * as path from "path";
-import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
+import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -80,7 +80,7 @@ export function configureSdm(
     };
 }
 
-function configureSdmToRunExactlyOneGoal(mergedConfig : SoftwareDeliveryMachineConfiguration, machine: SoftwareDeliveryMachine) {
+function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration, machine: SoftwareDeliveryMachine) {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {

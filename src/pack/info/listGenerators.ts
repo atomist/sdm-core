@@ -34,7 +34,7 @@ export function listGeneratorsHandler(sdm: SoftwareDeliveryMachine): CommandHand
         description: "List generators",
         intent: [ "list generators", "show generators" ],
     };
-};
+}
 
 function createListener(sdm: SoftwareDeliveryMachine): CommandListener<NoParameters> {
     return async cli => {
