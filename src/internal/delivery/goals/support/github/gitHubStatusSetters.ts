@@ -16,14 +16,14 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
     GoalsSetListener,
     GoalsSetListenerInvocation,
 } from "@atomist/sdm";
+import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
+import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { StatusState } from "@atomist/sdm/typings/types";
 import { SdmGoalState } from "../../../../../typings/types";

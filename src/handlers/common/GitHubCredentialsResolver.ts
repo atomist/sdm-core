@@ -17,6 +17,7 @@
 import {
     Secret,
     Secrets,
+    Value,
 } from "@atomist/automation-client";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
@@ -24,20 +25,35 @@ import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsRes
 export class GitHubCredentialsResolver implements CredentialsResolver {
 
     @Secret(Secrets.OrgToken)
-    private readonly githubToken: string;
+    private readonly orgToken: string;
+
+    @Value("token")
+    private readonly clientToken: string;
 
     public eventHandlerCredentials(): ProjectOperationCredentials {
-        if (!this.githubToken) {
-            throw new Error("githubToken has not been injected");
-        }
-        return {token: this.githubToken};
+        return this.credentials();
     }
 
     public commandHandlerCredentials(): ProjectOperationCredentials {
-        if (!this.githubToken) {
-            throw new Error("githubToken has not been injected");
+        return this.credentials();
+    }
+
+    private credentials() {
+        if (this.hasToken(this.orgToken)) {
+            return { token: this.orgToken };
+        } else if (this.hasToken(this.clientToken)) {
+            return { token: this.clientToken };
         }
-        return {token: this.githubToken};
+        throw new Error("orgToken and clientToken has not been injected");
+    }
+
+    private hasToken(token: string) {
+        if (!token) {
+            return false;
+        } else if (token === "null") { // "null" as string is being sent when the orgToken can't be determined by the api
+            return false;
+        }
+        return true;
     }
 
 }

@@ -22,7 +22,6 @@ import {
     HandlerResult,
     logger,
     Success,
-    Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { SdmGoalEvent } from "@atomist/sdm";
@@ -32,6 +31,7 @@ import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
+import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
@@ -46,12 +46,10 @@ import {
     subscription("OnAnySuccessfulSdmGoal"))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
-    @Value("token")
-    public githubToken: string;
-
     constructor(private readonly name,
                 private readonly implementationMapper: SdmGoalImplementationMapper,
-                private readonly repoRefResolver: RepoRefResolver) {
+                private readonly repoRefResolver: RepoRefResolver,
+                private readonly credentialsResolver: CredentialsResolver) {
     }
 
     public async handle(event: EventFired<OnAnySuccessfulSdmGoal.Subscription>,
@@ -65,6 +63,8 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         }
 
         const id = params.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const credentials = this.credentialsResolver.eventHandlerCredentials(context, id);
+
         const goals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
@@ -76,8 +76,6 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             logger.info("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
                 goalsToRequest.map(goalKeyString).join(", "));
         }
-
-        const credentials = { token: this.githubToken };
 
         /*
          * #294 Intention: for custom descriptions per goal, we need to look up the Goal.

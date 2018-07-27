@@ -29,6 +29,7 @@ import { RegistrationConfirmation } from "@atomist/automation-client/internal/tr
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { AutomationEventListenerSupport } from "@atomist/automation-client/server/AutomationEventListener";
 import { QueryNoCacheOptions } from "@atomist/automation-client/spi/graph/GraphClient";
+import { GoalExecutionListener } from "@atomist/sdm";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { ProgressLogFactory } from "@atomist/sdm/spi/log/ProgressLog";
@@ -37,7 +38,6 @@ import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as cluster from "cluster";
 import { SdmGoalById } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
-import { GoalExecutionListener } from "@atomist/sdm";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
 

@@ -22,16 +22,15 @@ import {
     HandlerResult,
     logger,
     Success,
-    Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { SdmGoalEvent } from "@atomist/sdm";
-import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
 } from "@atomist/sdm";
+import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
@@ -42,9 +41,6 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
  */
 @EventHandler("Run a listener on goal failure or success", subscription("OnAnyCompletedSdmGoal"))
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
-
-    @Value("token")
-    public token: string;
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
@@ -62,8 +58,6 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
         const allGoals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
-
-        (this.credentialsFactory as any).githubToken = this.token;
 
         const gsi: GoalCompletionListenerInvocation = {
             id,
