@@ -106,7 +106,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     this.configuration.sdm.repoRefResolver,
                     this.pushMapping,
                     this.goalsSetListeners,
-                    this.goalFulfillmentMapper, this.configuration.sdm.credentialsResolver)],
+                    this.goalFulfillmentMapper,
+                    this.configuration.sdm.credentialsResolver)],
                 commandHandlers: [() => resetGoalsCommand({
                     projectLoader: this.configuration.sdm.projectLoader,
                     repoRefResolver: this.configuration.sdm.repoRefResolver,
@@ -134,7 +135,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new RequestDownstreamGoalsOnGoalSuccess(
                         this.configuration.name,
                         this.goalFulfillmentMapper,
-                        this.configuration.sdm.repoRefResolver),
+                        this.configuration.sdm.repoRefResolver,
+                        this.configuration.sdm.credentialsResolver),
                     () => new RespondOnGoalCompletion(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,

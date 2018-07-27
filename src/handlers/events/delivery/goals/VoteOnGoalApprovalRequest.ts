@@ -22,7 +22,6 @@ import {
     HandlerResult,
     logger,
     Success,
-    Value,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
@@ -51,9 +50,6 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
     subscription("OnAnyApprovedSdmGoal"))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
-    @Value("token")
-    public token: string;
-
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly voters: GoalApprovalRequestVote[]) {
@@ -69,7 +65,6 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         }
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        (this.credentialsFactory as any).githubToken = this.token;
 
         const garvi: GoalApprovalRequestVoteInvocation = {
             id,
@@ -91,7 +86,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
             const goal: SdmGoalEvent = {
                 ...sdmGoal,
                 approval: undefined,
-            }
+            };
             await updateGoal(context, goal, {
                 state: SdmGoalState.waiting_for_approval,
                 description: `${sdmGoal.description} | approval request by @${sdmGoal.approval.userId} denied`,

@@ -17,6 +17,7 @@
 import {
     Secret,
     Secrets,
+    Value,
 } from "@atomist/automation-client";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
@@ -24,20 +25,23 @@ import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsRes
 export class GitHubCredentialsResolver implements CredentialsResolver {
 
     @Secret(Secrets.OrgToken)
-    private readonly githubToken: string;
+    private readonly orgToken: string;
+
+    @Value("token")
+    private readonly clientToken: string;
 
     public eventHandlerCredentials(): ProjectOperationCredentials {
-        if (!this.githubToken) {
-            throw new Error("githubToken has not been injected");
+        if (!this.orgToken && !this.clientToken) {
+            throw new Error("orgToken and clientToken has not been injected");
         }
-        return {token: this.githubToken};
+        return { token: this.orgToken ? this.orgToken : this.clientToken };
     }
 
     public commandHandlerCredentials(): ProjectOperationCredentials {
-        if (!this.githubToken) {
-            throw new Error("githubToken has not been injected");
+        if (!this.orgToken && !this.clientToken) {
+            throw new Error("orgToken and clientToken has not been injected");
         }
-        return {token: this.githubToken};
+        return { token: this.orgToken ? this.orgToken : this.clientToken };
     }
 
 }
