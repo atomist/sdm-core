@@ -43,6 +43,7 @@ import { resetGoalsCommand } from "../../handlers/events/delivery/goals/resetGoa
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
+import { VoteOnGoalApprovalRequest } from "../../handlers/events/delivery/goals/VoteOnGoalApprovalRequest";
 import { OnVerifiedDeploymentStatus } from "../../handlers/events/delivery/verify/OnVerifiedDeploymentStatus";
 import { ClosedIssueHandler } from "../../handlers/events/issue/ClosedIssueHandler";
 import { NewIssueHandler } from "../../handlers/events/issue/NewIssueHandler";
@@ -137,7 +138,11 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new RespondOnGoalCompletion(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalCompletionListeners) ],
+                        this.goalCompletionListeners),
+                    () => new VoteOnGoalApprovalRequest(
+                        this.configuration.sdm.repoRefResolver,
+                        this.configuration.sdm.credentialsResolver,
+                        this.goalApprovalRequestVotes) ],
                 commandHandlers: [],
                 ingesters: [],
             };
@@ -172,23 +177,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.configuration.sdm.credentialsResolver) :
             undefined;
     }
-
-    /* TODO CD move this into a pack that can installed
-    private get disposal(): FunctionalUnit {
-        return {
-            commandHandlers: [
-                () => disposeCommand({
-                    goalSetter: new PushRules("disposal", this.disposalGoalSetters),
-                    repoRefResolver: this.configuration.sdm.repoRefResolver,
-                    projectLoader: this.configuration.sdm.projectLoader,
-                    goalsListeners: this.goalsSetListeners,
-                    implementationMapping: this.goalFulfillmentMapper,
-                }),
-                deleteRepositoryCommand],
-            eventHandlers: [],
-            ingesters: [],
-        };
-    }*/
 
     private readonly onBuildComplete: Maker<SetGoalOnBuildComplete> =
         () => new SetGoalOnBuildComplete([BuildGoal, JustBuildGoal], this.configuration.sdm.repoRefResolver)

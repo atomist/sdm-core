@@ -327,7 +327,7 @@ MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org
 |`config-chain`|`1.1.11`|Dominic Tarr|[https://github.com/dominictarr/config-chain](https://github.com/dominictarr/config-chain)|
 |`core-util-is`|`1.0.2`|Isaac Z. Schlueter|[https://github.com/isaacs/core-util-is](https://github.com/isaacs/core-util-is)|
 |`crc32-stream`|`2.0.0`|Chris Talkington|[https://github.com/archiverjs/node-crc32-stream](https://github.com/archiverjs/node-crc32-stream)|
-|`crc`|`3.7.0`|Alex Gorbatchev|[https://github.com/alexgorbatchev/node-crc](https://github.com/alexgorbatchev/node-crc)|
+|`crc`|`3.8.0`|Alex Gorbatchev|[https://github.com/alexgorbatchev/node-crc](https://github.com/alexgorbatchev/node-crc)|
 |`create-error-class`|`3.0.2`|Vsevolod Strukchinsky|[https://github.com/floatdrop/create-error-class](https://github.com/floatdrop/create-error-class)|
 |`cross-spawn`|`5.1.0`|IndigoUnited|[https://github.com/IndigoUnited/node-cross-spawn](https://github.com/IndigoUnited/node-cross-spawn)|
 |`crypto-random-string`|`1.0.0`|Sindre Sorhus|[https://github.com/sindresorhus/crypto-random-string](https://github.com/sindresorhus/crypto-random-string)|
