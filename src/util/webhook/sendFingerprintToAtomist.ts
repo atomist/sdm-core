@@ -33,9 +33,24 @@ export const SendFingerprintToAtomist: FingerprintListener = fli => {
         },
         fingerprints: [fli.fingerprint],
     };
-    logger.info("Sending up fingerprint to %s: %j", url, payload);
+    try {
+        const shortenedPayload = JSON.stringify(payload, limitValueLength);
+        logger.info("Sending up fingerprint to %s: %j", url, shortenedPayload);
+    } catch (err) {
+        return Promise.reject("Unable to stringify your fingerprint. Is it circular? " + err.message);
+    }
     return axios.post(url, payload)
         .catch(err => {
             return Promise.reject(`Axios error calling ${url}: ${err.message}`);
         });
 };
+
+function limitValueLength(key: string, value: any): string {
+    if (!value) {
+        return;
+    }
+    const stringified = JSON.stringify(value);
+    if (stringified.length > 1000) {
+        return stringified.substr(0, 100) + " ... < plus " + (stringified.length - 100) + " more characters >";
+    }
+}
