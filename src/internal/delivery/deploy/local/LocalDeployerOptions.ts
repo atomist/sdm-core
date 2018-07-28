@@ -16,6 +16,7 @@
 
 import { Deployment } from "@atomist/sdm/spi/deploy/Deployment";
 import { ChildProcess } from "child_process";
+import { LookupStrategy } from "./ManagedDeployments";
 
 /**
  * @ModuleExport
@@ -66,6 +67,11 @@ export interface LocalDeployerOptions {
      * For example, matching something like "Started SpringRestSeedApplication in 3.931 seconds"
      */
     successPatterns: RegExp[];
+
+    /**
+     *  Strategy for looking up already running services
+     */
+    lookupStrategy: LookupStrategy;
 }
 
 /**
