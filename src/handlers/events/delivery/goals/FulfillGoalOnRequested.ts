@@ -26,11 +26,10 @@ import {
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     EventHandlerMetadata,
-    ValueDeclaration,
 } from "@atomist/automation-client/metadata/automationMetadata";
 import {
     GoalExecutionListener,
-    GoalInvocation
+    GoalInvocation,
 } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
@@ -60,10 +59,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public subscription: string;
     public name: string;
     public description: string;
-    // public secrets = [{name: "githubToken", uri: Secrets.OrgToken}];
-    public values = [ { path: "token", name: "githubToken", required: true } ] as any[] as ValueDeclaration[];
-
-    public githubToken: string;
 
     constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
                 private readonly projectLoader: ProjectLoader,
@@ -103,7 +98,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
 
-        (this.credentialsResolver as any).githubToken = params.githubToken;
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
 
         const goalInvocation: GoalInvocation = { sdmGoal, progressLog, context: ctx, addressChannels, id, credentials };
