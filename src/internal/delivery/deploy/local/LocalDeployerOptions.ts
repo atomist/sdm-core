@@ -69,9 +69,10 @@ export interface LocalDeployerOptions {
     successPatterns: RegExp[];
 
     /**
-     *  Strategy for looking up already running services
+     *  Strategy for looking up already running services.
+     *  Local deployers will have their own default.
      */
-    lookupStrategy: LookupStrategy;
+    lookupStrategy?: LookupStrategy;
 }
 
 /**
