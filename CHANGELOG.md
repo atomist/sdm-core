@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   **BREAKING** EditorRegistration supports general editorCommand customizations, instead of specifically dryRun.
 -   Link is missing on npm publish goal. [#11](https://github.com/atomist/sdm-core/issues/11)
+-   Use credentialsResolver consistently. [#18](https://github.com/atomist/sdm-core/issues/18)
 
 ## [0.2.3](https://github.com/atomist/sdm/compare/0.2.2...0.2.3) - 2018-06-18
 
