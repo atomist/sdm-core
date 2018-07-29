@@ -57,7 +57,8 @@ function displayBuildLogForCommit(interpreter?: LogInterpretation): CommandListe
     return async cli => {
 
         const sha = cli.parameters.sha ? cli.parameters.sha :
-            await tipOfDefaultBranch(cli.parameters.githubToken, new GitHubRepoRef(cli.parameters.owner, cli.parameters.repo)); // TODO: use fetchDefaultBranchTip
+            await tipOfDefaultBranch(cli.parameters.githubToken,
+                new GitHubRepoRef(cli.parameters.owner, cli.parameters.repo)); // TODO: use fetchDefaultBranchTip
 
         // TODO get rid of hard coding
         const id = new DefaultRepoRefResolver().toRemoteRepoRef(cli.parameters, { sha });
