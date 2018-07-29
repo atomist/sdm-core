@@ -63,7 +63,7 @@ function configure(sdm: SoftwareDeliveryMachine) {
         .addGoalImplementation("CodeReactions", PushReactionGoal,
             executePushReactions(sdm.configuration.sdm.projectLoader, sdm.pushImpactListenerRegistrations))
         .addGoalImplementation("Reviews", ReviewGoal,
-            executeReview(sdm.configuration.sdm.projectLoader, sdm.reviewerRegistrations, sdm.reviewListeners))
+            executeReview(sdm.configuration.sdm.projectLoader, sdm.reviewerRegistrations, sdm.reviewListenerRegistrations))
         .addVerifyImplementation()
         .addGoalImplementation("OfferToDeleteRepo", DeleteRepositoryGoal,
             offerToDeleteRepository())
