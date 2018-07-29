@@ -40,7 +40,7 @@ export interface ManagedDeploymentTargetInfo extends TargetInfo {
  * @ModuleExport
  */
 export const ManagedDeploymentTargeter: Targeter<ManagedDeploymentTargetInfo> = (id: RemoteRepoRef, branch: string) => {
-    const branchId = {...id, branch};
+    const branchId = { ...id, branch };
     return {
         name: "Run alongside this automation",
         description: `Locally run ${id.sha} from branch ${branch}`,
@@ -163,12 +163,12 @@ export class ManagedDeployments {
 
 }
 
-async function portIsInUse(host: string, port: number) {
+export async function portIsInUse(host: string, port: number) {
     const agent = new https.Agent({
         rejectUnauthorized: false,
     });
     try {
-        await axios.head(`${host}:${port}`, {httpsAgent: agent});
+        await axios.head(`${host}:${port}`, { httpsAgent: agent });
         return true;
     } catch {
         return false;
