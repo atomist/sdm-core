@@ -24,7 +24,6 @@ export {
 export { ProjectIdentifier } from "./internal/delivery/build/local/projectIdentifier";
 export { RolarProgressLog } from "./log/RolarProgressLog";
 export { InMemoryDeploymentStatusManager } from "./pack/freeze/InMemoryDeploymentStatusManager";
-export { PackageLockFingerprinter } from "./pack/node/PackageLockFingerprinter";
 export { CloudFoundryBlueGreenDeployer } from "./pack/pcf/CloudFoundryBlueGreenDeployer";
 export { EnvironmentCloudFoundryTarget } from "./pack/pcf/EnvironmentCloudFoundryTarget";
 export { K8sAutomationBuilder } from "./internal/delivery/build/k8s/K8AutomationBuilder";
@@ -54,22 +53,8 @@ export {
 } from "./pack/freeze/deploymentFreeze";
 export { summarizeGoalsInGitHubStatus } from "./internal/delivery/goals/support/githubStatusSummarySupport";
 export { requestDeployToK8s } from "./handlers/events/delivery/deploy/k8s/RequestK8sDeploys";
-export { npmCustomBuilder } from "./internal/delivery/build/local/npm/NpmDetectBuildMapping";
-export { nodeBuilder } from "./internal/delivery/build/local/npm/npmBuilder";
 export { ToPublicRepo } from "./mapping/pushtest/toPublicRepo";
 export { HasDockerfile } from "./pack/docker/dockerPushTests";
-export {
-    HasAtomistBuildFile,
-    IsNode,
-} from "./pack/node/nodePushTests";
-export {
-    NpmBuildGoals,
-    NpmDeployGoals,
-    NpmDockerGoals,
-    NpmKubernetesDeployGoals,
-} from "./pack/node/npmGoals";
-export { IsTypeScript } from "./pack/node/tsPushTests";
-export { tslintFix } from "./pack/node/tslintFix";
 export {
     CloudFoundryInfo,
     CloudFoundryManifestPath,
@@ -81,7 +66,6 @@ export {
     UndeployEverywhereGoals,
 } from "./pack/well-known-goals/httpServiceGoals";
 export { LibraryGoals } from "./pack/well-known-goals/libraryGoals";
-export { NodeProjectIdentifier } from "./internal/delivery/build/local/npm/nodeProjectIdentifier";
 export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
 export { renderCommitMessage } from "./util/slack/diffRendering";
 export { GraphGoals } from "./pack/graph-goals/graphGoals";
@@ -94,13 +78,7 @@ export { createTagForStatus,
 executeTag } from "./internal/delivery/build/executeTag";
 export { executeVersioner,
 readSdmVersion } from "./internal/delivery/build/local/projectVersioner";
-export { NpmOptions,
-executePublish } from "./internal/delivery/build/local/npm/executePublish";
 export { createKubernetesData } from "./handlers/events/delivery/goals/k8s/launchGoalK8";
-export { IsAtomistAutomationClient } from "./pack/node/nodePushTests";
-export { NodeProjectVersioner } from "./internal/delivery/build/local/npm/nodeProjectVersioner";
-export { DevelopmentEnvOptions,
-NpmPreparations } from "./internal/delivery/build/local/npm/npmBuilder";
 export { postLinkImageWebhook } from "./util/webhook/ImageLink";
 export { EphemeralLocalArtifactStore } from "./internal/artifact/local/EphemeralLocalArtifactStore";
 export { selfDescribingHandlers } from "./pack/info/support/commandSearch";
