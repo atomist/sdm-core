@@ -48,6 +48,7 @@ import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
 import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { formatDuration } from "../../../../util/misc/time";
+import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 
 /**
  * Handle an SDM request goal. Used for many implementation types.
@@ -147,7 +148,7 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
 
 async function reportEndAndClose(result: any, start: number, progressLog: ProgressLog) {
     progressLog.write(`---`);
-    progressLog.write(`Result: ${stringify(result)}`);
+    progressLog.write(`Result: ${stringify(result, possibleAxiosObjectReplacer, 2)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
     progressLog.write(`---`);
     await progressLog.close();
