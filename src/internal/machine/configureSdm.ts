@@ -83,20 +83,21 @@ export function configureSdm(
         const mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
         const defaultConfOptions = defaultConfigureOptions();
         const mergedOptions = _.merge(defaultConfOptions, options);
-        const machine = machineMaker(mergedConfig);
+        const sdm = machineMaker(mergedConfig);
 
         // Configure the local SDM
         try {
             const local = require("@atomist/slalom");
             local.configureLocal(mergedOptions.local);
+            sdm.addExtensionPacks(local.LocalLifecycle);
         } catch (err) {
             // Nothing to do here
         }
 
         // Configure the job forking ability
-        configureJobLaunching(mergedConfig, machine, mergedOptions);
+        configureJobLaunching(mergedConfig, sdm, mergedOptions);
 
-        registerMetadata(mergedConfig, machine);
+        registerMetadata(mergedConfig, sdm);
         return mergedConfig;
     };
 }
@@ -125,7 +126,8 @@ function configureJobLaunching(mergedConfig, machine, mergedOptions) {
     }
 };
 
-function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration, machine: SoftwareDeliveryMachine) {
+function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
+                                         machine: SoftwareDeliveryMachine) {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {
