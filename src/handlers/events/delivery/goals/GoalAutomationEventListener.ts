@@ -105,7 +105,10 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     team_name: teamName,
                     operationName: metadataFromInstance(maker()).name,
                 },
-                secrets: [],
+                secrets: [{
+                    uri: Secrets.OrgToken,
+                    value: "null",
+                }],
             };
             await eventHandler.processEvent(event, async results => {
                 const resolved = await results;
