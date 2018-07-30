@@ -23,6 +23,7 @@ import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
+import { ConfigureOptions } from "../internal/machine/configureSdm";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
 
 export function defaultSoftwareDeliveryMachineOptions(configuration: Configuration): SoftwareDeliveryMachineConfiguration {
@@ -40,4 +41,14 @@ export function defaultSoftwareDeliveryMachineOptions(configuration: Configurati
             projectPersister: RemoteGitProjectPersister,
         },
     };
+}
+
+export function defaultConfigureOptions(): ConfigureOptions {
+    return {
+        requiredConfigurationValues: [],
+        local: {
+            repositoryOwnerParentDirectory: require('os').homedir(),
+            preferLocalSeeds: true,
+        }
+    }
 }
