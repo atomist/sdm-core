@@ -104,10 +104,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     team_name: teamName,
                     operationName: maker().subscriptionName,
                 },
-                secrets: [{
-                    uri: Secrets.OrgToken,
-                    value: configurationValue<string>("token"),
-                }],
+                secrets: [],
             };
             await eventHandler.processEvent(event, async results => {
                 const resolved = await results;
