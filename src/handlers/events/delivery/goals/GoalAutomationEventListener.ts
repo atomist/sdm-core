@@ -19,7 +19,6 @@ import {
     logger,
     Secrets,
 } from "@atomist/automation-client";
-import { configurationValue } from "@atomist/automation-client/configuration";
 import { ApolloGraphClient } from "@atomist/automation-client/graph/ApolloGraphClient";
 import { metadataFromInstance } from "@atomist/automation-client/internal/metadata/metadataReading";
 import {
@@ -37,6 +36,7 @@ import { ProgressLogFactory } from "@atomist/sdm/spi/log/ProgressLog";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import * as cluster from "cluster";
+import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
@@ -98,7 +98,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
 
             // Create event and run event handler
             const event: EventIncoming = {
-                data: goal,
+                data: _.cloneDeep(goal),
                 extensions: {
                     correlation_id: correlationId,
                     team_id: teamId,
