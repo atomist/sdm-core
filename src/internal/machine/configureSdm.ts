@@ -80,7 +80,7 @@ export function configureSdm(
 
     return async (config: Configuration) => {
         const defaultSdmOptions = defaultSoftwareDeliveryMachineOptions(config);
-        const mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
+        let mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
         const defaultConfOptions = defaultConfigureOptions();
         const mergedOptions = _.merge(defaultConfOptions, options);
         const sdm = machineMaker(mergedConfig);
@@ -88,8 +88,8 @@ export function configureSdm(
         // Configure the local SDM
         try {
             const local = require("@atomist/slalom");
-            local.configureLocal(mergedOptions.local);
             sdm.addExtensionPacks(local.LocalLifecycle);
+            mergedConfig = await local.configureLocal(mergedOptions.local)(mergedConfig);
         } catch (err) {
             // Nothing to do here
         }
