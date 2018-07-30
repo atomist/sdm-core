@@ -83,16 +83,15 @@ export function configureSdm(
         let mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
         const defaultConfOptions = defaultConfigureOptions();
         const mergedOptions = _.merge(defaultConfOptions, options);
-        const sdm = machineMaker(mergedConfig);
 
         // Configure the local SDM
-        try {
-            const local = require("@atomist/slalom");
-            sdm.addExtensionPacks(local.LocalLifecycle);
-            mergedConfig = await local.configureLocal(mergedOptions.local)(mergedConfig);
-        } catch (err) {
-            // Nothing to do here
-        }
+        mergedConfig = await doWithSlalom(slalom => {
+            return slalom.configureLocal(mergedOptions.local)
+        })(mergedConfig);
+
+        const sdm = machineMaker(mergedConfig);
+
+        doWithSlalom(slalom => sdm.addExtensionPacks(slalom.LocalLifecycle));
 
         // Configure the job forking ability
         configureJobLaunching(mergedConfig, sdm, mergedOptions);
@@ -178,4 +177,14 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
         "atomist.sdm.name": machine.name,
         "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
     };
+}
+
+function doWithSlalom(callback: (slalom: any) => any) {
+    try {
+        const local = require("@atomist/slalom");
+        return callback(local);
+
+    } catch (err) {
+        // Nothing to report here
+    }
 }
