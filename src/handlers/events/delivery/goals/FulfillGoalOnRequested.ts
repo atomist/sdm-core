@@ -24,6 +24,7 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
+import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 import {
     EventHandlerMetadata,
 } from "@atomist/automation-client/metadata/automationMetadata";
@@ -48,7 +49,6 @@ import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
 import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { formatDuration } from "../../../../util/misc/time";
-import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 
 /**
  * Handle an SDM request goal. Used for many implementation types.
