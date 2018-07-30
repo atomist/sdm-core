@@ -21,6 +21,7 @@ import {
 } from "@atomist/automation-client";
 import { configurationValue } from "@atomist/automation-client/configuration";
 import { ApolloGraphClient } from "@atomist/automation-client/graph/ApolloGraphClient";
+import { metadataFromInstance } from "@atomist/automation-client/internal/metadata/metadataReading";
 import {
     EventIncoming,
     RequestProcessor,
@@ -102,7 +103,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     correlation_id: correlationId,
                     team_id: teamId,
                     team_name: teamName,
-                    operationName: maker().subscriptionName,
+                    operationName: metadataFromInstance(maker()).name,
                 },
                 secrets: [],
             };

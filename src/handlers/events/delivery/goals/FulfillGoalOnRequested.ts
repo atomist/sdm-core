@@ -17,6 +17,7 @@
 import {
     automationClientInstance,
     EventFired,
+    EventHandler,
     HandleEvent,
     HandlerContext,
     HandlerResult,
@@ -53,13 +54,9 @@ import { formatDuration } from "../../../../util/misc/time";
 /**
  * Handle an SDM request goal. Used for many implementation types.
  */
-export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription>,
-    EventHandlerMetadata {
-
-    public subscriptionName: string;
-    public subscription: string;
-    public name: string;
-    public description: string;
+@EventHandler("Fulfill a goal when it reaches 'requested' state",
+    subscription("OnAnyRequestedSdmGoal"))
+export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription> {
 
     constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
                 private readonly projectLoader: ProjectLoader,
@@ -67,12 +64,6 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 private readonly credentialsResolver: CredentialsResolver,
                 private readonly logFactory: ProgressLogFactory,
                 private readonly goalExecutionListeners: GoalExecutionListener[]) {
-        const implementationName = "FulfillGoal";
-        this.subscriptionName = "OnAnyRequestedSdmGoal";
-        this.subscription =
-            subscription({ name: "OnAnyRequestedSdmGoal" });
-        this.name = implementationName + "OnAnyRequestedSdmGoal";
-        this.description = `Fulfill a goal when it reaches 'requested' state`;
     }
 
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
