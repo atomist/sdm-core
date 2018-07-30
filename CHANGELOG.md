@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Differentiate between internal and external side-effecting fulfillment. [#9](https://github.com/atomist/sdm-core/issues/9)
 -   Add ability to extract and report goal Progress. [#14](https://github.com/atomist/sdm-core/issues/14)
 -   Add VoteOnGoalApprovalRequest. [#17](https://github.com/atomist/sdm-core/issues/17)
+-   Attempt to configure local SDM. [#23](https://github.com/atomist/sdm-core/issues/23)
 
 ### Changed
 
