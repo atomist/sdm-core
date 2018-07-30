@@ -22,14 +22,44 @@ import * as appRoot from "app-root-path";
 import * as _ from "lodash";
 import * as path from "path";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
-import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import {
+    defaultConfigureOptions,
+    defaultSoftwareDeliveryMachineOptions,
+} from "../../machine/defaultSoftwareDeliveryMachineOptions";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
  * running SDM instance
  */
 export interface ConfigureOptions {
+    /**
+     * Optional array of required configuration value paths resolved against the root configuration
+     */
     requiredConfigurationValues?: string[];
+
+    /**
+     * Configuration for local SDM
+     */
+    local?: {
+        /**
+         * Base of expanded directory tree the local client will work with:
+         * The projects the SDM can operate on.
+         * Under this we find /<org>/<repo>
+         */
+        repositoryOwnerParentDirectory: string;
+
+        /**
+         * Use local seeds (in whatever git state) vs cloning if possible?
+         */
+        preferLocalSeeds: boolean;
+
+        /**
+         * Whether to merge autofixes automatically
+         */
+        mergeAutofixes?: boolean;
+
+        useSystemNotifications?: boolean;
+    }
 }
 
 /**
@@ -38,7 +68,7 @@ export interface ConfigureOptions {
 export type SoftwareDeliveryMachineMaker = (configuration: SoftwareDeliveryMachineConfiguration) => SoftwareDeliveryMachine;
 
 /**
- * Configure and set up a Software Deliver Machince instance with the automation-client framework for standalone
+ * Configure and set up a Software Deliver Machine instance with the automation-client framework for standalone
  * or single goal based execution
  * @param {(configuration: (Configuration & SoftwareDeliveryMachineOptions)) => SoftwareDeliveryMachine} machineMaker
  * @param {ConfigureOptions} options
@@ -50,37 +80,53 @@ export function configureSdm(
 
     return async (config: Configuration) => {
         const defaultSdmOptions = defaultSoftwareDeliveryMachineOptions(config);
-        const mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
-        const machine = machineMaker(mergedConfig);
+        let mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
+        const defaultConfOptions = defaultConfigureOptions();
+        const mergedOptions = _.merge(defaultConfOptions, options);
 
-        const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
-        if (forked) {
-           configureSdmToRunExactlyOneGoal(mergedConfig, machine);
-        } else {
-            validateConfiguration(mergedConfig, options);
+        // Configure the local SDM
+        mergedConfig = await doWithSlalom(slalom => {
+            return slalom.configureLocal(mergedOptions.local)
+        })(mergedConfig);
 
-            if (!mergedConfig.commands) {
-                mergedConfig.commands = [];
-            }
-            mergedConfig.commands.push(...machine.commandHandlers);
+        const sdm = machineMaker(mergedConfig);
 
-            if (!mergedConfig.events) {
-                mergedConfig.events = [];
-            }
-            mergedConfig.events.push(...machine.eventHandlers);
+        doWithSlalom(slalom => sdm.addExtensionPacks(slalom.LocalLifecycle));
 
-            if (!mergedConfig.ingesters) {
-                mergedConfig.ingesters = [];
-            }
-            mergedConfig.ingesters.push(...machine.ingesters);
-        }
+        // Configure the job forking ability
+        configureJobLaunching(mergedConfig, sdm, mergedOptions);
 
-        registerMetadata(mergedConfig, machine);
+        registerMetadata(mergedConfig, sdm);
         return mergedConfig;
     };
 }
 
-function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration, machine: SoftwareDeliveryMachine) {
+function configureJobLaunching(mergedConfig, machine, mergedOptions) {
+    const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
+    if (forked) {
+        configureSdmToRunExactlyOneGoal(mergedConfig, machine);
+    } else {
+        validateConfiguration(mergedConfig, mergedOptions);
+
+        if (!mergedConfig.commands) {
+            mergedConfig.commands = [];
+        }
+        mergedConfig.commands.push(...machine.commandHandlers);
+
+        if (!mergedConfig.events) {
+            mergedConfig.events = [];
+        }
+        mergedConfig.events.push(...machine.eventHandlers);
+
+        if (!mergedConfig.ingesters) {
+            mergedConfig.ingesters = [];
+        }
+        mergedConfig.ingesters.push(...machine.ingesters);
+    }
+};
+
+function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
+                                         machine: SoftwareDeliveryMachine) {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {
@@ -131,4 +177,14 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
         "atomist.sdm.name": machine.name,
         "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
     };
+}
+
+function doWithSlalom(callback: (slalom: any) => any) {
+    try {
+        const local = require("@atomist/slalom");
+        return callback(local);
+
+    } catch (err) {
+        // Nothing to report here
+    }
 }
