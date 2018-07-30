@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Remove disposal command from default list of registered commands. [#5](https://github.com/atomist/sdm-core/issues/5)
 -   **BREAKING** Removed "dry run" support. See `makeBuildAware` in `sdm`
 -   Allow configuration of status creation for NPM packages. [#10](https://github.com/atomist/sdm-core/issues/10)
+-   **BREAKING** Removed Node and `npm` support. Moved to `sdm-pack-node`
 
 ### Deprecated
 
