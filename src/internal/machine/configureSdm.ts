@@ -86,12 +86,12 @@ export function configureSdm(
 
         // Configure the local SDM
         mergedConfig = await doWithSlalom(slalom => {
-            return slalom.configureLocal(mergedOptions.local);
-        })(mergedConfig);
+            return slalom.configureLocal(mergedOptions.local)(mergedConfig);
+        }) || mergedConfig;
 
         const sdm = machineMaker(mergedConfig);
 
-        doWithSlalom(slalom => sdm.addExtensionPacks(slalom.LocalLifecycle));
+        await doWithSlalom(slalom => sdm.addExtensionPacks(slalom.LocalLifecycle));
 
         // Configure the job forking ability
         configureJobLaunching(mergedConfig, sdm, mergedOptions);
@@ -185,7 +185,7 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
  * @param {(slalom: any) => any} callback
  * @return {any}
  */
-function doWithSlalom(callback: (slalom: any) => any) {
+async function doWithSlalom(callback: (slalom: any) => any) {
     try {
         const local = require("@atomist/slalom");
         return callback(local);
