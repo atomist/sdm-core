@@ -27,9 +27,6 @@ import {
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 import {
-    EventHandlerMetadata,
-} from "@atomist/automation-client/metadata/automationMetadata";
-import {
     GoalExecutionListener,
     GoalInvocation,
 } from "@atomist/sdm";

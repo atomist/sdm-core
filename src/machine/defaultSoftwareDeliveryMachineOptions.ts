@@ -47,8 +47,8 @@ export function defaultConfigureOptions(): ConfigureOptions {
     return {
         requiredConfigurationValues: [],
         local: {
-            repositoryOwnerParentDirectory: require('os').homedir(),
+            repositoryOwnerParentDirectory: require("os").homedir(),
             preferLocalSeeds: true,
-        }
-    }
+        },
+    };
 }

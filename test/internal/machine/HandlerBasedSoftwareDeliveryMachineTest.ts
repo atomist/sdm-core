@@ -16,7 +16,14 @@
 
 import { InMemoryFile } from "@atomist/automation-client/project/mem/InMemoryFile";
 import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
+import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
 import { toFactory } from "@atomist/automation-client/util/constructionUtils";
+import {
+    Builder,
+    PushListenerInvocation,
+    pushTest,
+    PushTest,
+} from "@atomist/sdm";
 import { when } from "@atomist/sdm/api-helper/dsl/buildDsl";
 import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
@@ -25,7 +32,7 @@ import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
 import {
     AnyPush,
-    hasFile
+    hasFile,
 } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
 import * as assert from "power-assert";
@@ -34,20 +41,11 @@ import { HandlerBasedSoftwareDeliveryMachine } from "../../../src/internal/machi
 import { NoGoals } from "../../../src/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "../../../src/pack/well-known-goals/httpServiceGoals";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
-import {
-    Builder,
-    PushListenerInvocation,
-    pushTest,
-    PushTest,
-} from "@atomist/sdm";
-import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
-
 
 export const IsTypeScript: PushTest = pushTest(
     "Is TypeScript",
     async (pi: PushListenerInvocation) => fileExists(pi.project, "**/*.ts", () => true),
 );
-
 
 const AddThingAutofix: AutofixRegistration = {
     name: "AddThing",
@@ -63,11 +61,11 @@ const HasAtomistBuildFile = hasFile(".atomist/build.sh");
 const fakeBuilder: Builder = {
     name: "fake",
     async initiateBuild() {
-
+        // do nothing
     },
-    logInterpreter:() => {
+    logInterpreter: () => {
         return null;
-    }
+    },
 };
 
 describe("SDM handler creation", () => {

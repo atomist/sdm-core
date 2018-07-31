@@ -59,7 +59,7 @@ export interface ConfigureOptions {
         mergeAutofixes?: boolean;
 
         useSystemNotifications?: boolean;
-    }
+    };
 }
 
 /**
@@ -86,7 +86,7 @@ export function configureSdm(
 
         // Configure the local SDM
         mergedConfig = await doWithSlalom(slalom => {
-            return slalom.configureLocal(mergedOptions.local)
+            return slalom.configureLocal(mergedOptions.local);
         })(mergedConfig);
 
         const sdm = machineMaker(mergedConfig);
@@ -123,7 +123,7 @@ function configureJobLaunching(mergedConfig, machine, mergedOptions) {
         }
         mergedConfig.ingesters.push(...machine.ingesters);
     }
-};
+}
 
 function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
                                          machine: SoftwareDeliveryMachine) {
@@ -179,6 +179,12 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
     };
 }
 
+/**
+ * Perform the given operation with the Slalom local SDM module if it's available.
+ * If it isn't, silently continue without error.
+ * @param {(slalom: any) => any} callback
+ * @return {any}
+ */
 function doWithSlalom(callback: (slalom: any) => any) {
     try {
         const local = require("@atomist/slalom");
