@@ -158,7 +158,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         },
         {
             name: "ATOMIST_GOAL_TEAM_NAME",
-            value: (ctx as any as AutomationContextAware).context.teamName,
+            value: (ctx as any as AutomationContextAware).context.workspaceName,
         },
         {
             name: "ATOMIST_GOAL_ID",

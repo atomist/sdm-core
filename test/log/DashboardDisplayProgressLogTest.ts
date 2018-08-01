@@ -23,6 +23,7 @@ describe("DashboardDisplayProgressLog", () => {
 
     const context: HandlerContext = {
         teamId: "TeamID",
+        workspaceId: "TeamID",
         correlationId: "CorrelationID",
         messageClient: undefined,
     };
