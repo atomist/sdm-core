@@ -85,18 +85,18 @@ export function configureSdm(
         const mergedOptions = _.merge(defaultConfOptions, options);
 
         // Configure the local SDM
-        mergedConfig = await doWithSlalom(slalom => {
-            return slalom.configureLocal(mergedOptions.local)(mergedConfig);
+        mergedConfig = await doWithSdmLocal(local => {
+            return local.configureLocal(mergedOptions.local)(mergedConfig);
         }) || mergedConfig;
 
         const sdm = machineMaker(mergedConfig);
 
-        await doWithSlalom(slalom => sdm.addExtensionPacks(slalom.LocalLifecycle));
+        await doWithSdmLocal(local => sdm.addExtensionPacks(local.LocalLifecycle));
 
         // Configure the job forking ability
         configureJobLaunching(mergedConfig, sdm, mergedOptions);
 
-        registerMetadata(mergedConfig, sdm);
+        await registerMetadata(mergedConfig, sdm);
         return mergedConfig;
     };
 }
@@ -166,7 +166,7 @@ function validateConfiguration(config: Configuration, options: ConfigureOptions)
     }
 }
 
-function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
+async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
     const sdmPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm", "package.json"));
     const sdmCorePj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm-core", "package.json"));
 
@@ -177,17 +177,22 @@ function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachin
         "atomist.sdm.name": machine.name,
         "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
     };
+
+    await doWithSdmLocal(() => {
+        const sdmLocalPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm-local", "package.json"));
+        config.metadata["atomist.sdm-local"] = `${sdmLocalPj.name}:${sdmLocalPj.version}`;
+    });
 }
 
 /**
- * Perform the given operation with the Slalom local SDM module if it's available.
+ * Perform the given operation with the sdm-local module if it's available.
  * If it isn't, silently continue without error.
- * @param {(slalom: any) => any} callback
+ * @param {(sdmLocal: any) => any} callback
  * @return {any}
  */
-async function doWithSlalom(callback: (slalom: any) => any) {
+async function doWithSdmLocal(callback: (sdmLocal: any) => any) {
     try {
-        const local = require("@atomist/slalom");
+        const local = require("@atomist/sdm-local");
         return callback(local);
 
     } catch (err) {
