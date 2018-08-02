@@ -24,6 +24,7 @@ import {
     defaultConfigureOptions,
     defaultSoftwareDeliveryMachineOptions,
 } from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import { sdmStartupMessage } from "../util/startupMessage";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -95,6 +96,10 @@ export function configureSdm(
         configureJobLaunching(mergedConfig, sdm, mergedOptions);
 
         await registerMetadata(mergedConfig, sdm);
+
+        // Register startup message detail
+        mergedConfig.logging.banner.contributors.push(sdmStartupMessage(sdm));
+
         return mergedConfig;
     };
 }
