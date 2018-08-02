@@ -76,9 +76,8 @@ export type SoftwareDeliveryMachineMaker = (configuration: SoftwareDeliveryMachi
  * @param {ConfigureOptions} options
  * @returns {(config: Configuration) => Promise<Configuration & SoftwareDeliveryMachineOptions>}
  */
-export function configureSdm(
-    machineMaker: SoftwareDeliveryMachineMaker,
-    options: ConfigureOptions = {}) {
+export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
+                             options: ConfigureOptions = {}) {
 
     return async (config: Configuration) => {
         const defaultSdmOptions = defaultSoftwareDeliveryMachineOptions(config);
