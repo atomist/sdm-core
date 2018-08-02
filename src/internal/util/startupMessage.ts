@@ -34,5 +34,5 @@ export function sdmStartupMessage(sdm: SoftwareDeliveryMachine): (configuration:
 ${sdm.extensionPacks.map(ex => `    ${ex.name}:${ex.version}  ${chalk.grey("by")} ${ex.vendor}`).join("\n")}`;
 
         return c;
-    }
+    };
 }
