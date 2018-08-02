@@ -18,9 +18,7 @@ import { Configuration } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
-import * as appRoot from "app-root-path";
 import * as _ from "lodash";
-import * as path from "path";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import {
     defaultConfigureOptions,
@@ -167,8 +165,8 @@ function validateConfiguration(config: Configuration, options: ConfigureOptions)
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
-    const sdmPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm", "package.json"));
-    const sdmCorePj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm-core", "package.json"));
+    const sdmPj = require("@atomist/sdm/package.json");
+    const sdmCorePj = require("@atomist/sdm-core/package.json");
 
     config.metadata = {
         ...config.metadata,
@@ -179,7 +177,7 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
     };
 
     await doWithSdmLocal(() => {
-        const sdmLocalPj = require(path.join(appRoot.path, "node_modules", "@atomist", "sdm-local", "package.json"));
+        const sdmLocalPj = require("@atomist/sdm-local/package.json");
         config.metadata["atomist.sdm-local"] = `${sdmLocalPj.name}:${sdmLocalPj.version}`;
     });
 }
