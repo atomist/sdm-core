@@ -24,6 +24,10 @@ import {
     defaultConfigureOptions,
     defaultSoftwareDeliveryMachineOptions,
 } from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import {
+    sdmExtensionPackStartupMessage,
+    sdmStartupMessage,
+} from "../util/startupMessage";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -72,9 +76,8 @@ export type SoftwareDeliveryMachineMaker = (configuration: SoftwareDeliveryMachi
  * @param {ConfigureOptions} options
  * @returns {(config: Configuration) => Promise<Configuration & SoftwareDeliveryMachineOptions>}
  */
-export function configureSdm(
-    machineMaker: SoftwareDeliveryMachineMaker,
-    options: ConfigureOptions = {}) {
+export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
+                             options: ConfigureOptions = {}) {
 
     return async (config: Configuration) => {
         const defaultSdmOptions = defaultSoftwareDeliveryMachineOptions(config);
@@ -95,6 +98,10 @@ export function configureSdm(
         configureJobLaunching(mergedConfig, sdm, mergedOptions);
 
         await registerMetadata(mergedConfig, sdm);
+
+        // Register startup message detail
+        mergedConfig.logging.banner.contributors.push(sdmStartupMessage(sdm), sdmExtensionPackStartupMessage(sdm));
+
         return mergedConfig;
     };
 }
