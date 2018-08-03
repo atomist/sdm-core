@@ -108,7 +108,8 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         await registerMetadata(mergedConfig, sdm);
 
         // Register startup message detail
-        _.set(mergedConfig, "logging.banner.contributors", []);
+        _.update(mergedConfig, "logging.banner.contributors",
+            old => !!old ? old : []);
         mergedConfig.logging.banner.contributors.push(
             sdmStartupMessage(sdm),
             sdmExtensionPackStartupMessage(sdm));
