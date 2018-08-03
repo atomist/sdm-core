@@ -124,19 +124,16 @@ function configureJobLaunching(mergedConfig, machine, mergedOptions) {
     } else {
         validateConfiguration(mergedConfig, mergedOptions);
 
-        if (!mergedConfig.commands) {
-            mergedConfig.commands = [];
-        }
+        _.update(mergedConfig, "commands",
+            old => !!old ? old : []);
         mergedConfig.commands.push(...machine.commandHandlers);
 
-        if (!mergedConfig.events) {
-            mergedConfig.events = [];
-        }
+        _.update(mergedConfig, "events",
+            old => !!old ? old : []);
         mergedConfig.events.push(...machine.eventHandlers);
 
-        if (!mergedConfig.ingesters) {
-            mergedConfig.ingesters = [];
-        }
+        _.update(mergedConfig, "ingesters",
+            old => !!old ? old : []);
         mergedConfig.ingesters.push(...machine.ingesters);
     }
 }
