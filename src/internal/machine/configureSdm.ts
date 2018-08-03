@@ -45,10 +45,11 @@ export interface ConfigureOptions {
     local?: {
         /**
          * Base of expanded directory tree the local client will work with:
-         * The projects the SDM can operate on.
+         * The projects the SDM can operate on. Defaulting rule handled in
+         * sdm-local.
          * Under this we find /<org>/<repo>
          */
-        repositoryOwnerParentDirectory: string;
+        repositoryOwnerParentDirectory?: string;
 
         /**
          * Use local seeds (in whatever git state) vs cloning if possible?
