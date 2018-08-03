@@ -20,6 +20,7 @@ import { BaseParameter } from "@atomist/automation-client/internal/metadata/deco
  * Validation pattern for Java identifiers
  * @type BaseParameter
  * @ModuleExport
+ * @deprecated moved to sdm-pack-spring
  */
 export const JavaIdentifierRegExp: Partial<BaseParameter> = {
     description: "valid Java identifier name",
@@ -33,6 +34,7 @@ export const JavaIdentifierRegExp: Partial<BaseParameter> = {
  * A useful parameter definition
  * @type BaseParameter
  * @ModuleExport
+ * @deprecated moved to sdm-pack-spring
  */
 export const JavaPackageRegExp: Partial<BaseParameter> = {
     displayName: "Root Package",
@@ -47,6 +49,7 @@ export const JavaPackageRegExp: Partial<BaseParameter> = {
  * A useful parameter definition
  * @type BaseParameter
  * @ModuleExport
+ * @deprecated moved to sdm-pack-spring
  */
 export const MavenArtifactIdRegExp: Partial<BaseParameter> = {
     displayName: "Maven Artifact ID",
@@ -62,7 +65,7 @@ export const MavenArtifactIdRegExp: Partial<BaseParameter> = {
 /**
  * A useful parameter definition
  * @type BaseParameter
- * @ModuleExport
+ * @deprecated moved to sdm-pack-spring
  */
 export const MavenGroupIdRegExp: Partial<BaseParameter> = {
     displayName: "Maven Group ID",

@@ -20,6 +20,14 @@ import {
     hasFileWithExtension,
 } from "@atomist/sdm/api/mapping/support/commonPushTests";
 
+/**
+ * @deprecated should move into Clojure pack
+ * @type {PredicatePushTest}
+ */
 export const IsClojure: PredicatePushTest = hasFileWithExtension("clj");
 
+/**
+ * @deprecated should move into Clojure pack
+ * @type {PredicatePushTest}
+ */
 export const IsLein = hasFile("project.clj");

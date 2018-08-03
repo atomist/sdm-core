@@ -43,6 +43,7 @@ export type DockerImageNameCreator = (p: GitProject,
  * @param {DockerImageNameCreator} imageNameCreator
  * @param {DockerOptions} options
  * @returns {ExecuteGoal}
+ * @deprecated move to Docker pack
  */
 export function executeDockerBuild(projectLoader: ProjectLoader,
                                    imageNameCreator: DockerImageNameCreator,

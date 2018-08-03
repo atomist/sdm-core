@@ -22,6 +22,7 @@ import { hasFile } from "@atomist/sdm/api/mapping/support/commonPushTests";
 
 /**
  * Does this project have a Dockerfile
+ * @deprecated should move to Docker pack
  */
 export const HasDockerfile: PredicatePushTest = predicatePushTest(
     "Has Dockerfile",
