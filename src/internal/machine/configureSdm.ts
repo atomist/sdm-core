@@ -42,27 +42,34 @@ export interface ConfigureOptions {
     /**
      * Configuration for local SDM
      */
-    local?: {
-        /**
-         * Base of expanded directory tree the local client will work with:
-         * The projects the SDM can operate on. Defaulting rule handled in
-         * sdm-local.
-         * Under this we find /<org>/<repo>
-         */
-        repositoryOwnerParentDirectory?: string;
+    local?: LocalModeConfiguration;
+}
 
-        /**
-         * Use local seeds (in whatever git state) vs cloning if possible?
-         */
-        preferLocalSeeds: boolean;
+/**
+ * Configuration determining how to run in local mode
+ */
+export interface LocalModeConfiguration {
 
-        /**
-         * Whether to merge autofixes automatically
-         */
-        mergeAutofixes?: boolean;
+    /**
+     * Base of expanded directory tree the local client will work with:
+     * The projects the SDM can operate on. Defaulting rule handled in
+     * sdm-local.
+     * Under this we find /<org>/<repo>
+     */
+    repositoryOwnerParentDirectory?: string;
 
-        useSystemNotifications?: boolean;
-    };
+    /**
+     * Use local seeds (in whatever git state) vs cloning if possible?
+     * Default will be true
+     */
+    preferLocalSeeds?: boolean;
+
+    /**
+     * Whether to merge autofixes automatically
+     */
+    mergeAutofixes?: boolean;
+
+    useSystemNotifications?: boolean;
 }
 
 /**
