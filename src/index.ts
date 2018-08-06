@@ -83,4 +83,4 @@ export { postLinkImageWebhook } from "./util/webhook/ImageLink";
 export { EphemeralLocalArtifactStore } from "./internal/artifact/local/EphemeralLocalArtifactStore";
 export { selfDescribingHandlers } from "./pack/info/support/commandSearch";
 export { WellKnownGoals } from "./pack/well-known-goals/addWellKnownGoals";
-export { LocalModeConfiguration, isInLocalMode } from "./internal/machine/LocalModeConfiguration";
+export { LocalModeConfiguration, isInLocalMode, IsInLocalMode } from "./internal/machine/LocalModeConfiguration";

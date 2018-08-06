@@ -15,6 +15,7 @@
  */
 
 import { logger } from "@atomist/automation-client";
+import { PushTest } from "@atomist/sdm";
 
 /**
  * Configuration determining how to run in local mode
@@ -52,3 +53,11 @@ export function isInLocalMode(): boolean {
     logger.info("Local determination is %s: startup command was '%s'", local, process.argv.join(" "));
     return local;
 }
+
+/**
+ * Is this SDM running in local mode?
+ */
+export const IsInLocalMode: PushTest = {
+    name: "IsInLocalMode",
+    mapping: async () => isInLocalMode(),
+};
