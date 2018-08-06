@@ -16,8 +16,10 @@
 
 import { HandlerContext } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { ExecuteGoal, GoalInvocation, PrepareForGoalExecution,
-    SdmGoalEvent } from "@atomist/sdm";
+import {
+    ExecuteGoal, GoalInvocation, PrepareForGoalExecution,
+    SdmGoalEvent,
+} from "@atomist/sdm";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
@@ -86,7 +88,10 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
                 },
                 opts,
                 progressLog,
-                spOpts);
+                {
+                    ...spOpts,
+                    logCommand: false,
+                });
 
             if (result.code !== 0) {
                 return result;

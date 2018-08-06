@@ -80,7 +80,7 @@
   "scripts": {
     "autostart": "npm-run-all --print-label --parallel watch:compile watch",
     "autotest": "supervisor --watch src,test --extensions ts --no-restart-on exit --quiet --exec npm -- test",
-    "build": "npm-run-all compile test",
+    "build": "npm-run-all compile test lint doc",
     "clean": "npm-run-all clean:js clean:build",
     "clean:build": "rimraf *-v8.log profile.txt build coverage",
     "clean:dist": "npm-run-all clean clean:npm",
@@ -90,6 +90,7 @@
     "compile:gql": "npm-run-all gql:gen gql:copy",
     "compile:ts": "tsc --project .",
     "debug": "node $NODE_DEBUG_OPTION node_modules/@atomist/automation-client/start.client.js",
+    "doc": "typedoc --mode modules --excludeExternals --out build/typedoc src",
     "fmt": "npm-run-all fmt:ts fmt:gql",
     "fmt:ts": "tsfmt --replace",
     "fmt:gql": "prettier --write \"**/*.graphql\"",
@@ -104,7 +105,7 @@
     "package:copy": "copyfiles \"package.json\" build/src",
     "test": "nyc mocha --exit --require ts-node/register --require source-map-support/register \"test/**/*.ts\"",
     "test:one": "mocha --require espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
-    "typedoc": "typedoc --mode modules --excludeExternals --out build/typedoc src",
+    "typedoc": "npm run doc",
     "watch:compile": "tsc --project . --watch",
     "watch": "supervisor --watch build --quiet --exec npm -- run start"
   },
