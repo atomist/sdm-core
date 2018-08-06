@@ -28,6 +28,7 @@ import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
+import { LocalModeConfiguration } from "./LocalModeConfiguration";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -43,33 +44,6 @@ export interface ConfigureOptions {
      * Configuration for local SDM
      */
     local?: LocalModeConfiguration;
-}
-
-/**
- * Configuration determining how to run in local mode
- */
-export interface LocalModeConfiguration {
-
-    /**
-     * Base of expanded directory tree the local client will work with:
-     * The projects the SDM can operate on. Defaulting rule handled in
-     * sdm-local.
-     * Under this we find /<org>/<repo>
-     */
-    repositoryOwnerParentDirectory?: string;
-
-    /**
-     * Use local seeds (in whatever git state) vs cloning if possible?
-     * Default will be true
-     */
-    preferLocalSeeds?: boolean;
-
-    /**
-     * Whether to merge autofixes automatically
-     */
-    mergeAutofixes?: boolean;
-
-    useSystemNotifications?: boolean;
 }
 
 /**
