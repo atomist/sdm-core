@@ -41,11 +41,11 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import { success } from "../../util/slack/messages";
 import {
     fetchDefaultBranchTip,
     tipOfBranch,
 } from "../../handlers/events/delivery/goals/resetGoals";
+import { success } from "../../util/slack/messages";
 
 @Parameters()
 class SetGoalStateParameters {
