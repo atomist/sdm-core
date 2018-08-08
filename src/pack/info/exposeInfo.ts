@@ -16,7 +16,6 @@
 
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { setGoalState } from "../../../build/src/handlers/events/delivery/goals/setGoalState";
 import { selfDescribeCommand } from "./SelfDescribe";
 import { setGoalStateCommand } from "./setGoalState";
 
