@@ -49,6 +49,7 @@ export const fakeSoftwareDeliveryMachineOptions = {
 } as any as SoftwareDeliveryMachineOptions;
 
 export const fakeSoftwareDeliveryMachineConfiguration: SoftwareDeliveryMachineConfiguration = {
+    name: "fakeSoftwareDeliverMachine",
     sdm: fakeSoftwareDeliveryMachineOptions,
 };
 
