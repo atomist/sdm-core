@@ -36,12 +36,12 @@ import * as path from "path";
  * @param {SoftwareDeliveryMachine} sdm
  * @return {HandleCommand<EmptyParameters>}
  */
-export function selfDescribeHandler(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
+export function selfDescribeCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
     return {
         name: "SelfDescribe",
         listener: selfDescribeListener(sdm),
         description: "Describe this SDM",
-        intent: [ `describe sdm ${sdm.configuration.name}`, "describe sdm" ],
+        intent: [ `describe sdm ${sdm.configuration.name.replace("@", "")}`, "describe sdm" ],
     };
 }
 

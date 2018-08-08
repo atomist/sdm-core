@@ -16,7 +16,9 @@
 
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { selfDescribeHandler } from "./SelfDescribe";
+import { setGoalState } from "../../../build/src/handlers/events/delivery/goals/setGoalState";
+import { selfDescribeCommand } from "./SelfDescribe";
+import { setGoalStateCommand } from "./setGoalState";
 
 /**
  * Expose information about this machine
@@ -24,6 +26,7 @@ import { selfDescribeHandler } from "./SelfDescribe";
 export const ExposeInfo: ExtensionPack = {
     ...metadata("info"),
     configure: sdm => {
-        sdm.addCommand(selfDescribeHandler(sdm));
+        sdm.addCommand(selfDescribeCommand(sdm))
+            .addCommand(setGoalStateCommand(sdm));
     },
 };
