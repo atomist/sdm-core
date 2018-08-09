@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/0.4.0...HEAD)
 
+### Fixed
+
+-   Corrected GraphQL file/name agreement
+
 ## [0.4.0](https://github.com/atomist/sdm/compare/0.2.4...0.4.0) - 2018-08-07
 
 ### Added
