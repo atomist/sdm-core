@@ -74,7 +74,9 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         const sdm = machineMaker(mergedConfig);
 
-        await doWithSdmLocal(local => sdm.addExtensionPacks(local.LocalLifecycle));
+        await doWithSdmLocal(local =>
+            sdm.addExtensionPacks(local.LocalLifecycle, local.LocalSdmConfig),
+        );
 
         // Configure the job forking ability
         configureJobLaunching(mergedConfig, sdm, mergedOptions);
