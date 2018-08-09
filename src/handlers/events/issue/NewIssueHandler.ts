@@ -36,7 +36,7 @@ import * as schema from "@atomist/sdm/typings/types";
 /**
  * A new issue has been created.
  */
-@EventHandler("On issue creation", subscription("OnNewIssue"))
+@EventHandler("On issue creation", subscription("OnIssueAction"))
 export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscription> {
 
     private readonly newIssueListeners: NewIssueListener[];

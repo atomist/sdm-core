@@ -1,5 +1,4 @@
-# deprecated, use PersonByChatId
-query PersonQuery($screenName: String!) {
+query PersonByChatId($screenName: String!) {
   ChatId(screenName: $screenName) {
     userId
     screenName
