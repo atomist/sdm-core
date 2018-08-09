@@ -73,10 +73,12 @@ export class RolarProgressLog implements ProgressLog {
 
     public write(what: string) {
         const line = what || "";
+        const now: Date = this.timestamper.next().value;
         this.localLogs.push({
             level: this.logLevel,
             message: line,
-            timestamp: this.constructUtcTimestamp(),
+            timestamp: this.constructUtcTimestamp(now),
+            timestampMillis: this.constructMillisTimestamp(now),
         } as LogData);
         const bufferSize = this.localLogs.reduce((acc, logData) => acc + logData.message.length, 0);
         if (bufferSize > this.bufferSizeLimit) {
@@ -123,14 +125,17 @@ export class RolarProgressLog implements ProgressLog {
         return Promise.resolve();
     }
 
-    private constructUtcTimestamp(): string {
-        if (!this.timestamper) { return ""; }
-        const now: Date = this.timestamper.next().value;
+    private constructUtcTimestamp(d: Date): string {
+        const now: Date = d;
         const date = [now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCFullYear()]
             .map(t => _.padStart(t.toString(), 2, "0"));
         const time = [now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()]
             .map(t => _.padStart(t.toString(), 2, "0"));
         return `${date.join("/")} ${time.join(":")}.${_.padStart(now.getUTCMilliseconds().toString(), 3, "0")}`;
+    }
+
+    private constructMillisTimestamp(d: Date): number {
+        return  d.valueOf();
     }
 }
 
@@ -138,4 +143,5 @@ interface LogData {
     level: string;
     message: string;
     timestamp: string;
+    timestampMillis: number;
 }
