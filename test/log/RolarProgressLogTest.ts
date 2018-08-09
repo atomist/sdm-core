@@ -59,11 +59,13 @@ describe("RolarProgressLog", () => {
                 level: "info",
                 message: "I'm a lumberjack and I'm OK",
                 timestamp: "01/01/1970 00:00:00.000",
+                timestampMillis: 0,
             },
             {
                 level: "info",
                 message: "I sleep all night and I work all day",
                 timestamp: "01/01/1970 00:00:00.001",
+                timestampMillis: 1,
             },
         ]);
     });
@@ -80,11 +82,13 @@ describe("RolarProgressLog", () => {
                     level: "info",
                     message: "He's a lumberjack and he's OK",
                     timestamp: "01/01/1970 00:00:00.000",
+                    timestampMillis: 0,
                 },
                 {
                     level: "info",
                     message: "He sleeps all night and he works all day",
                     timestamp: "01/01/1970 00:00:00.001",
+                    timestampMillis: 1,
                 },
             ];
             const actualRequest = JSON.parse(config.data).content;
@@ -116,11 +120,13 @@ describe("RolarProgressLog", () => {
                 level: "info",
                 message: "I cut down trees, I eat my lunch",
                 timestamp: "01/01/1970 00:00:00.000",
+                timestampMillis: 0,
             },
             {
                 level: "info",
                 message: "I go to the lavatory",
                 timestamp: "01/01/1970 00:00:00.001",
+                timestampMillis: 1,
             },
         ]);
     });
@@ -137,6 +143,7 @@ describe("RolarProgressLog", () => {
                         level: "info",
                         message: "On Wednesdays I go shopping and have buttered scones for tea",
                         timestamp: "01/01/1970 00:00:00.000",
+                        timestampMillis: 0,
                     },
                 ];
                 const actualRequest = JSON.parse(config.data).content;
@@ -199,31 +206,13 @@ describe("RolarProgressLog", () => {
                 level: "debug",
                 message: "I'm a lumberjack and I'm OK",
                 timestamp: "01/01/1970 00:00:00.000",
+                timestampMillis: 0,
             },
             {
                 level: "debug",
                 message: "I sleep all night and I work all day",
                 timestamp: "01/01/1970 00:00:00.001",
-            },
-        ]);
-    });
-
-    it("should log without timestamp", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, "", null);
-
-        log.write("I'm a lumberjack and I'm OK");
-        log.write("I sleep all night and I work all day");
-
-        assert.deepEqual((log as any).localLogs, [
-            {
-                level: "",
-                message: "I'm a lumberjack and I'm OK",
-                timestamp: "",
-            },
-            {
-                level: "",
-                message: "I sleep all night and I work all day",
-                timestamp: "",
+                timestampMillis: 1,
             },
         ]);
     });
