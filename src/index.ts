@@ -24,8 +24,6 @@ export {
 export { ProjectIdentifier } from "./internal/delivery/build/local/projectIdentifier";
 export { RolarProgressLog } from "./log/RolarProgressLog";
 export { InMemoryDeploymentStatusManager } from "./pack/freeze/InMemoryDeploymentStatusManager";
-export { CloudFoundryBlueGreenDeployer } from "./pack/pcf/CloudFoundryBlueGreenDeployer";
-export { EnvironmentCloudFoundryTarget } from "./pack/pcf/EnvironmentCloudFoundryTarget";
 export { K8sAutomationBuilder } from "./internal/delivery/build/k8s/K8AutomationBuilder";
 export { NoticeK8sTestDeployCompletionOnStatus } from "./handlers/events/delivery/deploy/k8s/NoticeK8sDeployCompletion";
 export { NoticeK8sProdDeployCompletionOnStatus } from "./handlers/events/delivery/deploy/k8s/NoticeK8sProdDeployCompletion";
@@ -55,11 +53,6 @@ export { summarizeGoalsInGitHubStatus } from "./internal/delivery/goals/support/
 export { requestDeployToK8s } from "./handlers/events/delivery/deploy/k8s/RequestK8sDeploys";
 export { ToPublicRepo } from "./mapping/pushtest/toPublicRepo";
 export { HasDockerfile } from "./pack/docker/dockerPushTests";
-export {
-    CloudFoundryInfo,
-    CloudFoundryManifestPath,
-} from "./pack/pcf/CloudFoundryTarget";
-export { HasCloudFoundryManifest } from "./pack/pcf/cloudFoundryManifestPushTest";
 export {
     HttpServiceGoals,
     RepositoryDeletionGoals,
