@@ -16,13 +16,16 @@
 
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import { isInLocalMode } from "../../../..";
 import {
     createPendingGitHubStatusOnGoalSet,
     SetGitHubStatusOnGoalCompletion,
 } from "./github/gitHubStatusSetters";
 
 export function summarizeGoalsInGitHubStatus(sdm: SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration>): SoftwareDeliveryMachine {
-    sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm.configuration.sdm.credentialsResolver));
-    sdm.addGoalCompletionListener(SetGitHubStatusOnGoalCompletion());
+    if (!isInLocalMode()) {
+        sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm.configuration.sdm.credentialsResolver));
+        sdm.addGoalCompletionListener(SetGitHubStatusOnGoalCompletion());
+    }
     return sdm;
 }
