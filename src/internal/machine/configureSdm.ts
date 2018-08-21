@@ -28,7 +28,10 @@ import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
-import { LocalModeConfiguration } from "./LocalModeConfiguration";
+import {
+    isInLocalMode,
+    LocalModeConfiguration,
+} from "./LocalModeConfiguration";
 
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -52,7 +55,7 @@ export interface ConfigureOptions {
 export type SoftwareDeliveryMachineMaker = (configuration: SoftwareDeliveryMachineConfiguration) => SoftwareDeliveryMachine;
 
 /**
- * Configure and set up a Software Deliver Machine instance with the automation-client framework for standalone
+ * Configure and set up a Software Delivery Machine instance with the automation-client framework for standalone
  * or single goal based execution
  * @param {(configuration: (Configuration & SoftwareDeliveryMachineOptions)) => SoftwareDeliveryMachine} machineMaker
  * @param {ConfigureOptions} options
@@ -181,10 +184,12 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
  */
 async function doWithSdmLocal(callback: (sdmLocal: any) => any) {
     try {
-        const local = require("@atomist/sdm-local");
-        return callback(local);
-
+        if (isInLocalMode()) {
+            const local = require("@atomist/sdm-local");
+            return callback(local);
+        }
     } catch (err) {
-        // Nothing to report here
+        throw new Error("SDM started in local mode, but '@atomist/sdm-local' not declared as dependency. " +
+            "Please install SDM local with 'npm install @atomist/sdm-local'.");
     }
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
 import { PushTest } from "@atomist/sdm";
 
 /**
@@ -47,9 +46,7 @@ export interface LocalModeConfiguration {
  * Invoked on client startup.
  */
 export function isInLocalMode(): boolean {
-    const local = process.env.ATOMIST_MODE === "local";
-    logger.info("Local determination is %s: startup command was '%s'", local, process.argv.join(" "));
-    return local;
+    return process.env.ATOMIST_MODE === "local";
 }
 
 /**
