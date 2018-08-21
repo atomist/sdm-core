@@ -165,6 +165,7 @@ export function postWebhook(
             .catch(err => {
                 logger.debug("error posting '%j' to '%s': %j", payload, url, err);
                 retry(err);
+                return false;
             });
     })
         .catch(err => {
