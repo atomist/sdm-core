@@ -40,8 +40,6 @@ export interface LocalModeConfiguration {
      * Whether to merge autofixes automatically
      */
     mergeAutofixes?: boolean;
-
-    useSystemNotifications?: boolean;
 }
 
 /**
