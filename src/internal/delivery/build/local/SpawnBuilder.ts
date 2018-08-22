@@ -132,7 +132,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
         const errorFinder = this.options.errorFinder;
         logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
             this.options.commandFile);
-        return this.sdm.configuration.sdm.projectLoader.doWithProject({credentials, id, readOnly: true}, async p => {
+        return this.sdm.configuration.sdm.projectLoader.doWithProject({ credentials, id, readOnly: true }, async p => {
             const commands: SpawnCommand[] = this.options.commands || await loadCommandsFromFile(p, this.options.commandFile);
 
             const appId: AppInfo = await this.options.projectToAppInfo(p);
@@ -142,7 +142,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                 logger.info("Enriching options from project %s:%s", p.id.owner, p.id.repo);
                 optionsToUse = await this.options.enrich(optionsToUse, p);
             }
-            const opts = _.merge({cwd: p.baseDir}, optionsToUse);
+            const opts = _.merge({ cwd: p.baseDir }, optionsToUse);
 
             function executeOne(buildCommand: SpawnCommand): Promise<ChildProcessResult> {
                 return spawnAndWatch(buildCommand,
@@ -156,7 +156,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                         if (br.error) {
                             const message = "Stopping build commands due to error on " + stringifySpawnCommand(buildCommand);
                             log.write(message);
-                            return {error: true, code: br.code, message};
+                            return { error: true, code: br.code, message, childProcess: undefined };
                         }
                         return br;
                     });
@@ -169,9 +169,11 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                         if (br.error) {
                             throw new Error("Build failure: " + br.error);
                         }
-                        log.write("---");
-                        log.write(`Result: ${JSON.stringify({ ...br, childProcess: undefined })}`);
-                        log.write("---");
+                        const r = {
+                            ...br,
+                        };
+                        delete r.childProcess;
+                        log.write(`---\nResult: ${JSON.stringify(r)}\n---`);
                         return executeOne(buildCommand);
                     });
             }

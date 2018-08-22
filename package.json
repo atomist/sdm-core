@@ -43,7 +43,7 @@
     "@atomist/sdm": "*"
   },
   "devDependencies": {
-    "@atomist/automation-client": "^0.21.2",
+    "@atomist/automation-client": "^0.21.4",
     "@atomist/sdm": "^0.4.3",
     "@types/lodash": "^4.14.116",
     "@types/mocha": "^5.2.5",
