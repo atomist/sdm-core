@@ -169,7 +169,9 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                         if (br.error) {
                             throw new Error("Build failure: " + br.error);
                         }
-                        log.write(sprintf("Next after %j is...%s", br, stringifySpawnCommand(buildCommand)));
+                        log.write("---");
+                        log.write(`Result: ${JSON.stringify({ ...br, childProcess: undefined })}`);
+                        log.write("---");
                         return executeOne(buildCommand);
                     });
             }
