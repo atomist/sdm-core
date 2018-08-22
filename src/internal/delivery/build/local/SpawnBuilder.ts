@@ -15,6 +15,7 @@
  */
 
 import { logger } from "@atomist/automation-client";
+import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
@@ -173,7 +174,9 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                             ...br,
                         };
                         delete r.childProcess;
-                        log.write(`---\nResult: ${JSON.stringify(r)}\n---`);
+                        log.write("---");
+                        log.write(`Result: ${JSON.stringify(r, possibleAxiosObjectReplacer, 0)}`);
+                        log.write("---");
                         return executeOne(buildCommand);
                     });
             }
