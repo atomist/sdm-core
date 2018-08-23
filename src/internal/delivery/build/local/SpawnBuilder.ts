@@ -127,9 +127,9 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
     }
 
     protected async startBuild(credentials: ProjectOperationCredentials,
-        id: RemoteRepoRef,
-        team: string,
-        log: ProgressLog): Promise<LocalBuildInProgress> {
+                               id: RemoteRepoRef,
+                               team: string,
+                               log: ProgressLog): Promise<LocalBuildInProgress> {
         const errorFinder = this.options.errorFinder;
         logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
             this.options.commandFile);
@@ -208,11 +208,11 @@ async function loadCommandsFromFile(p: Project, path: string) {
 class SpawnedBuild implements LocalBuildInProgress {
 
     constructor(public appInfo: AppInfo,
-        public repoRef: RemoteRepoRef,
-        public buildResult: Promise<ChildProcessResult>,
-        public team: string,
-        public url: string,
-        public deploymentUnitFile: string) {
+                public repoRef: RemoteRepoRef,
+                public buildResult: Promise<ChildProcessResult>,
+                public team: string,
+                public url: string,
+                public deploymentUnitFile: string) {
     }
 
 }
