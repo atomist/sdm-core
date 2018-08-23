@@ -174,9 +174,9 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                             ...br,
                         };
                         delete r.childProcess;
-                        log.write("---");
+                        log.write("/--");
                         log.write(`Result: ${JSON.stringify(r, possibleAxiosObjectReplacer, 0)}`);
-                        log.write("---");
+                        log.write("\\--");
                         return executeOne(buildCommand);
                     });
             }

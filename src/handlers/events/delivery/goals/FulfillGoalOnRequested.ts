@@ -123,21 +123,21 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 }
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
-    progressLog.write(`---`);
+    progressLog.write(`/--`);
     progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}/${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
     progressLog.write(`Goal: ${sdmGoal.name} - ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);
     progressLog.write(
         `SDM: ${automationClientInstance().configuration.name}:${automationClientInstance().configuration.version}`);
-    progressLog.write(`---`);
+    progressLog.write("\\--");
     await progressLog.flush();
 }
 
 async function reportEndAndClose(result: any, start: number, progressLog: ProgressLog) {
-    progressLog.write(`---`);
+    progressLog.write(`/--`);
     progressLog.write(`Result: ${stringify(result, possibleAxiosObjectReplacer, 0)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
-    progressLog.write(`---`);
+    progressLog.write("\\--");
     await progressLog.close();
 }
