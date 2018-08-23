@@ -136,7 +136,7 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
 
 async function reportEndAndClose(result: any, start: number, progressLog: ProgressLog) {
     progressLog.write(`---`);
-    progressLog.write(`Result: ${stringify(result, possibleAxiosObjectReplacer, 2)}`);
+    progressLog.write(`Result: ${stringify(result, possibleAxiosObjectReplacer, 0)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
     progressLog.write(`---`);
     await progressLog.close();
