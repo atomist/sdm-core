@@ -170,10 +170,7 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                         if (br.error) {
                             throw new Error("Build failure: " + br.error);
                         }
-                        const r = {
-                            ...br,
-                        };
-                        delete r.childProcess;
+                        const { childProcess, ...r } = br;
                         log.write("/--");
                         log.write(`Result: ${JSON.stringify(r, possibleAxiosObjectReplacer, 0)}`);
                         log.write("\\--");
