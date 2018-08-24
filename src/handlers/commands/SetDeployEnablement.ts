@@ -30,12 +30,12 @@ import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
 } from "@atomist/sdm";
+import { success } from "@atomist/sdm/api-helper/misc/slack/messages";
 import { bold } from "@atomist/slack-messages";
 import {
     DeployEnablementRootType,
     SdmDeployEnablement,
 } from "../../ingesters/sdmDeployEnablement";
-import { success } from "../../util/slack/messages";
 
 @Parameters()
 export class SetDeployEnablementParameters {

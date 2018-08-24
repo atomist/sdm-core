@@ -30,6 +30,10 @@ import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
+import {
+    success,
+    warning,
+} from "@atomist/sdm/api-helper/misc/slack/messages";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
@@ -46,10 +50,6 @@ import {
     PushForCommit,
     RepoBranchTips,
 } from "../../../../typings/types";
-import {
-    success,
-    warning,
-} from "../../../../util/slack/messages";
 
 @Parameters()
 export class ResetGoalsParameters {

@@ -34,6 +34,7 @@ import {
 } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
+import { success } from "@atomist/sdm/api-helper/misc/slack/messages";
 import {
     bold,
     codeLine,
@@ -45,7 +46,6 @@ import {
     fetchDefaultBranchTip,
     tipOfBranch,
 } from "../../handlers/events/delivery/goals/resetGoals";
-import { success } from "../../util/slack/messages";
 
 @Parameters()
 class SetGoalStateParameters {
