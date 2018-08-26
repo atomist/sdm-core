@@ -1,7 +1,6 @@
 export {
     DockerBuildGoal, LocalEndpointGoal, LocalUndeploymentGoal, NoGoals, StagingUndeploymentGoal, TagGoal, VersionGoal,
 }from "./pack/well-known-goals/commonGoals";
-export { JavaIdentifierRegExp, JavaPackageRegExp, MavenArtifactIdRegExp, MavenGroupIdRegExp } from "./handlers/commands/support/java/javaPatterns";
 export { DefaultLocalDeployerOptions } from "./internal/delivery/deploy/local/LocalDeployerOptions";
 export { ManagedDeploymentTargeter } from "./internal/delivery/deploy/local/ManagedDeployments";
 export {
