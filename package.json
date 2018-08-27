@@ -1,6 +1,6 @@
 {
   "name": "@atomist/sdm-core",
-  "version": "0.4.11",
+  "version": "1.0.0",
   "description": "Atomist Software Delivery Machine - Implementation",
   "author": "Atomist, Inc.",
   "license": "Apache-2.0",
