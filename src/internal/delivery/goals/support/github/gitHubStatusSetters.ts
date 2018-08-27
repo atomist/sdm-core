@@ -58,7 +58,7 @@ export function SetGitHubStatusOnGoalCompletion(): GoalCompletionListener {
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: "sdm/atomist",
                 description: `Atomist SDM Goals: ${completedGoal.description}`,
-                target_url: "https://app.atomist.com", // TODO: deep link!
+                target_url: completedGoal.url, // link to the log of the failed goal
                 state: "failure",
             });
         }
