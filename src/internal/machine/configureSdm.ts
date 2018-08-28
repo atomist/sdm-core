@@ -34,6 +34,14 @@ import {
 } from "./LocalModeConfiguration";
 
 /**
+ * Describe the type of configuration value
+ */
+export enum ConfigurationValueType {
+    number,
+    string,
+    boolean,
+}
+/**
  * Options that are used during configuration of an SDM but don't get passed on to the
  * running SDM instance
  */
@@ -41,7 +49,7 @@ export interface ConfigureOptions {
     /**
      * Optional array of required configuration value paths resolved against the root configuration
      */
-    requiredConfigurationValues?: string[];
+    requiredConfigurationValues?: Array<string | { path: string, type: ConfigurationValueType }>;
 
     /**
      * Configuration for local SDM
@@ -75,6 +83,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
             return local.configureLocal(mergedOptions.local)(mergedConfig);
         }) || mergedConfig;
 
+        validateConfiguration(mergedConfig, mergedOptions);
         const sdm = machineMaker(mergedConfig);
 
         await doWithSdmLocal(local =>
@@ -101,8 +110,6 @@ function configureJobLaunching(mergedConfig, machine, mergedOptions) {
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);
     } else {
-        validateConfiguration(mergedConfig, mergedOptions);
-
         _.update(mergedConfig, "commands",
             old => !!old ? old : []);
         mergedConfig.commands.push(...machine.commandHandlers);
@@ -144,17 +151,46 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.applicationEvents.enabled = false;
 }
 
-function validateConfiguration(config: Configuration, options: ConfigureOptions) {
+export function validateConfiguration(config: any, options: ConfigureOptions) {
     const missingValues = [];
+    const invalidValues = [];
     (options.requiredConfigurationValues || []).forEach(v => {
-        if (!_.get(config, v)) {
-            missingValues.push(v);
+        const path = typeof v === "string" ? v : v.path;
+        const type = typeof v === "string" ? ConfigurationValueType.string : v.type;
+        const value = _.get(config, path);
+        if (!value) {
+            missingValues.push(path);
+        } else {
+            switch (type) {
+                case ConfigurationValueType.number :
+                    if (!Number.isNaN(value)) {
+                        invalidValues.push(`${path} '${value}' is not a 'number'`);
+                    }
+                    break;
+                case ConfigurationValueType.string :
+                    if (typeof value !== "string") {
+                        invalidValues.push(`${path} '${value}' is not a 'string'`);
+                    }
+                    break;
+                case ConfigurationValueType.boolean :
+                    if (typeof value !== "boolean") {
+                        invalidValues.push(`${path} '${value}' is not a 'boolean'`);
+                    }
+                    break;
+            }
         }
     });
+    const errors = [];
     if (missingValues.length > 0) {
-        throw new Error(
-            `Missing configuration values. Please add the following values to your client configuration: '${
-                missingValues.join(", ")}'`);
+        errors.push(`Missing configuration values. Please add the following values to your client configuration: '${
+            missingValues.join(", ")}'`);
+    }
+    if (invalidValues.length > 0) {
+        errors.push(`Invalid configuration values. The following values have the wrong type: '${
+            invalidValues.join(", ")}'`);
+    }
+    if (errors.length > 0) {
+        throw new Error(errors.join("\n"));
     }
 }
 
