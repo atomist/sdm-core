@@ -22,7 +22,7 @@ import {
 /**
  * Configuration determining how to run in local mode
  */
-export interface LocalSoftwareDeliverMachineOptions {
+export interface LocalSoftwareDeliveryMachineOptions {
 
     /**
      * Base of expanded directory tree the local client will work with:
@@ -64,5 +64,5 @@ export const IsInLocalMode: PushTest = {
  * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
  */
 export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
-    localSdm: LocalSoftwareDeliverMachineOptions;
+    localSdm: LocalSoftwareDeliveryMachineOptions;
 }

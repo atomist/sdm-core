@@ -22,7 +22,7 @@ import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
-import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliverMachineOptions";
+import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
 
 export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {

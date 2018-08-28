@@ -28,7 +28,7 @@ import {
 import {
     isInLocalMode,
     LocalSoftwareDeliveryMachineConfiguration,
-} from "./LocalSoftwareDeliverMachineOptions";
+} from "./LocalSoftwareDeliveryMachineOptions";
 
 /**
  * Describe the type of configuration value
