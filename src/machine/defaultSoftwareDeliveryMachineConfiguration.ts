@@ -25,7 +25,7 @@ import { EphemeralLocalArtifactStore } from "../internal/artifact/local/Ephemera
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliverMachineOptions";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
 
-export function defaultSoftwareDeliveryMachineOptions(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
+export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
     const repoRefResolver = new DefaultRepoRefResolver();
     return {
         sdm: {

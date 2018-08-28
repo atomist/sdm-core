@@ -20,7 +20,7 @@ import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDelive
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
-import { defaultSoftwareDeliveryMachineOptions } from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
@@ -66,7 +66,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
                              options: ConfigureOptions = {}) {
 
     return async (config: Configuration) => {
-        const defaultSdmOptions = defaultSoftwareDeliveryMachineOptions(config);
+        const defaultSdmOptions = defaultSoftwareDeliveryMachineConfiguration(config);
         let mergedConfig = _.merge(defaultSdmOptions, config) as LocalSoftwareDeliveryMachineConfiguration;
 
         // Configure the local SDM
