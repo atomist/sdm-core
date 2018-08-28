@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-import { PushTest } from "@atomist/sdm";
+import {
+    PushTest,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
 
 /**
  * Configuration determining how to run in local mode
  */
-export interface LocalModeConfiguration {
+export interface LocalSoftwareDeliverMachineOptions {
 
     /**
      * Base of expanded directory tree the local client will work with:
@@ -56,3 +59,10 @@ export const IsInLocalMode: PushTest = {
     name: "IsInLocalMode",
     mapping: async () => isInLocalMode(),
 };
+
+/**
+ * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
+ */
+export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
+    localSdm: LocalSoftwareDeliverMachineOptions;
+}

@@ -18,6 +18,7 @@ import { Configuration } from "@atomist/automation-client";
 import { BannerSection } from "@atomist/automation-client/configuration";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import chalk from "chalk";
+import { isInLocalMode } from "../..";
 
 /**
  * Print some SDM details to the startup banner of the client
@@ -27,7 +28,7 @@ export function sdmStartupMessage(sdm: SoftwareDeliveryMachine):
     (configuration: Configuration) => string | BannerSection {
     return () => ({
         title: "SDM",
-        body: `${sdm.name}  ${process.env.ATOMIST_MODE === "local" ? `${chalk.gray("Local")} true` : "" }`,
+        body: `${sdm.name}${isInLocalMode() ? ` ${chalk.grey("started in")} ${chalk.yellow("local mode")}` : ""}`,
     });
 }
 

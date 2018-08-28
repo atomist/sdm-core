@@ -18,15 +18,14 @@ import { Configuration } from "@atomist/automation-client";
 import { RemoteGitProjectPersister } from "@atomist/automation-client/operations/generate/remoteGitProjectPersister";
 import { allReposInTeam } from "@atomist/sdm/api-helper/command/transform/allReposInTeam";
 import { CachingProjectLoader } from "@atomist/sdm/api-helper/project/CachingProjectLoader";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
-import { ConfigureOptions } from "../internal/machine/configureSdm";
+import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliverMachineOptions";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
 
-export function defaultSoftwareDeliveryMachineOptions(configuration: Configuration): SoftwareDeliveryMachineConfiguration {
+export function defaultSoftwareDeliveryMachineOptions(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
     const repoRefResolver = new DefaultRepoRefResolver();
     return {
         sdm: {
@@ -40,13 +39,7 @@ export function defaultSoftwareDeliveryMachineOptions(configuration: Configurati
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
         },
-    };
-}
-
-export function defaultConfigureOptions(): ConfigureOptions {
-    return {
-        requiredConfigurationValues: [],
-        local: {
+        localSdm: {
             preferLocalSeeds: true,
         },
     };
