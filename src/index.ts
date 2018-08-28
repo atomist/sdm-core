@@ -1,5 +1,11 @@
 export {
-    DockerBuildGoal, LocalEndpointGoal, LocalUndeploymentGoal, NoGoals, StagingUndeploymentGoal, TagGoal, VersionGoal,
+    DockerBuildGoal,
+    LocalEndpointGoal,
+    LocalUndeploymentGoal,
+    NoGoals,
+    StagingUndeploymentGoal,
+    TagGoal,
+    VersionGoal,
 }from "./pack/well-known-goals/commonGoals";
 export { DefaultLocalDeployerOptions } from "./internal/delivery/deploy/local/LocalDeployerOptions";
 export { ManagedDeploymentTargeter } from "./internal/delivery/deploy/local/ManagedDeployments";
@@ -25,7 +31,9 @@ export { RolarProgressLog } from "./log/RolarProgressLog";
 export { InMemoryDeploymentStatusManager } from "./pack/freeze/InMemoryDeploymentStatusManager";
 export { K8sAutomationBuilder } from "./internal/delivery/build/k8s/K8AutomationBuilder";
 export { NoticeK8sTestDeployCompletionOnStatus } from "./handlers/events/delivery/deploy/k8s/NoticeK8sDeployCompletion";
-export { NoticeK8sProdDeployCompletionOnStatus } from "./handlers/events/delivery/deploy/k8s/NoticeK8sProdDeployCompletion";
+export {
+    NoticeK8sProdDeployCompletionOnStatus,
+}from "./handlers/events/delivery/deploy/k8s/NoticeK8sProdDeployCompletion";
 export { constructLogPath } from "./log/DashboardDisplayProgressLog";
 export { createSoftwareDeliveryMachine } from "./machine/machineFactory";
 export { DisplayDeployEnablement } from "./handlers/commands/DisplayDeployEnablement";
@@ -41,6 +49,8 @@ export {
 export { lookFor200OnEndpointRootGet } from "./util/verify/lookFor200OnEndpointRootGet";
 export {
     ConfigureOptions,
+    ConfigurationValueType,
+    SoftwareDeliveryMachineMaker,
     configureSdm,
 } from "./internal/machine/configureSdm";
 export {
@@ -61,18 +71,30 @@ export { LibraryGoals } from "./pack/well-known-goals/libraryGoals";
 export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
 export { renderCommitMessage } from "./util/slack/diffRendering";
 export { GraphGoals } from "./pack/graph-goals/graphGoals";
-export { createRelease,
-createStatus } from "./util/github/ghub";
-export { DefaultDockerImageNameCreator,
-DockerOptions,
-executeDockerBuild } from "./pack/docker/executeDockerBuild";
-export { createTagForStatus,
-executeTag } from "./internal/delivery/build/executeTag";
-export { executeVersioner,
-readSdmVersion } from "./internal/delivery/build/local/projectVersioner";
+export {
+    createRelease,
+    createStatus,
+} from "./util/github/ghub";
+export {
+    DefaultDockerImageNameCreator,
+    DockerOptions,
+    executeDockerBuild,
+} from "./pack/docker/executeDockerBuild";
+export {
+    createTagForStatus,
+    executeTag,
+} from "./internal/delivery/build/executeTag";
+export {
+    executeVersioner,
+    readSdmVersion,
+} from "./internal/delivery/build/local/projectVersioner";
 export { createKubernetesData } from "./handlers/events/delivery/goals/k8s/launchGoalK8";
 export { postLinkImageWebhook } from "./util/webhook/ImageLink";
 export { EphemeralLocalArtifactStore } from "./internal/artifact/local/EphemeralLocalArtifactStore";
 export { selfDescribingHandlers } from "./pack/info/support/commandSearch";
 export { WellKnownGoals } from "./pack/well-known-goals/addWellKnownGoals";
-export { LocalModeConfiguration, isInLocalMode, IsInLocalMode } from "./internal/machine/LocalModeConfiguration";
+export {
+    LocalModeConfiguration,
+    isInLocalMode,
+    IsInLocalMode,
+} from "./internal/machine/LocalModeConfiguration";
