@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-M.1...HEAD)
 
+### Added
+
+-   Stronger validation of required configration values. [#48a616b](https://github.com/atomist/sdm-core/commit/48a616bfbb304f5ca8f483aa91d1fd563f5dcbd8)
+
 ## [1.0.0-M.1](https://github.com/atomist/sdm/compare/0.4.10...1.0.0-M.1) - 2018-08-27
 
 ## [0.4.10](https://github.com/atomist/sdm/compare/0.4.9...0.4.10) - 2018-08-27
