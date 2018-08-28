@@ -39,7 +39,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
         },
-        localSdm: {
+        local: {
             preferLocalSeeds: true,
         },
     };

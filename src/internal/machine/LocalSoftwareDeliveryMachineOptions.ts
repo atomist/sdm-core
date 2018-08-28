@@ -42,6 +42,11 @@ export interface LocalSoftwareDeliveryMachineOptions {
      * Whether to merge autofixes automatically
      */
     mergeAutofixes?: boolean;
+
+    /**
+     * Name of host to use for creating local url
+     */
+    hostname?: string;
 }
 
 /**
@@ -64,5 +69,5 @@ export const IsInLocalMode: PushTest = {
  * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
  */
 export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
-    localSdm: LocalSoftwareDeliveryMachineOptions;
+    local: LocalSoftwareDeliveryMachineOptions;
 }
