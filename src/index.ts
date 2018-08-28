@@ -94,7 +94,8 @@ export { EphemeralLocalArtifactStore } from "./internal/artifact/local/Ephemeral
 export { selfDescribingHandlers } from "./pack/info/support/commandSearch";
 export { WellKnownGoals } from "./pack/well-known-goals/addWellKnownGoals";
 export {
-    LocalModeConfiguration,
+    LocalSoftwareDeliveryMachineOptions,
+    LocalSoftwareDeliveryMachineConfiguration,
     isInLocalMode,
     IsInLocalMode,
-} from "./internal/machine/LocalModeConfiguration";
+} from "./internal/machine/LocalSoftwareDeliveryMachineOptions";

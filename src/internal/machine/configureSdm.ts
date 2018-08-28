@@ -15,23 +15,21 @@
  */
 
 import { Configuration } from "@atomist/automation-client";
+import { ConfigurationPostProcessor } from "@atomist/automation-client/configuration";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
-import {
-    defaultConfigureOptions,
-    defaultSoftwareDeliveryMachineOptions,
-} from "../../machine/defaultSoftwareDeliveryMachineOptions";
+import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
 import {
     isInLocalMode,
-    LocalModeConfiguration,
-} from "./LocalModeConfiguration";
+    LocalSoftwareDeliveryMachineConfiguration,
+} from "./LocalSoftwareDeliveryMachineOptions";
 
 /**
  * Describe the type of configuration value
@@ -50,40 +48,36 @@ export interface ConfigureOptions {
      * Optional array of required configuration value paths resolved against the root configuration
      */
     requiredConfigurationValues?: Array<string | { path: string, type: ConfigurationValueType }>;
-
-    /**
-     * Configuration for local SDM
-     */
-    local?: LocalModeConfiguration;
 }
 
 /**
  * Type that can create a fully configured SDM
  */
-export type SoftwareDeliveryMachineMaker = (configuration: SoftwareDeliveryMachineConfiguration) => SoftwareDeliveryMachine;
+export type SoftwareDeliveryMachineMaker =
+    (configuration: LocalSoftwareDeliveryMachineConfiguration) => SoftwareDeliveryMachine;
 
 /**
  * Configure and set up a Software Delivery Machine instance with the automation-client framework for standalone
  * or single goal based execution
  * @param {(configuration: (Configuration & SoftwareDeliveryMachineOptions)) => SoftwareDeliveryMachine} machineMaker
  * @param {ConfigureOptions} options
- * @returns {(config: Configuration) => Promise<Configuration & SoftwareDeliveryMachineOptions>}
+ * @returns {ConfigurationPostProcessor}
  */
 export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
-                             options: ConfigureOptions = {}) {
+                             options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
 
     return async (config: Configuration) => {
-        const defaultSdmOptions = defaultSoftwareDeliveryMachineOptions(config);
-        let mergedConfig = _.merge(defaultSdmOptions, config) as SoftwareDeliveryMachineConfiguration;
-        const defaultConfOptions = defaultConfigureOptions();
-        const mergedOptions = _.merge(defaultConfOptions, options);
+        let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
 
         // Configure the local SDM
         mergedConfig = await doWithSdmLocal(local => {
-            return local.configureLocal(mergedOptions.local)(mergedConfig);
+            return local.configureLocal()(mergedConfig);
         }) || mergedConfig;
 
-        validateConfiguration(mergedConfig, mergedOptions);
+        const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
+        mergedConfig = _.merge(defaultSdmConfiguration, mergedConfig);
+
+        validateConfiguration(mergedConfig, options);
         const sdm = machineMaker(mergedConfig);
 
         await doWithSdmLocal(local =>
@@ -91,7 +85,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         );
 
         // Configure the job forking ability
-        configureJobLaunching(mergedConfig, sdm, mergedOptions);
+        configureJobLaunching(mergedConfig, sdm);
 
         await registerMetadata(mergedConfig, sdm);
 
@@ -101,11 +95,12 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         mergedConfig.logging.banner.contributors.push(
             sdmStartupMessage(sdm),
             sdmExtensionPackStartupMessage(sdm));
+
         return mergedConfig;
     };
 }
 
-function configureJobLaunching(mergedConfig, machine, mergedOptions) {
+function configureJobLaunching(mergedConfig, machine) {
     const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);

@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import { PushTest } from "@atomist/sdm";
+import { AnyOptions } from "@atomist/automation-client/configuration";
+import {
+    PushTest,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
 
 /**
  * Configuration determining how to run in local mode
  */
-export interface LocalModeConfiguration {
+export interface LocalSoftwareDeliveryMachineOptions {
 
     /**
      * Base of expanded directory tree the local client will work with:
@@ -39,6 +43,11 @@ export interface LocalModeConfiguration {
      * Whether to merge autofixes automatically
      */
     mergeAutofixes?: boolean;
+
+    /**
+     * Name of host to use for creating local url
+     */
+    hostname?: string;
 }
 
 /**
@@ -56,3 +65,10 @@ export const IsInLocalMode: PushTest = {
     name: "IsInLocalMode",
     mapping: async () => isInLocalMode(),
 };
+
+/**
+ * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
+ */
+export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
+    local: LocalSoftwareDeliveryMachineOptions & AnyOptions;
+}
