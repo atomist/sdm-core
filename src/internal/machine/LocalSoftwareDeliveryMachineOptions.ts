@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { AnyOptions } from "@atomist/automation-client/configuration";
 import {
     PushTest,
     SoftwareDeliveryMachineConfiguration,
@@ -69,5 +70,5 @@ export const IsInLocalMode: PushTest = {
  * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
  */
 export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
-    local: LocalSoftwareDeliveryMachineOptions;
+    local: LocalSoftwareDeliveryMachineOptions & AnyOptions;
 }
