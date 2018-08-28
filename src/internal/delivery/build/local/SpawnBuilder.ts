@@ -15,7 +15,6 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
@@ -38,6 +37,7 @@ import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";
+import { serializeResult } from "../../../../util/misc/result";
 import {
     LocalBuilder,
     LocalBuildInProgress,
@@ -170,12 +170,8 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                         if (br.error) {
                             throw new Error("Build failure: " + br.error);
                         }
-                        const r = {
-                            ...br,
-                        };
-                        delete r.childProcess;
                         log.write("/--");
-                        log.write(`Result: ${JSON.stringify(r, possibleAxiosObjectReplacer, 0)}`);
+                        log.write(`Result: ${serializeResult(br)}`);
                         log.write("\\--");
                         return executeOne(buildCommand);
                     });
