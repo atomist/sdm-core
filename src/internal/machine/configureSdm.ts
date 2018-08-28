@@ -189,7 +189,10 @@ async function doWithSdmLocal(callback: (sdmLocal: any) => any) {
             return callback(local);
         }
     } catch (err) {
-        throw new Error("SDM started in local mode, but '@atomist/sdm-local' not declared as dependency. " +
-            "Please install SDM local with 'npm install @atomist/sdm-local'.");
+        // When npm linking we accept this error and move on
+        if (!process.env.ATOMIST_NPM_LOCAL_LINK) {
+            throw new Error("SDM started in local mode, but '@atomist/sdm-local' not declared as dependency. " +
+                "Please install SDM local with 'npm install @atomist/sdm-local'.");
+        }
     }
 }
