@@ -16,7 +16,7 @@
 
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
-import { isInLocalMode } from "../../../..";
+import { isInLocalMode } from "../../../machine/LocalSoftwareDeliveryMachineOptions";
 import {
     createPendingGitHubStatusOnGoalSet,
     SetGitHubStatusOnGoalCompletion,
