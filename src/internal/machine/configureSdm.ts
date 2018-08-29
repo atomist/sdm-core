@@ -67,13 +67,15 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
                              options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
 
     return async (config: Configuration) => {
-        const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
-        let mergedConfig = _.merge(defaultSdmConfiguration, config) as LocalSoftwareDeliveryMachineConfiguration;
+        let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
 
         // Configure the local SDM
         mergedConfig = await doWithSdmLocal(local => {
             return local.configureLocal(mergedConfig.localSdm)(mergedConfig);
         }) || mergedConfig;
+
+        const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
+        mergedConfig = _.merge(defaultSdmConfiguration, mergedConfig) as LocalSoftwareDeliveryMachineConfiguration;
 
         validateConfiguration(mergedConfig, options);
         const sdm = machineMaker(mergedConfig);
@@ -93,6 +95,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         mergedConfig.logging.banner.contributors.push(
             sdmStartupMessage(sdm),
             sdmExtensionPackStartupMessage(sdm));
+
         return mergedConfig;
     };
 }
