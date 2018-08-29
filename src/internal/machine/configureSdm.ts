@@ -75,7 +75,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         }) || mergedConfig;
 
         const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
-        mergedConfig = _.merge(defaultSdmConfiguration, mergedConfig) as LocalSoftwareDeliveryMachineConfiguration;
+        mergedConfig = _.merge(defaultSdmConfiguration, mergedConfig);
 
         validateConfiguration(mergedConfig, options);
         const sdm = machineMaker(mergedConfig);
