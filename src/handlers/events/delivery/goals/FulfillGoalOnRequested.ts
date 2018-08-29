@@ -25,7 +25,6 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { possibleAxiosObjectReplacer } from "@atomist/automation-client/internal/transport/AbstractRequestProcessor";
 import {
     GoalExecutionListener,
     GoalInvocation,
@@ -44,8 +43,8 @@ import {
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
-import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { serializeResult } from "../../../../util/misc/result";
 import { formatDuration } from "../../../../util/misc/time";
 
 /**
@@ -136,7 +135,7 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
 
 async function reportEndAndClose(result: any, start: number, progressLog: ProgressLog) {
     progressLog.write(`/--`);
-    progressLog.write(`Result: ${stringify(result, possibleAxiosObjectReplacer, 0)}`);
+    progressLog.write(`Result: ${serializeResult(result)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
     progressLog.write("\\--");
     await progressLog.close();
