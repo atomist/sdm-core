@@ -15,6 +15,7 @@
  */
 
 import { Configuration } from "@atomist/automation-client";
+import { ConfigurationPostProcessor } from "@atomist/automation-client/configuration";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
@@ -60,10 +61,10 @@ export type SoftwareDeliveryMachineMaker =
  * or single goal based execution
  * @param {(configuration: (Configuration & SoftwareDeliveryMachineOptions)) => SoftwareDeliveryMachine} machineMaker
  * @param {ConfigureOptions} options
- * @returns {(config: Configuration) => Promise<Configuration & SoftwareDeliveryMachineOptions>}
+ * @returns {ConfigurationPostProcessor}
  */
 export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
-                             options: ConfigureOptions = {}) {
+                             options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
 
     return async (config: Configuration) => {
         const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
