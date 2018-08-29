@@ -28,7 +28,7 @@ export function sdmStartupMessage(sdm: SoftwareDeliveryMachine):
     (configuration: Configuration) => string | BannerSection {
     return () => ({
         title: "SDM",
-        body: `${sdm.name}${isInLocalMode() ? ` ${chalk.grey("started in")} ${chalk.yellow("local mode")}` : ""}`,
+        body: `${sdm.name}${isInLocalMode() ? ` ${chalk.grey("started in")} ${chalk.green("local mode")}` : ""}`,
     });
 }
 
