@@ -71,7 +71,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         // Configure the local SDM
         mergedConfig = await doWithSdmLocal(local => {
-            return local.configureLocal(mergedConfig.localSdm)(mergedConfig);
+            return local.configureLocal()(mergedConfig);
         }) || mergedConfig;
 
         const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
