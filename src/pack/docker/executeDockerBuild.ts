@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-import { HandlerContext } from "@atomist/automation-client";
+import {
+    HandlerContext,
+    HandlerResult,
+} from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import {
-    ExecuteGoal, GoalInvocation, PrepareForGoalExecution,
+    ExecuteGoal,
+    GoalInvocation,
+    PrepareForGoalExecution,
+    ProgressLog,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
+import {
+    ChildProcessResult,
+    spawnAndWatch,
+} from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { isInLocalMode } from "../..";
@@ -97,7 +106,7 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
             const dockerfilePath = await (options.dockerfileFinder ? options.dockerfileFinder(p) : "Dockerfile");
 
             // 1. run docker build
-            let result = await spawnAndWatch(
+            let result: ExecuteGoalResult = await spawnAndWatch(
                 {
                     command: "docker",
                     args: ["build", ".", "-f", dockerfilePath, "-t", image],
@@ -110,55 +119,7 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
                 return result;
             }
 
-            // Default so that we don't attempt to push in local mode
-            if (options.push === undefined) {
-                options.push = !isInLocalMode();
-            }
-
-            if (options.push) {
-
-                if (!options.user || !options.password) {
-                    const message = "Required configuration missing for pushing docker image. Please make sure to set 'registry', 'user' and 'password' in your configuration.";
-                    progressLog.write(message);
-                    return { code: 1, message }
-                }
-
-                const loginArgs: string[] = ["login", "--username", options.user, "--password", options.password];
-                if (/[^A-Za-z0-9]/.test(options.registry)) {
-                    loginArgs.push(options.registry);
-                }
-
-                // 2. run docker login
-                result = await spawnAndWatch(
-                    {
-                        command: "docker",
-                        args: loginArgs,
-                    },
-                    opts,
-                    progressLog,
-                    {
-                        ...spOpts,
-                        logCommand: false,
-                    });
-
-                if (result.code !== 0) {
-                    return result;
-                }
-
-                // 3. run docker push
-                result = await spawnAndWatch(
-                    {
-                        command: "docker",
-                        args: ["push", image],
-                    },
-                    opts,
-                    progressLog,
-                    spOpts);
-
-                if (result.code !== 0) {
-                    return result;
-                }
-            }
+            result = await dockerPush(image, options, progressLog);
 
             // 4. create image link
             if (await postLinkImageWebhook(
@@ -173,6 +134,66 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
             }
         });
     };
+}
+
+async function dockerPush(image: string,
+                          options: DockerOptions,
+                          progressLog: ProgressLog): Promise<ExecuteGoalResult> {
+
+    const spOpts = {
+        errorFinder: code => code !== 0,
+    };
+
+    // Default so that we don't attempt to push in local mode
+    if (options.push === undefined) {
+        options.push = !isInLocalMode();
+    }
+
+    if (options.push) {
+
+        if (!options.user || !options.password) {
+            const message = "Required configuration missing for pushing docker image. Please make sure to set " +
+                "'registry', 'user' and 'password' in your configuration.";
+            progressLog.write(message);
+            return { code: 1, message };
+        }
+
+        const loginArgs: string[] = ["login", "--username", options.user, "--password", options.password];
+        if (/[^A-Za-z0-9]/.test(options.registry)) {
+            loginArgs.push(options.registry);
+        }
+
+        // 2. run docker login
+        let result = await spawnAndWatch(
+            {
+                command: "docker",
+                args: loginArgs,
+            },
+            {},
+            progressLog,
+            {
+                ...spOpts,
+                logCommand: false,
+            });
+
+        if (result.code !== 0) {
+            return result;
+        }
+
+        // 3. run docker push
+        result = await spawnAndWatch(
+            {
+                command: "docker",
+                args: ["push", image],
+            },
+            {},
+            progressLog,
+            spOpts);
+
+        if (result.code !== 0) {
+            return result;
+        }
+    }
 }
 
 export const DefaultDockerImageNameCreator: DockerImageNameCreator = async (p, sdmGoal, options, context) => {
