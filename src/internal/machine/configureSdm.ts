@@ -35,9 +35,9 @@ import {
  * Describe the type of configuration value
  */
 export enum ConfigurationValueType {
-    number,
-    string,
-    boolean,
+    Number,
+    String,
+    Boolean,
 }
 /**
  * Options that are used during configuration of an SDM but don't get passed on to the
@@ -151,25 +151,25 @@ export function validateConfiguration(config: any, options: ConfigureOptions) {
     const invalidValues = [];
     (options.requiredConfigurationValues || []).forEach(v => {
         const path = typeof v === "string" ? v : v.path;
-        const type = typeof v === "string" ? ConfigurationValueType.string : v.type;
+        const type = typeof v === "string" ? ConfigurationValueType.String : v.type;
         const value = _.get(config, path);
         if (!value) {
             missingValues.push(path);
         } else {
             switch (type) {
-                case ConfigurationValueType.number :
+                case ConfigurationValueType.Number :
                     if (!Number.isNaN(value)) {
-                        invalidValues.push(`${path} '${value}' is not a 'number'`);
+                        invalidValues.push(`${path} ${JSON.stringify(value)} is not a 'number'`);
                     }
                     break;
-                case ConfigurationValueType.string :
+                case ConfigurationValueType.String :
                     if (typeof value !== "string") {
-                        invalidValues.push(`${path} '${value}' is not a 'string'`);
+                        invalidValues.push(`${path} ${JSON.stringify(value)} is not a 'string'`);
                     }
                     break;
-                case ConfigurationValueType.boolean :
+                case ConfigurationValueType.Boolean :
                     if (typeof value !== "boolean") {
-                        invalidValues.push(`${path} '${value}' is not a 'boolean'`);
+                        invalidValues.push(`${path} ${JSON.stringify(value)} is not a 'boolean'`);
                     }
                     break;
             }

@@ -45,7 +45,7 @@ describe("configureSdm", () => {
 
         it("should validate simple missing value with type", done => {
             const config = {};
-            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.string }];
+            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.String }];
             try {
                 validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             } catch (err) {
@@ -57,55 +57,55 @@ describe("configureSdm", () => {
 
         it("should validate simple value with wrong type", done => {
             const config = { sdm: { test: true }};
-            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.string }];
+            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.String }];
             try {
                 validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             } catch (err) {
                 assert.equal(err.message,
-                    "Invalid configuration values. The following values have the wrong type: 'sdm.test 'true' is not a 'string''");
+                    "Invalid configuration values. The following values have the wrong type: 'sdm.test true is not a 'string''");
             }
             done();
         });
 
         it("should validate value with wrong string type", done => {
             const config = { sdm: { test: true }};
-            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.string }];
+            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.String }];
             try {
                 validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             } catch (err) {
                 assert.equal(err.message,
-                    "Invalid configuration values. The following values have the wrong type: 'sdm.test 'true' is not a 'string''");
+                    "Invalid configuration values. The following values have the wrong type: 'sdm.test true is not a 'string''");
             }
             done();
         });
 
         it("should validate value with wrong boolean type", done => {
             const config = { sdm: { test: "foo" }};
-            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.boolean }];
+            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.Boolean }];
             try {
                 validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             } catch (err) {
                 assert.equal(err.message,
-                    "Invalid configuration values. The following values have the wrong type: 'sdm.test 'foo' is not a 'boolean''");
+                    "Invalid configuration values. The following values have the wrong type: 'sdm.test \"foo\" is not a 'boolean''");
             }
             done();
         });
 
         it("should validate value with wrong number type", done => {
             const config = { sdm: { test: "foo" }};
-            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.number }];
+            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.Number }];
             try {
                 validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             } catch (err) {
                 assert.equal(err.message,
-                    "Invalid configuration values. The following values have the wrong type: 'sdm.test 'foo' is not a 'number''");
+                    "Invalid configuration values. The following values have the wrong type: 'sdm.test \"foo\" is not a 'number''");
             }
             done();
         });
 
         it("should validate value with correct type", done => {
             const config = { sdm: { test: "bla" }};
-            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.string }];
+            const requiredValues = [ { path: "sdm.test", type: ConfigurationValueType.String }];
             validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             done();
         });
@@ -119,16 +119,16 @@ describe("configureSdm", () => {
                     },
             };
             const requiredValues = [
-                { path: "sdm.test1", type: ConfigurationValueType.string },
-                { path: "sdm.test2", type: ConfigurationValueType.boolean },
-                { path: "sdm.test3", type: ConfigurationValueType.number },
+                { path: "sdm.test1", type: ConfigurationValueType.String },
+                { path: "sdm.test2", type: ConfigurationValueType.Boolean },
+                { path: "sdm.test3", type: ConfigurationValueType.Number },
             ];
             try {
                 validateConfiguration(config, { requiredConfigurationValues: requiredValues });
             } catch (err) {
                 assert.equal(err.message,
-                    "Invalid configuration values. The following values have the wrong type: 'sdm.test1 'true' is not a 'string', " +
-                    "sdm.test2 'bar' is not a 'boolean', sdm.test3 'foo' is not a 'number''");
+                    "Invalid configuration values. The following values have the wrong type: 'sdm.test1 true is not a 'string', " +
+                    "sdm.test2 \"bar\" is not a 'boolean', sdm.test3 \"foo\" is not a 'number''");
             }
             done();
         });
