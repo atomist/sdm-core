@@ -50,12 +50,10 @@ import {
     PushForCommit,
     RepoBranchTips,
 } from "../../../../typings/types";
+import { CommandHandlerRegistration, CommandListenerInvocation } from "@atomist/sdm";
 
 @Parameters()
 export class ResetGoalsParameters {
-
-    @Secret(Secrets.UserToken)
-    public githubToken: string;
 
     @MappedParameter(MappedParameters.GitHubOwner)
     public owner: string;
@@ -66,10 +64,10 @@ export class ResetGoalsParameters {
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
 
-    @Parameter({required: false})
+    @Parameter({ required: false })
     public sha: string;
 
-    @Parameter({required: false})
+    @Parameter({ required: false })
     public branch: string;
 
     @Value("name")
@@ -87,18 +85,15 @@ export function resetGoalsCommand(rules: {
     goalSetter: GoalSetter,
     implementationMapping: SdmGoalImplementationMapper,
     name: string,
-}): HandleCommand {
-    return commandHandlerFrom(resetGoalsOnCommit(rules),
-        ResetGoalsParameters,
-        "ResetGoalsOnCommit",
-        "Set goals",
-        [
-            `plan goals ${rules.name.replace("@", "")}`,
-            "plan goals",
-            `reset goals ${rules.name.replace("@", "")}`,
-            "reset goals",
-        ]);
+}): CommandHandlerRegistration {
+    return {
+        name: "ResetGoalsOnCommit",
+        paramsMaker: ResetGoalsParameters,
+        listener: resetGoalsOnCommit(rules),
+        intent: ["reset goals"],
+    }
 }
+
 
 function resetGoalsOnCommit(rules: {
     projectLoader: ProjectLoader,
@@ -107,43 +102,38 @@ function resetGoalsOnCommit(rules: {
     goalSetter: GoalSetter,
     implementationMapping: SdmGoalImplementationMapper,
 }) {
-    const {projectLoader, goalsListeners, goalSetter, implementationMapping, repoRefResolver} = rules;
-    return async (ctx: HandlerContext, commandParams: ResetGoalsParameters) => {
-        // figure out which commit
-        const repoData = await fetchDefaultBranchTip(ctx, commandParams);
+    return async (cli: CommandListenerInvocation<ResetGoalsParameters>) => {
+        const commandParams = cli.parameters;
+        const repoData = await fetchDefaultBranchTip(cli.context, cli.parameters);
         const branch = commandParams.branch || repoData.defaultBranch;
         const sha = commandParams.sha || tipOfBranch(repoData, branch);
-        const id = GitHubRepoRef.from({owner: commandParams.owner, repo: commandParams.repo, sha, branch});
+        const id = rules.repoRefResolver.toRemoteRepoRef({
+            owner: commandParams.owner, name: commandParams.repo,
+            org: { owner: commandParams.owner, provider: { providerId: commandParams.providerId } }
+        }, { sha, branch });
 
-        const push = await fetchPushForCommit(ctx, id, commandParams.providerId);
-        const credentials = {token: commandParams.githubToken};
+        const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
 
-        const goals = await chooseAndSetGoals({
-            projectLoader,
-            repoRefResolver,
-            goalsListeners,
-            goalSetter,
-            implementationMapping,
-        }, {
-            context: ctx,
-            credentials,
+        const goals = await chooseAndSetGoals(rules, {
+            context: cli.context,
+            credentials: cli.credentials,
             push,
         });
 
         if (goals) {
-            await ctx.messageClient.respond(success(
+            await cli.addressChannels(success(
                 "Plan Goals",
                 `Successfully planned goals on ${codeLine(sha.slice(0, 7))} of ${
-                    bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
+                bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
                 {
                     footer: `${commandParams.name}:${commandParams.version}`,
                 }));
         } else {
-            await ctx.messageClient.respond(warning(
+            await cli.addressChannels(warning(
                 "Plan Goals",
                 `No goals found for ${codeLine(sha.slice(0, 7))} of ${
-                    bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
-                ctx,
+                bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
+                cli.context,
                 {
                     footer: `${commandParams.name}:${commandParams.version}`,
                 }));
@@ -172,7 +162,7 @@ export async function fetchPushForCommit(context: HandlerContext, id: RemoteRepo
 
 export async function fetchDefaultBranchTip(ctx: HandlerContext, repositoryId: { repo: string, owner: string, providerId: string }) {
     const result = await ctx.graphClient.query<RepoBranchTips.Query, RepoBranchTips.Variables>(
-        {name: "RepoBranchTips", variables: {name: repositoryId.repo, owner: repositoryId.owner}});
+        { name: "RepoBranchTips", variables: { name: repositoryId.repo, owner: repositoryId.owner } });
     if (!result || !result.Repo || result.Repo.length === 0) {
         throw new Error(`Repository not found: ${repositoryId.owner}/${repositoryId.repo}`);
     }

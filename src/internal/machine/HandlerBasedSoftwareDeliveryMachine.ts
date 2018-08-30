@@ -108,22 +108,15 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     this.goalsSetListeners,
                     this.goalFulfillmentMapper,
                     this.configuration.sdm.credentialsResolver)],
-                commandHandlers: [() => resetGoalsCommand({
-                    projectLoader: this.configuration.sdm.projectLoader,
-                    repoRefResolver: this.configuration.sdm.repoRefResolver,
-                    goalsListeners: this.goalsSetListeners,
-                    goalSetter: this.pushMapping,
-                    implementationMapping: this.goalFulfillmentMapper,
-                    name: this.configuration.name,
-                })],
+                commandHandlers: [],
                 ingesters: [],
             };
         } else {
-             return {
-                 eventHandlers: [],
-                 commandHandlers: [],
-                 ingesters: [],
-             };
+            return {
+                eventHandlers: [],
+                commandHandlers: [],
+                ingesters: [],
+            };
         }
     }
 
@@ -144,7 +137,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new VoteOnGoalApprovalRequest(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalApprovalRequestVotes) ],
+                        this.goalApprovalRequestVotes)],
                 commandHandlers: [],
                 ingesters: [],
             };
@@ -287,12 +280,20 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
      * @param {GoalSetter} goalSetters tell me what to do on a push. Hint: start with "whenPushSatisfies(...)"
      */
     constructor(name: string,
-                configuration: Configuration & SoftwareDeliveryMachineConfiguration,
-                goalSetters: Array<GoalSetter | GoalSetter[]>) {
+        configuration: Configuration & SoftwareDeliveryMachineConfiguration,
+        goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
         // This hits the Atomist service
         this.addFingerprintListener(SendFingerprintToAtomist);
         this.addExtensionPacks(WellKnownGoals);
+        this.addCommand(resetGoalsCommand({
+            projectLoader: this.configuration.sdm.projectLoader,
+            repoRefResolver: this.configuration.sdm.repoRefResolver,
+            goalsListeners: this.goalsSetListeners,
+            goalSetter: this.pushMapping,
+            implementationMapping: this.goalFulfillmentMapper,
+            name: this.configuration.name,
+        }));
     }
 
 }
