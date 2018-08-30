@@ -29,6 +29,7 @@ import { Parameters } from "@atomist/automation-client/decorators";
 import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { CommandHandlerRegistration, CommandListenerInvocation } from "@atomist/sdm";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import {
     success,
@@ -50,7 +51,6 @@ import {
     PushForCommit,
     RepoBranchTips,
 } from "../../../../typings/types";
-import { CommandHandlerRegistration, CommandListenerInvocation } from "@atomist/sdm";
 
 @Parameters()
 export class ResetGoalsParameters {
@@ -91,9 +91,8 @@ export function resetGoalsCommand(rules: {
         paramsMaker: ResetGoalsParameters,
         listener: resetGoalsOnCommit(rules),
         intent: ["reset goals"],
-    }
+    };
 }
-
 
 function resetGoalsOnCommit(rules: {
     projectLoader: ProjectLoader,
@@ -109,7 +108,7 @@ function resetGoalsOnCommit(rules: {
         const sha = commandParams.sha || tipOfBranch(repoData, branch);
         const id = rules.repoRefResolver.toRemoteRepoRef({
             owner: commandParams.owner, name: commandParams.repo,
-            org: { owner: commandParams.owner, provider: { providerId: commandParams.providerId } }
+            org: { owner: commandParams.owner, provider: { providerId: commandParams.providerId } },
         }, { sha, branch });
 
         const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
