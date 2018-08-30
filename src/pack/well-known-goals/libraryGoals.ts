@@ -16,8 +16,8 @@
 
 import { Goals } from "@atomist/sdm/api/goal/Goals";
 import {
+    CodeInspectionGoal,
     JustBuildGoal,
-    ReviewGoal,
 } from "@atomist/sdm/api/machine/wellKnownGoals";
 
 /**
@@ -26,6 +26,6 @@ import {
  */
 export const LibraryGoals = new Goals(
     "Library",
-    ReviewGoal,
+    CodeInspectionGoal,
     JustBuildGoal,
 );
