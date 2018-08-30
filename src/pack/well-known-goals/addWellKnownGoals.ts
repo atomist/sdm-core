@@ -16,8 +16,8 @@
 
 import { executeImmaterial } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { executeAutofixes } from "@atomist/sdm/api-helper/listener/executeAutofixes";
+import { executeAutoInspects } from "@atomist/sdm/api-helper/listener/executeAutoInspects";
 import { executePushReactions } from "@atomist/sdm/api-helper/listener/executePushReactions";
-import { executeReview } from "@atomist/sdm/api-helper/listener/executeReview";
 import { LogSuppressor } from "@atomist/sdm/api-helper/log/logInterpreters";
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
@@ -63,7 +63,7 @@ function configure(sdm: SoftwareDeliveryMachine) {
         .addGoalImplementation("CodeReactions", PushReactionGoal,
             executePushReactions(sdm.configuration.sdm.projectLoader, sdm.pushImpactListenerRegistrations))
         .addGoalImplementation("Reviews", ReviewGoal,
-            executeReview(sdm.configuration.sdm.projectLoader, sdm.reviewerRegistrations, sdm.reviewListenerRegistrations))
+            executeAutoInspects(sdm.configuration.sdm.projectLoader, sdm.autoInspectRegistrations, sdm.reviewListenerRegistrations))
         .addVerifyImplementation()
         .addGoalImplementation("OfferToDeleteRepo", DeleteRepositoryGoal,
             offerToDeleteRepository())
