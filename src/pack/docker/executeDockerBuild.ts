@@ -23,13 +23,34 @@ import {
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import { isInLocalMode } from "../..";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
 
 export interface DockerOptions {
-    registry: string;
-    user: string;
-    password: string;
+
+    /**
+     * True if the docker image should be pushed to the registry
+     */
+    push: boolean;
+
+    /**
+     * Optional registry to push the docker image too.
+     * Needs to set when push === true
+     */
+    registry?: string;
+
+    /**
+     * Optional user to use when pushing the docker image.
+     * Needs to set when push === true*
+     */
+    user?: string;
+
+    /**
+     * Optional password to use when pushing the docker image.
+     * Needs to set when push === true
+     */
+    password?: string;
 
     dockerfileFinder?: (p: GitProject) => Promise<string>;
 }
@@ -75,30 +96,8 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
             const image = `${imageName.registry}/${imageName.name}:${imageName.version}`;
             const dockerfilePath = await (options.dockerfileFinder ? options.dockerfileFinder(p) : "Dockerfile");
 
-            const loginArgs: string[] = ["login", "--username", options.user, "--password", options.password];
-            if (/[^A-Za-z0-9]/.test(options.registry)) {
-                loginArgs.push(options.registry);
-            }
-
-            // 1. run docker login
+            // 1. run docker build
             let result = await spawnAndWatch(
-                {
-                    command: "docker",
-                    args: loginArgs,
-                },
-                opts,
-                progressLog,
-                {
-                    ...spOpts,
-                    logCommand: false,
-                });
-
-            if (result.code !== 0) {
-                return result;
-            }
-
-            // 2. run docker build
-            result = await spawnAndWatch(
                 {
                     command: "docker",
                     args: ["build", ".", "-f", dockerfilePath, "-t", image],
@@ -111,18 +110,54 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
                 return result;
             }
 
-            // 3. run docker push
-            result = await spawnAndWatch(
-                {
-                    command: "docker",
-                    args: ["push", image],
-                },
-                opts,
-                progressLog,
-                spOpts);
+            // Default so that we don't attempt to push in local mode
+            if (options.push === undefined) {
+                options.push = !isInLocalMode();
+            }
 
-            if (result.code !== 0) {
-                return result;
+            if (options.push) {
+
+                if (!options.user || !options.password) {
+                    const message = "Required configuration missing for pushing docker image. Please make sure to set 'registry', 'user' and 'password' in your configuration.";
+                    progressLog.write(message);
+                    return { code: 1, message }
+                }
+
+                const loginArgs: string[] = ["login", "--username", options.user, "--password", options.password];
+                if (/[^A-Za-z0-9]/.test(options.registry)) {
+                    loginArgs.push(options.registry);
+                }
+
+                // 2. run docker login
+                result = await spawnAndWatch(
+                    {
+                        command: "docker",
+                        args: loginArgs,
+                    },
+                    opts,
+                    progressLog,
+                    {
+                        ...spOpts,
+                        logCommand: false,
+                    });
+
+                if (result.code !== 0) {
+                    return result;
+                }
+
+                // 3. run docker push
+                result = await spawnAndWatch(
+                    {
+                        command: "docker",
+                        args: ["push", image],
+                    },
+                    opts,
+                    progressLog,
+                    spOpts);
+
+                if (result.code !== 0) {
+                    return result;
+                }
             }
 
             // 4. create image link
@@ -131,7 +166,7 @@ export function executeDockerBuild(projectLoader: ProjectLoader,
                 sdmGoal.repo.name,
                 sdmGoal.sha,
                 image,
-                context.teamId)) {
+                context.workspaceId)) {
                 return result;
             } else {
                 return { code: 1, message: "Image link failed" };
