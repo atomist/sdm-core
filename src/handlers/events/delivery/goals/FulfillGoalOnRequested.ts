@@ -28,6 +28,7 @@ import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     GoalExecutionListener,
     GoalInvocation,
+    PushListenerInvocation,
 } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
@@ -65,7 +66,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
                         ctx: HandlerContext,
                         params: this): Promise<HandlerResult> {
-        const sdmGoal = event.data.SdmGoal[ 0 ] as SdmGoalEvent;
+        const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
@@ -77,47 +78,67 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        const { goal, goalExecutor, logInterpreter, progressReporter } = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
-
-        const progressLog = new WriteToAllProgressLog(
-            sdmGoal.name,
-            new LoggingProgressLog(sdmGoal.name, "debug"),
-            await this.logFactory(ctx, sdmGoal));
-        const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const id = params.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
-
         const credentials = this.credentialsResolver.eventHandlerCredentials(ctx, id);
+        const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
 
-        const goalInvocation: GoalInvocation = { sdmGoal, progressLog, context: ctx, addressChannels, id, credentials };
+        return this.projectLoader.doWithProject({ credentials, id, context: ctx, readOnly: true }, async project => {
 
-        const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
+            const pli: PushListenerInvocation = {
+                project,
+                credentials,
+                id,
+                push: sdmGoal.push,
+                context,
+                addressChannels,
+            };
 
-        if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
-            const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
-            await progressLog.close();
-            return result;
-        } else {
-            delete (sdmGoal as any).id;
+            const { goal, goalExecutor, logInterpreter, progressReporter } =
+                await this.implementationMapper.findImplementationBySdmGoal(sdmGoal, pli);
 
-            await reportStart(sdmGoal, progressLog);
-            const start = Date.now();
+            const progressLog = new WriteToAllProgressLog(
+                sdmGoal.name,
+                new LoggingProgressLog(sdmGoal.name, "debug"),
+                await this.logFactory(ctx, sdmGoal));
 
-            return executeGoal(
-                { projectLoader: params.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
-                goalExecutor,
-                goalInvocation,
+            const goalInvocation: GoalInvocation = {
                 sdmGoal,
-                goal,
-                logInterpreter,
-                progressReporter)
-                .then(async res => {
-                    await reportEndAndClose(res, start, progressLog);
-                    return res;
-                }, async err => {
-                    await reportEndAndClose(err, start, progressLog);
-                    throw err;
-                });
-        }
+                progressLog,
+                context: ctx,
+                addressChannels,
+                id,
+                credentials,
+            };
+
+            const isolatedGoalLauncher = this.implementationMapper.getIsolatedGoalLauncher();
+
+            if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
+                const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
+                await progressLog.close();
+                return result;
+            } else {
+                delete (sdmGoal as any).id;
+
+                await reportStart(sdmGoal, progressLog);
+                const start = Date.now();
+
+                return executeGoal(
+                    { projectLoader: params.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
+                    goalExecutor,
+                    goalInvocation,
+                    sdmGoal,
+                    goal,
+                    logInterpreter,
+                    progressReporter)
+                    .then(async res => {
+                        await reportEndAndClose(res, start, progressLog);
+                        return res;
+                    }, async err => {
+                        await reportEndAndClose(err, start, progressLog);
+                        throw err;
+                    });
+            }
+        });
     }
 }
 
