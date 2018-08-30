@@ -89,7 +89,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 credentials,
                 id,
                 push: sdmGoal.push,
-                context,
+                context: ctx,
                 addressChannels,
             };
 

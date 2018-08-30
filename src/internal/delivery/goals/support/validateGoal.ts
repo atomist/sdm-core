@@ -15,9 +15,9 @@
  */
 
 import { automationClientInstance } from "@atomist/automation-client";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalEvent } from "@atomist/sdm";
 
-export function isGoalRelevant(sdmGoal: SdmGoal,
+export function isGoalRelevant(sdmGoal: SdmGoalEvent,
                                registration: string = automationClientInstance().configuration.name): boolean {
     // Backwards compatible: we might still have SDMs that don't correctly set the provenance
     if (!sdmGoal.provenance || sdmGoal.provenance.length === 0) {

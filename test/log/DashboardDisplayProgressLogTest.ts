@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {HandlerContext} from "@atomist/automation-client";
-import {SdmGoal} from "@atomist/sdm/api/goal/SdmGoal";
+import { HandlerContext } from "@atomist/automation-client";
+import { SdmGoalEvent } from "@atomist/sdm";
 import * as assert from "power-assert";
-import {DashboardDisplayProgressLog} from "../../src/log/DashboardDisplayProgressLog";
+import { DashboardDisplayProgressLog } from "../../src/log/DashboardDisplayProgressLog";
 
 describe("DashboardDisplayProgressLog", () => {
 
@@ -28,7 +28,7 @@ describe("DashboardDisplayProgressLog", () => {
         messageClient: undefined,
     };
 
-    const goal: SdmGoal = {
+    const goal: SdmGoalEvent = {
         push: {},
         repo: {
             owner: "RepoOwner",

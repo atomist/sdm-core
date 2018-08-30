@@ -21,9 +21,9 @@ import {
     GoalCompletionListenerInvocation,
     GoalsSetListener,
     GoalsSetListenerInvocation,
+    SdmGoalEvent,
 } from "@atomist/sdm";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { StatusState } from "@atomist/sdm/typings/types";
 import { SdmGoalState } from "../../../../../typings/types";
@@ -74,7 +74,7 @@ export function SetGitHubStatusOnGoalCompletion(): GoalCompletionListener {
     };
 }
 
-function allSuccessful(goals: SdmGoal[]): boolean {
+function allSuccessful(goals: SdmGoalEvent[]): boolean {
     goals.forEach(g => logger.debug("goal %s is %s", g.name, g.state));
     return !goals.some(g => g.state !== "success");
 }

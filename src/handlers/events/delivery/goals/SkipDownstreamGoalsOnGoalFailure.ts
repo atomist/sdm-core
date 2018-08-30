@@ -26,15 +26,12 @@ import {
 import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     SdmGoalEvent,
+    SdmGoalKey,
     SdmGoalState,
 } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { goalKeyEquals } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import {
-    SdmGoal,
-    SdmGoalKey,
-} from "@atomist/sdm/api/goal/SdmGoal";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
@@ -80,7 +77,7 @@ function mapKeyToGoal<T extends SdmGoalKey>(goals: T[]): (SdmGoalKey) => T {
     };
 }
 
-function isDependentOn(failedGoal: SdmGoalKey, goal: SdmGoal, preconditionToGoal: (g: SdmGoalKey) => SdmGoal): boolean {
+function isDependentOn(failedGoal: SdmGoalKey, goal: SdmGoalEvent, preconditionToGoal: (g: SdmGoalKey) => SdmGoalEvent): boolean {
     if (!goal) {
         // TODO we think this is caused by automation-api#396
         logger.warn("Internal error: Trying to work out if %j is dependent on null or undefined goal", failedGoal);

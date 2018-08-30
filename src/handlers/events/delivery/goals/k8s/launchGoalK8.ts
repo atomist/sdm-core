@@ -24,11 +24,13 @@ import {
 import { configurationValue } from "@atomist/automation-client/configuration";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { SuccessIsReturn0ErrorFinder } from "@atomist/automation-client/util/spawned";
-import { IsolatedGoalLauncher } from "@atomist/sdm";
+import {
+    IsolatedGoalLauncher,
+    SdmGoalEvent,
+} from "@atomist/sdm";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { StringCapturingProgressLog } from "@atomist/sdm/api-helper/log/StringCapturingProgressLog";
 import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
 import * as cluster from "cluster";
@@ -251,7 +253,7 @@ export interface KubernetesOptions {
  * @param {GitProject} p
  * @returns {Promise<SdmGoal>}
  */
-export async function createKubernetesData(goal: SdmGoal, options: KubernetesOptions, p: GitProject): Promise<SdmGoal> {
+export async function createKubernetesData(goal: SdmGoalEvent, options: KubernetesOptions, p: GitProject): Promise<SdmGoalEvent> {
     const deploymentSpec = await readKubernetesSpec(p, "deployment.json");
     const serviceSpec = await readKubernetesSpec(p, "service.json");
     return {
