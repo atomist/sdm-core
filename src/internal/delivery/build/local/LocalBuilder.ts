@@ -31,6 +31,7 @@ import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { sprintf } from "sprintf-js";
 import { SdmBuildIdentifierForRepo } from "../../../../typings/types";
 import { postLinkImageWebhook } from "../../../../util/webhook/ImageLink";
+import { isInLocalMode } from "../../../machine/LocalSoftwareDeliveryMachineOptions";
 import { createTagForStatus } from "../executeTag";
 import { AtomistBuildStatusUpdater } from "./AtomistBuildStatusUpdater";
 import { readSdmVersion } from "./projectVersioner";
@@ -229,7 +230,7 @@ export abstract class LocalBuilder implements Builder {
                                    buildNo: string,
                                    context: HandlerContext,
                                    credentials: ProjectOperationCredentials) {
-        if (configurationValue<boolean>("sdm.build.tag", true)) {
+        if (configurationValue<boolean>("sdm.build.tag", true) && !isInLocalMode()) {
             const version = await readSdmVersion(push.owner, push.name, push.providerId, push.sha, id.branch, context);
             if (version) {
                 await createTagForStatus(
