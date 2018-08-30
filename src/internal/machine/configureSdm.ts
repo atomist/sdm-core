@@ -190,7 +190,9 @@ export function validateConfiguration(config: any, options: ConfigureOptions) {
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
+    // tslint:disable-next-line:no-implicit-dependencies
     const sdmPj = require("@atomist/sdm/package.json");
+    // tslint:disable-next-line:no-implicit-dependencies
     const sdmCorePj = require("@atomist/sdm-core/package.json");
 
     config.metadata = {
@@ -202,6 +204,7 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
     };
 
     await doWithSdmLocal(() => {
+        // tslint:disable-next-line:no-implicit-dependencies
         const sdmLocalPj = require("@atomist/sdm-local/package.json");
         config.metadata["atomist.sdm-local"] = `${sdmLocalPj.name}:${sdmLocalPj.version}`;
     });
@@ -216,6 +219,7 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
 async function doWithSdmLocal(callback: (sdmLocal: any) => any) {
     try {
         if (isInLocalMode()) {
+            // tslint:disable-next-line:no-implicit-dependencies
             const local = require("@atomist/sdm-local");
             return callback(local);
         }
