@@ -27,7 +27,7 @@ const DesiredDot = `digraph HTTP_Service {
 
     code_fingerprint [label="Fingerprint"]
     code_autofix [label="autofix"]
-    code_inspect [label="inspects"]
+    code_inspect [label="inspect"]
     code_react [label="react"]
     code_build [label="build"]
     code_artifact [label="store artifact"]
