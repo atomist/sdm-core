@@ -24,12 +24,14 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { SdmGoalEvent } from "@atomist/sdm";
+import {
+    SdmGoalEvent,
+    SdmGoalKey,
+} from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { SdmGoalKey } from "@atomist/sdm/api/goal/SdmGoal";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";

@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-import { HandlerContext, Success } from "@atomist/automation-client";
+import {
+    HandlerContext,
+    Success,
+} from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
+import {
+    GitCommandGitProject,
+    GitProject,
+    NodeFsLocalProject,
+    PushListenerInvocation,
+} from "@atomist/sdm";
 
 import { determineGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
@@ -45,7 +54,7 @@ const favoriteRepoRef = GitHubRepoRef.from({
 
 export const fakeSoftwareDeliveryMachineOptions = {
     projectLoader: new SingleProjectLoader(InMemoryProject.from(favoriteRepoRef,
-        {path: "README.md", content: "read something else"})),
+        { path: "README.md", content: "read something else" })),
 } as any as SoftwareDeliveryMachineOptions;
 
 export const fakeSoftwareDeliveryMachineConfiguration: SoftwareDeliveryMachineConfiguration = {
@@ -53,22 +62,22 @@ export const fakeSoftwareDeliveryMachineConfiguration: SoftwareDeliveryMachineCo
     sdm: fakeSoftwareDeliveryMachineOptions,
 };
 
-const credentials: ProjectOperationCredentials = {token: "ab123bbbaaa"};
+const credentials: ProjectOperationCredentials = { token: "ab123bbbaaa" };
 
-const fakeContext = {context: {name: "my favorite context "}} as any as HandlerContext;
+const fakeContext = { context: { name: "my favorite context " } } as any as HandlerContext;
 
-const aPush = {repo: {org: {provider: {providerId: "myProviderId"}}}} as PushFields.Fragment;
+const aPush = { repo: { org: { provider: { providerId: "myProviderId" } } } } as PushFields.Fragment;
 
 describe("implementing goals in the SDM", () => {
 
     it("can autofix", async () => {
         const mySDM = createSoftwareDeliveryMachine(
-            {name: "Gustave", configuration: fakeSoftwareDeliveryMachineConfiguration},
+            { name: "Gustave", configuration: fakeSoftwareDeliveryMachineConfiguration },
             whenPushSatisfies(AnyPush)
                 .itMeans("autofix the crap out of that thing")
                 .setGoals(new Goals("Autofix only", AutofixGoal)));
 
-        const {determinedGoals, goalsToSave} = await determineGoals({
+        const { determinedGoals, goalsToSave } = await determineGoals({
                 projectLoader: fakeSoftwareDeliveryMachineOptions.projectLoader,
                 repoRefResolver: new DefaultRepoRefResolver(),
                 goalSetter: mySDM.pushMapping,
@@ -80,11 +89,21 @@ describe("implementing goals in the SDM", () => {
             },
         );
 
+        const lp = await NodeFsLocalProject.fromExistingDirectory(favoriteRepoRef, ".");
+        const pli: PushListenerInvocation = {
+            addressChannels: () => Promise.resolve({}),
+            project: GitCommandGitProject.fromProject(lp, credentials),
+            push: aPush,
+            id: favoriteRepoRef,
+            context: fakeContext,
+            credentials,
+        };
+
         assert(determinedGoals.goals.includes(AutofixGoal));
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
 
-        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
+        const myImpl = await mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent, pli);
         assert.equal(myImpl.implementationName, "Autofix");
     });
 
@@ -101,7 +120,7 @@ describe("implementing goals in the SDM", () => {
         };
 
         const mySDM = createSoftwareDeliveryMachine(
-            {name: "Gustave", configuration: fakeSoftwareDeliveryMachineConfiguration},
+            { name: "Gustave", configuration: fakeSoftwareDeliveryMachineConfiguration },
             whenPushSatisfies(AnyPush)
                 .itMeans("cornelius springer")
                 .setGoals(new Goals("Springer", customGoal)))
@@ -110,7 +129,7 @@ describe("implementing goals in the SDM", () => {
                 goalExecutor,
             );
 
-        const {determinedGoals, goalsToSave} = await determineGoals({
+        const { determinedGoals, goalsToSave } = await determineGoals({
                 projectLoader: fakeSoftwareDeliveryMachineOptions.projectLoader,
                 repoRefResolver: new DefaultRepoRefResolver(),
                 goalSetter: mySDM.pushMapping,
@@ -122,10 +141,20 @@ describe("implementing goals in the SDM", () => {
             },
         );
 
+        const lp = await NodeFsLocalProject.fromExistingDirectory(favoriteRepoRef, ".");
+        const pli: PushListenerInvocation = {
+            addressChannels: () => Promise.resolve({}),
+            project: GitCommandGitProject.fromProject(lp, credentials),
+            push: aPush,
+            id: favoriteRepoRef,
+            context: fakeContext,
+            credentials,
+        };
+
         assert(determinedGoals.goals.includes(customGoal));
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
-        const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
+        const myImpl = await mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent, pli);
         assert.equal(myImpl.implementationName, "Cornelius");
         await myImpl.goalExecutor(undefined);
         assert(executed);

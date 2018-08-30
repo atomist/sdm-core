@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SdmGoal } from "@atomist/sdm/api/goal/SdmGoal";
+import { SdmGoalEvent } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { isGoalRelevant } from "../../../../../src/internal/delivery/goals/support/validateGoal";
 
@@ -32,7 +32,7 @@ describe("isGoalRelevant", () => {
                 registration: "again-some-other-sdm",
                 ts: 3,
             }],
-        } as any as SdmGoal;
+        } as any as SdmGoalEvent;
         assert.equal(isGoalRelevant(goal, "my-super-sdm"), true);
     });
 
@@ -48,7 +48,7 @@ describe("isGoalRelevant", () => {
                 registration: "again-some-other-sdm",
                 ts: 1,
             }],
-        } as any as SdmGoal;
+        } as any as SdmGoalEvent;
         assert.equal(isGoalRelevant(goal, "my-super-sdm"), false);
     });
 
@@ -64,7 +64,7 @@ describe("isGoalRelevant", () => {
                 registration: "again-some-other-sdm",
                 ts: 2,
             }],
-        } as any as SdmGoal;
+        } as any as SdmGoalEvent;
         assert.equal(isGoalRelevant(goal, "my-super-sdm-job-4342234-build"), true);
     });
 
