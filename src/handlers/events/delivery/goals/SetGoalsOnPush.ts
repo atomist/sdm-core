@@ -49,18 +49,18 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
      * @param credentialsFactory credentials factory
      */
     constructor(private readonly projectLoader: ProjectLoader,
-                private readonly repoRefResolver: RepoRefResolver,
-                private readonly goalSetter: GoalSetter,
-                public readonly goalsListeners: GoalsSetListener[],
-                private readonly implementationMapping: GoalImplementationMapper,
-                private readonly credentialsFactory: CredentialsResolver) {
+        private readonly repoRefResolver: RepoRefResolver,
+        private readonly goalSetter: GoalSetter,
+        public readonly goalsListeners: GoalsSetListener[],
+        private readonly implementationMapping: GoalImplementationMapper,
+        private readonly credentialsFactory: CredentialsResolver) {
     }
 
     public async handle(event: EventFired<OnPushToAnyBranch.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+        context: HandlerContext,
+        params: this): Promise<HandlerResult> {
         const push: OnPushToAnyBranch.Push = event.data.Push[0];
-        const id: RemoteRepoRef = params.repoRefResolver.toRemoteRepoRef(push.repo, {});
+        const id: RemoteRepoRef = this.repoRefResolver.toRemoteRepoRef(push.repo, {});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         await chooseAndSetGoals({
@@ -70,10 +70,10 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
             goalSetter: params.goalSetter,
             implementationMapping: params.implementationMapping,
         }, {
-            context,
-            credentials,
-            push,
-        });
+                context,
+                credentials,
+                push,
+            });
         return Success;
     }
 }
