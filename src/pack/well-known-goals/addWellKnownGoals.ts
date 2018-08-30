@@ -25,12 +25,12 @@ import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDelive
 import {
     ArtifactGoal,
     AutofixGoal,
+    CodeInspectionGoal,
     DeleteAfterUndeploysGoal,
     DeleteRepositoryGoal,
     FingerprintGoal,
     NoGoal,
     PushReactionGoal,
-    ReviewGoal,
 } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { offerToDeleteRepository } from "../../handlers/commands/deleteRepository";
@@ -62,7 +62,7 @@ function configure(sdm: SoftwareDeliveryMachine) {
                 sdm.fingerprintListeners))
         .addGoalImplementation("CodeReactions", PushReactionGoal,
             executePushReactions(sdm.configuration.sdm.projectLoader, sdm.pushImpactListenerRegistrations))
-        .addGoalImplementation("Reviews", ReviewGoal,
+        .addGoalImplementation("CodeInspections", CodeInspectionGoal,
             executeAutoInspects(sdm.configuration.sdm.projectLoader, sdm.autoInspectRegistrations, sdm.reviewListenerRegistrations))
         .addVerifyImplementation()
         .addGoalImplementation("OfferToDeleteRepo", DeleteRepositoryGoal,
