@@ -22,7 +22,7 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
-import { CommandHandlerRegistration, CommandListenerInvocation } from "@atomist/sdm";
+import { CommandHandlerRegistration, CommandListenerInvocation, SoftwareDeliveryMachine } from "@atomist/sdm";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import {
     success,
@@ -70,30 +70,25 @@ export class ResetGoalsParameters {
 
 }
 
-export function resetGoalsCommand(rules: {
-    projectLoader: ProjectLoader,
-    repoRefResolver: RepoRefResolver,
-    goalsListeners: GoalsSetListener[],
-    goalSetter: GoalSetter,
-    implementationMapping: GoalImplementationMapper,
-    name: string,
-}): CommandHandlerRegistration {
+export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
     return {
         name: "ResetGoalsOnCommit",
         paramsMaker: ResetGoalsParameters,
-        listener: resetGoalsOnCommit(rules),
+        listener: resetGoalsOnCommit(sdm),
         intent: ["reset goals"],
     };
 }
 
-function resetGoalsOnCommit(rules: {
-    projectLoader: ProjectLoader,
-    repoRefResolver: RepoRefResolver,
-    goalsListeners: GoalsSetListener[],
-    goalSetter: GoalSetter,
-    implementationMapping: GoalImplementationMapper,
-}) {
+function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
     return async (cli: CommandListenerInvocation<ResetGoalsParameters>) => {
+        const rules = {
+            projectLoader: sdm.configuration.sdm.projectLoader,
+            repoRefResolver: sdm.configuration.sdm.repoRefResolver,
+            goalsListeners: sdm.goalsSetListeners,
+            goalSetter: sdm.pushMapping,
+            implementationMapping: sdm.goalFulfillmentMapper,
+        }
+
         const commandParams = cli.parameters;
         const repoData = await fetchDefaultBranchTip(cli.context, cli.parameters);
         const branch = commandParams.branch || repoData.defaultBranch;

@@ -10,13 +10,6 @@ export const GoalState: ExtensionPack = {
     ...metadata("set goal state"),
     configure: sdm => {
         sdm.addCommand(setGoalStateCommand(sdm));
-        sdm.addCommand(resetGoalsCommand({
-            projectLoader: sdm.configuration.sdm.projectLoader,
-            repoRefResolver: sdm.configuration.sdm.repoRefResolver,
-            goalsListeners: sdm.goalsSetListeners,
-            goalSetter: sdm.pushMapping,
-            implementationMapping: sdm.goalFulfillmentMapper,
-            name: sdm.configuration.name,
-        }));
+        sdm.addCommand(resetGoalsCommand(sdm));
     },
 };
