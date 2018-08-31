@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Stronger validation of required configration values. [#48a616b](https://github.com/atomist/sdm-core/commit/48a616bfbb304f5ca8f483aa91d1fd563f5dcbd8)
+-   Add mergePullRequest flag to local config. [#7784157](https://github.com/atomist/sdm-core/commit/77841573c406f60796196ca1637a814e8bb52a2b)
 
 ### Changed
 
