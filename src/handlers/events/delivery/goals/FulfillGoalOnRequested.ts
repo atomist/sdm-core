@@ -33,6 +33,7 @@ import {
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
+import { serializeResult } from "@atomist/sdm/api-helper/misc/result";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
@@ -45,7 +46,6 @@ import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import { serializeResult } from "../../../../util/misc/result";
 import { formatDuration } from "../../../../util/misc/time";
 
 /**

@@ -20,6 +20,7 @@ import { RemoteRepoRef } from "@atomist/automation-client/operations/common/Repo
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { Project } from "@atomist/automation-client/project/Project";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import { serializeResult } from "@atomist/sdm/api-helper/misc/result";
 import {
     asSpawnCommand,
     ChildProcessResult,
@@ -37,7 +38,6 @@ import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";
-import { serializeResult } from "../../../../util/misc/result";
 import {
     LocalBuilder,
     LocalBuildInProgress,
