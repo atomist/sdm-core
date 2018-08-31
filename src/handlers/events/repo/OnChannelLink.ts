@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     AddressChannels,
     addressChannelsFor,
@@ -39,7 +39,7 @@ import * as schema from "../../../typings/types";
 /**
  * A new channel has been linked to a repo
  */
-@EventHandler("On channel link", subscription("OnChannelLink"))
+@EventHandler("On channel link", GraphQL.subscription("OnChannelLink"))
 export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscription> {
 
     constructor(

@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     SdmGoalEvent,
     SdmGoalKey,
@@ -45,7 +45,7 @@ import {
  * Move downstream goals from 'planned' to 'requested' when preconditions are met.
  */
 @EventHandler("Move downstream goals from 'planned' to 'requested' when preconditions are met",
-    subscription("OnAnySuccessfulSdmGoal"))
+    GraphQL.subscription("OnAnySuccessfulSdmGoal"))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
     constructor(private readonly name,

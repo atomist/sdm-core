@@ -17,17 +17,17 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
-import { SdmGoalEvent } from "@atomist/sdm";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
+    SdmGoalEvent,
 } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
@@ -39,7 +39,7 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 /**
  * Respond to a failure or success status by running listeners
  */
-@EventHandler("Run a listener on goal failure or success", subscription("OnAnyCompletedSdmGoal"))
+@EventHandler("Run a listener on goal failure or success", GraphQL.subscription("OnAnyCompletedSdmGoal"))
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver,

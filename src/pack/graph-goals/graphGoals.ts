@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { configurationValue } from "@atomist/automation-client/configuration";
+import {
+    configurationValue,
+    logger,
+} from "@atomist/automation-client";
 import {
     Goal,
     GoalWithPrecondition,

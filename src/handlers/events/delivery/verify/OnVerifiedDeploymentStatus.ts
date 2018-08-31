@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     VerifiedDeploymentListener,
@@ -39,7 +39,7 @@ import Status = OnSuccessStatus.Status;
  * React to a verified deployment
  */
 @EventHandler("Act on verified deployment",
-    subscription({
+    GraphQL.subscription({
         name: "OnSuccessStatus",
         variables: {
             context: StagingVerifiedGoal.context,

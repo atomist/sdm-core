@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     NewIssueListener,
@@ -36,7 +36,7 @@ import * as schema from "@atomist/sdm/typings/types";
 /**
  * A new issue has been created.
  */
-@EventHandler("On issue creation", subscription("OnIssueAction"))
+@EventHandler("On issue creation", GraphQL.subscription("OnIssueAction"))
 export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscription> {
 
     private readonly newIssueListeners: NewIssueListener[];

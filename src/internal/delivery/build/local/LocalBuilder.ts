@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-import { failure, HandlerContext, HandlerResult, logger, Success } from "@atomist/automation-client";
-import { configurationValue } from "@atomist/automation-client/configuration";
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { QueryNoCacheOptions } from "@atomist/automation-client/spi/graph/GraphClient";
+import {
+    configurationValue,
+    failure,
+    HandlerContext,
+    HandlerResult,
+    logger,
+    RemoteRepoRef,
+    Success,
+} from "@atomist/automation-client";
 import { addressEvent } from "@atomist/automation-client/spi/message/MessageClient";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import {
+    ProjectOperationCredentials,
+    QueryNoCacheOptions,
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 import { ChildProcessResult } from "@atomist/sdm/api-helper/misc/spawned";
 import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
 import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { Builder, PushThatTriggersBuild } from "@atomist/sdm/spi/build/Builder";
+import {
+    Builder,
+    PushThatTriggersBuild,
+} from "@atomist/sdm/spi/build/Builder";
 import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
 import { InterpretLog } from "@atomist/sdm/spi/log/InterpretedLog";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { BitBucketServerRepoRef } from "@atomist/automation-client/operations/common/BitBucketServerRepoRef";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-
+import {
+    BitBucketServerRepoRef,
+    GitHubRepoRef,
+    logger,
+    RemoteRepoRef,
+} from "@atomist/automation-client";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {

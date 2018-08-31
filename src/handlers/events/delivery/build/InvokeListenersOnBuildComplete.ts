@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     AddressChannels,
     addressChannelsFor,
@@ -39,7 +39,7 @@ import { OnBuildComplete } from "@atomist/sdm/typings/types";
  * Invoke listeners on complete build. Not a part of our delivery flow:
  * just observational.
  */
-@EventHandler("Invoke listeners on build complete", subscription("OnBuildComplete"))
+@EventHandler("Invoke listeners on build complete", GraphQL.subscription("OnBuildComplete"))
 export class InvokeListenersOnBuildComplete implements HandleEvent<OnBuildComplete.Subscription> {
 
     constructor(private readonly listeners: BuildListener[],

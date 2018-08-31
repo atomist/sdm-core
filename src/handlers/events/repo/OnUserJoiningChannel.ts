@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
@@ -34,7 +34,7 @@ import * as schema from "@atomist/sdm/typings/types";
 /**
  * A user joined a channel
  */
-@EventHandler("On user joining channel", subscription("OnUserJoiningChannel"))
+@EventHandler("On user joining channel", GraphQL.subscription("OnUserJoiningChannel"))
 export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningChannel.Subscription> {
 
     constructor(private readonly listeners: UserJoiningChannelListener[],

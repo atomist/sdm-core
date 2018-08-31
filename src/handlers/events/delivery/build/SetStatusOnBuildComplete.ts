@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { SdmGoalEvent } from "@atomist/sdm";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
@@ -41,7 +41,8 @@ import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     BuildStatus,
-    OnBuildComplete, SdmGoalState,
+    OnBuildComplete,
+    SdmGoalState,
 } from "@atomist/sdm/typings/types";
 import * as slack from "@atomist/slack-messages/SlackMessages";
 import axios from "axios";
@@ -50,7 +51,8 @@ import * as stringify from "json-stringify-safe";
 /**
  * Set build status on complete build
  */
-@EventHandler("Set build goal to successful on build complete, if it's side-effecting", subscription("OnBuildComplete"))
+@EventHandler("Set build goal to successful on build complete, if it's side-effecting",
+    GraphQL.subscription("OnBuildComplete"))
 export class SetGoalOnBuildComplete implements HandleEvent<OnBuildComplete.Subscription> {
 
     constructor(private readonly buildGoals: Goal[],

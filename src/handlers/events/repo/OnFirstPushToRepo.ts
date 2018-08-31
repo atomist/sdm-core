@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import {
     AddressChannels,
@@ -41,7 +41,7 @@ import * as schema from "../../../typings/types";
 /**
  * A new repo has been created, and it has some code in it.
  */
-@EventHandler("On repo creation", subscription("OnFirstPushToRepo"))
+@EventHandler("On repo creation", GraphQL.subscription("OnFirstPushToRepo"))
 export class OnFirstPushToRepo
     implements HandleEvent<schema.OnFirstPushToRepo.Subscription> {
 

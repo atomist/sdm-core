@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     SdmGoalEvent,
     SdmGoalKey,
@@ -39,7 +39,7 @@ import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 /**
  * Respond to a failure status by failing downstream goals
  */
-@EventHandler("Fail downstream goals on a goal failure", subscription("OnAnyFailedSdmGoal"))
+@EventHandler("Fail downstream goals on a goal failure", GraphQL.subscription("OnAnyFailedSdmGoal"))
 export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver) {}

@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     DeploymentListener,
@@ -38,7 +38,7 @@ import { OnSuccessStatus } from "@atomist/sdm/typings/types";
  * React to a deployment.
  */
 @EventHandler("React to a successful deployment",
-    subscription({
+    GraphQL.subscription({
         name: "OnSuccessStatus",
         variables: {
             context: StagingDeploymentGoal.context,

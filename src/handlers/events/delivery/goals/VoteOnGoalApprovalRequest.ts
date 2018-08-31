@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     GoalApprovalRequestVote,
     GoalApprovalRequestVoteInvocation,
@@ -47,7 +47,7 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
  * If one voter denies the request, it will we discarded.
  */
 @EventHandler("Vote on approved goals",
-    subscription("OnAnyApprovedSdmGoal"))
+    GraphQL.subscription("OnAnyApprovedSdmGoal"))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver,

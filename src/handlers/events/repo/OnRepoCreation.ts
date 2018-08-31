@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { AddressNoChannels } from "@atomist/sdm/api/context/addressChannels";
 import {
     RepoCreationListener,
@@ -35,7 +35,7 @@ import * as schema from "@atomist/sdm/typings/types";
 /**
  * A new repo has been created. We don't know if it has code.
  */
-@EventHandler("On repo creation", subscription("OnRepoCreation"))
+@EventHandler("On repo creation", GraphQL.subscription("OnRepoCreation"))
 export class OnRepoCreation implements HandleEvent<schema.OnRepoCreation.Subscription> {
 
     private readonly newRepoActions: RepoCreationListener[];

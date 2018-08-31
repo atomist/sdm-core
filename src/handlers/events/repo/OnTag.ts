@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     TagListener,
@@ -35,7 +35,7 @@ import * as schema from "@atomist/sdm/typings/types";
 /**
  * A new tag has been created
  */
-@EventHandler("On tag", subscription("OnTag"))
+@EventHandler("On tag", GraphQL.subscription("OnTag"))
 export class OnTag implements HandleEvent<schema.OnTag.Subscription> {
 
     constructor(private readonly listeners: TagListener[],

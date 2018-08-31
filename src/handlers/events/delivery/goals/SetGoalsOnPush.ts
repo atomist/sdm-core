@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
@@ -36,7 +36,7 @@ import { OnPushToAnyBranch } from "@atomist/sdm/typings/types";
 /**
  * Set up goalSet on a push (e.g. for delivery).
  */
-@EventHandler("Set up goalSet", subscription("OnPushToAnyBranch"))
+@EventHandler("Set up goalSet", GraphQL.subscription("OnPushToAnyBranch"))
 export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscription> {
 
     /**

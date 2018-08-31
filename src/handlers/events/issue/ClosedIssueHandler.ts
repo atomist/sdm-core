@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import {
     ClosedIssueListener,
@@ -35,7 +35,7 @@ import * as schema from "@atomist/sdm/typings/types";
 /**
  * A new issue has been created.
  */
-@EventHandler("On an issue being closed", subscription("OnClosedIssue"))
+@EventHandler("On an issue being closed", GraphQL.subscription("OnClosedIssue"))
 export class ClosedIssueHandler implements HandleEvent<schema.OnClosedIssue.Subscription> {
 
     private readonly closedIssueListeners: ClosedIssueListener[];

@@ -17,13 +17,13 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { SdmGoalState } from "@atomist/sdm";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
@@ -40,7 +40,7 @@ import {
     OnImageLinked,
 } from "../../../../typings/types";
 
-@EventHandler("Scan when artifact is found", subscription("OnImageLinked"))
+@EventHandler("Scan when artifact is found", GraphQL.subscription("OnImageLinked"))
 export class FindArtifactOnImageLinked implements HandleEvent<OnImageLinked.Subscription> {
 
     /**

@@ -17,6 +17,7 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
@@ -25,7 +26,6 @@ import {
     Secrets,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { Goal } from "@atomist/sdm/api/goal/Goal";
 import { OnAParticularStatus } from "../../../../../typings/types";
@@ -44,7 +44,7 @@ export const K8sProductionDomain = "production";
  * Deploy a published artifact identified in an ImageLinked event.
  */
 @EventHandler("Request k8s deploy of linked artifact",
-    subscription({
+    GraphQL.subscription({
         name: "OnAParticularStatus",
         variables: {
             context: k8AutomationDeployContext(K8sTestingDomain),

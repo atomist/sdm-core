@@ -17,12 +17,12 @@
 import {
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import {
     AddressChannels,
@@ -39,7 +39,7 @@ import * as schema from "../../../typings/types";
 /**
  * A repo has been onboarded
  */
-@EventHandler("On repo onboarding", subscription("OnRepoOnboarded"))
+@EventHandler("On repo onboarding", GraphQL.subscription("OnRepoOnboarded"))
 export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subscription> {
 
     constructor(private readonly actions: ProjectListener[],

@@ -18,13 +18,13 @@ import {
     automationClientInstance,
     EventFired,
     EventHandler,
+    GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
-import { subscription } from "@atomist/automation-client/graph/graphQL";
 import {
     GoalExecutionListener,
     GoalInvocation,
@@ -52,7 +52,7 @@ import { formatDuration } from "../../../../util/misc/time";
  * Handle an SDM request goal. Used for many implementation types.
  */
 @EventHandler("Fulfill a goal when it reaches 'requested' state",
-    subscription("OnAnyRequestedSdmGoal"))
+    GraphQL.subscription("OnAnyRequestedSdmGoal"))
 export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription> {
 
     constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
