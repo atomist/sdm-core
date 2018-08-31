@@ -45,7 +45,10 @@ export interface LocalSoftwareDeliveryMachineOptions {
     mergeAutofixes?: boolean;
 
     /**
-     * Whether to merge pull request branches automatically
+     * Whether to merge pull request branches automatically.
+     * For instance, if you run a BuildAwareTransform (like Upgrade Spring Boot in the spring seed SDM),
+     * it'll make a branch and then run the build on it; when the build passes,
+     * the SDM will commit the change into your default branch in your working directory.
      */
     mergePullRequests?: boolean;
 
