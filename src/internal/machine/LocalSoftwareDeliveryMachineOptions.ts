@@ -45,6 +45,11 @@ export interface LocalSoftwareDeliveryMachineOptions {
     mergeAutofixes?: boolean;
 
     /**
+     * Whether to merge pull request branches automatically
+     */
+    mergePullRequests?: boolean;
+
+    /**
      * Name of host to use for creating local url
      */
     hostname?: string;
