@@ -38,7 +38,6 @@ import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery
 import { OnDeployStatus } from "../../handlers/events/delivery/deploy/OnDeployStatus";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
-import { resetGoalsCommand } from "../../handlers/events/delivery/goals/resetGoals";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
@@ -267,25 +266,12 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
      * @param {GoalSetter} goalSetters tell me what to do on a push. Hint: start with "whenPushSatisfies(...)"
      */
     constructor(name: string,
-        configuration: Configuration & SoftwareDeliveryMachineConfiguration,
-        goalSetters: Array<GoalSetter | GoalSetter[]>) {
+                configuration: Configuration & SoftwareDeliveryMachineConfiguration,
+                goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
         // This hits the Atomist service
         this.addFingerprintListener(SendFingerprintToAtomist);
         this.addExtensionPacks(WellKnownGoals);
-    }
-
-    public includeResetGoalCommand(): this {
-        // this would be an extension pack, except it needs the unpublic field pushmapping
-        this.addCommand(resetGoalsCommand({
-            projectLoader: this.configuration.sdm.projectLoader,
-            repoRefResolver: this.configuration.sdm.repoRefResolver,
-            goalsListeners: this.goalsSetListeners,
-            goalSetter: this.pushMapping,
-            implementationMapping: this.goalFulfillmentMapper,
-            name: this.configuration.name,
-        }));
-        return this;
     }
 
 }

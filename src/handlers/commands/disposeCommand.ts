@@ -32,11 +32,7 @@ import {
     chooseAndSetGoals,
     ChooseAndSetGoalsRules,
 } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
-import {
-    fetchDefaultBranchTip,
-    fetchPushForCommit,
-    tipOfBranch,
-} from "../events/delivery/goals/resetGoals";
+import { fetchDefaultBranchTip, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 export class DisposeParameters {
@@ -53,7 +49,7 @@ export class DisposeParameters {
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
 
-    @Parameter({required: true})
+    @Parameter({ required: true })
     public areYouSure: string;
 }
 
@@ -75,12 +71,12 @@ function disposeOfProject(rules: ChooseAndSetGoalsRules) {
         const branch = repoData.defaultBranch;
         const sha = tipOfBranch(repoData, branch);
 
-        const id = GitHubRepoRef.from({owner: commandParams.owner, repo: commandParams.repo, sha, branch});
+        const id = GitHubRepoRef.from({ owner: commandParams.owner, repo: commandParams.repo, sha, branch });
         const push = await fetchPushForCommit(ctx, id, commandParams.providerId);
 
         const determinedGoals = await chooseAndSetGoals(rules, {
             context: ctx,
-            credentials: {token: commandParams.githubToken},
+            credentials: { token: commandParams.githubToken },
             push,
         });
         if (!determinedGoals) {
