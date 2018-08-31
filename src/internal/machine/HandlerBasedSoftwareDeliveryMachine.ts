@@ -119,11 +119,11 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 ingesters: [],
             };
         } else {
-             return {
-                 eventHandlers: [],
-                 commandHandlers: [],
-                 ingesters: [],
-             };
+            return {
+                eventHandlers: [],
+                commandHandlers: [],
+                ingesters: [],
+            };
         }
     }
 
@@ -144,7 +144,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new VoteOnGoalApprovalRequest(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalApprovalRequestVotes) ],
+                        this.goalApprovalRequestVoters)],
                 commandHandlers: [],
                 ingesters: [],
             };

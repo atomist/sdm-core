@@ -20,11 +20,13 @@ import { fileExists } from "@atomist/automation-client/project/util/projectUtils
 import { toFactory } from "@atomist/automation-client/util/constructionUtils";
 import {
     Builder,
+    BuildGoal,
     PushListenerInvocation,
     pushTest,
     PushTest,
 } from "@atomist/sdm";
 import { when } from "@atomist/sdm/api-helper/dsl/buildDsl";
+import { executeBuild } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
@@ -168,40 +170,6 @@ describe("SDM handler creation", () => {
             sdm.addExtensionPacks(ep);
             assert.deepEqual((await sdm.pushMapping.mapping(p)).goals, HttpServiceGoals.goals.concat([MessageGoal as any]));
         });
-    });
-
-    describe("observesOnly", () => {
-
-        it("cannot mutate", async () => {
-            const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
-                fakeSoftwareDeliveryMachineConfiguration,
-                [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
-                    .setGoals(HttpServiceGoals)]);
-            assert(sdm.observesOnly);
-        });
-
-        it("has an autofix", async () => {
-            const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
-                fakeSoftwareDeliveryMachineConfiguration,
-                [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
-                    .setGoals(HttpServiceGoals)]);
-            sdm.addAutofix(AddThingAutofix);
-            assert(!sdm.observesOnly);
-        });
-
-        it("has a build", async () => {
-            const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
-                fakeSoftwareDeliveryMachineConfiguration,
-                [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
-                    .setGoals(HttpServiceGoals)]);
-            sdm.addBuildRules(when(HasAtomistBuildFile)
-                .itMeans("Custom build script")
-                .set(fakeBuilder));
-            assert(!sdm.observesOnly);
-        });
-
-        // tslint:disable:no-unused-expression
-        it("has a deployment").pending;
     });
 
 });

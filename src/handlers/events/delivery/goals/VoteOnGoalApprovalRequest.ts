@@ -26,8 +26,9 @@ import {
 } from "@atomist/automation-client";
 import {
     GoalApprovalRequestVote,
-    GoalApprovalRequestVoteInvocation,
+    GoalApprovalRequestVoter,
     GoalApprovalRequestVoteResult,
+    GoalApprovalRequestVoterInvocation,
     SdmGoalEvent,
     SdmGoalState,
 } from "@atomist/sdm";
@@ -52,7 +53,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
-                private readonly voters: GoalApprovalRequestVote[]) {
+                private readonly voters: GoalApprovalRequestVoter[]) {
     }
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
@@ -66,7 +67,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
-        const garvi: GoalApprovalRequestVoteInvocation = {
+        const garvi: GoalApprovalRequestVoterInvocation = {
             id,
             context,
             credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
@@ -77,7 +78,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         const votes = await Promise.all(this.voters.map(v => v(garvi)));
 
         // Policy for now is if one vote denies, we deny the request.
-        if (!votes.some(v => v === GoalApprovalRequestVoteResult.Denied)) {
+        if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
             await updateGoal(context, sdmGoal, {
                 state: SdmGoalState.success,
                 description: sdmGoal.description,
