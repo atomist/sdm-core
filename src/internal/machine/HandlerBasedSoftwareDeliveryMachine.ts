@@ -286,6 +286,10 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
         // This hits the Atomist service
         this.addFingerprintListener(SendFingerprintToAtomist);
         this.addExtensionPacks(WellKnownGoals);
+    }
+
+    public includeResetGoalCommand(): this {
+        // this would be an extension pack, except it needs the unpublic field pushmapping
         this.addCommand(resetGoalsCommand({
             projectLoader: this.configuration.sdm.projectLoader,
             repoRefResolver: this.configuration.sdm.repoRefResolver,
@@ -294,6 +298,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             implementationMapping: this.goalFulfillmentMapper,
             name: this.configuration.name,
         }));
+        return this;
     }
 
 }

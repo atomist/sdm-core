@@ -31,6 +31,7 @@ import {
     CommandHandlerRegistration,
     SdmGoalState,
     SoftwareDeliveryMachine,
+    ExtensionPack,
 } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
@@ -46,6 +47,17 @@ import {
     fetchDefaultBranchTip,
     tipOfBranch,
 } from "../../handlers/events/delivery/goals/resetGoals";
+import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
+
+/**
+ * allow goal setting
+ */
+export const SetGoalState: ExtensionPack = {
+    ...metadata("set goal state"),
+    configure: sdm => {
+        sdm.addCommand(setGoalStateCommand(sdm))
+    },
+};
 
 @Parameters()
 class SetGoalStateParameters {
@@ -129,9 +141,9 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                             codeLine(sha.slice(0, 7))} of ${bold(`${id.owner}/${id.repo}/${branch}`)}:`,
                         actions: [
                             menuForCommand({
-                                    text: "Goals",
-                                    options: optionsGroups,
-                                },
+                                text: "Goals",
+                                options: optionsGroups,
+                            },
                                 "SetGoalState",
                                 "goal",
                                 { ...chi.parameters }),
@@ -182,7 +194,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                     success(
                         "Set Goal State",
                         `Successfully set state of ${italic(goal.name)} on ${codeLine(sha.slice(0, 7))} of ${
-                            bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`,
+                        bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`,
                         { footer }),
                     { id: chi.parameters.msgId });
             }
