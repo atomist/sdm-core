@@ -382,10 +382,9 @@ export const PublishNewRepo: SdmListener = (i: ListenerInvocation) => {
 Tagging a repo with topics based on its content is a useful action. `tagRepo` is a convenient function to construct a `ProjectListener` for this. It tags as an argument a `Tagger`, which looks at the project content and returns a `Tags` object. The following example from `atomist.config.ts` tags Spring Boot repos, using a `Tagger` from the `spring-automation` project, in addition to suggesting the addition of a Cloud Foundry manifest, and publishing the repo using the listener previously shown:
 
 ```typescript
-sdm.addNewRepoWithCodeActions(
-      tagRepo(springBootTagger),
-      suggestAddingCloudFoundryManifest,
-      PublishNewRepo)
+sdm.addFirstPushListener(tagRepo(springBootTagger))
+    .addFirstPushListener(suggestAddingCloudFoundryManifest),
+    .addFirstPushListener(PublishNewRepo)
 ```
 
 ##### ReviewerRegistration
@@ -594,7 +593,7 @@ You can invoke such a generator from Slack, like this:
 Note how the repo was automatically tagged with GitHub topics after creation. This was the work of a listener, specified as follows:
 
 ```typescript
-sdm.addNewRepoWithCodeActions(
+sdm.addFirstPushListener(
     tagRepo(springBootTagger),
 );
 ```
@@ -696,7 +695,7 @@ For example:
             .setGoals(LibraryGoals),
         whenPushSatisfies(IsNode).setGoals(NpmGoals),
     );
-    sdm.addNewRepoWithCodeActions(suggestAddingK8sSpec)
+    sdm.addFirstPushListener(suggestAddingK8sSpec)
         .addSupportingCommands(() => addK8sSpec)
         .addSupportingEvents(() => NoticeK8sTestDeployCompletion,
             () => NoticeK8sProdDeployCompletion)
@@ -714,10 +713,7 @@ For example:
             seedRepo: "spring-rest-seed",
             groupId: "myco",
         }))
-        .addNewRepoWithCodeActions(
-            tagRepo(springBootTagger),
-            suggestAddingCloudFoundryManifest,
-            PublishNewRepo)
+        .addFirstPushListener(tagRepo(springBootTagger))
         .addProjectReviewers(logReview)
         .addPushReactions(listChangedFiles)
         .addFingerprinters(mavenFingerprinter)
