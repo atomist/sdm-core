@@ -172,37 +172,4 @@ describe("SDM handler creation", () => {
         });
     });
 
-    describe("observesOnly", () => {
-
-        it("cannot mutate", async () => {
-            const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
-                fakeSoftwareDeliveryMachineConfiguration,
-                [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
-                    .setGoals(HttpServiceGoals)]);
-            assert(sdm.observesOnly);
-        });
-
-        it("has an autofix", async () => {
-            const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
-                fakeSoftwareDeliveryMachineConfiguration,
-                [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
-                    .setGoals(HttpServiceGoals)]);
-            sdm.addAutofix(AddThingAutofix);
-            assert(!sdm.observesOnly);
-        });
-
-        it("has a build", async () => {
-            const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
-                fakeSoftwareDeliveryMachineConfiguration,
-                [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
-                    .setGoals(HttpServiceGoals)]);
-            sdm.addGoalImplementation("Custom build script", BuildGoal, executeBuild(sdm.configuration.sdm.projectLoader,
-                fakeBuilder))
-            assert(!sdm.observesOnly);
-        });
-
-        // tslint:disable:no-unused-expression
-        it("has a deployment").pending;
-    });
-
 });
