@@ -23,7 +23,9 @@ import {
     PushListenerInvocation,
     pushTest,
     PushTest,
+    BuildGoal,
 } from "@atomist/sdm";
+import { executeBuild } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { when } from "@atomist/sdm/api-helper/dsl/buildDsl";
 import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
@@ -194,9 +196,8 @@ describe("SDM handler creation", () => {
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
                     .setGoals(HttpServiceGoals)]);
-            sdm.addBuildRules(when(HasAtomistBuildFile)
-                .itMeans("Custom build script")
-                .set(fakeBuilder));
+            sdm.addGoalImplementation("Custom build script", BuildGoal, executeBuild(sdm.configuration.sdm.projectLoader,
+                fakeBuilder))
             assert(!sdm.observesOnly);
         });
 
