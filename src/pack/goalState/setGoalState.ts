@@ -29,9 +29,9 @@ import {
 } from "@atomist/automation-client/spi/message/MessageClient";
 import {
     CommandHandlerRegistration,
+    ExtensionPack,
     SdmGoalState,
     SoftwareDeliveryMachine,
-    ExtensionPack,
 } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
@@ -43,21 +43,7 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import {
-    fetchDefaultBranchTip,
-    tipOfBranch,
-} from "../../handlers/events/delivery/goals/resetGoals";
-import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
-
-/**
- * allow goal setting
- */
-export const SetGoalState: ExtensionPack = {
-    ...metadata("set goal state"),
-    configure: sdm => {
-        sdm.addCommand(setGoalStateCommand(sdm))
-    },
-};
+import { fetchDefaultBranchTip, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 class SetGoalStateParameters {

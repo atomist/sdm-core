@@ -1,4 +1,3 @@
-import { SetGoalState } from './../pack/info/setGoalState';
 /*
  * Copyright © 2018 Atomist, Inc.
  *
@@ -20,8 +19,9 @@ import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDelive
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { HandlerBasedSoftwareDeliveryMachine } from "../internal/machine/HandlerBasedSoftwareDeliveryMachine";
-import { ExposeInfo } from "../pack/info/exposeInfo";
 import { isInLocalMode } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
+import { GoalState } from "../pack/goalState/goalState";
+import { ExposeInfo } from "../pack/info/exposeInfo";
 
 /**
  * Create a **Software Delivery MachineConfiguration** with default predefined goals.
@@ -63,14 +63,13 @@ import { isInLocalMode } from "../internal/machine/LocalSoftwareDeliveryMachineO
  */
 export function createSoftwareDeliveryMachine(config: MachineConfiguration<SoftwareDeliveryMachineConfiguration>,
     // tslint:disable-next-line:max-line-length
-    ...goalSetters: Array<GoalSetter | GoalSetter[]>): SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration> {
+                                              ...goalSetters: Array<GoalSetter | GoalSetter[]>): SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration> {
     const machine = new HandlerBasedSoftwareDeliveryMachine(config.name, config.configuration,
         goalSetters);
     machine.addExtensionPacks(ExposeInfo);
 
-    if (isInLocalMode()) {
-        machine.includeResetGoalCommand();
-        machine.addExtensionPacks(SetGoalState);
+    if (!isInLocalMode()) {
+        machine.addExtensionPacks(GoalState);
     }
 
     return machine;

@@ -15,20 +15,14 @@
  */
 
 import {
-    HandleCommand,
-    HandlerContext,
     MappedParameter,
     MappedParameters,
     Parameter,
-    Secret,
-    Secrets,
     Success,
     Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
-import { commandHandlerFrom } from "@atomist/automation-client/onCommand";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { CommandHandlerRegistration, CommandListenerInvocation } from "@atomist/sdm";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import {
     success,
@@ -39,18 +33,16 @@ import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { PushFields } from "@atomist/sdm/typings/types";
 import {
     bold,
     codeLine,
     italic,
 } from "@atomist/slack-messages";
-import * as stringify from "json-stringify-safe";
 import {
     PushForCommit,
     RepoBranchTips,
-} from "../../../../typings/types";
-import { CommandHandlerRegistration, CommandListenerInvocation } from "@atomist/sdm";
+} from "../../typings/types";
+import { fetchDefaultBranchTip, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 export class ResetGoalsParameters {
@@ -91,9 +83,8 @@ export function resetGoalsCommand(rules: {
         paramsMaker: ResetGoalsParameters,
         listener: resetGoalsOnCommit(rules),
         intent: ["reset goals"],
-    }
+    };
 }
-
 
 function resetGoalsOnCommit(rules: {
     projectLoader: ProjectLoader,
@@ -109,7 +100,7 @@ function resetGoalsOnCommit(rules: {
         const sha = commandParams.sha || tipOfBranch(repoData, branch);
         const id = rules.repoRefResolver.toRemoteRepoRef({
             owner: commandParams.owner, name: commandParams.repo,
-            org: { owner: commandParams.owner, provider: { providerId: commandParams.providerId } }
+            org: { owner: commandParams.owner, provider: { providerId: commandParams.providerId } },
         }, { sha, branch });
 
         const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
@@ -141,42 +132,4 @@ function resetGoalsOnCommit(rules: {
 
         return Success;
     };
-}
-
-export async function fetchPushForCommit(context: HandlerContext, id: RemoteRepoRef, providerId: string): Promise<PushFields.Fragment> {
-    const commitResult = await context.graphClient.query<PushForCommit.Query, PushForCommit.Variables>({
-        name: "PushForCommit", variables: {
-            owner: id.owner, repo: id.repo, providerId, branch: id.branch, sha: id.sha,
-        },
-    });
-
-    if (!commitResult || !commitResult.Commit || commitResult.Commit.length === 0) {
-        throw new Error("Could not find commit for " + stringify(id));
-    }
-    const commit = commitResult.Commit[0];
-    if (!commit.pushes || commit.pushes.length === 0) {
-        throw new Error("Could not find push for " + stringify(id));
-    }
-    return commit.pushes[0];
-}
-
-export async function fetchDefaultBranchTip(ctx: HandlerContext, repositoryId: { repo: string, owner: string, providerId: string }) {
-    const result = await ctx.graphClient.query<RepoBranchTips.Query, RepoBranchTips.Variables>(
-        { name: "RepoBranchTips", variables: { name: repositoryId.repo, owner: repositoryId.owner } });
-    if (!result || !result.Repo || result.Repo.length === 0) {
-        throw new Error(`Repository not found: ${repositoryId.owner}/${repositoryId.repo}`);
-    }
-    const repo = result.Repo.find(r => r.org.provider.providerId === repositoryId.providerId);
-    if (!repo) {
-        throw new Error(`Repository not found: ${repositoryId.owner}/${repositoryId.repo} provider ${repositoryId.providerId}`);
-    }
-    return repo;
-}
-
-export function tipOfBranch(repo: RepoBranchTips.Repo, branchName: string) {
-    const branchData = repo.branches.find(b => b.name === branchName);
-    if (!branchData) {
-        throw new Error("Branch not found: " + branchName);
-    }
-    return branchData.commit.sha;
 }
