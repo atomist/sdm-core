@@ -287,8 +287,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
      * @param {GoalSetter} goalSetters tell me what to do on a push. Hint: start with "whenPushSatisfies(...)"
      */
     constructor(name: string,
-        configuration: Configuration & SoftwareDeliveryMachineConfiguration,
-        goalSetters: Array<GoalSetter | GoalSetter[]>) {
+                configuration: Configuration & SoftwareDeliveryMachineConfiguration,
+                goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
         // This hits the Atomist service
         this.addFingerprintListener(SendFingerprintToAtomist);

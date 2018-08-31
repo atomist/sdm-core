@@ -26,11 +26,11 @@ import {
 } from "@atomist/automation-client";
 import {
     GoalApprovalRequestVote,
-    GoalApprovalRequestVoterInvocation,
+    GoalApprovalRequestVoter,
     GoalApprovalRequestVoteResult,
+    GoalApprovalRequestVoterInvocation,
     SdmGoalEvent,
     SdmGoalState,
-    GoalApprovalRequestVoter,
 } from "@atomist/sdm";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
@@ -52,12 +52,12 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
-        private readonly credentialsFactory: CredentialsResolver,
-        private readonly voters: GoalApprovalRequestVoter[]) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly voters: GoalApprovalRequestVoter[]) {
     }
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
-        context: HandlerContext): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const sdmGoal: SdmGoalEvent = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {

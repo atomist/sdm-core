@@ -20,13 +20,13 @@ import { fileExists } from "@atomist/automation-client/project/util/projectUtils
 import { toFactory } from "@atomist/automation-client/util/constructionUtils";
 import {
     Builder,
+    BuildGoal,
     PushListenerInvocation,
     pushTest,
     PushTest,
-    BuildGoal,
 } from "@atomist/sdm";
-import { executeBuild } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { when } from "@atomist/sdm/api-helper/dsl/buildDsl";
+import { executeBuild } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
