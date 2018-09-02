@@ -40,7 +40,7 @@ import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
 
-    constructor(private sdm: SoftwareDeliveryMachine,
+    constructor(private readonly sdm: SoftwareDeliveryMachine,
                 private readonly goalExecutionListeners: GoalExecutionListener[]) {
         super();
     }

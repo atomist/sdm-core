@@ -57,7 +57,7 @@ import { formatDuration } from "../../../../util/misc/time";
     GraphQL.subscription("OnAnyRequestedSdmGoal"))
 export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription> {
 
-    constructor(private sdm: SoftwareDeliveryMachine,
+    constructor(private readonly sdm: SoftwareDeliveryMachine,
                 private readonly goalExecutionListeners: GoalExecutionListener[]) {
     }
 
