@@ -30,6 +30,7 @@ import {
     JustBuildGoal,
 } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
+import { WellKnownGoals } from "@atomist/sdm/pack/well-known-goals/addWellKnownGoals";
 import * as _ from "lodash";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";
@@ -288,6 +289,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
         super(name, configuration, goalSetters);
         // This hits the Atomist service
         this.addFingerprintListener(SendFingerprintToAtomist);
+        this.addExtensionPacks(WellKnownGoals);
     }
 
 }
