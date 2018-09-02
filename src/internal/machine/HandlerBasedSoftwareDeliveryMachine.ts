@@ -81,10 +81,10 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             undefined;
     }
 
-    private get onNewRepoWithCode(): Maker<OnFirstPushToRepo> {
-        return this.newRepoWithCodeListeners.length > 0 ?
+    private get onFirstPush(): Maker<OnFirstPushToRepo> {
+        return this.firstPushListeners.length > 0 ?
             () => new OnFirstPushToRepo(
-                this.newRepoWithCodeListeners,
+                this.firstPushListeners,
                 this.configuration.sdm.repoRefResolver,
                 this.configuration.sdm.credentialsResolver) :
             undefined;
@@ -255,7 +255,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                         this.configuration.sdm.credentialsResolver) :
                     undefined,
                 this.onRepoCreation,
-                this.onNewRepoWithCode,
+                this.onFirstPush,
                 this.semanticDiffReactor,
                 this.notifyOnDeploy,
                 this.onVerifiedStatus,
