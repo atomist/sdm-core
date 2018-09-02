@@ -23,7 +23,7 @@ import axios from "axios";
  * @return {Promise<any>}
  */
 export const SendFingerprintToAtomist: FingerprintListener = fli => {
-    const url = `https://webhook.atomist.com/atomist/fingerprints/teams/${fli.context.teamId}`;
+    const url = `https://webhook.atomist.com/atomist/fingerprints/teams/${fli.context.workspaceId}`;
     const payload = {
         commit: {
             provider: fli.id.providerType,

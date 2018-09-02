@@ -64,7 +64,7 @@ export class DashboardDisplayProgressLog implements ProgressLog {
 
 export function constructLogPath(context: HandlerContext, sdmGoal: SdmGoalEvent): string[] {
     return [
-        context.teamId,
+        context.workspaceId,
         sdmGoal.repo.owner,
         sdmGoal.repo.name,
         sdmGoal.sha,
