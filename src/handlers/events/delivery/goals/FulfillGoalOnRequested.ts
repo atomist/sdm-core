@@ -52,7 +52,7 @@ import { formatDuration } from "../../../../util/misc/time";
     GraphQL.subscription("OnAnyRequestedSdmGoal"))
 export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription> {
 
-    @Value("sdm")
+    @Value("") // empty path returns the entire configuration
     public configuration: SoftwareDeliveryMachineConfiguration;
 
     constructor(private readonly implementationMapper: GoalImplementationMapper,
