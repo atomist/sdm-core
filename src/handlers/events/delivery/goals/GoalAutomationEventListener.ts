@@ -29,12 +29,10 @@ import { RegistrationConfirmation } from "@atomist/automation-client/internal/tr
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { AutomationEventListenerSupport } from "@atomist/automation-client/server/AutomationEventListener";
 import { QueryNoCacheOptions } from "@atomist/automation-client/spi/graph/GraphClient";
-import { GoalExecutionListener } from "@atomist/sdm";
-import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { ProgressLogFactory } from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import {
+    GoalExecutionListener,
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
@@ -42,11 +40,7 @@ import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
 
-    constructor(private readonly implementationMapper: SdmGoalImplementationMapper,
-                private readonly projectLoader: ProjectLoader,
-                private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsResolver: CredentialsResolver,
-                private readonly logFactory: ProgressLogFactory,
+    constructor(private sdm: SoftwareDeliveryMachine,
                 private readonly goalExecutionListeners: GoalExecutionListener[]) {
         super();
     }
@@ -55,11 +49,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         if (cluster.isWorker) {
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
-                this.implementationMapper,
-                this.projectLoader,
-                this.repoRefResolver,
-                this.credentialsResolver,
-                this.logFactory,
+                this.sdm,
                 this.goalExecutionListeners);
             automationClientInstance().withEventHandler(maker);
         }
@@ -88,11 +78,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
 
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
-                this.implementationMapper,
-                this.projectLoader,
-                this.repoRefResolver,
-                this.credentialsResolver,
-                this.logFactory,
+                this.sdm,
                 this.goalExecutionListeners);
             automationClientInstance().withEventHandler(maker);
 

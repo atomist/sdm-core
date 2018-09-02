@@ -32,7 +32,7 @@ import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCo
 import { preconditionsAreMet } from "@atomist/sdm/api-helper/goal/goalPreconditions";
 import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
 import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
+import { GoalImplementationMapper } from "@atomist/sdm/api/goal/support/GoalImplementationMapper";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
 import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
@@ -49,7 +49,7 @@ import {
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
     constructor(private readonly name,
-                private readonly implementationMapper: SdmGoalImplementationMapper,
+                private readonly implementationMapper: GoalImplementationMapper,
                 private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsResolver: CredentialsResolver) {
     }

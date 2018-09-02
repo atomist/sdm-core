@@ -15,12 +15,12 @@
  */
 
 import {
+    buttonForCommand,
     failure,
     RepoRef,
     Success,
 } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
-import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
 import {
     CommandHandlerRegistration,
     CommandListener,

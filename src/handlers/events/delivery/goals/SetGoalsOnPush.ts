@@ -25,7 +25,7 @@ import {
 } from "@atomist/automation-client";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
-import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
+import { GoalImplementationMapper } from "@atomist/sdm/api/goal/support/GoalImplementationMapper";
 import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
@@ -52,7 +52,7 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
                 private readonly repoRefResolver: RepoRefResolver,
                 private readonly goalSetter: GoalSetter,
                 public readonly goalsListeners: GoalsSetListener[],
-                private readonly implementationMapping: SdmGoalImplementationMapper,
+                private readonly implementationMapping: GoalImplementationMapper,
                 private readonly credentialsFactory: CredentialsResolver) {
     }
 

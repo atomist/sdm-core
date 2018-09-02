@@ -135,11 +135,7 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
     mergedConfig.listeners.push(
         new GoalAutomationEventListener(
-            machine.goalFulfillmentMapper,
-            machine.configuration.sdm.projectLoader,
-            machine.configuration.sdm.repoRefResolver,
-            machine.configuration.sdm.credentialsResolver,
-            machine.configuration.sdm.logFactory,
+            machine,
             machine.goalExecutionListeners));
 
     // Disable app events for forked clients
