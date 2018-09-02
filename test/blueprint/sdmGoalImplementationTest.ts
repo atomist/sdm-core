@@ -98,7 +98,6 @@ describe("implementing goals in the SDM", () => {
         assert.equal(myImpl.implementationName, "Autofix-Autofix");
     });
 
-
     it("I can teach it to do a custom goal", async () => {
 
         const customGoal = new GoalWithFulfillment({
