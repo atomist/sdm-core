@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { HttpServiceGoals } from "@atomist/sdm/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
 import { goalsToDot } from "../../../src/pack/graph-goals/graphGoals";
-import { HttpServiceGoals } from "../../../src/pack/well-known-goals/httpServiceGoals";
 
 const DesiredDot = `digraph HTTP_Service {
     fontname="Arial";

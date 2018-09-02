@@ -34,7 +34,7 @@ import {
     success,
     warning,
 } from "@atomist/sdm/api-helper/misc/slack/messages";
-import { SdmGoalImplementationMapper } from "@atomist/sdm/api/goal/support/SdmGoalImplementationMapper";
+import { GoalImplementationMapper } from "@atomist/sdm/api/goal/support/GoalImplementationMapper";
 import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
@@ -85,7 +85,7 @@ export function resetGoalsCommand(rules: {
     repoRefResolver: RepoRefResolver,
     goalsListeners: GoalsSetListener[],
     goalSetter: GoalSetter,
-    implementationMapping: SdmGoalImplementationMapper,
+    implementationMapping: GoalImplementationMapper,
     name: string,
 }): HandleCommand {
     return commandHandlerFrom(resetGoalsOnCommit(rules),
@@ -105,7 +105,7 @@ function resetGoalsOnCommit(rules: {
     repoRefResolver: RepoRefResolver,
     goalsListeners: GoalsSetListener[],
     goalSetter: GoalSetter,
-    implementationMapping: SdmGoalImplementationMapper,
+    implementationMapping: GoalImplementationMapper,
 }) {
     const {projectLoader, goalsListeners, goalSetter, implementationMapping, repoRefResolver} = rules;
     return async (ctx: HandlerContext, commandParams: ResetGoalsParameters) => {

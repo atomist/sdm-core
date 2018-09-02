@@ -21,6 +21,7 @@ import { CachingProjectLoader } from "@atomist/sdm/api-helper/project/CachingPro
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
+import { createKubernetesGoalLauncher } from "../handlers/events/delivery/goals/k8s/launchGoalK8";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
@@ -38,6 +39,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
+            goalLauncher: process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes" ? createKubernetesGoalLauncher() : undefined,
         },
         local: {
             preferLocalSeeds: true,

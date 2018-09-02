@@ -1,12 +1,3 @@
-export {
-    DockerBuildGoal,
-    LocalEndpointGoal,
-    LocalUndeploymentGoal,
-    NoGoals,
-    StagingUndeploymentGoal,
-    TagGoal,
-    VersionGoal,
-}from "./pack/well-known-goals/commonGoals";
 export { DefaultLocalDeployerOptions } from "./internal/delivery/deploy/local/LocalDeployerOptions";
 export { ManagedDeploymentTargeter } from "./internal/delivery/deploy/local/ManagedDeployments";
 export {
@@ -62,12 +53,6 @@ export { summarizeGoalsInGitHubStatus } from "./internal/delivery/goals/support/
 export { requestDeployToK8s } from "./handlers/events/delivery/deploy/k8s/RequestK8sDeploys";
 export { ToPublicRepo } from "./mapping/pushtest/toPublicRepo";
 export { HasDockerfile } from "./pack/docker/dockerPushTests";
-export {
-    HttpServiceGoals,
-    RepositoryDeletionGoals,
-    UndeployEverywhereGoals,
-} from "./pack/well-known-goals/httpServiceGoals";
-export { LibraryGoals } from "./pack/well-known-goals/libraryGoals";
 export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
 export { renderCommitMessage } from "./util/slack/diffRendering";
 export { GraphGoals } from "./pack/graph-goals/graphGoals";
@@ -92,7 +77,6 @@ export { createKubernetesData } from "./handlers/events/delivery/goals/k8s/launc
 export { postLinkImageWebhook } from "./util/webhook/ImageLink";
 export { EphemeralLocalArtifactStore } from "./internal/artifact/local/EphemeralLocalArtifactStore";
 export { selfDescribingHandlers } from "./pack/info/support/commandSearch";
-export { WellKnownGoals } from "./pack/well-known-goals/addWellKnownGoals";
 export {
     LocalSoftwareDeliveryMachineOptions,
     LocalSoftwareDeliveryMachineConfiguration,

@@ -20,7 +20,7 @@ import {
     HandleEvent,
 } from "@atomist/automation-client";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
-import { SdmGoalImplementationMapperImpl } from "@atomist/sdm/api-helper/goal/SdmGoalImplementationMapperImpl";
+import { DefaultGoalImplementationMapper } from "@atomist/sdm/api-helper/goal/DefaultGoalImplementationMapper";
 import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/api-helper/machine/AbstractSoftwareDeliveryMachine";
 import { FunctionalUnit } from "@atomist/sdm/api/machine/FunctionalUnit";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
@@ -30,6 +30,7 @@ import {
     JustBuildGoal,
 } from "@atomist/sdm/api/machine/wellKnownGoals";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
+import { WellKnownGoals } from "@atomist/sdm/pack/well-known-goals/addWellKnownGoals";
 import * as _ from "lodash";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";
@@ -37,7 +38,6 @@ import { SetGoalOnBuildComplete } from "../../handlers/events/delivery/build/Set
 import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery/code/ReactToSemanticDiffsOnPushImpact";
 import { OnDeployStatus } from "../../handlers/events/delivery/deploy/OnDeployStatus";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
-import { createKubernetesGoalLauncher } from "../../handlers/events/delivery/goals/k8s/launchGoalK8";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { resetGoalsCommand } from "../../handlers/events/delivery/goals/resetGoals";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
@@ -55,7 +55,6 @@ import { OnRepoCreation } from "../../handlers/events/repo/OnRepoCreation";
 import { OnRepoOnboarded } from "../../handlers/events/repo/OnRepoOnboarded";
 import { OnTag } from "../../handlers/events/repo/OnTag";
 import { OnUserJoiningChannel } from "../../handlers/events/repo/OnUserJoiningChannel";
-import { WellKnownGoals } from "../../pack/well-known-goals/addWellKnownGoals";
 import { SendFingerprintToAtomist } from "../../util/webhook/sendFingerprintToAtomist";
 
 /**
@@ -64,12 +63,14 @@ import { SendFingerprintToAtomist } from "../../util/webhook/sendFingerprintToAt
  */
 export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliveryMachine {
 
-    /*
-     * Store all the implementations we know
-     */
-    public readonly goalFulfillmentMapper = new SdmGoalImplementationMapperImpl(
-        // For now we only support kube or in process
-        process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes" ? createKubernetesGoalLauncher() : undefined); // public for testing
+    private fulfillmentMapper;
+
+    public get goalFulfillmentMapper() {
+        if (!this.fulfillmentMapper) {
+            this.fulfillmentMapper = new DefaultGoalImplementationMapper();
+        }
+        return this.fulfillmentMapper;
+    }
 
     private get onRepoCreation(): Maker<OnRepoCreation> {
         return this.repoCreationListeners.length > 0 ?
@@ -195,10 +196,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
         return this.registrationManager.eventHandlers
             .concat(this.pushMapping ? () => new FulfillGoalOnRequested(
                 this.goalFulfillmentMapper,
-                this.configuration.sdm.projectLoader,
-                this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver,
-                this.configuration.sdm.logFactory,
                 this.goalExecutionListeners) : undefined)
             .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.eventHandlers)))
             .concat([

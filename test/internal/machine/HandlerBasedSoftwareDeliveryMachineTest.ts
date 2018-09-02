@@ -20,13 +20,10 @@ import { fileExists } from "@atomist/automation-client/project/util/projectUtils
 import { toFactory } from "@atomist/automation-client/util/constructionUtils";
 import {
     Builder,
-    BuildGoal,
     PushListenerInvocation,
     pushTest,
     PushTest,
 } from "@atomist/sdm";
-import { when } from "@atomist/sdm/api-helper/dsl/buildDsl";
-import { executeBuild } from "@atomist/sdm/api-helper/goal/executeBuild";
 import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
 import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
@@ -37,11 +34,11 @@ import {
     hasFile,
 } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
+import { NoGoals } from "@atomist/sdm/pack/well-known-goals/commonGoals";
+import { HttpServiceGoals } from "@atomist/sdm/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../src/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../src/internal/machine/HandlerBasedSoftwareDeliveryMachine";
-import { NoGoals } from "../../../src/pack/well-known-goals/commonGoals";
-import { HttpServiceGoals } from "../../../src/pack/well-known-goals/httpServiceGoals";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
 
 export const IsTypeScript: PushTest = pushTest(

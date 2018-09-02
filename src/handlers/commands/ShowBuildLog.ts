@@ -20,7 +20,11 @@ import {
     MappedParameter,
     MappedParameters,
     Parameter,
-    Parameters, RemoteRepoRef, Secret, Secrets, Success,
+    Parameters,
+    RemoteRepoRef,
+    Secret,
+    Secrets,
+    Success,
 } from "@atomist/automation-client";
 import {
     CommandHandlerRegistration,
