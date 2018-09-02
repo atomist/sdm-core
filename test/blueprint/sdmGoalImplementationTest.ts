@@ -24,6 +24,7 @@ import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemory
 import {
     Autofix,
     GoalWithFulfillment,
+    resetRegistrableManager,
 } from "@atomist/sdm";
 import { determineGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
@@ -65,10 +66,14 @@ const aPush = { repo: { org: { provider: { providerId: "myProviderId" } } } } as
 
 describe("implementing goals in the SDM", () => {
 
+    afterEach(() => {
+        resetRegistrableManager();
+    });
+
     it("can autofix", async () => {
         const mySDM = createSoftwareDeliveryMachine(
             { name: "Gustave", configuration: fakeSoftwareDeliveryMachineConfiguration });
-        const autofixGoal = new Autofix("Autofix", mySDM);
+        const autofixGoal = new Autofix("Autofix");
         mySDM.addGoalContributions(whenPushSatisfies(AnyPush)
             .itMeans("autofix the crap out of that thing")
             .setGoals(new Goals("Autofix only", autofixGoal)));
@@ -93,12 +98,14 @@ describe("implementing goals in the SDM", () => {
         assert.equal(myImpl.implementationName, "Autofix-Autofix");
     });
 
-    const customGoal = new GoalWithFulfillment({
-        uniqueName: "Jerry",
-        displayName: "Springer", environment: "1-staging/", orderedName: "1-springer",
-    });
 
     it("I can teach it to do a custom goal", async () => {
+
+        const customGoal = new GoalWithFulfillment({
+            uniqueName: "Jerry",
+            displayName: "Springer", environment: "1-staging/", orderedName: "1-springer",
+        });
+
         let executed: boolean = false;
         const goalExecutor = async () => {
             executed = true;
@@ -122,7 +129,7 @@ describe("implementing goals in the SDM", () => {
                 goalSetId: "hi",
             },
         );
-        assert(determinedGoals.goals.includes(customGoal));
+        assert(determinedGoals.goals.some(g => g.name === customGoal.name));
         assert.equal(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
         const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);

@@ -62,10 +62,14 @@ import { SendFingerprintToAtomist } from "../../util/webhook/sendFingerprintToAt
  */
 export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliveryMachine {
 
-    /*
-     * Store all the implementations we know
-     */
-    public readonly goalFulfillmentMapper = new DefaultGoalImplementationMapper();
+    private fulfillmentMapper;
+
+    public get goalFulfillmentMapper() {
+        if (!this.fulfillmentMapper) {
+            this.fulfillmentMapper = new DefaultGoalImplementationMapper();
+        }
+        return this.fulfillmentMapper;
+    }
 
     private get onRepoCreation(): Maker<OnRepoCreation> {
         return this.repoCreationListeners.length > 0 ?
