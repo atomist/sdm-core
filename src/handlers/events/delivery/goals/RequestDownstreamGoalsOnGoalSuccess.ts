@@ -26,6 +26,7 @@ import {
 } from "@atomist/automation-client";
 import {
     SdmGoalEvent,
+    SdmGoalFulfillmentMethod,
     SdmGoalKey,
 } from "@atomist/sdm";
 import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
@@ -104,14 +105,14 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
 }
 
 function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
-    if (dependentGoal.state === "planned") {
+    if (dependentGoal.state === SdmGoalState.planned) {
         return true;
     }
-    if (dependentGoal.state === "skipped") {
+    if (dependentGoal.state === SdmGoalState.skipped) {
         logger.info("Goal %s was skipped, but now maybe it can go", dependentGoal.name);
         return true;
     }
-    if (dependentGoal.state === "failure" && dependentGoal.retryFeasible) {
+    if (dependentGoal.state === SdmGoalState.failure && dependentGoal.retryFeasible) {
         logger.info("Goal %s failed, but maybe we will retry it", dependentGoal.name);
         return true;
     }
@@ -121,11 +122,11 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
 
 function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: string) {
     switch (dependentGoal.fulfillment.method) {
-        case "SDM fulfill on requested":
+        case SdmGoalFulfillmentMethod.Sdm:
             return true;
-        case "side-effect":
+        case SdmGoalFulfillmentMethod.SideEffect:
             return dependentGoal.fulfillment.name !== name;
-        case "other":
+        case SdmGoalFulfillmentMethod.Other:
             // legacy behavior
             return true;
     }

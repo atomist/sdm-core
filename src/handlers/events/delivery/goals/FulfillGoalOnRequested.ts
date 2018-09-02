@@ -83,7 +83,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const progressLog = new WriteToAllProgressLog(
             sdmGoal.name,
             new LoggingProgressLog(sdmGoal.name, "debug"),
-            await this.configuration.logFactory(ctx, sdmGoal));
+            await this.configuration.sdm.logFactory(ctx, sdmGoal));
 
         const goalInvocation: GoalInvocation = {
             configuration: this.configuration,
