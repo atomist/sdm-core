@@ -16,6 +16,7 @@
 
 import {
     failure,
+    RepoRef,
     Success,
 } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
@@ -33,7 +34,7 @@ import { SetDeployEnablementParameters } from "./SetDeployEnablement";
 
 const displayDeployEnablement: CommandListener<SetDeployEnablementParameters> =
     async cli => {
-        const enabled = await isDeployEnabled({ context: cli.context, id: cli.parameters });
+        const enabled = await isDeployEnabled({ context: cli.context, id: cli.parameters as any as RepoRef });
         const msgId = guid();
         return cli.context.messageClient.respond(
             reportDeployEnablement(cli.parameters, enabled, msgId), { id: cli.parameters.msgId })
@@ -45,20 +46,20 @@ export function reportDeployEnablement(params: SetDeployEnablementParameters,
                                        msgId: string): SlackMessage {
     const text = `Deploy is currently ${enabled ? "enabled" : "disabled"} on ${bold(`${params.owner}/${params.repo}`)}`;
     const actions =
-        [ buttonForCommand({ text: enabled ? "Disable" : "Enable" },
+        [buttonForCommand({ text: enabled ? "Disable" : "Enable" },
             enabled ? "DisableDeploy" : "EnableDeploy",
-            { ...params, msgId }) ];
+            { ...params, msgId })];
     const msg: SlackMessage = {
-        attachments: [ {
+        attachments: [{
             author_icon: `https://images.atomist.com/rug/check-circle.gif?gif=${guid()}`,
             author_name: "Deploy Enablement",
             text,
             fallback: text,
             color: enabled ? "#45B254" : "#aaaaaa",
-            mrkdwn_in: [ "text" ],
+            mrkdwn_in: ["text"],
             actions,
             footer: `${params.name}:${params.version}`,
-        } ],
+        }],
     };
     return msg;
 }

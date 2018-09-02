@@ -67,9 +67,9 @@ export async function cleanCompletedJobs() {
     let log = new StringCapturingProgressLog();
 
     await spawnAndWatch({
-            command: "kubectl",
-            args: ["get", "jobs", "-n", deploymentNamespace, "-o", "json"],
-        },
+        command: "kubectl",
+        args: ["get", "jobs", "-n", deploymentNamespace, "-o", "json"],
+    },
         {},
         log,
         {
@@ -92,9 +92,9 @@ export async function cleanCompletedJobs() {
 
         for (const completedSdmJob of completedSdmJobs) {
             await spawnAndWatch({
-                    command: "kubectl",
-                    args: ["delete", "job", completedSdmJob, "-n" , deploymentNamespace],
-                },
+                command: "kubectl",
+                args: ["delete", "job", completedSdmJob, "-n", deploymentNamespace],
+            },
                 {},
                 log,
                 {
@@ -122,9 +122,9 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
     const log = new StringCapturingProgressLog();
 
     let result = await spawnAndWatch({
-            command: "kubectl",
-            args: ["get", "deployment", deploymentName, "-n", deploymentNamespace, "-o", "json"],
-        },
+        command: "kubectl",
+        args: ["get", "deployment", deploymentName, "-n", deploymentNamespace, "-o", "json"],
+    },
         {},
         log,
         {
@@ -147,16 +147,16 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
     jobSpec.spec.template.spec.restartPolicy = "Never";
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
     jobSpec.spec.template.spec.containers[0].env.push({
-            name: "ATOMIST_JOB_NAME",
-            value: jobSpec.metadata.name,
-        },
+        name: "ATOMIST_JOB_NAME",
+        value: jobSpec.metadata.name,
+    },
         {
             name: "ATOMIST_REGISTRATION_NAME",
             value: `${automationClientInstance().configuration.name}-job-${goal.goalSetId.slice(0, 7)}-${goal.uniqueName.toLocaleLowerCase()}`,
         },
         {
             name: "ATOMIST_GOAL_TEAM",
-            value: ctx.teamId,
+            value: ctx.workspaceId,
         },
         {
             name: "ATOMIST_GOAL_TEAM_NAME",
@@ -180,9 +180,9 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
 
     // Check if this job was previously launched
     result = await spawnAndWatch({
-            command: "kubectl",
-            args: ["get", "job", jobSpec.metadata.name, "-n", deploymentNamespace],
-        },
+        command: "kubectl",
+        args: ["get", "job", jobSpec.metadata.name, "-n", deploymentNamespace],
+    },
         {},
         progressLog,
         {
@@ -192,9 +192,9 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
 
     if (result.code !== 0) {
         return spawnAndWatch({
-                command: "kubectl",
-                args: ["apply", "-f", tempfile],
-            },
+            command: "kubectl",
+            args: ["apply", "-f", tempfile],
+        },
             {},
             progressLog,
             {
@@ -203,9 +203,9 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         );
     } else {
         return spawnAndWatch({
-                command: "kubectl",
-                args: ["replace", "--force", "-f", tempfile],
-            },
+            command: "kubectl",
+            args: ["replace", "--force", "-f", tempfile],
+        },
             {},
             progressLog,
             {

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { Success } from "@atomist/automation-client/Handlers";
+import { logger, Success } from "@atomist/automation-client";
 import { Fingerprint } from "@atomist/automation-client/project/fingerprint/Fingerprint";
 import {
     ExecuteGoal,
@@ -38,13 +37,13 @@ export function executeFingerprinting(projectLoader: ProjectLoader,
                                       fingerprinters: FingerprinterRegistration[],
                                       listeners: FingerprintListener[]): ExecuteGoal {
     return async (goalInvocation: GoalInvocation) => {
-        const {id, credentials, context} = goalInvocation;
+        const { id, credentials, context } = goalInvocation;
         if (fingerprinters.length === 0) {
             return Success;
         }
 
         logger.debug("About to fingerprint %j using %d fingerprinters", id, fingerprinters.length);
-        await projectLoader.doWithProject({credentials, id, readOnly: true}, async project => {
+        await projectLoader.doWithProject({ credentials, id, readOnly: true }, async project => {
             const cri = await createPushImpactListenerInvocation(goalInvocation, project);
             const relevantFingerprinters: FingerprinterRegistration[] = await relevantCodeActions(fingerprinters, cri);
             logger.info("Will invoke %d eligible fingerprinters of %d to %j",
