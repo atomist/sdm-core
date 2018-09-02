@@ -40,8 +40,7 @@ import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
 
-    constructor(private readonly sdm: SoftwareDeliveryMachine,
-                private readonly goalExecutionListeners: GoalExecutionListener[]) {
+    constructor(private readonly sdm: SoftwareDeliveryMachine) {
         super();
     }
 
@@ -49,8 +48,8 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         if (cluster.isWorker) {
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
-                this.sdm,
-                this.goalExecutionListeners);
+                this.sdm.goalFulfillmentMapper,
+                this.sdm.goalExecutionListeners);
             automationClientInstance().withEventHandler(maker);
         }
     }
@@ -78,8 +77,8 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
 
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
-                this.sdm,
-                this.goalExecutionListeners);
+                this.sdm.goalFulfillmentMapper,
+                this.sdm.goalExecutionListeners);
             automationClientInstance().withEventHandler(maker);
 
             // Create event and run event handler

@@ -194,7 +194,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     get eventHandlers(): Array<Maker<HandleEvent<any>>> {
         return this.registrationManager.eventHandlers
             .concat(this.pushMapping ? () => new FulfillGoalOnRequested(
-                this,
+                this.goalFulfillmentMapper,
                 this.goalExecutionListeners) : undefined)
             .concat(_.flatten(this.allFunctionalUnits.map(fu => fu.eventHandlers)))
             .concat([

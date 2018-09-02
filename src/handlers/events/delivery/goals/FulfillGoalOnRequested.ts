@@ -24,13 +24,15 @@ import {
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import {
     GoalExecutionListener,
+    GoalImplementationMapper,
     GoalInvocation,
-    PushListenerInvocation,
     SdmGoalFulfillmentMethod,
     SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
@@ -38,14 +40,7 @@ import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllPro
 import { serializeResult } from "@atomist/sdm/api-helper/misc/result";
 import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
 import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
-import { GoalImplementationMapper } from "@atomist/sdm/api/goal/support/GoalImplementationMapper";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import {
-    ProgressLog,
-    ProgressLogFactory,
-} from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
 import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { formatDuration } from "../../../../util/misc/time";
@@ -57,13 +52,15 @@ import { formatDuration } from "../../../../util/misc/time";
     GraphQL.subscription("OnAnyRequestedSdmGoal"))
 export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription> {
 
-    constructor(private readonly sdm: SoftwareDeliveryMachine,
+    @Value("sdm")
+    public configuration: SoftwareDeliveryMachineConfiguration;
+
+    constructor(private readonly implementationMapper: GoalImplementationMapper,
                 private readonly goalExecutionListeners: GoalExecutionListener[]) {
     }
 
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
-                        ctx: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        ctx: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
@@ -76,20 +73,20 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        const id = this.sdm.configuration.sdm.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
-        const credentials = this.sdm.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id);
+        const id = this.configuration.sdm.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
+        const credentials = this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id);
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
 
         const { goal, goalExecutor, logInterpreter, progressReporter } =
-            this.sdm.configuration.implementationMapper.findImplementationBySdmGoal(sdmGoal);
+            this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
 
         const progressLog = new WriteToAllProgressLog(
             sdmGoal.name,
             new LoggingProgressLog(sdmGoal.name, "debug"),
-            await this.sdm.configuration.logFactory(ctx, sdmGoal));
+            await this.configuration.logFactory(ctx, sdmGoal));
 
         const goalInvocation: GoalInvocation = {
-            sdm: this.sdm,
+            configuration: this.configuration,
             sdmGoal,
             progressLog,
             context: ctx,
@@ -98,7 +95,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             credentials,
         };
 
-        const isolatedGoalLauncher = this.sdm.configuration.implementationMapper.getIsolatedGoalLauncher();
+        const isolatedGoalLauncher = this.configuration.goalLauncher;
 
         if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
             const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
@@ -111,7 +108,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             const start = Date.now();
 
             return executeGoal(
-                { projectLoader: this.sdm.configuration.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
+                { projectLoader: this.configuration.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
                 goalExecutor,
                 goalInvocation,
                 sdmGoal,

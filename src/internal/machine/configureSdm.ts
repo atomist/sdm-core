@@ -133,10 +133,7 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.events = [];
     mergedConfig.ingesters = [];
 
-    mergedConfig.listeners.push(
-        new GoalAutomationEventListener(
-            machine,
-            machine.goalExecutionListeners));
+    mergedConfig.listeners.push(new GoalAutomationEventListener(machine));
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
