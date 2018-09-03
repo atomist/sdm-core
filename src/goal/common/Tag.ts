@@ -33,7 +33,6 @@ export class Tag extends FulfillableGoalWithRegistrations<ImplementationRegistra
             ...TagGoal.definition,
             uniqueName,
             displayName: "tag",
-            orderedName: `4-${uniqueName.toLowerCase()}`,
         });
     }
 
