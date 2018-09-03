@@ -1,6 +1,11 @@
-# Software Delivery Machine
+<p align="center">
+  <img src="/atomist/sdm/raw/master/docs/SDM-Logo-Dark.png">
+</p>
 
-[![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/sdm-core/e93405f2-a313-4da8-92fd-833de3b90cde)](https://app.atomist.com/workspace/T29E48P34) [![npm version](https://badge.fury.io/js/%40atomist%2Fsdm-core.svg)](https://badge.fury.io/js/%40atomist%2Fsdm-core)
+# Software Delivery Machine - Core - `@atomist/sdm-core`
+
+[![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/sdm-core/e93405f2-a313-4da8-92fd-833de3b90cde)](https://app.atomist.com/workspace/T29E48P34)
+[![npm version](https://img.shields.io/npm/v/@atomist/sdm-core.svg)](https://www.npmjs.com/package/@atomist/sdm-core)
 
 Atomist framework enabling you to control your delivery and development process in code. Think of it as Spring Boot for software delivery.
 
