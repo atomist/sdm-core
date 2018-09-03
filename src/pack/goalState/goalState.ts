@@ -35,4 +35,3 @@ export const GoalState: ExtensionPack = {
         }
     },
 };
-x
