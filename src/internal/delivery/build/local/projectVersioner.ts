@@ -27,7 +27,6 @@ import {
 } from "@atomist/sdm";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import * as _ from "lodash";
 import {
     SdmVersion,
@@ -43,12 +42,11 @@ export type ProjectVersioner =
  * @param projectLoader used to load projects
  * @param projectVersioner decides on the version string
  */
-export function executeVersioner(projectLoader: ProjectLoader,
-                                 projectVersioner: ProjectVersioner): ExecuteGoal {
+export function executeVersioner(projectVersioner: ProjectVersioner): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { sdmGoal, credentials, id, context, progressLog } = goalInvocation;
+        const { configuration, sdmGoal, credentials, id, context, progressLog } = goalInvocation;
 
-        return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
+        return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
             const version = await projectVersioner(sdmGoal, p, progressLog);
             const sdmVersion: SdmVersion = {
                 sha: sdmGoal.sha,
