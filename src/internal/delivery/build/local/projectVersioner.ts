@@ -27,6 +27,7 @@ import {
 } from "@atomist/sdm";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { codeLine } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {
     SdmVersion,
@@ -59,7 +60,10 @@ export function executeVersioner(projectVersioner: ProjectVersioner): ExecuteGoa
                 },
             };
             await context.messageClient.send(sdmVersion, addressEvent(SdmVersionRootType));
-            return Success;
+            return {
+                ...Success,
+                description: `Versioned ${codeLine(version)}`,
+            };
         });
     };
 }
