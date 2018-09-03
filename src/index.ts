@@ -51,7 +51,6 @@ export {
 export { summarizeGoalsInGitHubStatus } from "./internal/delivery/goals/support/githubStatusSummarySupport";
 export { requestDeployToK8s } from "./handlers/events/delivery/deploy/k8s/RequestK8sDeploys";
 export { ToPublicRepo } from "./mapping/pushtest/toPublicRepo";
-export { HasDockerfile } from "./pack/docker/dockerPushTests";
 export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
 export { renderCommitMessage } from "./util/slack/diffRendering";
 export { GraphGoals } from "./pack/graph-goals/graphGoals";
@@ -59,11 +58,6 @@ export {
     createRelease,
     createStatus,
 } from "./util/github/ghub";
-export {
-    DefaultDockerImageNameCreator,
-    DockerOptions,
-    executeDockerBuild,
-} from "./pack/docker/executeDockerBuild";
 export {
     createTagForStatus,
     executeTag,
