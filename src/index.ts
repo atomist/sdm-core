@@ -39,8 +39,6 @@ export {
 } from "./util/github/ghub";
 export { lookFor200OnEndpointRootGet } from "./util/verify/lookFor200OnEndpointRootGet";
 export {
-    ConfigureOptions,
-    ConfigurationValueType,
     SoftwareDeliveryMachineMaker,
     configureSdm,
 } from "./internal/machine/configureSdm";
