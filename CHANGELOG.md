@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   **BREAKING** Move local configuration into configuration object. [#34](https://github.com/atomist/sdm-core/issues/34)
+-   **BREAKING** Moved "set goal state" and "reset goals" into an extension pack. Add it in your SDM if you want these: `sdm.addExtensionPacks(GoalState)`
 
 ### Removed
 
