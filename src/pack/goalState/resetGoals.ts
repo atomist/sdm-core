@@ -22,8 +22,9 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
-import { CommandHandlerRegistration, CommandListenerInvocation, SoftwareDeliveryMachine } from "@atomist/sdm";
+import { CommandHandlerRegistration, CommandListenerInvocation, SoftwareDeliveryMachine, GitHubRepoTargets } from "@atomist/sdm";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
+import { toRepoTargetingParametersMaker } from "@atomist/sdm/api-helper/machine/handlerRegistrations";
 import {
     success,
     warning,
@@ -43,24 +44,13 @@ import {
     RepoBranchTips,
 } from "../../typings/types";
 import { fetchDefaultBranchTip, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
+import { RepoTargetingParameters } from "@atomist/sdm/api-helper/machine/RepoTargetingParameters";
 
 @Parameters()
-export class ResetGoalsParameters {
-
-    @MappedParameter(MappedParameters.GitHubOwner)
-    public owner: string;
-
-    @MappedParameter(MappedParameters.GitHubRepository)
-    public repo: string;
+export class ResetGoalsParameters extends GitHubRepoTargets {
 
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
-
-    @Parameter({ required: false })
-    public sha: string;
-
-    @Parameter({ required: false })
-    public branch: string;
 
     @Value("name")
     public name: string;
@@ -73,14 +63,17 @@ export class ResetGoalsParameters {
 export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
     return {
         name: "ResetGoalsOnCommit",
-        paramsMaker: ResetGoalsParameters,
+        paramsMaker: toRepoTargetingParametersMaker(ResetGoalsParameters, GitHubRepoTargets),
         listener: resetGoalsOnCommit(sdm),
         intent: ["reset goals"],
     };
 }
 
 function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
-    return async (cli: CommandListenerInvocation<ResetGoalsParameters>) => {
+    return async (cli: CommandListenerInvocation<ResetGoalsParameters & RepoTargetingParameters>) => {
+        if (!cli.credentials) {
+            throw new Error("This is invalid. I need credentials");
+        }
         const rules = {
             projectLoader: sdm.configuration.sdm.projectLoader,
             repoRefResolver: sdm.configuration.sdm.repoRefResolver,
@@ -89,8 +82,8 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             implementationMapping: sdm.goalFulfillmentMapper,
         };
 
-        const commandParams = cli.parameters;
-        const repoData = await fetchDefaultBranchTip(cli.context, cli.parameters);
+        const commandParams = { ...cli.parameters, ...cli.parameters.targets.repoRef, };
+        const repoData = await fetchDefaultBranchTip(cli.context, commandParams);
         const branch = commandParams.branch || repoData.defaultBranch;
         const sha = commandParams.sha || tipOfBranch(repoData, branch);
         const id = rules.repoRefResolver.toRemoteRepoRef({
