@@ -22,9 +22,10 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
-import { CommandHandlerRegistration, CommandListenerInvocation, SoftwareDeliveryMachine, GitHubRepoTargets } from "@atomist/sdm";
+import { CommandHandlerRegistration, CommandListenerInvocation, GitHubRepoTargets, SoftwareDeliveryMachine } from "@atomist/sdm";
 import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
 import { toRepoTargetingParametersMaker } from "@atomist/sdm/api-helper/machine/handlerRegistrations";
+import { RepoTargetingParameters } from "@atomist/sdm/api-helper/machine/RepoTargetingParameters";
 import {
     success,
     warning,
@@ -44,7 +45,6 @@ import {
     RepoBranchTips,
 } from "../../typings/types";
 import { fetchDefaultBranchTip, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
-import { RepoTargetingParameters } from "@atomist/sdm/api-helper/machine/RepoTargetingParameters";
 
 @Parameters()
 export class ResetGoalsParameters extends GitHubRepoTargets {
@@ -82,7 +82,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             implementationMapping: sdm.goalFulfillmentMapper,
         };
 
-        const commandParams = { ...cli.parameters, ...cli.parameters.targets.repoRef, };
+        const commandParams = { ...cli.parameters, ...cli.parameters.targets.repoRef };
         const repoData = await fetchDefaultBranchTip(cli.context, commandParams);
         const branch = commandParams.branch || repoData.defaultBranch;
         const sha = commandParams.sha || tipOfBranch(repoData, branch);
