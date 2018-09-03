@@ -27,7 +27,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
     @Secret(Secrets.OrgToken)
     private readonly orgToken: string;
 
-    @Value("token")
+    @Value({ path: "token", required: false, type: "string" })
     private readonly clientToken: string;
 
     public eventHandlerCredentials(): ProjectOperationCredentials {
