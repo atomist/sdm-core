@@ -23,7 +23,6 @@ import {
     GoalInvocation,
 } from "@atomist/sdm";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
 import {
     createTag,
     createTagReference,
@@ -31,11 +30,11 @@ import {
 } from "../../../util/github/ghub";
 import { readSdmVersion } from "./local/projectVersioner";
 
-export function executeTag(projectLoader: ProjectLoader): ExecuteGoal {
+export function executeTag(): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { sdmGoal, credentials, id, context } = goalInvocation;
+        const { configuration, sdmGoal, credentials, id, context } = goalInvocation;
 
-        return projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
+        return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
             const version = await readSdmVersion(sdmGoal.repo.owner, sdmGoal.repo.name,
                 sdmGoal.repo.providerId, sdmGoal.sha, id.branch, context);
             await createTagForStatus(id, sdmGoal.sha, sdmGoal.push.after.message, version, credentials);

@@ -81,3 +81,6 @@ export {
     isInLocalMode,
     IsInLocalMode,
 } from "./internal/machine/LocalSoftwareDeliveryMachineOptions";
+
+export { Version } from "./goal/common/Version";
+export { Tag } from "./goal/common/Tag";

@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    HandlerContext,
-    HandlerResult,
-} from "@atomist/automation-client";
+import { HandlerContext } from "@atomist/automation-client";
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import {
     ExecuteGoal,
@@ -26,14 +23,11 @@ import {
     ProgressLog,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import {
-    ChildProcessResult,
-    spawnAndWatch,
-} from "@atomist/sdm/api-helper/misc/spawned";
+import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
 import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
 import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { isInLocalMode } from "../..";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
+import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { postLinkImageWebhook } from "../../util/webhook/ImageLink";
 
 export interface DockerOptions {
@@ -61,6 +55,10 @@ export interface DockerOptions {
      */
     password?: string;
 
+    /**
+     * Find the path to Dockerfile in a project
+     * @param p
+     */
     dockerfileFinder?: (p: GitProject) => Promise<string>;
 }
 
