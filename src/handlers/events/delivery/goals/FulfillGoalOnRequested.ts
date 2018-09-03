@@ -31,7 +31,6 @@ import {
     GoalImplementationMapper,
     GoalInvocation,
     SdmGoalFulfillmentMethod,
-    SoftwareDeliveryMachine,
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
@@ -95,7 +94,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             credentials,
         };
 
-        const isolatedGoalLauncher = this.configuration.goalLauncher;
+        const isolatedGoalLauncher = this.configuration.sdm.goalLauncher;
 
         if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
             const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
@@ -108,7 +107,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             const start = Date.now();
 
             return executeGoal(
-                { projectLoader: this.configuration.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
+                { projectLoader: this.configuration.sdm.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
                 goalExecutor,
                 goalInvocation,
                 sdmGoal,

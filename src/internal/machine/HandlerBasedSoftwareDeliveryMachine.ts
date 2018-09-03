@@ -20,7 +20,6 @@ import {
     HandleEvent,
 } from "@atomist/automation-client";
 import { Maker } from "@atomist/automation-client/util/constructionUtils";
-import { DefaultGoalImplementationMapper } from "@atomist/sdm/api-helper/goal/DefaultGoalImplementationMapper";
 import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/api-helper/machine/AbstractSoftwareDeliveryMachine";
 import { FunctionalUnit } from "@atomist/sdm/api/machine/FunctionalUnit";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
@@ -62,15 +61,6 @@ import { SendFingerprintToAtomist } from "../../util/webhook/sendFingerprintToAt
  * Not intended for direct user instantiation. See machineFactory.ts
  */
 export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliveryMachine {
-
-    private fulfillmentMapper;
-
-    public get goalFulfillmentMapper() {
-        if (!this.fulfillmentMapper) {
-            this.fulfillmentMapper = new DefaultGoalImplementationMapper();
-        }
-        return this.fulfillmentMapper;
-    }
 
     private get onRepoCreation(): Maker<OnRepoCreation> {
         return this.repoCreationListeners.length > 0 ?
