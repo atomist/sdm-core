@@ -87,7 +87,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             goalsListeners: sdm.goalsSetListeners,
             goalSetter: sdm.pushMapping,
             implementationMapping: sdm.goalFulfillmentMapper,
-        }
+        };
 
         const commandParams = cli.parameters;
         const repoData = await fetchDefaultBranchTip(cli.context, cli.parameters);
