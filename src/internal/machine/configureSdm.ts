@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Configuration } from "@atomist/automation-client";
+import { Configuration, logger } from "@atomist/automation-client";
 import { ConfigurationPostProcessor } from "@atomist/automation-client/configuration";
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
@@ -64,7 +64,7 @@ export type SoftwareDeliveryMachineMaker =
  * @returns {ConfigurationPostProcessor}
  */
 export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
-                             options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
+    options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
 
     return async (config: Configuration) => {
         let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
@@ -120,7 +120,7 @@ function configureJobLaunching(mergedConfig, machine) {
 }
 
 function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
-                                         machine: SoftwareDeliveryMachine) {
+    machine: SoftwareDeliveryMachine) {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {
@@ -157,17 +157,17 @@ export function validateConfiguration(config: any, options: ConfigureOptions) {
             missingValues.push(path);
         } else {
             switch (type) {
-                case ConfigurationValueType.Number :
+                case ConfigurationValueType.Number:
                     if (!Number.isNaN(value)) {
                         invalidValues.push(`${path} ${JSON.stringify(value)} is not a 'number'`);
                     }
                     break;
-                case ConfigurationValueType.String :
+                case ConfigurationValueType.String:
                     if (typeof value !== "string") {
                         invalidValues.push(`${path} ${JSON.stringify(value)} is not a 'string'`);
                     }
                     break;
-                case ConfigurationValueType.Boolean :
+                case ConfigurationValueType.Boolean:
                     if (typeof value !== "boolean") {
                         invalidValues.push(`${path} ${JSON.stringify(value)} is not a 'boolean'`);
                     }
@@ -217,17 +217,30 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
  * @return {any}
  */
 async function doWithSdmLocal(callback: (sdmLocal: any) => any) {
-    try {
-        if (isInLocalMode()) {
-            // tslint:disable-next-line:no-implicit-dependencies
-            const local = require("@atomist/sdm-local");
+
+    if (isInLocalMode()) {
+        // tslint:disable-next-line:no-implicit-dependencies
+        const local = attemptToRequire("@atomist/sdm-local", !process.env.ATOMIST_NPM_LOCAL_LINK);
+        if (local) {
             return callback(local);
-        }
-    } catch (err) {
-        // When npm linking we accept this error and move on
-        if (!process.env.ATOMIST_NPM_LOCAL_LINK) {
-            throw new Error("SDM started in local mode, but '@atomist/sdm-local' not declared as dependency. " +
-                "Please install SDM local with 'npm install @atomist/sdm-local'.");
+        } else {
+            logger.warn("Skipping localMode activity because ATOMIST_NPM_LOCAL_LINK was defined, but @atomist/sdm-local could not be loaded");
         }
     }
+
+}
+
+function attemptToRequire<T = any>(lib: string, failOnError: boolean): T | null {
+    try {
+        return require(lib) as T;
+    } catch (err) {
+        logger.error(err.stack);
+
+        if (failOnError) {
+            throw new Error(`Unable to load ${lib}. Please install with 'npm install ${lib}'.`);
+        } else {
+            return null;
+        }
+    }
+
 }
