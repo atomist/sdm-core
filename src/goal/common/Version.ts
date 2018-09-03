@@ -42,6 +42,7 @@ export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRe
         super({
             ...VersionGoal.definition,
             uniqueName,
+            displayName: "version",
             orderedName: `0.1-${uniqueName.toLowerCase()}`,
         });
     }
