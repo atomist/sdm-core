@@ -75,14 +75,13 @@ export type DockerImageNameCreator = (p: GitProject,
  * @returns {ExecuteGoal}
  * @deprecated move to Docker pack
  */
-export function executeDockerBuild(projectLoader: ProjectLoader,
-                                   imageNameCreator: DockerImageNameCreator,
+export function executeDockerBuild(imageNameCreator: DockerImageNameCreator,
                                    preparations: PrepareForGoalExecution[] = [],
                                    options: DockerOptions): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { sdmGoal, credentials, id, context, progressLog } = goalInvocation;
+        const { configuration, sdmGoal, credentials, id, context, progressLog } = goalInvocation;
 
-        return projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
+        return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
 
             for (const preparation of preparations) {
                 const pResult = await preparation(p, goalInvocation);
