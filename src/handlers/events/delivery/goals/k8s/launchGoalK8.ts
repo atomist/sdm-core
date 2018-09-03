@@ -137,12 +137,14 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         return result;
     }
 
+    const goalName = goal.uniqueName.split("#")[0].toLowerCase();
+
     const jobSpec = JSON.parse(JobSpec);
     const containerSpec = JSON.parse(log.log).spec.template.spec;
     jobSpec.spec.template.spec = containerSpec;
 
     jobSpec.metadata.name =
-        `${deploymentName}-job-${goal.goalSetId.slice(0, 7)}-${goal.uniqueName.toLocaleLowerCase()}`;
+        `${deploymentName}-job-${goal.goalSetId.slice(0, 7)}-${goalName}`;
     jobSpec.metadata.namespace = deploymentNamespace;
     jobSpec.spec.template.spec.restartPolicy = "Never";
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
@@ -152,7 +154,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
     },
         {
             name: "ATOMIST_REGISTRATION_NAME",
-            value: `${automationClientInstance().configuration.name}-job-${goal.goalSetId.slice(0, 7)}-${goal.uniqueName.toLocaleLowerCase()}`,
+            value: `${automationClientInstance().configuration.name}-job-${goal.goalSetId.slice(0, 7)}-${goalName}`,
         },
         {
             name: "ATOMIST_GOAL_TEAM",
