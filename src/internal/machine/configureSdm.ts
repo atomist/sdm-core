@@ -64,7 +64,7 @@ export type SoftwareDeliveryMachineMaker =
  * @returns {ConfigurationPostProcessor}
  */
 export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
-    options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
+                             options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
 
     return async (config: Configuration) => {
         let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
@@ -120,7 +120,7 @@ function configureJobLaunching(mergedConfig, machine) {
 }
 
 function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
-    machine: SoftwareDeliveryMachine) {
+                                         machine: SoftwareDeliveryMachine) {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {
