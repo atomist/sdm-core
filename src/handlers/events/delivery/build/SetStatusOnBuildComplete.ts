@@ -25,7 +25,10 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { SdmGoalEvent } from "@atomist/sdm";
+import {
+    SdmGoalEvent,
+    SdmGoalFulfillmentMethod,
+} from "@atomist/sdm";
 import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
 import {
     descriptionFromState,
@@ -72,8 +75,9 @@ export class SetGoalOnBuildComplete implements HandleEvent<OnBuildComplete.Subsc
                 logger.debug("No build goal on commit; ignoring someone else's build result");
                 return Success;
             }
-            if (sdmGoal.fulfillment.method !== "side-effect" && sdmGoal.fulfillment.method !== "other") {
-                logger.info("This build goal is not set up to be completed based on the build node. %j",
+            if (sdmGoal.fulfillment.method !== SdmGoalFulfillmentMethod.SideEffect &&
+                sdmGoal.fulfillment.method !== SdmGoalFulfillmentMethod.Other) {
+                logger.debug("This build goal is not set up to be completed based on the build node. %j",
                     sdmGoal.fulfillment);
                 return Success;
             }
@@ -102,7 +106,7 @@ export async function displayBuildLogFailure(id: RemoteRepoRef,
         const interpretation = logInterpretation && logInterpretation.logInterpreter(buildLog);
         logger.debug("What did it say? " + stringify(interpretation));
         await reportFailureInterpretation("external-build", interpretation,
-                { log: buildLog, url: buildUrl }, id, addressChannels);
+            { log: buildLog, url: buildUrl }, id, addressChannels);
 
     } else {
         return addressChannels("No build log detected for " + linkToSha(id));
