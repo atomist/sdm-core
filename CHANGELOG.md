@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   **BREAKING** Move local configuration into configuration object. [#34](https://github.com/atomist/sdm-core/issues/34)
 
+### Removed
+
+-   **BREAKING** Moved docker functionality to separate pack. [#44](https://github.com/atomist/sdm-core/issues/44)
+
 ## [1.0.0-M.1](https://github.com/atomist/sdm/compare/0.4.10...1.0.0-M.1) - 2018-08-27
 
 ## [0.4.10](https://github.com/atomist/sdm/compare/0.4.9...0.4.10) - 2018-08-27
