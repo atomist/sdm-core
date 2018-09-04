@@ -87,6 +87,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const goalInvocation: GoalInvocation = {
             configuration: this.configuration,
             sdmGoal,
+            goal,
             progressLog,
             context: ctx,
             addressChannels,
@@ -107,11 +108,12 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             const start = Date.now();
 
             return executeGoal(
-                { projectLoader: this.configuration.sdm.projectLoader, goalExecutionListeners: this.goalExecutionListeners },
+                {
+                    projectLoader: this.configuration.sdm.projectLoader,
+                    goalExecutionListeners: this.goalExecutionListeners,
+                },
                 goalExecutor,
                 goalInvocation,
-                sdmGoal,
-                goal,
                 logInterpreter,
                 progressReporter)
                 .then(async res => {
