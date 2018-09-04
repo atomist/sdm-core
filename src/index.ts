@@ -41,6 +41,7 @@ export { lookFor200OnEndpointRootGet } from "./util/verify/lookFor200OnEndpointR
 export {
     SoftwareDeliveryMachineMaker,
     configureSdm,
+    ConfigureOptions,
 } from "./internal/machine/configureSdm";
 export {
     ExplainDeploymentFreezeGoal,
