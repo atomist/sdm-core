@@ -36,7 +36,8 @@ export async function fetchPushForCommit(context: HandlerContext, id: RemoteRepo
     return commit.pushes[0];
 }
 
-export async function fetchDefaultBranchTip(ctx: HandlerContext, repositoryId: { repo: string, owner: string, providerId: string }) {
+export async function fetchBranchTips(ctx: HandlerContext,
+    repositoryId: { repo: string, owner: string, providerId: string }): Promise<RepoBranchTips.Repo> {
     const result = await ctx.graphClient.query<RepoBranchTips.Query, RepoBranchTips.Variables>(
         { name: "RepoBranchTips", variables: { name: repositoryId.repo, owner: repositoryId.owner } });
     if (!result || !result.Repo || result.Repo.length === 0) {
