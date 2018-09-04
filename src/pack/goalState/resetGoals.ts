@@ -84,7 +84,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
         if (!isValidSHA1(id.sha)) {
             logger.info("Fetching tip of branch %s", id.branch);
             const allBranchTips = await fetchBranchTips(cli.context, {
-                repo: id.repo, owner: id.owner, providerId: cli.parameters.providerId
+                repo: id.repo, owner: id.owner, providerId: cli.parameters.providerId,
             });
             id.sha = tipOfBranch(allBranchTips, id.branch);
             logger.info("Learned that the tip of %s is %s", id.branch, id.sha);
