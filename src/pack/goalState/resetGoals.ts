@@ -83,13 +83,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
         };
 
         const commandParams = { ...cli.parameters, ...cli.parameters.targets.repoRef };
-        const repoData = await fetchDefaultBranchTip(cli.context, commandParams);
-        const branch = commandParams.branch || repoData.defaultBranch;
-        const sha = commandParams.sha || tipOfBranch(repoData, branch);
-        const id = rules.repoRefResolver.toRemoteRepoRef({
-            owner: commandParams.owner, name: commandParams.repo,
-            org: { owner: commandParams.owner, provider: { providerId: commandParams.providerId } },
-        }, { sha, branch });
+        const id = cli.parameters.targets.repoRef;
 
         const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
 
@@ -102,16 +96,16 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
         if (goals) {
             await cli.addressChannels(success(
                 "Plan Goals",
-                `Successfully planned goals on ${codeLine(sha.slice(0, 7))} of ${
-                bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)} to ${italic(goals.name)}`,
+                `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
+                bold(`${commandParams.owner}/${commandParams.repo}/${push.branch}`)} to ${italic(goals.name)}`,
                 {
                     footer: `${commandParams.name}:${commandParams.version}`,
                 }));
         } else {
             await cli.addressChannels(warning(
                 "Plan Goals",
-                `No goals found for ${codeLine(sha.slice(0, 7))} of ${
-                bold(`${commandParams.owner}/${commandParams.repo}/${branch}`)}`,
+                `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
+                bold(`${commandParams.owner}/${commandParams.repo}/${push.branch}`)}`,
                 cli.context,
                 {
                     footer: `${commandParams.name}:${commandParams.version}`,
