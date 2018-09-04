@@ -43,7 +43,7 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import { fetchDefaultBranchTip, tipOfBranch } from "../../util/graph/queryCommits";
+import { fetchBranchTips, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 class SetGoalStateParameters {
@@ -94,7 +94,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                 chi.parameters.msgId = guid();
             }
             const footer = `${chi.parameters.name}:${chi.parameters.version}`;
-            const repoData = await fetchDefaultBranchTip(chi.context, chi.parameters);
+            const repoData = await fetchBranchTips(chi.context, chi.parameters);
             const branch = chi.parameters.branch || repoData.defaultBranch;
             const sha = chi.parameters.sha || tipOfBranch(repoData, branch);
             const id = GitHubRepoRef.from({ owner: chi.parameters.owner, repo: chi.parameters.repo, sha, branch });

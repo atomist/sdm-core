@@ -32,7 +32,7 @@ import {
     chooseAndSetGoals,
     ChooseAndSetGoalsRules,
 } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
-import { fetchDefaultBranchTip, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
+import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 export class DisposeParameters {
@@ -67,7 +67,7 @@ function disposeOfProject(rules: ChooseAndSetGoalsRules) {
             return ctx.messageClient.respond("You didn't say 'yes' to 'are you sure?' so I won't do anything.")
                 .then(success);
         }
-        const repoData = await fetchDefaultBranchTip(ctx, commandParams);
+        const repoData = await fetchBranchTips(ctx, commandParams);
         const branch = repoData.defaultBranch;
         const sha = tipOfBranch(repoData, branch);
 

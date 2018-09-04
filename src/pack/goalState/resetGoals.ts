@@ -31,11 +31,6 @@ import {
     success,
     warning,
 } from "@atomist/sdm/api-helper/misc/slack/messages";
-import { GoalImplementationMapper } from "@atomist/sdm/api/goal/support/GoalImplementationMapper";
-import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
-import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
 import {
     bold,
     codeLine,
@@ -45,7 +40,7 @@ import {
     PushForCommit,
     RepoBranchTips,
 } from "../../typings/types";
-import { fetchDefaultBranchTip, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
+import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 export class ResetGoalsParameters extends GitHubRepoTargets {
@@ -88,7 +83,10 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
 
         if (!isValidSHA1(id.sha)) {
             logger.info("Fetching tip of branch %s", id.branch);
-            id.sha = await tipOfBranch(id, id.branch);
+            const allBranchTips = await fetchBranchTips(cli.context, {
+                repo: id.repo, owner: id.owner, providerId: cli.parameters.providerId
+            });
+            id.sha = tipOfBranch(allBranchTips, id.branch);
             logger.info("Learned that the tip of %s is %s", id.branch, id.sha);
         }
 
