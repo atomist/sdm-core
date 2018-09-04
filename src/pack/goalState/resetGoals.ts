@@ -20,6 +20,7 @@ import {
     Parameter,
     Success,
     Value,
+    logger,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { CommandHandlerRegistration, CommandListenerInvocation, GitHubRepoTargets, SoftwareDeliveryMachine } from "@atomist/sdm";
@@ -85,6 +86,12 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
         const commandParams = { ...cli.parameters, ...cli.parameters.targets.repoRef };
         const id = cli.parameters.targets.repoRef;
 
+        if (!isValidSHA1(id.sha)) {
+            logger.info("Fetching tip of branch %s", id.branch);
+            id.sha = await tipOfBranch(id, id.branch);
+            logger.info("Learned that the tip of %s is %s", id.branch, id.sha);
+        }
+
         const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
 
         const goals = await chooseAndSetGoals(rules, {
@@ -114,4 +121,8 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
 
         return Success;
     };
+}
+
+function isValidSHA1(s: string): boolean {
+    return s.match(/[a-fA-F0-9]{40}/) != null;
 }
