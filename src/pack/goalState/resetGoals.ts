@@ -15,12 +15,12 @@
  */
 
 import {
+    logger,
     MappedParameter,
     MappedParameters,
     Parameter,
     Success,
     Value,
-    logger,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/decorators";
 import { CommandHandlerRegistration, CommandListenerInvocation, GitHubRepoTargets, SoftwareDeliveryMachine } from "@atomist/sdm";
