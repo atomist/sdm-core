@@ -15,10 +15,10 @@
  */
 
 import { logger } from "@atomist/automation-client";
+import { executeSendMessageToSlack } from "@atomist/sdm/api-helper/goal/executeSendMessageToSlack";
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import { allOf } from "@atomist/sdm/api/dsl/allOf";
 import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
-import { executeSendMessageToSlack } from "@atomist/sdm/api/goal/support/executeSendMessageToSlack";
 import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
 import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
 import { PushTest } from "@atomist/sdm/api/mapping/PushTest";
