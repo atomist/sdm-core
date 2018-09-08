@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
+import { ExtensionPack, logger } from "@atomist/sdm";
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
-import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { selfDescribeCommand } from "./SelfDescribe";
+import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
+import { resetGoalsCommand } from "./resetGoals";
+import { setGoalStateCommand } from "./setGoalState";
 
 /**
- * Expose information about this machine
+ * allow goal setting
  */
-export const ExposeInfo: ExtensionPack = {
-    ...metadata("info"),
+export const GoalState: ExtensionPack = {
+    ...metadata("set goal state"),
     configure: sdm => {
-        sdm.addCommand(selfDescribeCommand(sdm));
+        if (isInLocalMode()) {
+            logger.warn("Setting goal state is not available in local mode.");
+            logger.warn("Resetting goals does not work in local mode. Use `atomist trigger post-commit` instead.");
+        } else {
+            sdm.addCommand(setGoalStateCommand(sdm));
+            sdm.addCommand(resetGoalsCommand(sdm));
+        }
     },
 };

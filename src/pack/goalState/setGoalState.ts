@@ -29,6 +29,7 @@ import {
 } from "@atomist/automation-client/spi/message/MessageClient";
 import {
     CommandHandlerRegistration,
+    ExtensionPack,
     SdmGoalState,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
@@ -42,10 +43,7 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import {
-    fetchDefaultBranchTip,
-    tipOfBranch,
-} from "../../handlers/events/delivery/goals/resetGoals";
+import { fetchBranchTips, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
 class SetGoalStateParameters {
@@ -96,7 +94,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                 chi.parameters.msgId = guid();
             }
             const footer = `${chi.parameters.name}:${chi.parameters.version}`;
-            const repoData = await fetchDefaultBranchTip(chi.context, chi.parameters);
+            const repoData = await fetchBranchTips(chi.context, chi.parameters);
             const branch = chi.parameters.branch || repoData.defaultBranch;
             const sha = chi.parameters.sha || tipOfBranch(repoData, branch);
             const id = GitHubRepoRef.from({ owner: chi.parameters.owner, repo: chi.parameters.repo, sha, branch });
@@ -129,9 +127,9 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                             codeLine(sha.slice(0, 7))} of ${bold(`${id.owner}/${id.repo}/${branch}`)}:`,
                         actions: [
                             menuForCommand({
-                                    text: "Goals",
-                                    options: optionsGroups,
-                                },
+                                text: "Goals",
+                                options: optionsGroups,
+                            },
                                 "SetGoalState",
                                 "goal",
                                 { ...chi.parameters }),
@@ -182,7 +180,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                     success(
                         "Set Goal State",
                         `Successfully set state of ${italic(goal.name)} on ${codeLine(sha.slice(0, 7))} of ${
-                            bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`,
+                        bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`,
                         { footer }),
                     { id: chi.parameters.msgId });
             }

@@ -19,6 +19,8 @@ import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDelive
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
 import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
 import { HandlerBasedSoftwareDeliveryMachine } from "../internal/machine/HandlerBasedSoftwareDeliveryMachine";
+import { isInLocalMode } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
+import { GoalState } from "../pack/goalState/goalState";
 import { ExposeInfo } from "../pack/info/exposeInfo";
 
 /**
@@ -60,10 +62,11 @@ import { ExposeInfo } from "../pack/info/exposeInfo";
  * ```
  */
 export function createSoftwareDeliveryMachine(config: MachineConfiguration<SoftwareDeliveryMachineConfiguration>,
-                                              // tslint:disable-next-line:max-line-length
+    // tslint:disable-next-line:max-line-length
                                               ...goalSetters: Array<GoalSetter | GoalSetter[]>): SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration> {
     const machine = new HandlerBasedSoftwareDeliveryMachine(config.name, config.configuration,
         goalSetters);
-    return machine
-        .addExtensionPacks(ExposeInfo);
+    machine.addExtensionPacks(ExposeInfo);
+
+    return machine;
 }

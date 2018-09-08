@@ -38,7 +38,6 @@ import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery
 import { OnDeployStatus } from "../../handlers/events/delivery/deploy/OnDeployStatus";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
-import { resetGoalsCommand } from "../../handlers/events/delivery/goals/resetGoals";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
@@ -99,14 +98,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     this.goalsSetListeners,
                     this.goalFulfillmentMapper,
                     this.configuration.sdm.credentialsResolver)],
-                commandHandlers: [() => resetGoalsCommand({
-                    projectLoader: this.configuration.sdm.projectLoader,
-                    repoRefResolver: this.configuration.sdm.repoRefResolver,
-                    goalsListeners: this.goalsSetListeners,
-                    goalSetter: this.pushMapping,
-                    implementationMapping: this.goalFulfillmentMapper,
-                    name: this.configuration.name,
-                })],
+                commandHandlers: [],
                 ingesters: [],
             };
         } else {
