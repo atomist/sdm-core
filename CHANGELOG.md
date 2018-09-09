@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-M.3...HEAD)
 
+### Removed
+
+-   **BREAKING** Goal contexts no longer have an order but splitContext expects one. [#47](https://github.com/atomist/sdm-core/issues/47)
+
 ## [1.0.0-M.3](https://github.com/atomist/sdm/compare/1.0.0-M.1...1.0.0-M.3) - 2018-09-04
 
 ### Added
