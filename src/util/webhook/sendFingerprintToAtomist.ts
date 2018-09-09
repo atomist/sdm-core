@@ -31,7 +31,7 @@ export const SendFingerprintToAtomist: FingerprintListener = fli => {
             repo: fli.id.repo,
             sha: fli.id.sha,
         },
-        fingerprints: [fli.fingerprint],
+        fingerprints: fli.fingerprints,
     };
     try {
         const shortenedPayload = JSON.stringify(payload, limitValueLength);

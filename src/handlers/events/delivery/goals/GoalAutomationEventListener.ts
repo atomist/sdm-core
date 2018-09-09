@@ -29,10 +29,7 @@ import { RegistrationConfirmation } from "@atomist/automation-client/internal/tr
 import { guid } from "@atomist/automation-client/internal/util/string";
 import { AutomationEventListenerSupport } from "@atomist/automation-client/server/AutomationEventListener";
 import { QueryNoCacheOptions } from "@atomist/automation-client/spi/graph/GraphClient";
-import {
-    GoalExecutionListener,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
