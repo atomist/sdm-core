@@ -33,6 +33,7 @@ import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
+import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
 import {
     isInLocalMode,
     LocalSoftwareDeliveryMachineConfiguration,
@@ -91,6 +92,10 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         mergedConfig.logging.banner.contributors.push(
             sdmStartupMessage(sdm),
             sdmExtensionPackStartupMessage(sdm));
+
+        _.update(mergedConfig, "listeners",
+            old => !!old ? old : []);
+        mergedConfig.listeners.push(new InvokeSdmStartupListenersAutomationEventListener(sdm));
 
         return mergedConfig;
     };
