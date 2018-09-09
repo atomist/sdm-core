@@ -17,6 +17,8 @@
 import {
     DefaultGoalNameGenerator,
     FulfillableGoal,
+    FulfillableGoalDetails,
+    getGoalDefintionFrom,
     Goal,
 } from "@atomist/sdm";
 import { TagGoal } from "@atomist/sdm/pack/well-known-goals/commonGoals";
@@ -27,12 +29,12 @@ import { executeTag } from "../../internal/delivery/build/executeTag";
  */
 export class Tag extends FulfillableGoal {
 
-    constructor(private readonly uniqueName: string = DefaultGoalNameGenerator.generateName("tag"),
+    constructor(private readonly goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("tag"),
                 ...dependsOn: Goal[]) {
 
         super({
             ...TagGoal.definition,
-            uniqueName,
+            ...getGoalDefintionFrom(goalDetailsOrUniqueName, DefaultGoalNameGenerator.generateName("tag")),
             displayName: "tag",
         }, ...dependsOn);
 

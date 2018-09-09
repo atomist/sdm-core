@@ -17,7 +17,9 @@
 import {
     AnyPush,
     DefaultGoalNameGenerator,
+    FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
+    getGoalDefintionFrom,
     Goal,
     ImplementationRegistration,
 } from "@atomist/sdm";
@@ -39,12 +41,12 @@ export interface ProjectVersionerRegistration extends ImplementationRegistration
  */
 export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRegistration> {
 
-    constructor(private readonly uniqueName: string = DefaultGoalNameGenerator.generateName("version"),
+    constructor(private readonly goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("version"),
                 ...dependsOn: Goal[]) {
 
         super({
             ...VersionGoal.definition,
-            uniqueName,
+            ...getGoalDefintionFrom(goalDetailsOrUniqueName, DefaultGoalNameGenerator.generateName("version")),
             displayName: "version",
         }, ...dependsOn);
     }
