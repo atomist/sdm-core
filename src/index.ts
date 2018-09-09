@@ -53,7 +53,6 @@ export { requestDeployToK8s } from "./handlers/events/delivery/deploy/k8s/Reques
 export { ToPublicRepo } from "./mapping/pushtest/toPublicRepo";
 export { DefaultRepoRefResolver } from "./handlers/common/DefaultRepoRefResolver";
 export { renderCommitMessage } from "./util/slack/diffRendering";
-export { GraphGoals } from "./pack/graph-goals/graphGoals";
 export {
     createRelease,
     createStatus,
