@@ -15,6 +15,7 @@
  */
 
 import {
+    AnyPush,
     DefaultGoalNameGenerator,
     FulfillableGoalWithRegistrations,
     Goal,
@@ -52,6 +53,15 @@ export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRe
         this.addFulfillment({
             goalExecutor: executeVersioner(registration.versioner),
             ...registration as ImplementationRegistration,
+        });
+        return this;
+    }
+
+    public withVersioner(versioner: ProjectVersioner): this {
+        this.with({
+            name: DefaultGoalNameGenerator.generateName("versioner"),
+            pushTest: AnyPush,
+            versioner,
         });
         return this;
     }
