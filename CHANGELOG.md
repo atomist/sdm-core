@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-M.3...HEAD)
 
+### Changed
+
+-   FingerprintInvocation contains a vector of Fingerprints. [#49](https://github.com/atomist/sdm-core/issues/49)
+
 ### Removed
 
 -   **BREAKING** Goal contexts no longer have an order but splitContext expects one. [#47](https://github.com/atomist/sdm-core/issues/47)
