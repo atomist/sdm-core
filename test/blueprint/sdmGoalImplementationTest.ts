@@ -16,6 +16,8 @@
 
 import {
     HandlerContext,
+    logger,
+    LoggingConfig,
     Success,
 } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
@@ -40,6 +42,9 @@ import { PushFields } from "@atomist/sdm/typings/types";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../src/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../src/machine/machineFactory";
+
+LoggingConfig.format = "cli";
+(logger as any).level = process.env.LOG_LEVEL || "info";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",
@@ -79,11 +84,11 @@ describe("implementing goals in the SDM", () => {
             .setGoals(new Goals("Autofix only", autofixGoal)));
 
         const { determinedGoals, goalsToSave } = await determineGoals({
-                projectLoader: fakeSoftwareDeliveryMachineOptions.projectLoader,
-                repoRefResolver: new DefaultRepoRefResolver(),
-                goalSetter: mySDM.pushMapping,
-                implementationMapping: mySDM.goalFulfillmentMapper,
-            }, {
+            projectLoader: fakeSoftwareDeliveryMachineOptions.projectLoader,
+            repoRefResolver: new DefaultRepoRefResolver(),
+            goalSetter: mySDM.pushMapping,
+            implementationMapping: mySDM.goalFulfillmentMapper,
+        }, {
                 credentials, id: favoriteRepoRef, context: fakeContext, push: aPush,
                 addressChannels: () => Promise.resolve({}),
                 goalSetId: "hi",
@@ -91,11 +96,11 @@ describe("implementing goals in the SDM", () => {
         );
 
         assert(determinedGoals.goals.some(g => g.name === autofixGoal.name));
-        assert.equal(goalsToSave.length, 1);
+        assert.strictEqual(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
 
         const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
-        assert.equal(myImpl.implementationName, "Autofix-Autofix");
+        assert.strictEqual(myImpl.implementationName, autofixGoal.name);
     });
 
     it("I can teach it to do a custom goal", async () => {
@@ -118,24 +123,23 @@ describe("implementing goals in the SDM", () => {
                 .setGoals(new Goals("Springer", customGoal.with({ goalExecutor, name: "Cornelius" }))));
 
         const { determinedGoals, goalsToSave } = await determineGoals({
-                projectLoader: fakeSoftwareDeliveryMachineOptions.projectLoader,
-                repoRefResolver: new DefaultRepoRefResolver(),
-                goalSetter: mySDM.pushMapping,
-                implementationMapping: mySDM.goalFulfillmentMapper,
-            }, {
+            projectLoader: fakeSoftwareDeliveryMachineOptions.projectLoader,
+            repoRefResolver: new DefaultRepoRefResolver(),
+            goalSetter: mySDM.pushMapping,
+            implementationMapping: mySDM.goalFulfillmentMapper,
+        }, {
                 credentials, id: favoriteRepoRef, context: fakeContext, push: aPush,
                 addressChannels: () => Promise.resolve({}),
                 goalSetId: "hi",
             },
         );
         assert(determinedGoals.goals.some(g => g.name === customGoal.name));
-        assert.equal(goalsToSave.length, 1);
+        assert.strictEqual(goalsToSave.length, 1);
         const onlyGoal = goalsToSave[0];
         const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
-        assert.equal(myImpl.implementationName, "Cornelius");
+        assert.strictEqual(myImpl.implementationName, "Cornelius");
         await myImpl.goalExecutor(undefined);
         assert(executed);
     });
 
-})
-;
+});

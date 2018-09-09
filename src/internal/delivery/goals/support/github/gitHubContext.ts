@@ -33,11 +33,13 @@ export function splitContext(context: GitHubStatusContext) {
 
         const matchWhole = context.match(wholeContext);
         if (!matchWhole) {
+            logger.debug(`Context '${context}' did not match expected format`);
             return undefined;
         }
 
         const goalPart = matchWhole[2];
-        const matchEnv = matchWhole[1].match(numberAndName);
+        const envPart = matchWhole[1];
+        const matchEnv = envPart.match(numberAndName);
         const matchGoal = goalPart.match(numberAndName);
         if (!matchGoal || !matchEnv) {
             logger.debug(`Did not find number and name in ${matchWhole[1]} or ${matchWhole[2]}`);
@@ -56,6 +58,8 @@ export function splitContext(context: GitHubStatusContext) {
             goalName: name,
         };
     }
+    logger.debug(`Context '${context}' did not start with '${BaseContext}`);
+    return undefined;
 }
 
 /*
