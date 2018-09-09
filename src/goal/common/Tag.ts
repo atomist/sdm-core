@@ -17,6 +17,7 @@
 import {
     DefaultGoalNameGenerator,
     FulfillableGoalWithRegistrations,
+    Goal,
     ImplementationRegistration,
 } from "@atomist/sdm";
 import { TagGoal } from "@atomist/sdm/pack/well-known-goals/commonGoals";
@@ -27,13 +28,13 @@ import { executeTag } from "../../internal/delivery/build/executeTag";
  */
 export class Tag extends FulfillableGoalWithRegistrations<ImplementationRegistration> {
 
-    constructor(private readonly uniqueName: string = DefaultGoalNameGenerator.generateName("tag")) {
+    constructor(private readonly uniqueName: string = DefaultGoalNameGenerator.generateName("tag"), ...dependsOn: Goal[]) {
 
         super({
             ...TagGoal.definition,
             uniqueName,
             displayName: "tag",
-        });
+        }, ...dependsOn);
     }
 
     public with(registration: ImplementationRegistration): this {

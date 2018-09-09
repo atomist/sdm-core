@@ -17,6 +17,7 @@
 import {
     DefaultGoalNameGenerator,
     FulfillableGoalWithRegistrations,
+    Goal,
     ImplementationRegistration,
 } from "@atomist/sdm";
 import { VersionGoal } from "@atomist/sdm/pack/well-known-goals/commonGoals";
@@ -37,13 +38,14 @@ export interface ProjectVersionerRegistration extends ImplementationRegistration
  */
 export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRegistration> {
 
-    constructor(private readonly uniqueName: string = DefaultGoalNameGenerator.generateName("version")) {
+    constructor(private readonly uniqueName: string = DefaultGoalNameGenerator.generateName("version"),
+                ...dependsOn: Goal[]) {
 
         super({
             ...VersionGoal.definition,
             uniqueName,
             displayName: "version",
-        });
+        }, ...dependsOn);
     }
 
     public with(registration: ProjectVersionerRegistration): this {
