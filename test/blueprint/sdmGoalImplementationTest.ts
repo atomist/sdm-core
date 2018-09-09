@@ -116,7 +116,7 @@ describe("implementing goals in the SDM", () => {
         const onlyGoal = goalsToSave[0];
 
         const myImpl = mySDM.goalFulfillmentMapper.findImplementationBySdmGoal(onlyGoal as any as SdmGoalEvent);
-        assert.strictEqual(myImpl.implementationName, autofixGoal.name);
+        assert(myImpl.implementationName.endsWith(autofixGoal.definition.uniqueName));
     });
 
     it("I can teach it to do a custom goal", async () => {
