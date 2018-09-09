@@ -33,11 +33,11 @@ import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
+import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
 import {
     isInLocalMode,
     LocalSoftwareDeliveryMachineConfiguration,
 } from "./LocalSoftwareDeliveryMachineOptions";
-import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
 
 /**
  * Options passed to the set up of the SDM.
