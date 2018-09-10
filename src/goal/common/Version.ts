@@ -32,7 +32,7 @@ import {
 /**
  * Register a ProjectVersioner for a certain type of push
  */
-export interface ProjectVersionerRegistration extends ImplementationRegistration {
+export interface ProjectVersionerRegistration extends Partial<ImplementationRegistration> {
     versioner: ProjectVersioner;
 }
 
@@ -54,6 +54,7 @@ export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRe
     public with(registration: ProjectVersionerRegistration): this {
         this.addFulfillment({
             goalExecutor: executeVersioner(registration.versioner),
+            name: DefaultGoalNameGenerator.generateName("versioner"),
             ...registration as ImplementationRegistration,
         });
         return this;
