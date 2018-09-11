@@ -31,9 +31,11 @@ import {
     GoalImplementationMapper,
     GoalInvocation,
     SdmGoalFulfillmentMethod,
+    SdmGoalState,
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
+import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
 import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
 import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
 import { serializeResult } from "@atomist/sdm/api-helper/misc/result";
@@ -67,8 +69,18 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        if (sdmGoal.fulfillment.method !== SdmGoalFulfillmentMethod.Sdm) {
-            logger.info("Goal %s: Implementation method is '%s'; not fulfilling", sdmGoal.name, sdmGoal.fulfillment.method);
+        if (sdmGoal.fulfillment.method === SdmGoalFulfillmentMethod.SideEffect) {
+            logger.info("No fulfilling side-effected goal '%s' with method '%s/%s'", sdmGoal.uniqueName, sdmGoal.fulfillment.method, sdmGoal.fulfillment.name);
+            return Success;
+        } else if (sdmGoal.fulfillment.method === SdmGoalFulfillmentMethod.Other) {
+            // fail goal with neither Sdm nor SideEffect fulfillment
+            await updateGoal(
+                ctx,
+                sdmGoal,
+                {
+                    state: SdmGoalState.failure,
+                    description: `No fulfillment for ${sdmGoal.name}`,
+                });
             return Success;
         }
 
