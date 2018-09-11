@@ -47,7 +47,7 @@ import {
     OnBuildComplete,
     SdmGoalState,
 } from "@atomist/sdm/typings/types";
-import * as slack from "@atomist/slack-messages/SlackMessages";
+import * as slack from "@atomist/slack-messages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";
 
