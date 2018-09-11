@@ -24,7 +24,7 @@ import { setGoalStateCommand } from "./setGoalState";
  * allow goal setting
  */
 export const GoalState: ExtensionPack = {
-    ...metadata("set goal state"),
+    ...metadata("set-goal-state"),
     configure: sdm => {
         if (isInLocalMode()) {
             logger.warn("Setting goal state is not available in local mode.");
