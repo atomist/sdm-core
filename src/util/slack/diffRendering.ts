@@ -17,7 +17,10 @@
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import * as slack from "@atomist/slack-messages/SlackMessages";
+import {
+    Attachment,
+    url,
+} from "@atomist/slack-messages";
 import { listCommitsBetween } from "../github/ghub";
 import {
     avatarUrl,
@@ -30,14 +33,14 @@ import {
 /* tslint:disable:no-unused-variable */
 
 export function linkToDiff(id: RemoteRepoRef, start: string, end: string, endDescription?: string) {
-    return slack.url(diffUrl(id, start, end), `(Compare with ${endDescription || end.substr(0, 6)})`);
+    return url(diffUrl(id, start, end), `(Compare with ${endDescription || end.substr(0, 6)})`);
 }
 
 function diffUrl(id: RemoteRepoRef, start: string, end: string) {
     return `${id.url}/compare/${start}...${end}`;
 }
 
-export async function renderDiff(token: string, id: GitHubRepoRef, start: string, end: string, color: string): Promise<slack.Attachment[]> {
+export async function renderDiff(token: string, id: GitHubRepoRef, start: string, end: string, color: string): Promise<Attachment[]> {
     const fromGitHub = await listCommitsBetween(token, id, start, end);
 
     const commits: CommitForRendering[] = fromGitHub.commits.map(c => ({
@@ -59,7 +62,7 @@ export interface CommitForRendering {
     };
 }
 
-function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: string, color: string): Promise<slack.Attachment[]> {
+function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: string, color: string): Promise<Attachment[]> {
 
     const commitsGroupedByAuthor = [];
 
@@ -87,7 +90,7 @@ function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: str
         }
     }
 
-    let attachments: slack.Attachment[] = [];
+    let attachments: Attachment[] = [];
 
     commitsGroupedByAuthor
         .forEach(cgba => {
@@ -97,7 +100,7 @@ function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: str
 
             const fallback = `lots of commits`;
 
-            const attachment: slack.Attachment = {
+            const attachment: Attachment = {
                 author_name: `@${a}`,
                 author_link: userUrl(repo, a),
                 author_icon: avatarUrl(repo, a),
@@ -115,7 +118,7 @@ function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: str
         attachments = attachments.slice(0, 3);
         const fullDiffDescription = `... and more! (${commits.length} total commits)`;
 
-        const attachment: slack.Attachment = {
+        const attachment: Attachment = {
             title_link: fullDiffLink,
             title: fullDiffDescription,
             color,
@@ -147,5 +150,5 @@ function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: str
 export function renderCommitMessage(repo: RepoInfo, commitNode: CommitForRendering): string {
     // Cut commit to 50 chars of first line
     const m = truncateCommitMessage(commitNode.message, repo);
-    return "`" + slack.url(commitUrl(repo, commitNode), commitNode.sha.substring(0, 7)) + "` " + m;
+    return "`" + url(commitUrl(repo, commitNode), commitNode.sha.substring(0, 7)) + "` " + m;
 }

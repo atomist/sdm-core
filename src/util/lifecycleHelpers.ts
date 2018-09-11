@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as slack from "@atomist/slack-messages/SlackMessages";
+import * as slack from "@atomist/slack-messages";
 import * as _ from "lodash";
 
 // This file copied from atomist/lifecycle-automation
