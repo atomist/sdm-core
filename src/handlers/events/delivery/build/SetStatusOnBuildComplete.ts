@@ -47,7 +47,7 @@ import {
     OnBuildComplete,
     SdmGoalState,
 } from "@atomist/sdm/typings/types";
-import { url } from "@atomist/slack-messages";
+import * as slack from "@atomist/slack-messages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";
 
@@ -114,7 +114,7 @@ export async function displayBuildLogFailure(id: RemoteRepoRef,
 }
 
 function linkToSha(id: RemoteRepoRef) {
-    return url(id.url + "/tree/" + id.sha, id.sha.substr(0, 6));
+    return slack.url(id.url + "/tree/" + id.sha, id.sha.substr(0, 6));
 }
 
 function buildStatusToSdmGoalState(buildStatus: BuildStatus): SdmGoalState {

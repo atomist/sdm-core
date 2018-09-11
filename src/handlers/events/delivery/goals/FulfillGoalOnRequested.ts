@@ -70,7 +70,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         }
 
         if (sdmGoal.fulfillment.method === SdmGoalFulfillmentMethod.SideEffect) {
-            logger.info("No fulfilling side-effected goal '%s' with method '%s/%s'", sdmGoal.uniqueName, sdmGoal.fulfillment.method, sdmGoal.fulfillment.name);
+            logger.info("No fulfilling side-effected goal '%s' with method '%s/%s'",
+                sdmGoal.uniqueName, sdmGoal.fulfillment.method, sdmGoal.fulfillment.name);
             return Success;
         } else if (sdmGoal.fulfillment.method === SdmGoalFulfillmentMethod.Other) {
             // fail goal with neither Sdm nor SideEffect fulfillment
