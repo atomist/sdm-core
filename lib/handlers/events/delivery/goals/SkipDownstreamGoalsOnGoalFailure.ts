@@ -25,14 +25,14 @@ import {
     Success,
 } from "@atomist/automation-client";
 import {
+    fetchGoalsForCommit,
+    goalKeyEquals,
+    RepoRefResolver,
     SdmGoalEvent,
     SdmGoalKey,
     SdmGoalState,
+    updateGoal,
 } from "@atomist/sdm";
-import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
-import { goalKeyEquals } from "@atomist/sdm/lib/api-helper/goal/sdmGoal";
-import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 

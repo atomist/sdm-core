@@ -19,12 +19,12 @@ import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/
 import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
-import { toToken } from "@atomist/sdm/lib/api-helper/misc/credentials/toToken";
 import {
+    AppInfo,
     ArtifactStore,
     DeployableArtifact,
-} from "@atomist/sdm/lib/spi/artifact/ArtifactStore";
-import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
+    toToken,
+} from "@atomist/sdm";
 import * as GitHubApi from "@octokit/rest";
 import axios from "axios";
 import * as fs from "fs";

@@ -16,7 +16,7 @@
 
 import { logger } from "@atomist/automation-client";
 import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
-import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
+import { ProgressLog } from "@atomist/sdm";
 import axios, { AxiosInstance } from "axios";
 import * as _ from "lodash";
 import os = require("os");

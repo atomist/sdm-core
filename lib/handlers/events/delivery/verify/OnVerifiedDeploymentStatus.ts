@@ -24,15 +24,15 @@ import {
     logger,
     Success,
 } from "@atomist/automation-client";
-import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
+    addressChannelsFor,
+    CredentialsResolver,
+    OnSuccessStatus,
+    RepoRefResolver,
+    StagingVerifiedGoal,
     VerifiedDeploymentListener,
     VerifiedDeploymentListenerInvocation,
-} from "@atomist/sdm/lib/api/listener/VerifiedDeploymentListener";
-import { StagingVerifiedGoal } from "@atomist/sdm/lib/api/machine/wellKnownGoals";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
-import { OnSuccessStatus } from "@atomist/sdm/lib/typings/types";
+} from "@atomist/sdm";
 import Status = OnSuccessStatus.Status;
 
 /**

@@ -15,8 +15,10 @@
  */
 
 import { HandlerContext } from "@atomist/automation-client";
-import { SdmGoalEvent } from "@atomist/sdm";
-import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
+import {
+    ProgressLog,
+    SdmGoalEvent,
+} from "@atomist/sdm";
 import { RolarProgressLog } from "./RolarProgressLog";
 
 /**

@@ -17,15 +17,15 @@
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {
+    CredentialsResolver,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
+    goalKeyString,
     GoalsSetListener,
     GoalsSetListenerInvocation,
     SdmGoalEvent,
+    StatusState,
 } from "@atomist/sdm";
-import { goalKeyString } from "@atomist/sdm/lib/api-helper/goal/sdmGoal";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { StatusState } from "@atomist/sdm/lib/typings/types";
 import { SdmGoalState } from "../../../../../typings/types";
 import { createStatus } from "../../../../../util/github/ghub";
 

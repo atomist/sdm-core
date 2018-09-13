@@ -15,6 +15,7 @@
  */
 
 import {
+    ChildProcessResult,
     configurationValue,
     failure,
     HandlerContext,
@@ -25,20 +26,17 @@ import {
 } from "@atomist/automation-client";
 import { addressEvent } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
+    AddressChannels,
+    AppInfo,
+    ArtifactStore,
+    Builder,
+    InterpretLog,
+    ProgressLog,
     ProjectOperationCredentials,
+    PushThatTriggersBuild,
     QueryNoCacheOptions,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import { ChildProcessResult } from "@atomist/sdm/lib/api-helper/misc/spawned";
-import { AddressChannels } from "@atomist/sdm/lib/api/context/addressChannels";
-import { ArtifactStore } from "@atomist/sdm/lib/spi/artifact/ArtifactStore";
-import {
-    Builder,
-    PushThatTriggersBuild,
-} from "@atomist/sdm/lib/spi/build/Builder";
-import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
-import { InterpretLog } from "@atomist/sdm/lib/spi/log/InterpretedLog";
-import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import { sprintf } from "sprintf-js";
 import { SdmBuildIdentifierForRepo } from "../../../../typings/types";
 import { postLinkImageWebhook } from "../../../../util/webhook/ImageLink";

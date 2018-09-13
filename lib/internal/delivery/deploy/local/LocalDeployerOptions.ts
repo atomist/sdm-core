@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Deployment } from "@atomist/sdm/lib/spi/deploy/Deployment";
+import { Deployment } from "@atomist/sdm";
 import { ChildProcess } from "child_process";
 import { LookupStrategy } from "./ManagedDeployments";
 

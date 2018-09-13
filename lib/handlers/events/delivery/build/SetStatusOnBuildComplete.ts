@@ -26,27 +26,21 @@ import {
 } from "@atomist/automation-client";
 import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import {
-    SdmGoalEvent,
-    SdmGoalFulfillmentMethod,
-} from "@atomist/sdm";
-import { findSdmGoalOnCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
-import {
-    descriptionFromState,
-    updateGoal,
-} from "@atomist/sdm/lib/api-helper/goal/storeGoals";
-import { reportFailureInterpretation } from "@atomist/sdm/lib/api-helper/misc/reportFailureInterpretation";
-import {
     AddressChannels,
     addressChannelsFor,
-} from "@atomist/sdm/lib/api/context/addressChannels";
-import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
-import { LogInterpretation } from "@atomist/sdm/lib/spi/log/InterpretedLog";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
-import {
     BuildStatus,
+    descriptionFromState,
+    findSdmGoalOnCommit,
+    Goal,
+    LogInterpretation,
     OnBuildComplete,
+    RepoRefResolver,
+    reportFailureInterpretation,
+    SdmGoalEvent,
+    SdmGoalFulfillmentMethod,
     SdmGoalState,
-} from "@atomist/sdm/lib/typings/types";
+    updateGoal,
+} from "@atomist/sdm";
 import * as slack from "@atomist/slack-messages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";

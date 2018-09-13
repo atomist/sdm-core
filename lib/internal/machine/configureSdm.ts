@@ -22,10 +22,10 @@ import { ConfigurationPostProcessor } from "@atomist/automation-client/lib/confi
 import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     ConfigurationValues,
+    SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
     validateConfigurationValues,
-} from "@atomist/sdm/lib/api/machine/ConfigurationValues";
-import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+} from "@atomist/sdm";
 import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
@@ -152,7 +152,7 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
     // tslint:disable-next-line:no-implicit-dependencies
-    const sdmPj = require("@atomist/sdm/lib/package.json");
+    const sdmPj = require("@atomist/sdm/package.json");
     // tslint:disable-next-line:no-implicit-dependencies
     const sdmCorePj = require("@atomist/sdm-core/package.json");
 

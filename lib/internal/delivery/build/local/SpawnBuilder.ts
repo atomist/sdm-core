@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
-import { Project } from "@atomist/automation-client/lib/project/Project";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
-import { serializeResult } from "@atomist/sdm/lib/api-helper/misc/result";
 import {
     asSpawnCommand,
     ChildProcessResult,
     ErrorFinder,
+    logger,
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
-} from "@atomist/sdm/lib/api-helper/misc/spawned";
-import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
+} from "@atomist/automation-client";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { Project } from "@atomist/automation-client/lib/project/Project";
 import {
+    AppInfo,
     InterpretLog,
     LogInterpretation,
-} from "@atomist/sdm/lib/spi/log/InterpretedLog";
-import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
+    ProgressLog,
+    serializeResult,
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";

@@ -20,15 +20,15 @@ import {
     HandleEvent,
 } from "@atomist/automation-client";
 import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
-import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/lib/api-helper/machine/AbstractSoftwareDeliveryMachine";
-import { FunctionalUnit } from "@atomist/sdm/lib/api/machine/FunctionalUnit";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import {
+    AbstractSoftwareDeliveryMachine,
     ArtifactGoal,
     BuildGoal,
+    FunctionalUnit,
+    GoalSetter,
     JustBuildGoal,
-} from "@atomist/sdm/lib/api/machine/wellKnownGoals";
-import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
 import { WellKnownGoals } from "@atomist/sdm/lib/pack/well-known-goals/addWellKnownGoals";
 import * as _ from "lodash";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";

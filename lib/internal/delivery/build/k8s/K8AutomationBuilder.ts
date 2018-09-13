@@ -21,17 +21,15 @@ import {
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
 import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { lastLinesLogInterpreter } from "@atomist/sdm/lib/api-helper/log/logInterpreters";
-import { AddressChannels } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
+    AddressChannels,
     Builder,
-    PushThatTriggersBuild,
-} from "@atomist/sdm/lib/spi/build/Builder";
-import {
     InterpretLog,
+    lastLinesLogInterpreter,
     LogInterpretation,
-} from "@atomist/sdm/lib/spi/log/InterpretedLog";
-import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
+    ProgressLog,
+    PushThatTriggersBuild,
+} from "@atomist/sdm";
 import { createStatus } from "../../../../util/github/ghub";
 
 const K8AutomationBuildContext = "build/atomist/k8s";

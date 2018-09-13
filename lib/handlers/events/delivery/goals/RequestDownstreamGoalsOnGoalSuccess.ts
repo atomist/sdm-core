@@ -25,17 +25,17 @@ import {
     Success,
 } from "@atomist/automation-client";
 import {
+    CredentialsResolver,
+    fetchGoalsForCommit,
+    GoalImplementationMapper,
+    goalKeyString,
+    preconditionsAreMet,
+    RepoRefResolver,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalKey,
+    updateGoal,
 } from "@atomist/sdm";
-import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
-import { preconditionsAreMet } from "@atomist/sdm/lib/api-helper/goal/goalPreconditions";
-import { goalKeyString } from "@atomist/sdm/lib/api-helper/goal/sdmGoal";
-import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
-import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
     OnAnySuccessfulSdmGoal,

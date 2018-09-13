@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { MachineConfiguration } from "@atomist/sdm/lib/api/machine/MachineConfiguration";
-import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
-import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
+import {
+    GoalSetter,
+    MachineConfiguration,
+    SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
 import { HandlerBasedSoftwareDeliveryMachine } from "../internal/machine/HandlerBasedSoftwareDeliveryMachine";
-import { isInLocalMode } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
-import { GoalState } from "../pack/goalState/goalState";
 import { ExposeInfo } from "../pack/info/exposeInfo";
 
 /**

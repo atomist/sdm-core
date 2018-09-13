@@ -29,8 +29,8 @@ import { addressEvent } from "@atomist/automation-client/lib/spi/message/Message
 import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
+    success,
 } from "@atomist/sdm";
-import { success } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import { bold } from "@atomist/slack-messages";
 import {
     DeployEnablementRootType,

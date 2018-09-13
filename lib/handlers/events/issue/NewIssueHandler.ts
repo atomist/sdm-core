@@ -24,13 +24,13 @@ import {
     logger,
     Success,
 } from "@atomist/automation-client";
-import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
+    addressChannelsFor,
+    CredentialsResolver,
     NewIssueListener,
     NewIssueListenerInvocation,
-} from "@atomist/sdm/lib/api/listener/NewIssueListener";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+    RepoRefResolver,
+} from "@atomist/sdm";
 import * as schema from "@atomist/sdm/lib/typings/types";
 
 /**

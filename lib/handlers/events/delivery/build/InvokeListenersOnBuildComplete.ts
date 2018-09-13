@@ -26,14 +26,12 @@ import {
 import {
     AddressChannels,
     addressChannelsFor,
-} from "@atomist/sdm/lib/api/context/addressChannels";
-import {
     BuildListener,
     BuildListenerInvocation,
-} from "@atomist/sdm/lib/api/listener/BuildListener";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
-import { OnBuildComplete } from "@atomist/sdm/lib/typings/types";
+    CredentialsResolver,
+    OnBuildComplete,
+    RepoRefResolver,
+} from "@atomist/sdm";
 
 /**
  * Invoke listeners on complete build. Not a part of our delivery flow:

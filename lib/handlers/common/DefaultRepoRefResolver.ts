@@ -20,13 +20,13 @@ import {
     logger,
     RemoteRepoRef,
 } from "@atomist/automation-client";
-import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import {
     CoreRepoFieldsAndChannels,
     OnPushToAnyBranch,
     ProviderType,
-} from "@atomist/sdm/lib/typings/types";
+    RepoRefResolver,
+    SdmGoalEvent,
+} from "@atomist/sdm";
 import * as _ from "lodash";
 
 export class DefaultRepoRefResolver implements RepoRefResolver {

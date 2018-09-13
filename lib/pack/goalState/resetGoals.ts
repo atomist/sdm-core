@@ -18,28 +18,26 @@ import {
     logger,
     MappedParameter,
     MappedParameters,
-    Parameter,
     Success,
     Value,
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/lib/decorators";
-import { CommandHandlerRegistration, CommandListenerInvocation, GitHubRepoTargets, SoftwareDeliveryMachine } from "@atomist/sdm";
-import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
-import { toRepoTargetingParametersMaker } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
-import { RepoTargetingParameters } from "@atomist/sdm/lib/api-helper/machine/RepoTargetingParameters";
 import {
+    chooseAndSetGoals,
+    CommandHandlerRegistration,
+    CommandListenerInvocation,
+    GitHubRepoTargets,
+    RepoTargetingParameters,
+    SoftwareDeliveryMachine,
     success,
+    toRepoTargetingParametersMaker,
     warning,
-} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+} from "@atomist/sdm";
 import {
     bold,
     codeLine,
     italic,
 } from "@atomist/slack-messages";
-import {
-    PushForCommit,
-    RepoBranchTips,
-} from "../../typings/types";
 import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()

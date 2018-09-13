@@ -16,7 +16,7 @@
 
 import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
 
-import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
+import { PushListenerInvocation } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { IsClojure } from "../../../lib/pack/clojure/pushTests";
 

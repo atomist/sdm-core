@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
+import {
+    logger,
+    poisonAndWait,
+} from "@atomist/automation-client";
 import {
     RemoteRepoRef,
     RepoRef,
 } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { poisonAndWait } from "@atomist/sdm/lib/api-helper/misc/spawned";
 import {
     Deployment,
+    Targeter,
     TargetInfo,
-} from "@atomist/sdm/lib/spi/deploy/Deployment";
-import { Targeter } from "@atomist/sdm/lib/spi/deploy/Target";
+} from "@atomist/sdm";
 import axios from "axios";
 import { ChildProcess } from "child_process";
 import * as https from "https";

@@ -21,17 +21,19 @@ import {
     HandleEvent,
     HandlerContext,
     HandlerResult,
+    RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
-import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
-import { GoalsSetListener } from "@atomist/sdm/lib/api/listener/GoalsSetListener";
-import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
-import { OnPushToAnyBranch } from "@atomist/sdm/lib/typings/types";
+import {
+    chooseAndSetGoals,
+    CredentialsResolver,
+    GoalImplementationMapper,
+    GoalSetter,
+    GoalsSetListener,
+    OnPushToAnyBranch,
+    ProjectLoader,
+    RepoRefResolver,
+} from "@atomist/sdm";
 
 /**
  * Set up goalSet on a push (e.g. for delivery).

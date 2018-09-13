@@ -16,7 +16,7 @@
 
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 
-import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
+import { PushListenerInvocation } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { ToPublicRepo } from "../../../lib/mapping/pushtest/toPublicRepo";
 

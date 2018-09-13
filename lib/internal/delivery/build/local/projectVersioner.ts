@@ -22,11 +22,11 @@ import { GitProject } from "@atomist/automation-client/lib/project/git/GitProjec
 import { addressEvent } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
     ExecuteGoal,
+    ExecuteGoalResult,
     GoalInvocation,
+    ProgressLog,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
-import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import { codeLine } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {

@@ -24,18 +24,18 @@ import {
     logger,
     Success,
 } from "@atomist/automation-client";
-import { SdmGoalState } from "@atomist/sdm";
-import { findSdmGoalOnCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
-import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
-import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
-import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
 import {
+    addressChannelsFor,
     ArtifactListenerInvocation,
     ArtifactListenerRegisterable,
+    findSdmGoalOnCommit,
+    Goal,
+    PushListenerInvocation,
+    SdmGoalState,
+    SoftwareDeliveryMachineOptions,
     toArtifactListenerRegistration,
-} from "@atomist/sdm/lib/api/listener/ArtifactListener";
-import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
-import { SoftwareDeliveryMachineOptions } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+    updateGoal,
+} from "@atomist/sdm";
 import {
     OnImageLinked,
 } from "../../../../typings/types";

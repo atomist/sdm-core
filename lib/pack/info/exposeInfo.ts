@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
-import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
+import {
+    ExtensionPack,
+    metadata,
+} from "@atomist/sdm";
 import { selfDescribeCommand } from "./SelfDescribe";
 
 /**

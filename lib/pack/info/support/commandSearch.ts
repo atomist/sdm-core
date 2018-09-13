@@ -21,7 +21,7 @@ import {
     Maker,
     toFactory,
 } from "@atomist/automation-client/lib/util/constructionUtils";
-import { FunctionalUnit } from "@atomist/sdm/lib/api/machine/FunctionalUnit";
+import { FunctionalUnit } from "@atomist/sdm";
 
 export interface HandlerInfo {
     maker: Maker<HandleCommand<any>>;

@@ -24,21 +24,19 @@ import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/
 import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
 import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
 import {
+    AnyPush,
     Autofix,
+    determineGoals,
+    Goals,
     GoalWithFulfillment,
+    PushFields,
     resetRegistrableManager,
-} from "@atomist/sdm";
-import { determineGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
-import { SingleProjectLoader } from "@atomist/sdm/lib/api-helper/test/SingleProjectLoader";
-import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
-import { Goals } from "@atomist/sdm/lib/api/goal/Goals";
-import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
-import {
+    SdmGoalEvent,
     SoftwareDeliveryMachineConfiguration,
     SoftwareDeliveryMachineOptions,
-} from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
-import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
-import { PushFields } from "@atomist/sdm/lib/typings/types";
+    whenPushSatisfies,
+} from "@atomist/sdm";
+import { SingleProjectLoader } from "@atomist/sdm/lib/api-helper/test/SingleProjectLoader";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../lib/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../lib/machine/machineFactory";

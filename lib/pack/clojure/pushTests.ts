@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { PredicatePushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import {
     hasFile,
     hasFileWithExtension,
-} from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
+    PredicatePushTest,
+} from "@atomist/sdm";
 
 /**
  * @deprecated should move into Clojure pack

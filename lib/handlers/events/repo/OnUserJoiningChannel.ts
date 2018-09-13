@@ -24,11 +24,11 @@ import {
     Success,
 } from "@atomist/automation-client";
 import {
+    CredentialsResolver,
+    RepoRefResolver,
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
-} from "@atomist/sdm/lib/api/listener/UserJoiningChannelListener";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm";
 import * as schema from "@atomist/sdm/lib/typings/types";
 
 /**

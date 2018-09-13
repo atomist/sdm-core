@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
+import {
+    asSpawnCommand,
+    SpawnCommand,
+} from "@atomist/automation-client";
 import { Project } from "@atomist/automation-client/lib/project/Project";
 import { Microgrammar } from "@atomist/microgrammar";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
-import { asSpawnCommand, SpawnCommand } from "@atomist/sdm/lib/api-helper/misc/spawned";
-import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
-import { InterpretLog } from "@atomist/sdm/lib/spi/log/InterpretedLog";
+import {
+    AppInfo,
+    InterpretLog,
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 import { SpawnBuilder, SpawnBuilderOptions } from "../SpawnBuilder";
 
 export const RunBuild: SpawnCommand = asSpawnCommand("lein");

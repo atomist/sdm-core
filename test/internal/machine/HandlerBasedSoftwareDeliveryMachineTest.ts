@@ -19,21 +19,19 @@ import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMe
 import { fileExists } from "@atomist/automation-client/lib/project/util/projectUtils";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
+    AnyPush,
+    AutofixRegistration,
     Builder,
+    ExtensionPack,
+    GoalsSetListener,
+    hasFile,
+    MessageGoal,
     PushListenerInvocation,
-    pushTest,
     PushTest,
+    pushTest,
+    whenPushSatisfies,
 } from "@atomist/sdm";
 import { fakePush } from "@atomist/sdm/lib/api-helper/test/fakePush";
-import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
-import { MessageGoal } from "@atomist/sdm/lib/api/goal/common/MessageGoal";
-import { GoalsSetListener } from "@atomist/sdm/lib/api/listener/GoalsSetListener";
-import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
-import {
-    AnyPush,
-    hasFile,
-} from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
-import { AutofixRegistration } from "@atomist/sdm/lib/api/registration/AutofixRegistration";
 import { NoGoals } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "@atomist/sdm/lib/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";

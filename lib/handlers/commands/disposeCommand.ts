@@ -31,7 +31,7 @@ import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/
 import {
     chooseAndSetGoals,
     ChooseAndSetGoalsRules,
-} from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+} from "@atomist/sdm";
 import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()

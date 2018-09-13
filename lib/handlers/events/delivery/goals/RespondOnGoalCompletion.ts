@@ -25,14 +25,14 @@ import {
     Success,
 } from "@atomist/automation-client";
 import {
+    addressChannelsFor,
+    CredentialsResolver,
+    fetchGoalsForCommit,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
+    RepoRefResolver,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
-import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
-import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 

@@ -20,9 +20,9 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/lib/oper
 import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import {
     ExecuteGoal,
+    ExecuteGoalResult,
     GoalInvocation,
 } from "@atomist/sdm";
-import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import {
     createTag,
     createTagReference,

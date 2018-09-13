@@ -24,8 +24,8 @@ import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     CommandHandlerRegistration,
     CommandListener,
+    isDeployEnabled
 } from "@atomist/sdm";
-import { isDeployEnabled } from "@atomist/sdm/lib/api/mapping/support/deployPushTests";
 import {
     bold,
     SlackMessage,
