@@ -17,14 +17,14 @@
 import {
     automationClientInstance,
     AutomationContextAware,
+    configurationValue,
     HandlerContext,
     HandlerResult,
     logger,
+    SuccessIsReturn0ErrorFinder,
 } from "@atomist/automation-client";
-import { configurationValue } from "@atomist/automation-client/configuration";
-import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { SuccessIsReturn0ErrorFinder } from "@atomist/automation-client/util/spawned";
 import {
+    GitProject,
     IsolatedGoalLauncher,
     SdmGoalEvent,
 } from "@atomist/sdm";

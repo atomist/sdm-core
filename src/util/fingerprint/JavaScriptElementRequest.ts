@@ -15,7 +15,7 @@
  */
 
 import { TypeScriptES6FileParser } from "@atomist/automation-client/tree/ast/typescript/TypeScriptFileParser";
-import { TreeNode } from "@atomist/tree-path/TreeNode";
+import { TreeNode } from "@atomist/tree-path";
 import { ElementRequest } from "./elementRequest";
 
 /**

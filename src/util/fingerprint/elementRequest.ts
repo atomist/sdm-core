@@ -18,10 +18,9 @@ import { Project } from "@atomist/automation-client/project/Project";
 import { findMatches } from "@atomist/automation-client/tree/ast/astUtils";
 import { MatchResult } from "@atomist/automation-client/tree/ast/FileHits";
 import { FileParser } from "@atomist/automation-client/tree/ast/FileParser";
-
 import { CFamilyLangHelper } from "@atomist/microgrammar/matchers/lang/cfamily/CFamilyLangHelper";
 import { computeShaOf } from "@atomist/sdm/api-helper/misc/sha";
-import { TreeNode } from "@atomist/tree-path/TreeNode";
+import { TreeNode } from "@atomist/tree-path";
 import { JavaScriptElementRequest } from "./JavaScriptElementRequest";
 
 /**

@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
+import { execIn } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import * as fs from "fs";
-import * as assert from "power-assert";
-import {
-    GitHubReleaseArtifactStore,
-} from "../../../../src/internal/artifact/github/GitHubReleaseArtifactStore";
-
-import { runCommand } from "@atomist/automation-client/action/cli/commandLine";
 import * as p from "path";
+import * as assert from "power-assert";
+import { GitHubReleaseArtifactStore } from "../../../../src/internal/artifact/github/GitHubReleaseArtifactStore";
 
 const asset = "https://github.com/spring-team/fintan/releases/download/0.1.0-SNAPSHOT454/fintan-0.1.0-SNAPSHOT.jar";
 
@@ -35,13 +32,13 @@ describe("GitHubReleaseArtifactStore", () => {
             const id = new GitHubRepoRef("spring-team", "fintan");
             return ghras.checkout(asset,
                 id,
-                {token: process.env.GITHUB_TOKEN})
+                { token: process.env.GITHUB_TOKEN })
                 .then(da => {
                     const path = `${da.cwd}/${da.filename}`;
                     assert(fs.existsSync(path), `File [${path}] must exist`);
                     const cwd = p.dirname(path);
                     const filename = p.basename(path);
-                    return runCommand(`unzip ${filename}`, { cwd });
+                    return execIn(cwd, "unzip", [filename]);
                 });
         }).timeout(60000);
 
@@ -50,7 +47,7 @@ describe("GitHubReleaseArtifactStore", () => {
             const id = new GitHubRepoRef("spring-team", "fintan");
             return ghras.checkout(asset,
                 id,
-                {token: process.env.GITHUB_TOKEN})
+                { token: process.env.GITHUB_TOKEN })
                 .then(da => {
                     assert.equal(da.id.owner, id.owner);
                     assert.equal(da.id.repo, id.repo);

@@ -17,7 +17,6 @@
 import {
     HandlerContext,
     logger,
-    LoggingConfig,
     Success,
 } from "@atomist/automation-client";
 import { guid } from "@atomist/automation-client/internal/util/string";
@@ -43,9 +42,6 @@ import { PushFields } from "@atomist/sdm/typings/types";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../src/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../src/machine/machineFactory";
-
-LoggingConfig.format = "cli";
-(logger as any).level = process.env.LOG_LEVEL || "info";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",
