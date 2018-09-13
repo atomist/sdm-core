@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { InMemoryFile } from "@atomist/automation-client/project/mem/InMemoryFile";
-import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
-import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
-import { toFactory } from "@atomist/automation-client/util/constructionUtils";
+import { InMemoryFile } from "@atomist/automation-client/lib/project/mem/InMemoryFile";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { fileExists } from "@atomist/automation-client/lib/project/util/projectUtils";
+import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     Builder,
     PushListenerInvocation,
@@ -37,8 +37,8 @@ import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegist
 import { NoGoals } from "@atomist/sdm/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "@atomist/sdm/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
-import { SetGoalsOnPush } from "../../../src/handlers/events/delivery/goals/SetGoalsOnPush";
-import { HandlerBasedSoftwareDeliveryMachine } from "../../../src/internal/machine/HandlerBasedSoftwareDeliveryMachine";
+import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
+import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
 
 export const IsTypeScript: PushTest = pushTest(

@@ -16,7 +16,7 @@
 
 import { SdmGoalEvent } from "@atomist/sdm";
 import * as assert from "power-assert";
-import { isGoalRelevant } from "../../../../../src/internal/delivery/goals/support/validateGoal";
+import { isGoalRelevant } from "../../../../../lib/internal/delivery/goals/support/validateGoal";
 
 describe("isGoalRelevant", () => {
 

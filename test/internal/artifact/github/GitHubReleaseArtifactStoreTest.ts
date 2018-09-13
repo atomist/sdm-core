@@ -15,11 +15,11 @@
  */
 
 import { execIn } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import * as fs from "fs";
 import * as p from "path";
 import * as assert from "power-assert";
-import { GitHubReleaseArtifactStore } from "../../../../src/internal/artifact/github/GitHubReleaseArtifactStore";
+import { GitHubReleaseArtifactStore } from "../../../../lib/internal/artifact/github/GitHubReleaseArtifactStore";
 
 const asset = "https://github.com/spring-team/fintan/releases/download/0.1.0-SNAPSHOT454/fintan-0.1.0-SNAPSHOT.jar";
 

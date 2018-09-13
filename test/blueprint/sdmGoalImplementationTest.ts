@@ -19,10 +19,10 @@ import {
     logger,
     Success,
 } from "@atomist/automation-client";
-import { guid } from "@atomist/automation-client/internal/util/string";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
 import {
     Autofix,
     GoalWithFulfillment,
@@ -40,8 +40,8 @@ import {
 import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
 import { PushFields } from "@atomist/sdm/typings/types";
 import * as assert from "power-assert";
-import { DefaultRepoRefResolver } from "../../src/handlers/common/DefaultRepoRefResolver";
-import { createSoftwareDeliveryMachine } from "../../src/machine/machineFactory";
+import { DefaultRepoRefResolver } from "../../lib/handlers/common/DefaultRepoRefResolver";
+import { createSoftwareDeliveryMachine } from "../../lib/machine/machineFactory";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",
