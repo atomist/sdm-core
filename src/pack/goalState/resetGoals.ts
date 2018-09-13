@@ -54,6 +54,9 @@ export class ResetGoalsParameters extends GitHubRepoTargets {
     @Value("version")
     public version: string;
 
+    @Parameter()
+    public thing: string;
+
 }
 
 export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
