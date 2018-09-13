@@ -69,7 +69,7 @@ export class SetGoalOnBuildComplete implements HandleEvent<OnBuildComplete.Subsc
         const commit: OnBuildComplete.Commit = build.commit;
 
         const id = params.repoRefResolver.toRemoteRepoRef(commit.repo, { sha: commit.sha });
-        params.buildGoals.forEach(async buildGoal => {
+        for (const buildGoal of params.buildGoals) {
             const sdmGoal = await findSdmGoalOnCommit(ctx, id, commit.repo.org.provider.providerId, buildGoal);
             if (!sdmGoal) {
                 logger.debug("No build goal on commit; ignoring someone else's build result");
@@ -85,7 +85,7 @@ export class SetGoalOnBuildComplete implements HandleEvent<OnBuildComplete.Subsc
             await setBuiltContext(ctx, buildGoal, sdmGoal,
                 build.status,
                 build.buildUrl);
-        });
+        }
         if (build.status === "failed" && build.buildUrl) {
             const ac = addressChannelsFor(commit.repo, ctx);
             await displayBuildLogFailure(id, build, ac, params.logInterpretation);
