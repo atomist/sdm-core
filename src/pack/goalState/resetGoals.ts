@@ -43,7 +43,7 @@ import {
 import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
 
 @Parameters()
-export class ResetGoalsParameters extends GitHubRepoTargets {
+export class ResetGoalsParameters {
 
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
