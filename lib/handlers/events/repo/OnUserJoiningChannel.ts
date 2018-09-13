@@ -26,10 +26,10 @@ import {
 import {
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
-} from "@atomist/sdm/api/listener/UserJoiningChannelListener";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "@atomist/sdm/typings/types";
+} from "@atomist/sdm/lib/api/listener/UserJoiningChannelListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/lib/typings/types";
 
 /**
  * A user joined a channel

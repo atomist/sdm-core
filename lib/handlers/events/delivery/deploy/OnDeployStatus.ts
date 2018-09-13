@@ -24,15 +24,15 @@ import {
     logger,
     Success,
 } from "@atomist/automation-client";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     DeploymentListener,
     DeploymentListenerInvocation,
-} from "@atomist/sdm/api/listener/DeploymentListener";
-import { StagingDeploymentGoal } from "@atomist/sdm/api/machine/wellKnownGoals";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { OnSuccessStatus } from "@atomist/sdm/typings/types";
+} from "@atomist/sdm/lib/api/listener/DeploymentListener";
+import { StagingDeploymentGoal } from "@atomist/sdm/lib/api/machine/wellKnownGoals";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import { OnSuccessStatus } from "@atomist/sdm/lib/typings/types";
 
 /**
  * React to a deployment.

@@ -17,9 +17,9 @@
 import { Project } from "@atomist/automation-client/lib/project/Project";
 import { Microgrammar } from "@atomist/microgrammar";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
-import { asSpawnCommand, SpawnCommand } from "@atomist/sdm/api-helper/misc/spawned";
-import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
-import { InterpretLog } from "@atomist/sdm/spi/log/InterpretedLog";
+import { asSpawnCommand, SpawnCommand } from "@atomist/sdm/lib/api-helper/misc/spawned";
+import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
+import { InterpretLog } from "@atomist/sdm/lib/spi/log/InterpretedLog";
 import { SpawnBuilder, SpawnBuilderOptions } from "../SpawnBuilder";
 
 export const RunBuild: SpawnCommand = asSpawnCommand("lein");

@@ -23,15 +23,15 @@ import {
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     FingerprintDifference,
     FingerprintDifferenceListener,
     FingerprintDifferenceListenerInvocation,
     FingerprintValue,
-} from "@atomist/sdm/api/listener/FingerprintDifferenceListener";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm/lib/api/listener/FingerprintDifferenceListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as _ from "lodash";
 import * as schema from "../../../../typings/types";
 

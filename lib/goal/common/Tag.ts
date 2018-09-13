@@ -21,7 +21,7 @@ import {
     getGoalDefintionFrom,
     Goal,
 } from "@atomist/sdm";
-import { TagGoal } from "@atomist/sdm/pack/well-known-goals/commonGoals";
+import { TagGoal } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import { executeTag } from "../../internal/delivery/build/executeTag";
 
 /**

@@ -24,18 +24,18 @@ import {
     pushTest,
     PushTest,
 } from "@atomist/sdm";
-import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
-import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
-import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
-import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
-import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
+import { fakePush } from "@atomist/sdm/lib/api-helper/test/fakePush";
+import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
+import { MessageGoal } from "@atomist/sdm/lib/api/goal/common/MessageGoal";
+import { GoalsSetListener } from "@atomist/sdm/lib/api/listener/GoalsSetListener";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
 import {
     AnyPush,
     hasFile,
-} from "@atomist/sdm/api/mapping/support/commonPushTests";
-import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
-import { NoGoals } from "@atomist/sdm/pack/well-known-goals/commonGoals";
-import { HttpServiceGoals } from "@atomist/sdm/pack/well-known-goals/httpServiceGoals";
+} from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
+import { AutofixRegistration } from "@atomist/sdm/lib/api/registration/AutofixRegistration";
+import { NoGoals } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
+import { HttpServiceGoals } from "@atomist/sdm/lib/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";

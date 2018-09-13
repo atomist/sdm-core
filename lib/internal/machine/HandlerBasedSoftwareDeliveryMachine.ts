@@ -20,16 +20,16 @@ import {
     HandleEvent,
 } from "@atomist/automation-client";
 import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
-import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/api-helper/machine/AbstractSoftwareDeliveryMachine";
-import { FunctionalUnit } from "@atomist/sdm/api/machine/FunctionalUnit";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/lib/api-helper/machine/AbstractSoftwareDeliveryMachine";
+import { FunctionalUnit } from "@atomist/sdm/lib/api/machine/FunctionalUnit";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import {
     ArtifactGoal,
     BuildGoal,
     JustBuildGoal,
-} from "@atomist/sdm/api/machine/wellKnownGoals";
-import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
-import { WellKnownGoals } from "@atomist/sdm/pack/well-known-goals/addWellKnownGoals";
+} from "@atomist/sdm/lib/api/machine/wellKnownGoals";
+import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
+import { WellKnownGoals } from "@atomist/sdm/lib/pack/well-known-goals/addWellKnownGoals";
 import * as _ from "lodash";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";

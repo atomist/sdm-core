@@ -29,10 +29,10 @@ import {
     GoalCompletionListenerInvocation,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 

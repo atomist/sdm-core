@@ -19,8 +19,8 @@ import {
     ArtifactStore,
     DeployableArtifact,
     StoredArtifact,
-} from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
+} from "@atomist/sdm/lib/spi/artifact/ArtifactStore";
+import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
 
 /**
  * Store the artifact on local disk, relying on in memory cache.

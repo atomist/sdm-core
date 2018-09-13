@@ -18,7 +18,7 @@ import { logger } from "@atomist/automation-client";
 import {
     BaseContext,
     GitHubStatusContext,
-} from "@atomist/sdm/api/goal/GitHubContext";
+} from "@atomist/sdm/lib/api/goal/GitHubContext";
 
 /**
  * if this is a context we created, then we can interpret it.

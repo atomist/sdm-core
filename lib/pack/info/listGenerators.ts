@@ -17,8 +17,8 @@
 import { Success } from "@atomist/automation-client";
 import { NoParameters } from "@atomist/automation-client/lib/SmartParameters";
 import { CommandListener } from "@atomist/sdm";
-import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
-import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import { commandHandlersWithTag } from "./support/commandSearch";
 
 /**

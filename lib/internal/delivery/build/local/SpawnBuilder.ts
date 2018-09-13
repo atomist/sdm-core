@@ -20,7 +20,7 @@ import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import { Project } from "@atomist/automation-client/lib/project/Project";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
-import { serializeResult } from "@atomist/sdm/api-helper/misc/result";
+import { serializeResult } from "@atomist/sdm/lib/api-helper/misc/result";
 import {
     asSpawnCommand,
     ChildProcessResult,
@@ -28,13 +28,13 @@ import {
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
-} from "@atomist/sdm/api-helper/misc/spawned";
-import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
+} from "@atomist/sdm/lib/api-helper/misc/spawned";
+import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
 import {
     InterpretLog,
     LogInterpretation,
-} from "@atomist/sdm/spi/log/InterpretedLog";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+} from "@atomist/sdm/lib/spi/log/InterpretedLog";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";

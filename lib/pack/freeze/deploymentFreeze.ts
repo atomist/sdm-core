@@ -15,14 +15,14 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { executeSendMessageToSlack } from "@atomist/sdm/api-helper/goal/executeSendMessageToSlack";
-import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
-import { allOf } from "@atomist/sdm/api/dsl/allOf";
-import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
-import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
-import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
-import { PushTest } from "@atomist/sdm/api/mapping/PushTest";
-import { CommandHandlerRegistration } from "@atomist/sdm/api/registration/CommandHandlerRegistration";
+import { executeSendMessageToSlack } from "@atomist/sdm/lib/api-helper/goal/executeSendMessageToSlack";
+import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
+import { allOf } from "@atomist/sdm/lib/api/dsl/allOf";
+import { MessageGoal } from "@atomist/sdm/lib/api/goal/common/MessageGoal";
+import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
+import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 
 /**
  * Goal to explain a deployment freeze to the user.

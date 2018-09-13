@@ -29,16 +29,16 @@ import {
     QueryNoCacheOptions,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import { ChildProcessResult } from "@atomist/sdm/api-helper/misc/spawned";
-import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
-import { ArtifactStore } from "@atomist/sdm/spi/artifact/ArtifactStore";
+import { ChildProcessResult } from "@atomist/sdm/lib/api-helper/misc/spawned";
+import { AddressChannels } from "@atomist/sdm/lib/api/context/addressChannels";
+import { ArtifactStore } from "@atomist/sdm/lib/spi/artifact/ArtifactStore";
 import {
     Builder,
     PushThatTriggersBuild,
-} from "@atomist/sdm/spi/build/Builder";
-import { AppInfo } from "@atomist/sdm/spi/deploy/Deployment";
-import { InterpretLog } from "@atomist/sdm/spi/log/InterpretedLog";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+} from "@atomist/sdm/lib/spi/build/Builder";
+import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
+import { InterpretLog } from "@atomist/sdm/lib/spi/log/InterpretedLog";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import { sprintf } from "sprintf-js";
 import { SdmBuildIdentifierForRepo } from "../../../../typings/types";
 import { postLinkImageWebhook } from "../../../../util/webhook/ImageLink";

@@ -23,9 +23,9 @@ import {
     GoalsSetListenerInvocation,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { goalKeyString } from "@atomist/sdm/api-helper/goal/sdmGoal";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { StatusState } from "@atomist/sdm/typings/types";
+import { goalKeyString } from "@atomist/sdm/lib/api-helper/goal/sdmGoal";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { StatusState } from "@atomist/sdm/lib/typings/types";
 import { SdmGoalState } from "../../../../../typings/types";
 import { createStatus } from "../../../../../util/github/ghub";
 

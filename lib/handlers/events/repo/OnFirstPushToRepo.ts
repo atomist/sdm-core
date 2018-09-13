@@ -28,13 +28,13 @@ import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git
 import {
     AddressChannels,
     AddressNoChannels,
-} from "@atomist/sdm/api/context/addressChannels";
+} from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     PushListener,
     PushListenerInvocation,
-} from "@atomist/sdm/api/listener/PushListener";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm/lib/api/listener/PushListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as _ from "lodash";
 import * as schema from "../../../typings/types";
 

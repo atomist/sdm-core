@@ -24,14 +24,14 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
-import { GoalImplementationMapper } from "@atomist/sdm/api/goal/support/GoalImplementationMapper";
-import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
-import { GoalSetter } from "@atomist/sdm/api/mapping/GoalSetter";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import { OnPushToAnyBranch } from "@atomist/sdm/typings/types";
+import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
+import { GoalsSetListener } from "@atomist/sdm/lib/api/listener/GoalsSetListener";
+import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import { OnPushToAnyBranch } from "@atomist/sdm/lib/typings/types";
 
 /**
  * Set up goalSet on a push (e.g. for delivery).

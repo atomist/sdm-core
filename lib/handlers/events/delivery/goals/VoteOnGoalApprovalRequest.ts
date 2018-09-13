@@ -32,10 +32,10 @@ import {
     SdmGoalEvent,
     SdmGoalState,
 } from "@atomist/sdm";
-import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 

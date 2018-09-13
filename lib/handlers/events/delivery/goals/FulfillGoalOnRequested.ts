@@ -34,15 +34,15 @@ import {
     SdmGoalState,
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
-import { executeGoal } from "@atomist/sdm/api-helper/goal/executeGoal";
-import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
-import { WriteToAllProgressLog } from "@atomist/sdm/api-helper/log/WriteToAllProgressLog";
-import { serializeResult } from "@atomist/sdm/api-helper/misc/result";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
+import { executeGoal } from "@atomist/sdm/lib/api-helper/goal/executeGoal";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { LoggingProgressLog } from "@atomist/sdm/lib/api-helper/log/LoggingProgressLog";
+import { WriteToAllProgressLog } from "@atomist/sdm/lib/api-helper/log/WriteToAllProgressLog";
+import { serializeResult } from "@atomist/sdm/lib/api-helper/misc/result";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
+import { OnAnyRequestedSdmGoal } from "@atomist/sdm/lib/typings/types";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { formatDuration } from "../../../../util/misc/time";
 

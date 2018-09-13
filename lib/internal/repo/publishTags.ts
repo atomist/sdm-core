@@ -24,7 +24,7 @@ import {
 } from "@atomist/automation-client/lib/operations/tagger/Tagger";
 import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
 import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
-import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
+import { AddressChannels } from "@atomist/sdm/lib/api/context/addressChannels";
 import { listTopics } from "../../util/github/ghub";
 import { GitHubTagRouter } from "../../util/github/gitHubTagRouter";
 

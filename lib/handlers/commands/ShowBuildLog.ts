@@ -30,8 +30,8 @@ import {
     CommandHandlerRegistration,
     CommandListener,
 } from "@atomist/sdm";
-import { AddressChannels } from "@atomist/sdm/api/context/addressChannels";
-import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
+import { AddressChannels } from "@atomist/sdm/lib/api/context/addressChannels";
+import { LogInterpretation } from "@atomist/sdm/lib/spi/log/InterpretedLog";
 import * as _ from "lodash";
 import { BuildUrlBySha } from "../../typings/types";
 import { tipOfDefaultBranch } from "../../util/github/ghub";

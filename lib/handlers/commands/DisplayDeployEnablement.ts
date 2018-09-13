@@ -25,7 +25,7 @@ import {
     CommandHandlerRegistration,
     CommandListener,
 } from "@atomist/sdm";
-import { isDeployEnabled } from "@atomist/sdm/api/mapping/support/deployPushTests";
+import { isDeployEnabled } from "@atomist/sdm/lib/api/mapping/support/deployPushTests";
 import {
     bold,
     SlackMessage,

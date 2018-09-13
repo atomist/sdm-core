@@ -23,14 +23,14 @@ import {
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { AddressNoChannels } from "@atomist/sdm/api/context/addressChannels";
+import { AddressNoChannels } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     RepoCreationListener,
     RepoCreationListenerInvocation,
-} from "@atomist/sdm/api/listener/RepoCreationListener";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "@atomist/sdm/typings/types";
+} from "@atomist/sdm/lib/api/listener/RepoCreationListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/lib/typings/types";
 
 /**
  * A new repo has been created. We don't know if it has code.

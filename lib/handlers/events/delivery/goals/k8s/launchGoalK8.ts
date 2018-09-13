@@ -28,11 +28,11 @@ import {
     IsolatedGoalLauncher,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { LoggingProgressLog } from "@atomist/sdm/api-helper/log/LoggingProgressLog";
-import { StringCapturingProgressLog } from "@atomist/sdm/api-helper/log/StringCapturingProgressLog";
-import { spawnAndWatch } from "@atomist/sdm/api-helper/misc/spawned";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { OnAnyRequestedSdmGoal } from "@atomist/sdm/typings/types";
+import { LoggingProgressLog } from "@atomist/sdm/lib/api-helper/log/LoggingProgressLog";
+import { StringCapturingProgressLog } from "@atomist/sdm/lib/api-helper/log/StringCapturingProgressLog";
+import { spawnAndWatch } from "@atomist/sdm/lib/api-helper/misc/spawned";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
+import { OnAnyRequestedSdmGoal } from "@atomist/sdm/lib/typings/types";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
 import * as path from "path";

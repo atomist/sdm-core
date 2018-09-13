@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import { isInLocalMode } from "../../../machine/LocalSoftwareDeliveryMachineOptions";
 import {
     createPendingGitHubStatusOnGoalSet,

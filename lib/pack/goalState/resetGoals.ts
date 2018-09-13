@@ -24,13 +24,13 @@ import {
 } from "@atomist/automation-client";
 import { Parameters } from "@atomist/automation-client/lib/decorators";
 import { CommandHandlerRegistration, CommandListenerInvocation, GitHubRepoTargets, SoftwareDeliveryMachine } from "@atomist/sdm";
-import { chooseAndSetGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
-import { toRepoTargetingParametersMaker } from "@atomist/sdm/api-helper/machine/handlerRegistrations";
-import { RepoTargetingParameters } from "@atomist/sdm/api-helper/machine/RepoTargetingParameters";
+import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { toRepoTargetingParametersMaker } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { RepoTargetingParameters } from "@atomist/sdm/lib/api-helper/machine/RepoTargetingParameters";
 import {
     success,
     warning,
-} from "@atomist/sdm/api-helper/misc/slack/messages";
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import {
     bold,
     codeLine,

@@ -15,7 +15,7 @@
  */
 
 import { HandlerContext } from "@atomist/automation-client";
-import { ScmProvider } from "@atomist/sdm/typings/types";
+import { ScmProvider } from "@atomist/sdm/lib/typings/types";
 
 export const GitHubDotComProviderId = "zjlmxjzwhurspem";
 

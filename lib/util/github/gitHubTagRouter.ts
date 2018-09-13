@@ -22,7 +22,7 @@ import {
     isGitHubRepoRef,
 } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { TagRouter } from "@atomist/automation-client/lib/operations/tagger/Tagger";
-import { toToken } from "@atomist/sdm/api-helper/misc/credentials/toToken";
+import { toToken } from "@atomist/sdm/lib/api-helper/misc/credentials/toToken";
 import axios, { AxiosRequestConfig } from "axios";
 import * as _ from "lodash";
 

@@ -15,7 +15,7 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { FingerprintListener } from "@atomist/sdm/api/listener/FingerprintListener";
+import { FingerprintListener } from "@atomist/sdm/lib/api/listener/FingerprintListener";
 import axios from "axios";
 
 /**

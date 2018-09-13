@@ -33,9 +33,9 @@ import {
     SdmGoalState,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import { fetchGoalsForCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
-import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { success } from "@atomist/sdm/api-helper/misc/slack/messages";
+import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { success } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import {
     bold,
     codeLine,

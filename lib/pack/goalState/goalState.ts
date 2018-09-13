@@ -15,7 +15,7 @@
  */
 
 import { ExtensionPack, logger } from "@atomist/sdm";
-import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
+import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
 import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";

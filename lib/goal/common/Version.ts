@@ -23,7 +23,7 @@ import {
     Goal,
     ImplementationRegistration,
 } from "@atomist/sdm";
-import { VersionGoal } from "@atomist/sdm/pack/well-known-goals/commonGoals";
+import { VersionGoal } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import {
     executeVersioner,
     ProjectVersioner,

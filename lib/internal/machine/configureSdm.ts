@@ -23,9 +23,9 @@ import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     ConfigurationValues,
     validateConfigurationValues,
-} from "@atomist/sdm/api/machine/ConfigurationValues";
-import { SoftwareDeliveryMachine } from "@atomist/sdm/api/machine/SoftwareDeliveryMachine";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+} from "@atomist/sdm/lib/api/machine/ConfigurationValues";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
@@ -152,7 +152,7 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
     // tslint:disable-next-line:no-implicit-dependencies
-    const sdmPj = require("@atomist/sdm/package.json");
+    const sdmPj = require("@atomist/sdm/lib/package.json");
     // tslint:disable-next-line:no-implicit-dependencies
     const sdmCorePj = require("@atomist/sdm-core/package.json");
 

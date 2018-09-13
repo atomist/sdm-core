@@ -19,7 +19,7 @@ import { findMatches } from "@atomist/automation-client/lib/tree/ast/astUtils";
 import { MatchResult } from "@atomist/automation-client/lib/tree/ast/FileHits";
 import { FileParser } from "@atomist/automation-client/lib/tree/ast/FileParser";
 import { CFamilyLangHelper } from "@atomist/microgrammar/lib/matchers/lang/cfamily/CFamilyLangHelper";
-import { computeShaOf } from "@atomist/sdm/api-helper/misc/sha";
+import { computeShaOf } from "@atomist/sdm/lib/api-helper/misc/sha";
 import { TreeNode } from "@atomist/tree-path";
 import { JavaScriptElementRequest } from "./JavaScriptElementRequest";
 

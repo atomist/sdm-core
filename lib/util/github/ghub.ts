@@ -23,7 +23,7 @@ import { ProjectOperationCredentials } from "@atomist/automation-client/lib/oper
 import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import { Issue } from "@atomist/automation-client/lib/util/gitHub";
 import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
-import { toToken } from "@atomist/sdm/api-helper/misc/credentials/toToken";
+import { toToken } from "@atomist/sdm/lib/api-helper/misc/credentials/toToken";
 import axios, {
     AxiosPromise,
     AxiosRequestConfig,

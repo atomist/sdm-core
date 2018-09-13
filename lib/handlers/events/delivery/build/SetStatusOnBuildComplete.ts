@@ -29,24 +29,24 @@ import {
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
 } from "@atomist/sdm";
-import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
+import { findSdmGoalOnCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
 import {
     descriptionFromState,
     updateGoal,
-} from "@atomist/sdm/api-helper/goal/storeGoals";
-import { reportFailureInterpretation } from "@atomist/sdm/api-helper/misc/reportFailureInterpretation";
+} from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { reportFailureInterpretation } from "@atomist/sdm/lib/api-helper/misc/reportFailureInterpretation";
 import {
     AddressChannels,
     addressChannelsFor,
-} from "@atomist/sdm/api/context/addressChannels";
-import { Goal } from "@atomist/sdm/api/goal/Goal";
-import { LogInterpretation } from "@atomist/sdm/spi/log/InterpretedLog";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm/lib/api/context/addressChannels";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { LogInterpretation } from "@atomist/sdm/lib/spi/log/InterpretedLog";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import {
     BuildStatus,
     OnBuildComplete,
     SdmGoalState,
-} from "@atomist/sdm/typings/types";
+} from "@atomist/sdm/lib/typings/types";
 import * as slack from "@atomist/slack-messages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";

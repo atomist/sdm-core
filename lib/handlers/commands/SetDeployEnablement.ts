@@ -30,7 +30,7 @@ import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
 } from "@atomist/sdm";
-import { success } from "@atomist/sdm/api-helper/misc/slack/messages";
+import { success } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import { bold } from "@atomist/slack-messages";
 import {
     DeployEnablementRootType,

@@ -16,8 +16,8 @@
 
 import { Configuration } from "@atomist/automation-client";
 import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operations/generate/remoteGitProjectPersister";
-import { allReposInTeam } from "@atomist/sdm/api-helper/command/transform/allReposInTeam";
-import { CachingProjectLoader } from "@atomist/sdm/api-helper/project/CachingProjectLoader";
+import { allReposInTeam } from "@atomist/sdm/lib/api-helper/command/transform/allReposInTeam";
+import { CachingProjectLoader } from "@atomist/sdm/lib/api-helper/project/CachingProjectLoader";
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";

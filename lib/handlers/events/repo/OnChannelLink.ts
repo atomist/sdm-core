@@ -26,14 +26,14 @@ import {
 import {
     AddressChannels,
     addressChannelsFor,
-} from "@atomist/sdm/api/context/addressChannels";
+} from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     ChannelLinkListener,
     ChannelLinkListenerInvocation,
-} from "@atomist/sdm/api/listener/ChannelLinkListenerInvocation";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm/lib/api/listener/ChannelLinkListenerInvocation";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as schema from "../../../typings/types";
 
 /**

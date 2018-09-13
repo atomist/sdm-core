@@ -19,12 +19,12 @@ import {
     RemoteRepoRef,
     RepoRef,
 } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { poisonAndWait } from "@atomist/sdm/api-helper/misc/spawned";
+import { poisonAndWait } from "@atomist/sdm/lib/api-helper/misc/spawned";
 import {
     Deployment,
     TargetInfo,
-} from "@atomist/sdm/spi/deploy/Deployment";
-import { Targeter } from "@atomist/sdm/spi/deploy/Target";
+} from "@atomist/sdm/lib/spi/deploy/Deployment";
+import { Targeter } from "@atomist/sdm/lib/spi/deploy/Target";
 import axios from "axios";
 import { ChildProcess } from "child_process";
 import * as https from "https";

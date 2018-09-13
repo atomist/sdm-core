@@ -25,17 +25,17 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { SdmGoalState } from "@atomist/sdm";
-import { findSdmGoalOnCommit } from "@atomist/sdm/api-helper/goal/fetchGoalsOnCommit";
-import { updateGoal } from "@atomist/sdm/api-helper/goal/storeGoals";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
-import { Goal } from "@atomist/sdm/api/goal/Goal";
+import { findSdmGoalOnCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
 import {
     ArtifactListenerInvocation,
     ArtifactListenerRegisterable,
     toArtifactListenerRegistration,
-} from "@atomist/sdm/api/listener/ArtifactListener";
-import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
-import { SoftwareDeliveryMachineOptions } from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
+} from "@atomist/sdm/lib/api/listener/ArtifactListener";
+import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
+import { SoftwareDeliveryMachineOptions } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import {
     OnImageLinked,
 } from "../../../../typings/types";

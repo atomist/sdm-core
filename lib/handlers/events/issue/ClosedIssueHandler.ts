@@ -23,14 +23,14 @@ import {
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { addressChannelsFor } from "@atomist/sdm/api/context/addressChannels";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     ClosedIssueListener,
     ClosedIssueListenerInvocation,
-} from "@atomist/sdm/api/listener/ClosedIssueListener";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
-import * as schema from "@atomist/sdm/typings/types";
+} from "@atomist/sdm/lib/api/listener/ClosedIssueListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import * as schema from "@atomist/sdm/lib/typings/types";
 
 /**
  * A new issue has been created.

@@ -25,8 +25,8 @@ import {
     GoalInvocation,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import { codeLine } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {

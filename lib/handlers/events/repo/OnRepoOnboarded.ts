@@ -27,13 +27,13 @@ import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git
 import {
     AddressChannels,
     addressChannelsFor,
-} from "@atomist/sdm/api/context/addressChannels";
+} from "@atomist/sdm/lib/api/context/addressChannels";
 import {
     ProjectListener,
     ProjectListenerInvocation,
-} from "@atomist/sdm/api/listener/ProjectListener";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
-import { RepoRefResolver } from "@atomist/sdm/spi/repo-ref/RepoRefResolver";
+} from "@atomist/sdm/lib/api/listener/ProjectListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as schema from "../../../typings/types";
 
 /**

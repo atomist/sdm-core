@@ -20,7 +20,7 @@ import {
     Value,
 } from "@atomist/automation-client";
 import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { CredentialsResolver } from "@atomist/sdm/spi/credentials/CredentialsResolver";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
 
 export class GitHubCredentialsResolver implements CredentialsResolver {
 

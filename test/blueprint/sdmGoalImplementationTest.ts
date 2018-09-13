@@ -28,17 +28,17 @@ import {
     GoalWithFulfillment,
     resetRegistrableManager,
 } from "@atomist/sdm";
-import { determineGoals } from "@atomist/sdm/api-helper/goal/chooseAndSetGoals";
-import { SingleProjectLoader } from "@atomist/sdm/api-helper/test/SingleProjectLoader";
-import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
-import { Goals } from "@atomist/sdm/api/goal/Goals";
-import { SdmGoalEvent } from "@atomist/sdm/api/goal/SdmGoalEvent";
+import { determineGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { SingleProjectLoader } from "@atomist/sdm/lib/api-helper/test/SingleProjectLoader";
+import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
+import { Goals } from "@atomist/sdm/lib/api/goal/Goals";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import {
     SoftwareDeliveryMachineConfiguration,
     SoftwareDeliveryMachineOptions,
-} from "@atomist/sdm/api/machine/SoftwareDeliveryMachineOptions";
-import { AnyPush } from "@atomist/sdm/api/mapping/support/commonPushTests";
-import { PushFields } from "@atomist/sdm/typings/types";
+} from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
+import { PushFields } from "@atomist/sdm/lib/typings/types";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../lib/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../lib/machine/machineFactory";
