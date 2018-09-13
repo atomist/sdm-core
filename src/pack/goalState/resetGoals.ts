@@ -54,8 +54,8 @@ export class ResetGoalsParameters {
     @Value("version")
     public version: string;
 
-    @Parameter()
-    public thing: string;
+    @Parameter({ required: false })
+    public branch: string;
 
 }
 
@@ -91,6 +91,9 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             });
             id.sha = tipOfBranch(allBranchTips, id.branch);
             logger.info("Learned that the tip of %s is %s", id.branch, id.sha);
+        } else {
+            // they gave us a real SHA. Hopefully they gave us the branch too.
+            id.branch = cli.parameters.branch || "master";
         }
 
         const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
