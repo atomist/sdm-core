@@ -40,7 +40,10 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import { fetchBranchTips, tipOfBranch } from "../../util/graph/queryCommits";
+import {
+    fetchBranchTips,
+    tipOfBranch,
+} from "../../util/graph/queryCommits";
 
 @Parameters()
 class SetGoalStateParameters {

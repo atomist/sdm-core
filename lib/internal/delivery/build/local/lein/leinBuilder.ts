@@ -25,7 +25,10 @@ import {
     InterpretLog,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import { SpawnBuilder, SpawnBuilderOptions } from "../SpawnBuilder";
+import {
+    SpawnBuilder,
+    SpawnBuilderOptions,
+} from "../SpawnBuilder";
 
 export const RunBuild: SpawnCommand = asSpawnCommand("lein");
 

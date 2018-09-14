@@ -38,7 +38,11 @@ import {
     codeLine,
     italic,
 } from "@atomist/slack-messages";
-import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
+import {
+    fetchBranchTips,
+    fetchPushForCommit,
+    tipOfBranch,
+} from "../../util/graph/queryCommits";
 
 @Parameters()
 export class ResetGoalsParameters extends GitHubRepoTargets {
