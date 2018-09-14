@@ -24,7 +24,7 @@ import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     CommandHandlerRegistration,
     CommandListener,
-    isDeployEnabled
+    isDeployEnabled,
 } from "@atomist/sdm";
 import {
     bold,
