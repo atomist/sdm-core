@@ -1,5 +1,4 @@
 /build/
-/lib/typings
 node_modules/
 *.js
 npm-debug.log
@@ -19,4 +18,3 @@ git-info.json
 .nyc_output/
 coverage/
 .vscode
-

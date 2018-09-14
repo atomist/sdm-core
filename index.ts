@@ -27,6 +27,7 @@ export {
     DisableDeploy,
     EnableDeploy,
     setDeployEnablement,
+    SetDeployEnablementParameters,
 } from "./lib/handlers/commands/SetDeployEnablement";
 export {
     DefaultRepoRefResolver,
