@@ -25,6 +25,7 @@ import {
     AutofixRegistration,
     Builder,
     ExtensionPack,
+    fakePush,
     GoalsSetListener,
     hasFile,
     MessageGoal,
@@ -33,7 +34,6 @@ import {
     PushTest,
     whenPushSatisfies,
 } from "@atomist/sdm";
-import { fakePush } from "@atomist/sdm/lib/api-helper/test/fakePush";
 import { NoGoals } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "@atomist/sdm/lib/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
