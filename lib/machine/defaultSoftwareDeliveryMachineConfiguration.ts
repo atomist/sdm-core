@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { Configuration } from "@atomist/automation-client";
-import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operations/generate/remoteGitProjectPersister";
+import {
+    Configuration,
+    RemoteGitProjectPersister,
+} from "@atomist/automation-client";
 import {
     allReposInTeam,
     CachingProjectLoader,

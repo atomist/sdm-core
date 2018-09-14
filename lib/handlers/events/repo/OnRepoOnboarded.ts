@@ -16,14 +16,14 @@
 
 import {
     EventFired,
+    EventHandler,
+    GitCommandGitProject,
     GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     Success,
 } from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
 import {
     AddressChannels,
     addressChannelsFor,

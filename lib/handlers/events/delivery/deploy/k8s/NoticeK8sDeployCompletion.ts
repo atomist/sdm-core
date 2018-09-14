@@ -16,15 +16,17 @@
 
 import {
     EventFired,
+    EventHandler,
+    GitHubRepoRef,
     GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
+    Secret,
+    Secrets,
     Success,
 } from "@atomist/automation-client";
-import { EventHandler, Secret, Secrets } from "@atomist/automation-client/lib/decorators";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { Goal } from "@atomist/sdm";
 import { OnAParticularStatus } from "../../../../../typings/types";
 import { createStatus } from "../../../../../util/github/ghub";

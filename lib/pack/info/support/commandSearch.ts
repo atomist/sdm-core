@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { HandleCommand } from "@atomist/automation-client";
-import { isCommandHandlerMetadata } from "@atomist/automation-client/lib/internal/metadata/metadata";
-import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
 import {
+    CommandHandlerMetadata,
+    HandleCommand,
+    isCommandHandlerMetadata,
     Maker,
     toFactory,
-} from "@atomist/automation-client/lib/util/constructionUtils";
+} from "@atomist/automation-client";
 import { FunctionalUnit } from "@atomist/sdm";
 
 export interface HandlerInfo {

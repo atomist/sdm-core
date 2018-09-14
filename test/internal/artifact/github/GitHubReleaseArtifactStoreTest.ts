@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { execIn } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import {
+    execIn,
+    GitHubRepoRef,
+} from "@atomist/automation-client";
 import * as fs from "fs";
 import * as p from "path";
 import * as assert from "power-assert";

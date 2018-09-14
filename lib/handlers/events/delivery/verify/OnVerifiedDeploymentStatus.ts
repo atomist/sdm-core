@@ -16,6 +16,7 @@
 
 import {
     EventFired,
+    EventHandler,
     GraphQL,
     HandleEvent,
     HandlerContext,
@@ -24,7 +25,6 @@ import {
     Success,
 } from "@atomist/automation-client";
 import Status = OnSuccessStatus.Status;
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import {
     addressChannelsFor,
     CredentialsResolver,

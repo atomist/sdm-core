@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
+import {
+    doWithRetry,
+    logger,
+} from "@atomist/automation-client";
 import {
     EndpointVerificationInvocation,
     EndpointVerificationListener,

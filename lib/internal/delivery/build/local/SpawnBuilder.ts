@@ -18,15 +18,15 @@ import {
     asSpawnCommand,
     ChildProcessResult,
     ErrorFinder,
+    GitProject,
     logger,
+    Project,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
 } from "@atomist/automation-client";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
-import { Project } from "@atomist/automation-client/lib/project/Project";
 import {
     AppInfo,
     InterpretLog,

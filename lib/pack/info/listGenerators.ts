@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { Success } from "@atomist/automation-client";
-import { NoParameters } from "@atomist/automation-client/lib/SmartParameters";
+import {
+    NoParameters,
+    Success,
+} from "@atomist/automation-client";
 import {
     CommandHandlerRegistration,
     CommandListener,

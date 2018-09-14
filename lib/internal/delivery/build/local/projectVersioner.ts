@@ -15,11 +15,11 @@
  */
 
 import {
+    addressEvent,
+    GitProject,
     HandlerContext,
     Success,
 } from "@atomist/automation-client";
-import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
-import { addressEvent } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
     ExecuteGoal,
     ExecuteGoalResult,

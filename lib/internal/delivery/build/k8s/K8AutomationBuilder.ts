@@ -15,12 +15,12 @@
  */
 
 import {
+    GitHubRepoRef,
     HandlerContext,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
     success,
 } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import {
     AddressChannels,
     Builder,

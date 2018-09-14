@@ -15,6 +15,7 @@
  */
 
 import {
+    addressEvent,
     ChildProcessResult,
     configurationValue,
     failure,
@@ -24,7 +25,6 @@ import {
     RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
-import { addressEvent } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
     AddressChannels,
     AppInfo,

@@ -16,12 +16,12 @@
 
 import {
     failure,
+    GitHubRepoRef,
     logger,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import {
     ExecuteGoal,
     GoalInvocation,

@@ -17,8 +17,8 @@
 import {
     HandlerContext,
     logger,
+    RepoRef,
 } from "@atomist/automation-client";
-import { RepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import * as https from "https";
 import { LastEndpoint } from "../typings/types";
 

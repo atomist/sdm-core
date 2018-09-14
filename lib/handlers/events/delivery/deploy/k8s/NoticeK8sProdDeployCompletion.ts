@@ -16,15 +16,17 @@
 
 import {
     EventFired,
+    EventHandler,
     GitHubRepoRef,
     GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
+    Secret,
+    Secrets,
     Success,
 } from "@atomist/automation-client";
-import { EventHandler, Secret, Secrets } from "@atomist/automation-client/lib/decorators";
 import {
     Goal,
     RepoRefResolver,

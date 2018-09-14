@@ -18,17 +18,15 @@
 import {
     GitHubRepoRef,
     HandlerContext,
-    RemoteRepoRef,
-    Success,
-} from "@atomist/automation-client";
-import {
     MappedParameter,
     MappedParameters,
     Parameter,
     Parameters,
+    RemoteRepoRef,
     Secret,
     Secrets,
-} from "@atomist/automation-client/lib/decorators";
+    Success,
+} from "@atomist/automation-client";
 import {
     AddressChannels,
     CommandHandlerRegistration,

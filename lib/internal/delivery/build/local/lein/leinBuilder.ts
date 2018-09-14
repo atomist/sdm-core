@@ -16,9 +16,9 @@
 
 import {
     asSpawnCommand,
+    Project,
     SpawnCommand,
 } from "@atomist/automation-client";
-import { Project } from "@atomist/automation-client/lib/project/Project";
 import { Microgrammar } from "@atomist/microgrammar";
 import {
     AppInfo,

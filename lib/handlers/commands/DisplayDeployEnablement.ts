@@ -17,10 +17,10 @@
 import {
     buttonForCommand,
     failure,
+    guid,
     RepoRef,
     Success,
 } from "@atomist/automation-client";
-import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     CommandHandlerRegistration,
     CommandListener,

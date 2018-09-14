@@ -17,11 +17,9 @@
 import {
     logger,
     poisonAndWait,
-} from "@atomist/automation-client";
-import {
     RemoteRepoRef,
     RepoRef,
-} from "@atomist/automation-client/lib/operations/common/RepoId";
+} from "@atomist/automation-client";
 import {
     Deployment,
     Targeter,

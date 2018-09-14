@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import { Project } from "@atomist/automation-client/lib/project/Project";
-import { findMatches } from "@atomist/automation-client/lib/tree/ast/astUtils";
-import { MatchResult } from "@atomist/automation-client/lib/tree/ast/FileHits";
-import { FileParser } from "@atomist/automation-client/lib/tree/ast/FileParser";
+import {
+    FileParser,
+    findMatches,
+    MatchResult,
+    Project,
+} from "@atomist/automation-client";
 import { CFamilyLangHelper } from "@atomist/microgrammar/lib/matchers/lang/cfamily/CFamilyLangHelper";
 import { computeShaOf } from "@atomist/sdm";
 import { TreeNode } from "@atomist/tree-path";
