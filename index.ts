@@ -153,9 +153,7 @@ export {
 export {
     lookFor200OnEndpointRootGet,
 } from "./lib/util/verify/lookFor200OnEndpointRootGet";
-export {
-    postLinkImageWebhook,
-} from "./lib/util/webhook/ImageLink";
+export * from "./lib/util/webhook/ImageLink";
 import {
     SendFingerprintToAtomist,
 } from "./lib/util/webhook/sendFingerprintToAtomist";
