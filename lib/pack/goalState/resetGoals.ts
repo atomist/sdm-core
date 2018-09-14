@@ -15,10 +15,13 @@
  */
 
 import {
-    logger,
+    GitHubRepoRef,
     MappedParameter,
     MappedParameters,
+    Parameter,
     Parameters,
+    Secret,
+    Secrets,
     Success,
     Value,
 } from "@atomist/automation-client";
@@ -27,7 +30,6 @@ import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
     GitHubRepoTargets,
-    RepoTargetingParameters,
     SoftwareDeliveryMachine,
     success,
     toRepoTargetingParametersMaker,
@@ -45,10 +47,25 @@ import {
 } from "../../util/graph/queryCommits";
 
 @Parameters()
-export class ResetGoalsParameters extends GitHubRepoTargets {
+export class ResetGoalsParameters {
+
+    @Secret(Secrets.UserToken)
+    public token: string;
+
+    @MappedParameter(MappedParameters.GitHubOwner)
+    public owner: string;
+
+    @MappedParameter(MappedParameters.GitHubRepository)
+    public repo: string;
 
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
+
+    @Parameter({ required: false })
+    public sha: string;
+
+    @Parameter({ required: false })
+    public branch: string;
 
     @Value("name")
     public name: string;
@@ -63,15 +80,18 @@ export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerR
         name: "ResetGoalsOnCommit",
         paramsMaker: toRepoTargetingParametersMaker(ResetGoalsParameters, GitHubRepoTargets),
         listener: resetGoalsOnCommit(sdm),
-        intent: ["reset goals"],
+        intent: [
+            `reset goals ${sdm.configuration.name.replace("@", "")}`,
+            "reset goals",
+            `plan goals ${sdm.configuration.name.replace("@", "")}`,
+            "plan goals",
+        ],
     };
 }
 
 function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
-    return async (cli: CommandListenerInvocation<ResetGoalsParameters & RepoTargetingParameters>) => {
-        if (!cli.credentials) {
-            throw new Error("This is invalid. I need credentials");
-        }
+    return async (cli: CommandListenerInvocation<ResetGoalsParameters>) => {
+
         const rules = {
             projectLoader: sdm.configuration.sdm.projectLoader,
             repoRefResolver: sdm.configuration.sdm.repoRefResolver,
@@ -80,19 +100,12 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             implementationMapping: sdm.goalFulfillmentMapper,
         };
 
-        const commandParams = { ...cli.parameters, ...cli.parameters.targets.repoRef };
-        const id = cli.parameters.targets.repoRef;
+        const repoData = await fetchBranchTips(cli.context, cli.parameters);
+        const branch = cli.parameters.branch || repoData.defaultBranch;
+        const sha = cli.parameters.sha || tipOfBranch(repoData, branch);
+        const id = GitHubRepoRef.from({ owner: cli.parameters.owner, repo: cli.parameters.repo, sha, branch });
 
-        if (!isValidSHA1(id.sha)) {
-            logger.info("Fetching tip of branch %s", id.branch);
-            const allBranchTips = await fetchBranchTips(cli.context, {
-                repo: id.repo, owner: id.owner, providerId: cli.parameters.providerId,
-            });
-            id.sha = tipOfBranch(allBranchTips, id.branch);
-            logger.info("Learned that the tip of %s is %s", id.branch, id.sha);
-        }
-
-        const push = await fetchPushForCommit(cli.context, id, commandParams.providerId);
+        const push = await fetchPushForCommit(cli.context, id, cli.parameters.providerId);
 
         const goals = await chooseAndSetGoals(rules, {
             context: cli.context,
@@ -104,25 +117,21 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             await cli.addressChannels(success(
                 "Plan Goals",
                 `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
-                bold(`${commandParams.owner}/${commandParams.repo}/${push.branch}`)} to ${italic(goals.name)}`,
+                    bold(`${cli.parameters.owner}/${cli.parameters.repo}/${push.branch}`)} to ${italic(goals.name)}`,
                 {
-                    footer: `${commandParams.name}:${commandParams.version}`,
+                    footer: `${cli.parameters.name}:${cli.parameters.version}`,
                 }));
         } else {
             await cli.addressChannels(warning(
                 "Plan Goals",
                 `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
-                bold(`${commandParams.owner}/${commandParams.repo}/${push.branch}`)}`,
+                    bold(`${cli.parameters.owner}/${cli.parameters.repo}/${push.branch}`)}`,
                 cli.context,
                 {
-                    footer: `${commandParams.name}:${commandParams.version}`,
+                    footer: `${cli.parameters.name}:${cli.parameters.version}`,
                 }));
         }
 
         return Success;
     };
-}
-
-function isValidSHA1(s: string): boolean {
-    return s.match(/[a-fA-F0-9]{40}/) != null;
 }
