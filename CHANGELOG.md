@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Prepare to hook in client startup events . [#48](https://github.com/atomist/sdm-core/issues/48)
+-   Augment and organize export in index. [#52](https://github.com/atomist/sdm-core/issues/52)
 
 ### Changed
 
