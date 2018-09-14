@@ -155,3 +155,6 @@ export {
 export {
     postLinkImageWebhook,
 } from "./lib/util/webhook/ImageLink";
+import { 
+    SendFingerprintToAtomist,
+} from "./lib/util/webhook/sendFingerprintToAtomist";
