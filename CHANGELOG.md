@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   FingerprintInvocation contains a vector of Fingerprints. [#49](https://github.com/atomist/sdm-core/issues/49)
 -   **BREAKING** Move to lib structure and use index. [#53](https://github.com/atomist/sdm-core/issues/53)
+-   **BREAKING** Update from src to lib. [#54](https://github.com/atomist/sdm-core/issues/54)
 
 ### Removed
 
