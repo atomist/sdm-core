@@ -16,7 +16,6 @@
 
 import {
     EventFired,
-    EventHandler,
     GraphQL,
     HandleEvent,
     HandlerContext,
@@ -24,6 +23,8 @@ import {
     logger,
     Success,
 } from "@atomist/automation-client";
+import Status = OnSuccessStatus.Status;
+import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import {
     addressChannelsFor,
     CredentialsResolver,
@@ -33,7 +34,6 @@ import {
     VerifiedDeploymentListener,
     VerifiedDeploymentListenerInvocation,
 } from "@atomist/sdm";
-import Status = OnSuccessStatus.Status;
 
 /**
  * React to a verified deployment

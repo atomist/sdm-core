@@ -18,13 +18,15 @@ import {
     failure,
     HandlerError,
     HandlerResult,
+    Success,
+} from "@atomist/automation-client";
+import {
     MappedParameter,
     MappedParameters,
     Parameter,
-    Success,
+    Parameters,
     Value,
-} from "@atomist/automation-client";
-import { Parameters } from "@atomist/automation-client/lib/decorators";
+} from "@atomist/automation-client/lib/decorators";
 import { addressEvent } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
     CommandHandlerRegistration,

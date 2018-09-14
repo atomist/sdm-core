@@ -18,7 +18,7 @@ import {
     Secret,
     Secrets,
     Value,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/decorators";
 import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
 import { CredentialsResolver } from "@atomist/sdm";
 

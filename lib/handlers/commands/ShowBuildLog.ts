@@ -1,3 +1,4 @@
+
 /*
  * Copyright © 2018 Atomist, Inc.
  *
@@ -17,15 +18,17 @@
 import {
     GitHubRepoRef,
     HandlerContext,
+    RemoteRepoRef,
+    Success,
+} from "@atomist/automation-client";
+import {
     MappedParameter,
     MappedParameters,
     Parameter,
     Parameters,
-    RemoteRepoRef,
     Secret,
     Secrets,
-    Success,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/decorators";
 import {
     AddressChannels,
     CommandHandlerRegistration,

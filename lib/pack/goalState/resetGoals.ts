@@ -16,12 +16,9 @@
 
 import {
     logger,
-    MappedParameter,
-    MappedParameters,
     Success,
-    Value,
 } from "@atomist/automation-client";
-import { Parameters } from "@atomist/automation-client/lib/decorators";
+import { MappedParameter, MappedParameters, Parameters, Value } from "@atomist/automation-client/lib/decorators";
 import {
     chooseAndSetGoals,
     CommandHandlerRegistration,

@@ -17,15 +17,17 @@
 import {
     HandleCommand,
     HandlerContext,
-    MappedParameter,
-    MappedParameters,
-    Parameter,
-    Secret,
-    Secrets,
     success,
     Success,
 } from "@atomist/automation-client";
-import { Parameters } from "@atomist/automation-client/lib/decorators";
+import {
+    MappedParameter,
+    MappedParameters,
+    Parameter,
+    Parameters,
+    Secret,
+    Secrets,
+} from "@atomist/automation-client/lib/decorators";
 import { commandHandlerFrom } from "@atomist/automation-client/lib/onCommand";
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {

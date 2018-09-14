@@ -17,8 +17,8 @@
 import {
     automationClientInstance,
     logger,
-    Secrets,
 } from "@atomist/automation-client";
+import { Secrets } from "@atomist/automation-client/lib/decorators";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
 import {

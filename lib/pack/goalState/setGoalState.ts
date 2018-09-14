@@ -20,7 +20,7 @@ import {
     Parameter,
     Parameters,
     Value,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/decorators";
 import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {
