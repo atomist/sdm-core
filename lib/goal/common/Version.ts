@@ -22,8 +22,8 @@ import {
     getGoalDefintionFrom,
     Goal,
     ImplementationRegistration,
-    VersionGoal,
 } from "@atomist/sdm";
+import { VersionGoal } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import {
     executeVersioner,
     ProjectVersioner,

@@ -28,8 +28,8 @@ import {
     GoalSetter,
     JustBuildGoal,
     SoftwareDeliveryMachineConfiguration,
-    WellKnownGoals,
 } from "@atomist/sdm";
+import { WellKnownGoals } from "@atomist/sdm/lib/pack/well-known-goals/addWellKnownGoals";
 import * as _ from "lodash";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";

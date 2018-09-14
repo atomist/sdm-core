@@ -15,12 +15,12 @@
  */
 
 import {
-    CommandHandlerMetadata,
     HandleCommand,
     isCommandHandlerMetadata,
     Maker,
     toFactory,
 } from "@atomist/automation-client";
+import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
 import { FunctionalUnit } from "@atomist/sdm";
 
 export interface HandlerInfo {

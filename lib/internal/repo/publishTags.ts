@@ -22,7 +22,7 @@ import {
     HandlerContext,
     ProjectOperationCredentials,
     Tagger,
-    Tags,
+    TaggerTags,
 } from "@atomist/automation-client";
 import { AddressChannels } from "@atomist/sdm";
 import { listTopics } from "../../util/github/ghub";
@@ -42,7 +42,7 @@ export async function publishTags(tagger: Tagger,
                                   addressChannels: AddressChannels,
                                   ctx: HandlerContext): Promise<any> {
     const p = await GitCommandGitProject.cloned(credentials, id);
-    const tags: Tags = await tagger(p, ctx, undefined);
+    const tags: TaggerTags = await tagger(p, ctx, undefined);
     if (tags.tags.length > 0) {
         // Add existing tags so they're not lost
         tags.tags = tags.tags.concat(await listTopics(credentials, id));
