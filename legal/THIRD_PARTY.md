@@ -9,14 +9,14 @@ This page details all runtime OSS dependencies of `@atomist/sdm-core`.
 | License | Count |
 |---------|-------|
 |[AFLv2.1](#aflv21)|1|
-|[Apache-2.0](#apache-20)|21|
+|[Apache-2.0](#apache-20)|19|
 |[Artistic-2.0](#artistic-20)|4|
-|[BSD-2-Clause](#bsd-2-clause)|21|
+|[BSD-2-Clause](#bsd-2-clause)|17|
 |[BSD-3-Clause](#bsd-3-clause)|20|
 |[BSD](#bsd)|4|
 |[CC-BY-3.0](#cc-by-30)|1|
 |[CC0-1.0](#cc0-10)|2|
-|[GPL-3.0](#gpl-30)|4|
+|[GPL-3.0](#gpl-30)|3|
 |[ISC](#isc)|114|
 |[MIT](#mit)|621|
 |[Public Domain](#public-domain)|1|
@@ -34,9 +34,7 @@ Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apa
 
 | Name | Version | Publisher | Repository |
 |------|---------|-----------|------------|
-|`@atomist/sdm`|`1.0.0-master.20180913101258`|Atomist|[https://github.com/atomist/sdm](https://github.com/atomist/sdm)|
-|`@atomist/slack-messages`|`0.12.1`|Atomist|[https://github.com/atomist/slack-messages](https://github.com/atomist/slack-messages)|
-|`@atomist/slack-messages`|`1.0.0`|Atomist|[https://github.com/atomist/slack-messages](https://github.com/atomist/slack-messages)|
+|`@atomist/sdm`|`1.0.0-master.20180914101315`|Atomist|[https://github.com/atomist/sdm](https://github.com/atomist/sdm)|
 |`@atomist/slack-messages`|`1.0.1-master.20180830190736`|Atomist|[https://github.com/atomist/slack-messages](https://github.com/atomist/slack-messages)|
 |`JSONStream`|`1.3.4`|Dominic Tarr|[https://github.com/dominictarr/JSONStream](https://github.com/dominictarr/JSONStream)|
 |`aws-sign2`|`0.7.0`|Mikeal Rogers|[https://github.com/mikeal/aws-sign](https://github.com/mikeal/aws-sign)|
@@ -80,13 +78,10 @@ BSD 2-Clause "Simplified" License - [http://www.opensource.org/licenses/BSD-2-Cl
 
 | Name | Version | Publisher | Repository |
 |------|---------|-----------|------------|
-|`async-listener`|`0.6.9`|Forrest L Norvell|[https://github.com/othiym23/async-listener](https://github.com/othiym23/async-listener)|
 |`cidr-regex`|`2.0.9`|silverwind|[https://github.com/silverwind/cidr-regex](https://github.com/silverwind/cidr-regex)|
 |`cmd-shim`|`2.0.2`||[https://github.com/ForbesLindesay/cmd-shim](https://github.com/ForbesLindesay/cmd-shim)|
 |`configstore`|`3.1.2`|Sindre Sorhus|[https://github.com/yeoman/configstore](https://github.com/yeoman/configstore)|
-|`continuation-local-storage`|`3.2.1`|Forrest L Norvell|[https://github.com/othiym23/node-continuation-local-storage](https://github.com/othiym23/node-continuation-local-storage)|
 |`dotenv`|`5.0.1`|scottmotte|[https://github.com/motdotla/dotenv](https://github.com/motdotla/dotenv)|
-|`emitter-listener`|`1.1.1`|Forrest L Norvell|[https://github.com/othiym23/emitter-listener](https://github.com/othiym23/emitter-listener)|
 |`esprima`|`2.7.3`|Ariya Hidayat|[https://github.com/jquery/esprima](https://github.com/jquery/esprima)|
 |`estraverse`|`4.2.0`||[https://github.com/estools/estraverse](https://github.com/estools/estraverse)|
 |`http-cache-semantics`|`3.8.1`|Kornel Lesiński|[https://github.com/pornel/http-cache-semantics](https://github.com/pornel/http-cache-semantics)|
@@ -98,7 +93,6 @@ BSD 2-Clause "Simplified" License - [http://www.opensource.org/licenses/BSD-2-Cl
 |`npm-user-validate`|`1.0.0`|Robert Kowalski|[https://github.com/npm/npm-user-validate](https://github.com/npm/npm-user-validate)|
 |`rc`|`1.2.7`|Dominic Tarr|[https://github.com/dominictarr/rc](https://github.com/dominictarr/rc)|
 |`sha`|`2.0.1`||[https://github.com/ForbesLindesay/sha](https://github.com/ForbesLindesay/sha)|
-|`shimmer`|`1.2.0`|Forrest L Norvell|[https://github.com/othiym23/shimmer](https://github.com/othiym23/shimmer)|
 |`uglify-js`|`2.8.29`|Mihai Bazon|[https://github.com/mishoo/UglifyJS2](https://github.com/mishoo/UglifyJS2)|
 |`update-notifier`|`2.5.0`|Sindre Sorhus|[https://github.com/yeoman/update-notifier](https://github.com/yeoman/update-notifier)|
 
@@ -148,9 +142,8 @@ GNU General Public License v3.0 only - [http://www.gnu.org/licenses/gpl-3.0-stan
 
 | Name | Version | Publisher | Repository |
 |------|---------|-----------|------------|
-|`@atomist/automation-client`|`1.0.0-master.20180913093131`|Atomist|[https://github.com/atomist/automation-client-ts](https://github.com/atomist/automation-client-ts)|
-|`@atomist/microgrammar`|`0.8.1`|Atomist|[https://github.com/atomist/microgrammar](https://github.com/atomist/microgrammar)|
-|`@atomist/microgrammar`|`1.0.0-M.1`|Atomist|[https://github.com/atomist/microgrammar](https://github.com/atomist/microgrammar)|
+|`@atomist/automation-client`|`1.0.0-master.20180914094511`|Atomist|[https://github.com/atomist/automation-client-ts](https://github.com/atomist/automation-client-ts)|
+|`@atomist/microgrammar`|`1.0.0-master.20180829162516`|Atomist|[https://github.com/atomist/microgrammar](https://github.com/atomist/microgrammar)|
 |`@atomist/tree-path`|`1.0.0-master.20180913033718`|Atomist|[https://github.com/atomist/tree-path-ts](https://github.com/atomist/tree-path-ts)|
 
 #### ISC
