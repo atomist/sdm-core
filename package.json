@@ -87,7 +87,7 @@
     "compile": "run-s compile:gql compile:ts",
     "compile:gql": "run-s gql:gen",
     "compile:ts": "tsc --project .",
-    "doc": "typedoc --mode modules --ignoreCompilerErrors --excludeExternals --exclude \"**/*.d.ts\" --out build/typedoc lib",
+    "doc": "typedoc --mode modules --ignoreCompilerErrors --excludeExternals --exclude \"**/*.d.ts\" --out doc lib",
     "gql:gen": "atm-gql-gen",
     "lint": "run-s lint:ts lint:gql",
     "lint:fix": "run-s lint:ts:fix lint:gql:fix",
