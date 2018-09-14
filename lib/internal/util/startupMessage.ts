@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { Configuration } from "@atomist/automation-client";
-import { BannerSection } from "@atomist/automation-client/lib/configuration";
+import {
+    BannerSection,
+    Configuration,
+} from "@atomist/automation-client";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import chalk from "chalk";
 import { isInLocalMode } from "../machine/LocalSoftwareDeliveryMachineOptions";

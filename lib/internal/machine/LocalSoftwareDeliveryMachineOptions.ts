@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AnyOptions } from "@atomist/automation-client/lib/configuration";
+import { AnyOptions } from "@atomist/automation-client";
 import {
     PushTest,
     SoftwareDeliveryMachineConfiguration,

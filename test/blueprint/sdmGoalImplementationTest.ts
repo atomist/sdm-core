@@ -15,14 +15,14 @@
  */
 
 import {
+    GitHubRepoRef,
+    guid,
     HandlerContext,
+    InMemoryProject,
     logger,
+    ProjectOperationCredentials,
     Success,
 } from "@atomist/automation-client";
-import { guid } from "@atomist/automation-client/lib/internal/util/string";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
 import {
     AnyPush,
     Autofix,
@@ -32,11 +32,11 @@ import {
     PushFields,
     resetRegistrableManager,
     SdmGoalEvent,
+    SingleProjectLoader,
     SoftwareDeliveryMachineConfiguration,
     SoftwareDeliveryMachineOptions,
     whenPushSatisfies,
 } from "@atomist/sdm";
-import { SingleProjectLoader } from "@atomist/sdm/lib/api-helper/test/SingleProjectLoader";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../lib/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../lib/machine/machineFactory";

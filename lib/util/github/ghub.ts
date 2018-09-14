@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
 import {
+    doWithRetry,
     GitHubRepoRef,
     isGitHubRepoRef,
-} from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { Issue } from "@atomist/automation-client/lib/util/gitHub";
-import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
+    Issue,
+    logger,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
+} from "@atomist/automation-client";
 import { toToken } from "@atomist/sdm";
 import axios, {
     AxiosPromise,

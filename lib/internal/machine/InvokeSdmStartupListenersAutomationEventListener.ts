@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AutomationEventListenerSupport } from "@atomist/automation-client/lib/server/AutomationEventListener";
+import { AutomationEventListenerSupport } from "@atomist/automation-client";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 
 /**

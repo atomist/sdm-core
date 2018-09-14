@@ -15,9 +15,15 @@
  */
 
 import { HandlerContext } from "@atomist/automation-client";
-import { PushFields, RemoteRepoRef } from "@atomist/sdm";
+import {
+    PushFields,
+    RemoteRepoRef,
+} from "@atomist/sdm";
 import * as stringify from "json-stringify-safe";
-import { PushForCommit, RepoBranchTips } from "../../typings/types";
+import {
+    PushForCommit,
+    RepoBranchTips,
+} from "../../typings/types";
 
 export async function fetchPushForCommit(context: HandlerContext, id: RemoteRepoRef, providerId: string): Promise<PushFields.Fragment> {
     const commitResult = await context.graphClient.query<PushForCommit.Query, PushForCommit.Variables>({

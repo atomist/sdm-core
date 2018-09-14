@@ -18,8 +18,8 @@ import {
     Configuration,
     HandleCommand,
     HandleEvent,
+    Maker,
 } from "@atomist/automation-client";
-import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     AbstractSoftwareDeliveryMachine,
     ArtifactGoal,

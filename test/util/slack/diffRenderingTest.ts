@@ -15,7 +15,7 @@
  */
 
 import * as assert from "power-assert";
-import {renderCommitMessage} from "../../../lib/util/slack/diffRendering";
+import { renderCommitMessage } from "../../../lib/util/slack/diffRendering";
 
 describe("commit rendering", () => {
 

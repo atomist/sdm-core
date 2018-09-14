@@ -15,26 +15,28 @@
  */
 
 import {
+    commandHandlerFrom,
+    GitHubRepoRef,
     HandleCommand,
     HandlerContext,
-    success,
-    Success,
-} from "@atomist/automation-client";
-import {
     MappedParameter,
     MappedParameters,
     Parameter,
     Parameters,
     Secret,
     Secrets,
-} from "@atomist/automation-client/lib/decorators";
-import { commandHandlerFrom } from "@atomist/automation-client/lib/onCommand";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+    success,
+    Success,
+} from "@atomist/automation-client";
 import {
     chooseAndSetGoals,
     ChooseAndSetGoalsRules,
 } from "@atomist/sdm";
-import { fetchBranchTips, fetchPushForCommit, tipOfBranch } from "../../util/graph/queryCommits";
+import {
+    fetchBranchTips,
+    fetchPushForCommit,
+    tipOfBranch,
+} from "../../util/graph/queryCommits";
 
 @Parameters()
 export class DisposeParameters {

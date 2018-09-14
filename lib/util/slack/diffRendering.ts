@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import {
+    GitHubRepoRef,
+    logger,
+    RemoteRepoRef,
+} from "@atomist/automation-client";
 import {
     Attachment,
     url,

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-
-import { successOn } from "@atomist/automation-client/lib/action/ActionResult";
 import {
     GitHubRepoRef,
     isGitHubRepoRef,
-} from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { TagRouter } from "@atomist/automation-client/lib/operations/tagger/Tagger";
+    logger,
+    successOn,
+    TagRouter,
+} from "@atomist/automation-client";
+
 import { toToken } from "@atomist/sdm";
 import axios, { AxiosRequestConfig } from "axios";
 import * as _ from "lodash";

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import {
+    GitHubRepoRef,
+    logger,
+} from "@atomist/automation-client";
 import {
     CredentialsResolver,
     GoalCompletionListener,

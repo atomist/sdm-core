@@ -15,11 +15,11 @@
  */
 
 import {
+    ProjectOperationCredentials,
     Secret,
     Secrets,
     Value,
-} from "@atomist/automation-client/lib/decorators";
-import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+} from "@atomist/automation-client";
 import { CredentialsResolver } from "@atomist/sdm";
 
 export class GitHubCredentialsResolver implements CredentialsResolver {

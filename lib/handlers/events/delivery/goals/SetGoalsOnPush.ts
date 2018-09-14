@@ -16,6 +16,7 @@
 
 import {
     EventFired,
+    EventHandler,
     GraphQL,
     HandleEvent,
     HandlerContext,
@@ -23,7 +24,6 @@ import {
     RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import {
     chooseAndSetGoals,
     CredentialsResolver,

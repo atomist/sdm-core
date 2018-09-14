@@ -15,20 +15,18 @@
  */
 
 import {
+    ApolloGraphClient,
     automationClientInstance,
-    logger,
-} from "@atomist/automation-client";
-import { Secrets } from "@atomist/automation-client/lib/decorators";
-import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
-import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
-import {
+    AutomationEventListenerSupport,
     EventIncoming,
+    guid,
+    logger,
+    metadataFromInstance,
+    QueryNoCacheOptions,
+    RegistrationConfirmation,
     RequestProcessor,
-} from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
-import { RegistrationConfirmation } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketRequestProcessor";
-import { guid } from "@atomist/automation-client/lib/internal/util/string";
-import { AutomationEventListenerSupport } from "@atomist/automation-client/lib/server/AutomationEventListener";
-import { QueryNoCacheOptions } from "@atomist/automation-client/lib/spi/graph/GraphClient";
+    Secrets,
+} from "@atomist/automation-client";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";

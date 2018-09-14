@@ -16,15 +16,15 @@
 
 import {
     EventFired,
+    EventHandler,
     GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
+    RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
 import {
     AddressChannels,
     addressChannelsFor,

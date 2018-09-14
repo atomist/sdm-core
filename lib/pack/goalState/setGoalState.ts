@@ -15,18 +15,16 @@
  */
 
 import {
+    buttonForCommand,
+    GitHubRepoRef,
+    guid,
     MappedParameter,
     MappedParameters,
+    menuForCommand,
     Parameter,
     Parameters,
     Value,
-} from "@atomist/automation-client/lib/decorators";
-import { guid } from "@atomist/automation-client/lib/internal/util/string";
-import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import {
-    buttonForCommand,
-    menuForCommand,
-} from "@atomist/automation-client/lib/spi/message/MessageClient";
+} from "@atomist/automation-client";
 import {
     CommandHandlerRegistration,
     fetchGoalsForCommit,
@@ -42,7 +40,10 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import { fetchBranchTips, tipOfBranch } from "../../util/graph/queryCommits";
+import {
+    fetchBranchTips,
+    tipOfBranch,
+} from "../../util/graph/queryCommits";
 
 @Parameters()
 class SetGoalStateParameters {

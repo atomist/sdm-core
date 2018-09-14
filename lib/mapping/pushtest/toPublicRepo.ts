@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { isGitHubRepoRef } from "@atomist/automation-client";
 import {
-    PushTest,
     pushTest,
+    PushTest,
 } from "@atomist/sdm";
 import { isPublicRepo } from "../../util/github/ghub";
 

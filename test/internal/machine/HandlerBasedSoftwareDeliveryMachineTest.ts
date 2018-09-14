@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-import { InMemoryFile } from "@atomist/automation-client/lib/project/mem/InMemoryFile";
-import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
-import { fileExists } from "@atomist/automation-client/lib/project/util/projectUtils";
-import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
+import {
+    fileExists,
+    InMemoryFile,
+    InMemoryProject,
+    toFactory,
+} from "@atomist/automation-client";
 import {
     AnyPush,
     AutofixRegistration,
     Builder,
     ExtensionPack,
+    fakePush,
     GoalsSetListener,
     hasFile,
     MessageGoal,
     PushListenerInvocation,
-    PushTest,
     pushTest,
+    PushTest,
     whenPushSatisfies,
 } from "@atomist/sdm";
-import { fakePush } from "@atomist/sdm/lib/api-helper/test/fakePush";
 import { NoGoals } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import { HttpServiceGoals } from "@atomist/sdm/lib/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";

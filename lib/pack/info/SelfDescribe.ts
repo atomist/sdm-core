@@ -16,10 +16,10 @@
 
 import {
     automationClientInstance,
+    info,
+    NoParameters,
     Success,
 } from "@atomist/automation-client";
-import { info } from "@atomist/automation-client/lib/internal/util/info";
-import { NoParameters } from "@atomist/automation-client/lib/SmartParameters";
 import {
     CommandHandlerRegistration,
     CommandListener,

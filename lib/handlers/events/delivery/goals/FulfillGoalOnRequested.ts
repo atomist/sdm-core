@@ -17,14 +17,15 @@
 import {
     automationClientInstance,
     EventFired,
+    EventHandler,
     GraphQL,
     HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
-import { EventHandler, Value } from "@atomist/automation-client/lib/decorators";
 import {
     addressChannelsFor,
     executeGoal,

@@ -16,10 +16,10 @@
 
 import {
     Configuration,
+    ConfigurationPostProcessor,
+    guid,
     logger,
 } from "@atomist/automation-client";
-import { ConfigurationPostProcessor } from "@atomist/automation-client/lib/configuration";
-import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     ConfigurationValues,
     SoftwareDeliveryMachine,

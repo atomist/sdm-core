@@ -15,11 +15,11 @@
  */
 
 import {
+    doWithRetry,
     HandlerContext,
     logger,
+    RemoteRepoRef,
 } from "@atomist/automation-client";
-import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
 import axios from "axios";
 import { BuildStatusUpdater } from "./LocalBuilder";
 
