@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
-import { findElements } from "../../../src/util/fingerprint/elementRequest";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { findElements } from "../../../lib/util/fingerprint/elementRequest";
 
 import * as assert from "power-assert";
 

@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-import { InMemoryFile } from "@atomist/automation-client/project/mem/InMemoryFile";
-import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
-import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
-import { toFactory } from "@atomist/automation-client/util/constructionUtils";
-import {
-    Builder,
-    PushListenerInvocation,
-    pushTest,
-    PushTest,
-} from "@atomist/sdm";
-import { fakePush } from "@atomist/sdm/api-helper/test/fakePush";
-import { whenPushSatisfies } from "@atomist/sdm/api/dsl/goalDsl";
-import { MessageGoal } from "@atomist/sdm/api/goal/common/MessageGoal";
-import { GoalsSetListener } from "@atomist/sdm/api/listener/GoalsSetListener";
-import { ExtensionPack } from "@atomist/sdm/api/machine/ExtensionPack";
+import { InMemoryFile } from "@atomist/automation-client/lib/project/mem/InMemoryFile";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { fileExists } from "@atomist/automation-client/lib/project/util/projectUtils";
+import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     AnyPush,
+    AutofixRegistration,
+    Builder,
+    ExtensionPack,
+    GoalsSetListener,
     hasFile,
-} from "@atomist/sdm/api/mapping/support/commonPushTests";
-import { AutofixRegistration } from "@atomist/sdm/api/registration/AutofixRegistration";
-import { NoGoals } from "@atomist/sdm/pack/well-known-goals/commonGoals";
-import { HttpServiceGoals } from "@atomist/sdm/pack/well-known-goals/httpServiceGoals";
+    MessageGoal,
+    PushListenerInvocation,
+    PushTest,
+    pushTest,
+    whenPushSatisfies,
+} from "@atomist/sdm";
+import { fakePush } from "@atomist/sdm/lib/api-helper/test/fakePush";
+import { NoGoals } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
+import { HttpServiceGoals } from "@atomist/sdm/lib/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
-import { SetGoalsOnPush } from "../../../src/handlers/events/delivery/goals/SetGoalsOnPush";
-import { HandlerBasedSoftwareDeliveryMachine } from "../../../src/internal/machine/HandlerBasedSoftwareDeliveryMachine";
+import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
+import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementationTest";
 
 export const IsTypeScript: PushTest = pushTest(

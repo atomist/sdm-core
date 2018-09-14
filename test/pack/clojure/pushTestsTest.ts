@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { InMemoryProject } from "@atomist/automation-client/project/mem/InMemoryProject";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
 
-import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
+import { PushListenerInvocation } from "@atomist/sdm";
 import * as assert from "power-assert";
-import { IsClojure } from "../../../src/pack/clojure/pushTests";
+import { IsClojure } from "../../../lib/pack/clojure/pushTests";
 
 describe("jvmPushTests", () => {
 

@@ -17,7 +17,7 @@
 import { HandlerContext } from "@atomist/automation-client";
 import { SdmGoalEvent } from "@atomist/sdm";
 import * as assert from "power-assert";
-import { DashboardDisplayProgressLog } from "../../src/log/DashboardDisplayProgressLog";
+import { DashboardDisplayProgressLog } from "../../lib/log/DashboardDisplayProgressLog";
 
 describe("DashboardDisplayProgressLog", () => {
 

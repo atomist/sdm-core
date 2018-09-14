@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 
-import { PushListenerInvocation } from "@atomist/sdm/api/listener/PushListener";
+import { PushListenerInvocation } from "@atomist/sdm";
 import * as assert from "power-assert";
-import { ToPublicRepo } from "../../../src/mapping/pushtest/toPublicRepo";
+import { ToPublicRepo } from "../../../lib/mapping/pushtest/toPublicRepo";
 
 const credentials = { token: process.env.GITHUB_TOKEN};
 
