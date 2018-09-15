@@ -30,7 +30,7 @@ import {
     TagListener,
     TagListenerInvocation,
 } from "@atomist/sdm";
-import * as schema from "@atomist/sdm/lib/typings/types";
+import * as schema from "../../../typings/types";
 
 /**
  * A new tag has been created

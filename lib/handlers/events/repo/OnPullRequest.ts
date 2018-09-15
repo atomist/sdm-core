@@ -32,7 +32,7 @@ import {
     PullRequestListenerInvocation,
     RepoRefResolver,
 } from "@atomist/sdm";
-import * as schema from "@atomist/sdm/lib/typings/types";
+import * as schema from "../../../typings/types";
 
 /**
  * A pull request has been raised
@@ -52,11 +52,16 @@ export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscript
                         params: this): Promise<HandlerResult> {
         const pullRequest = event.data.PullRequest[0];
         const repo = pullRequest.repo;
-        const id = params.repoRefResolver.toRemoteRepoRef(repo, { sha: pullRequest.head.sha });
+        const id = params.repoRefResolver.toRemoteRepoRef(
+            repo,
+            {
+                sha: pullRequest.head.sha,
+                branch: pullRequest.branch.name,
+            });
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         const addressChannels: AddressChannels = addressChannelsFor(repo, context);
-        await this.projectLoader.doWithProject({credentials, id, context, readOnly: true}, async project => {
+        await this.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async project => {
             const prli: PullRequestListenerInvocation = {
                 id,
                 context,

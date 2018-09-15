@@ -51,12 +51,17 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
                         context: HandlerContext,
                         params: this): Promise<HandlerResult> {
         const repo = event.data.ChannelLink[0].repo;
-        const id = params.repoRefResolver.toRemoteRepoRef(repo, {});
+        const id = params.repoRefResolver.toRemoteRepoRef(
+            repo,
+            {
+                branch: repo.defaultBranch,
+                sha: "HEAD"
+            });
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         const addressChannels: AddressChannels = addressChannelsFor(repo, context);
         const newlyLinkedChannelName = event.data.ChannelLink[0].channel.name;
-        await this.projectLoader.doWithProject({credentials, id, context, readOnly: true}, async project => {
+        await this.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async project => {
             const invocation: ChannelLinkListenerInvocation = {
                 id,
                 context,

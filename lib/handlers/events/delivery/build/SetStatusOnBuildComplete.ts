@@ -33,7 +33,6 @@ import {
     findSdmGoalOnCommit,
     Goal,
     LogInterpretation,
-    OnBuildComplete,
     RepoRefResolver,
     reportFailureInterpretation,
     SdmGoalEvent,
@@ -44,6 +43,7 @@ import {
 import * as slack from "@atomist/slack-messages";
 import axios from "axios";
 import * as stringify from "json-stringify-safe";
+import { OnBuildComplete } from "../../../../typings/types";
 
 /**
  * Set build status on complete build

@@ -28,12 +28,12 @@ import Status = OnSuccessStatus.Status;
 import {
     addressChannelsFor,
     CredentialsResolver,
-    OnSuccessStatus,
     RepoRefResolver,
     StagingVerifiedGoal,
     VerifiedDeploymentListener,
     VerifiedDeploymentListenerInvocation,
 } from "@atomist/sdm";
+import { OnSuccessStatus } from "../../../../typings/types";
 
 /**
  * React to a verified deployment

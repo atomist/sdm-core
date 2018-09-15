@@ -33,7 +33,6 @@ import {
     GoalImplementationMapper,
     GoalInvocation,
     LoggingProgressLog,
-    OnAnyRequestedSdmGoal,
     ProgressLog,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
@@ -44,6 +43,7 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
 import { formatDuration } from "../../../../util/misc/time";
 
 /**

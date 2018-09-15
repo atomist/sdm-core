@@ -30,10 +30,10 @@ import {
     GoalImplementationMapper,
     GoalSetter,
     GoalsSetListener,
-    OnPushToAnyBranch,
     ProjectLoader,
     RepoRefResolver,
 } from "@atomist/sdm";
+import { OnPushToAnyBranch } from "../../../../typings/types";
 
 /**
  * Set up goalSet on a push (e.g. for delivery).

@@ -36,9 +36,7 @@ import {
     toArtifactListenerRegistration,
     updateGoal,
 } from "@atomist/sdm";
-import {
-    OnImageLinked,
-} from "../../../../typings/types";
+import { OnImageLinked } from "../../../../typings/types";
 
 @EventHandler("Scan when artifact is found", GraphQL.subscription("OnImageLinked"))
 export class FindArtifactOnImageLinked implements HandleEvent<OnImageLinked.Subscription> {
@@ -49,7 +47,8 @@ export class FindArtifactOnImageLinked implements HandleEvent<OnImageLinked.Subs
      */
     constructor(public goal: Goal,
                 private readonly registrations: ArtifactListenerRegisterable[],
-                private readonly options: SoftwareDeliveryMachineOptions) {}
+                private readonly options: SoftwareDeliveryMachineOptions) {
+    }
 
     public async handle(event: EventFired<OnImageLinked.Subscription>,
                         context: HandlerContext,
@@ -57,21 +56,31 @@ export class FindArtifactOnImageLinked implements HandleEvent<OnImageLinked.Subs
         const imageLinked = event.data.ImageLinked[0];
         const commit = imageLinked.commit;
         const image = imageLinked.image;
-        const id = params.options.repoRefResolver.toRemoteRepoRef(commit.repo, { sha: commit.sha });
+        const id = params.options.repoRefResolver.toRemoteRepoRef(
+            commit.repo,
+            {
+                sha: commit.sha,
+                branch: commit.pushes[0].branch,
+            });
 
         const artifactSdmGoal = await findSdmGoalOnCommit(context, id, commit.repo.org.provider.providerId, params.goal);
         if (!artifactSdmGoal) {
-            logger.debug("FindArtifactOnImageLinked: context %s not found for %j", params.goal.context, id);
+            logger.debug("Context %s not found for %j", params.goal.context, id);
             return Success;
         }
 
         if (params.registrations.length > 0) {
             const credentials = this.options.credentialsResolver.eventHandlerCredentials(context, id);
-            logger.info("FindArtifactOnImageLinked: Scanning artifact for %j", id);
+            logger.info("Scanning artifact for %j", id);
             const deployableArtifact = await params.options.artifactStore.checkout(image.imageName, id, credentials);
             const addressChannels = addressChannelsFor(commit.repo, context);
 
-            await params.options.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async project => {
+            await params.options.projectLoader.doWithProject({
+                credentials,
+                id,
+                context,
+                readOnly: true,
+            }, async project => {
                 // TODO only handles first push
                 const pli: PushListenerInvocation = {
                     id,

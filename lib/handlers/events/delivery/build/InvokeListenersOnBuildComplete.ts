@@ -29,9 +29,9 @@ import {
     BuildListener,
     BuildListenerInvocation,
     CredentialsResolver,
-    OnBuildComplete,
     RepoRefResolver,
 } from "@atomist/sdm";
+import { OnBuildComplete } from "../../../../typings/types";
 
 /**
  * Invoke listeners on complete build. Not a part of our delivery flow:

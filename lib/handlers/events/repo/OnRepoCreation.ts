@@ -30,7 +30,7 @@ import {
     RepoCreationListenerInvocation,
     RepoRefResolver,
 } from "@atomist/sdm";
-import * as schema from "@atomist/sdm/lib/typings/types";
+import * as schema from "../../../typings/types";
 
 /**
  * A new repo has been created. We don't know if it has code.

@@ -29,10 +29,10 @@ import {
     CredentialsResolver,
     DeploymentListener,
     DeploymentListenerInvocation,
-    OnSuccessStatus,
     RepoRefResolver,
     StagingDeploymentGoal,
 } from "@atomist/sdm";
+import { OnSuccessStatus } from "../../../../typings/types";
 
 /**
  * React to a deployment.

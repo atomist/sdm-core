@@ -29,7 +29,7 @@ import {
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
 } from "@atomist/sdm";
-import * as schema from "@atomist/sdm/lib/typings/types";
+import * as schema from "../../../typings/types";
 
 /**
  * A user joined a channel
