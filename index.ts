@@ -112,9 +112,6 @@ export {
     ToPublicRepo,
 } from "./lib/mapping/pushtest/toPublicRepo";
 export {
-    IsLein,
-} from "./lib/pack/clojure/pushTests";
-export {
     deploymentFreeze,
     ExplainDeploymentFreezeGoal,
     isDeploymentFrozen,
