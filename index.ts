@@ -124,7 +124,7 @@ export {
 } from "./lib/pack/freeze/InMemoryDeploymentStatusManager";
 export {
     GoalState,
-} from "./lib/pack/goalState/goalState";
+} from "./lib/pack/goal-state/goalState";
 export {
     selfDescribingHandlers,
 } from "./lib/pack/info/support/commandSearch";
