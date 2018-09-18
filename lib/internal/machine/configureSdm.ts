@@ -51,7 +51,7 @@ export interface ConfigureOptions extends ConfigurationValues {
  * Type that can create a fully configured SDM
  */
 export type SoftwareDeliveryMachineMaker =
-    (configuration: LocalSoftwareDeliveryMachineConfiguration) => SoftwareDeliveryMachine;
+    (configuration: LocalSoftwareDeliveryMachineConfiguration) => SoftwareDeliveryMachine | Promise<SoftwareDeliveryMachine>;
 
 /**
  * Configure and set up a Software Delivery Machine instance with the automation-client framework for standalone
@@ -75,7 +75,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         mergedConfig = _.merge(defaultSdmConfiguration, mergedConfig);
 
         validateConfigurationValues(mergedConfig, options);
-        const sdm = machineMaker(mergedConfig);
+        const sdm = await machineMaker(mergedConfig);
 
         await doWithSdmLocal<void>(local =>
             sdm.addExtensionPacks(local.LocalLifecycle, local.LocalSdmConfig),
