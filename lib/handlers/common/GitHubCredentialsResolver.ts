@@ -15,6 +15,7 @@
  */
 
 import {
+    Parameters,
     ProjectOperationCredentials,
     Secret,
     Secrets,
@@ -22,6 +23,7 @@ import {
 } from "@atomist/automation-client";
 import { CredentialsResolver } from "@atomist/sdm";
 
+@Parameters()
 export class GitHubCredentialsResolver implements CredentialsResolver {
 
     @Secret(Secrets.OrgToken)
