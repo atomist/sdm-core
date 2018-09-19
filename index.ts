@@ -112,14 +112,6 @@ export {
     ToPublicRepo,
 } from "./lib/mapping/pushtest/toPublicRepo";
 export {
-    deploymentFreeze,
-    ExplainDeploymentFreezeGoal,
-    isDeploymentFrozen,
-} from "./lib/pack/freeze/deploymentFreeze";
-export {
-    InMemoryDeploymentStatusManager,
-} from "./lib/pack/freeze/InMemoryDeploymentStatusManager";
-export {
     GoalState,
 } from "./lib/pack/goal-state/goalState";
 export {
