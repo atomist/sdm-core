@@ -133,57 +133,63 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
         const errorFinder = this.options.errorFinder;
         logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
             this.options.commandFile);
-        return this.sdm.configuration.sdm.projectLoader.doWithProject({ credentials, id, readOnly: true }, async p => {
-            const commands: SpawnCommand[] = this.options.commands || await loadCommandsFromFile(p, this.options.commandFile);
+        return this.sdm.configuration.sdm.projectLoader.doWithProject({
+                    credentials,
+                    id,
+                    readOnly: true,
+                    cloneOptions: { detachHead: true },
+                },
+            async p => {
+                const commands: SpawnCommand[] = this.options.commands || await loadCommandsFromFile(p, this.options.commandFile);
 
-            const appId: AppInfo = await this.options.projectToAppInfo(p);
+                const appId: AppInfo = await this.options.projectToAppInfo(p);
 
-            let optionsToUse = this.options.options || {};
-            if (!!this.options.enrich) {
-                logger.info("Enriching options from project %s:%s", p.id.owner, p.id.repo);
-                optionsToUse = await this.options.enrich(optionsToUse, p);
-            }
-            const opts = _.merge({ cwd: p.baseDir }, optionsToUse);
+                let optionsToUse = this.options.options || {};
+                if (!!this.options.enrich) {
+                    logger.info("Enriching options from project %s:%s", p.id.owner, p.id.repo);
+                    optionsToUse = await this.options.enrich(optionsToUse, p);
+                }
+                const opts = _.merge({ cwd: p.baseDir }, optionsToUse);
 
-            function executeOne(buildCommand: SpawnCommand): Promise<ChildProcessResult> {
-                return spawnAndWatch(buildCommand,
-                    _.merge(opts, buildCommand.options),
-                    log,
-                    {
-                        errorFinder,
-                        stripAnsi: true,
-                    })
-                    .then(br => {
-                        if (br.error) {
-                            const message = "Stopping build commands due to error on " + stringifySpawnCommand(buildCommand);
-                            log.write(message);
-                            return { error: true, code: br.code, message, childProcess: undefined };
-                        }
-                        return br;
-                    });
-            }
+                function executeOne(buildCommand: SpawnCommand): Promise<ChildProcessResult> {
+                    return spawnAndWatch(buildCommand,
+                        _.merge(opts, buildCommand.options),
+                        log,
+                        {
+                            errorFinder,
+                            stripAnsi: true,
+                        })
+                        .then(br => {
+                            if (br.error) {
+                                const message = "Stopping build commands due to error on " + stringifySpawnCommand(buildCommand);
+                                log.write(message);
+                                return { error: true, code: br.code, message, childProcess: undefined };
+                            }
+                            return br;
+                        });
+                }
 
-            let buildResult: Promise<ChildProcessResult> = executeOne(commands[0]);
-            for (const buildCommand of commands.slice(1)) {
-                buildResult = buildResult
-                    .then(br => {
-                        if (br.error) {
-                            throw new Error("Build failure: " + br.error);
-                        }
-                        log.write("/--");
-                        log.write(`Result: ${serializeResult(br)}`);
-                        log.write("\\--");
-                        return executeOne(buildCommand);
-                    });
-            }
-            buildResult = buildResult.then(br => {
-                logger.info("Build RETURN: %j", br);
-                return br;
+                let buildResult: Promise<ChildProcessResult> = executeOne(commands[0]);
+                for (const buildCommand of commands.slice(1)) {
+                    buildResult = buildResult
+                        .then(br => {
+                            if (br.error) {
+                                throw new Error("Build failure: " + br.error);
+                            }
+                            log.write("/--");
+                            log.write(`Result: ${serializeResult(br)}`);
+                            log.write("\\--");
+                            return executeOne(buildCommand);
+                        });
+                }
+                buildResult = buildResult.then(br => {
+                    logger.info("Build RETURN: %j", br);
+                    return br;
+                });
+                const b = new SpawnedBuild(appId, id, buildResult, team, log.url,
+                    !!this.options.deploymentUnitFor ? await this.options.deploymentUnitFor(p, appId) : undefined);
+                return b;
             });
-            const b = new SpawnedBuild(appId, id, buildResult, team, log.url,
-                !!this.options.deploymentUnitFor ? await this.options.deploymentUnitFor(p, appId) : undefined);
-            return b;
-        });
     }
 
 }
