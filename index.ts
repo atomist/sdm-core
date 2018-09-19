@@ -151,6 +151,6 @@ export {
     lookFor200OnEndpointRootGet,
 } from "./lib/util/verify/lookFor200OnEndpointRootGet";
 export * from "./lib/util/webhook/ImageLink";
-import {
+export {
     SendFingerprintToAtomist,
 } from "./lib/util/webhook/sendFingerprintToAtomist";
