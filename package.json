@@ -24,7 +24,7 @@
     "url": "https://github.com/atomist/sdm-core/issues"
   },
   "dependencies": {
-    "@atomist/slack-messages": "1.0.1-master.20180830190736",
+    "@atomist/slack-messages": "1.0.0",
     "@octokit/rest": "^14.0.9",
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
