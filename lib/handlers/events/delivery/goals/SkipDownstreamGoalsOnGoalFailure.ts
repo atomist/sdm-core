@@ -37,9 +37,9 @@ import { isGoalRelevant } from "../../../../internal/delivery/goals/support/vali
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
 /**
- * Respond to a failure status by failing downstream goals
+ * Skip downstream goals on failed, stopped or canceled goal
  */
-@EventHandler("Fail downstream goals on a goal failure", GraphQL.subscription("OnAnyFailedSdmGoal"))
+@EventHandler("Skip downstream goals on failed, stopped or canceled goal", GraphQL.subscription("OnAnyFailedSdmGoal"))
 export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver) {}
@@ -61,9 +61,21 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
         const goalsToSkip = goals.filter(g => isDependentOn(failedGoal, g, mapKeyToGoal(goals)))
             .filter(g => g.state === "planned");
 
+        let failedGoalState;
+        switch (failedGoal.state) {
+            case SdmGoalState.failure:
+                failedGoalState = "failed";
+                break;
+            case SdmGoalState.stopped:
+                failedGoalState = "stopped goals";
+                break;
+            case SdmGoalState.canceled:
+                failedGoalState = "was canceled";
+                break;
+        }
         await Promise.all(goalsToSkip.map(g => updateGoal(context, g, {
             state: SdmGoalState.skipped,
-            description: `Skipped ${g.name} because ${failedGoal.name} failed`,
+            description: `Skipped ${g.name} because ${failedGoal.name} ${failedGoalState}`,
         })));
 
         return Success;
@@ -79,8 +91,6 @@ function mapKeyToGoal<T extends SdmGoalKey>(goals: T[]): (SdmGoalKey) => T {
 
 function isDependentOn(failedGoal: SdmGoalKey, goal: SdmGoalEvent, preconditionToGoal: (g: SdmGoalKey) => SdmGoalEvent): boolean {
     if (!goal) {
-        // TODO we think this is caused by automation-api#396
-        logger.warn("Internal error: Trying to work out if %j is dependent on null or undefined goal", failedGoal);
         return false;
     }
     if (!goal.preConditions || goal.preConditions.length === 0) {
