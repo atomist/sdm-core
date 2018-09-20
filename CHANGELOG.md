@@ -7,9 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-M.4...HEAD)
 
+### Added
+
+-   Allow using async function to create SDM. [#57](https://github.com/atomist/sdm-core/pull/57)
+-   New states for stopped and canceled goals. [#59](https://github.com/atomist/sdm-core/pull/59)
+
+### Changed
+
+-   **BREAKING** Export packs from the index as packs. [#62](https://github.com/atomist/sdm-core/pull/62)
+
 ### Removed
 
--   *BREAKING* Removed "freeze" pack. In sample-sdm pending a new home.
+-   **BREAKING** Removed "freeze" pack. In sample-sdm pending a new home.
 
 ## [1.0.0-M.4](https://github.com/atomist/sdm/compare/1.0.0-M.3...1.0.0-M.4) - 2018-09-16
 
