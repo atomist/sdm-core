@@ -112,12 +112,6 @@ export {
     ToPublicRepo,
 } from "./lib/mapping/pushtest/toPublicRepo";
 export {
-    GoalState,
-} from "./lib/pack/goal-state/goalState";
-export {
-    selfDescribingHandlers,
-} from "./lib/pack/info/support/commandSearch";
-export {
     CoreRepoFieldsAndChannels,
     OnChannelLink,
     OnRepoOnboarded,
@@ -146,3 +140,7 @@ export * from "./lib/util/webhook/ImageLink";
 export {
     SendFingerprintToAtomist,
 } from "./lib/util/webhook/sendFingerprintToAtomist";
+import * as pack from "./lib/pack";
+export {
+    pack,
+}
