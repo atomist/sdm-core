@@ -24,7 +24,7 @@ import {
     TransformModeSuggestion,
 } from "@atomist/sdm";
 
-export const DryRunMessage = "[atomist:build-aware]";
+export const BuildAwareMarker = "[atomist:build-aware]";
 
 /**
  * Return a function wrapping a CodeTransform registration to make
@@ -49,7 +49,7 @@ export const makeBuildAware: CodeTransformRegistrationDecorator<any> =
                     || dryRunMessage(ctr.description || ctr.name);
                 return {
                     branch,
-                    message: desiredCommitMessage + "\n\n" + DryRunMessage,
+                    message: desiredCommitMessage + "\n\n" + BuildAwareMarker,
                 };
             }
         };
@@ -64,7 +64,7 @@ export const makeBuildAware: CodeTransformRegistrationDecorator<any> =
  */
 function dryRunOf(em: EditMode): EditMode {
     // Add dry run message suffix
-    em.message = dryRunMessage(em.message) + "\n\n" + DryRunMessage;
+    em.message = dryRunMessage(em.message) + "\n\n" + BuildAwareMarker;
     if (isPullRequest(em)) {
         // Don't let it raise a PR if it wanted to.
         // It will remain a valid BranchCommit if it was a PR

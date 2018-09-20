@@ -19,7 +19,7 @@ import {
     BuildListener,
     IssueCreationOptions,
 } from "@atomist/sdm";
-import { DryRunMessage } from "./makeBuildAware";
+import { BuildAwareMarker } from "./makeBuildAware";
 
 /**
  * React to result of a build-aware build to raise a PR or issue.
@@ -30,12 +30,12 @@ export function buildAwareBuildListener(opts: IssueCreationOptions): BuildListen
         const branch = build.push.branch;
 
         logger.debug("Assessing build aware build for '%j': '%s'", bu.id, bu.build.commit.message);
-        if (!bu.build.commit.message.includes(DryRunMessage)) {
+        if (!bu.build.commit.message.includes(BuildAwareMarker)) {
             logger.info("Not a build aware build: '%j': '%s'", bu.id, bu.build.commit.message);
             return;
         }
 
-        const body = bu.build.commit.message.replace(DryRunMessage, "").trim() + "\n\n[atomist:generated]";
+        const body = bu.build.commit.message.replace(BuildAwareMarker, "").trim() + "\n\n[atomist:generated]";
         const description = body.split("\n")[0];
         switch (build.status) {
             case "started" :
