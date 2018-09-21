@@ -186,8 +186,12 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
     const goalName = goal.uniqueName.split("#")[0].toLowerCase();
 
     const jobSpec = JSON.parse(jobSpecWithAffinity(goal.goalSetId));
+    const affinity = jobSpec.spec.template.spec.affinity;
+
     const containerSpec = JSON.parse(log.log).spec.template.spec;
+
     jobSpec.spec.template.spec = containerSpec;
+    jobSpec.spec.template.spec.affinity = affinity;
 
     jobSpec.metadata.name =
         `${deploymentName}-job-${goal.goalSetId.slice(0, 7)}-${goalName}`;
