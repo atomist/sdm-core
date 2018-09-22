@@ -28,12 +28,14 @@ import {
     stringifySpawnCommand,
 } from "@atomist/automation-client";
 import {
+    AddressChannels,
     AppInfo,
     InterpretLog,
     LogInterpretation,
     ProgressLog,
     serializeResult,
     SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
@@ -129,11 +131,13 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
     protected async startBuild(credentials: ProjectOperationCredentials,
                                id: RemoteRepoRef,
                                team: string,
-                               log: ProgressLog): Promise<LocalBuildInProgress> {
+                               log: ProgressLog,
+                               addressChannels: AddressChannels,
+                               configuration: SoftwareDeliveryMachineConfiguration): Promise<LocalBuildInProgress> {
         const errorFinder = this.options.errorFinder;
         logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
             this.options.commandFile);
-        return this.sdm.configuration.sdm.projectLoader.doWithProject({
+        return configuration.sdm.projectLoader.doWithProject({
                     credentials,
                     id,
                     readOnly: true,
