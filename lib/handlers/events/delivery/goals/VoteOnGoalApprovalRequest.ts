@@ -78,19 +78,37 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
         // Policy for now is if one vote denies, we deny the request.
         if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
-            await updateGoal(context, sdmGoal, {
-                state: SdmGoalState.success,
-                description: sdmGoal.description,
-            });
+             if (sdmGoal.state === SdmGoalState.pre_approved) {
+                 await updateGoal(context, sdmGoal, {
+                     state: SdmGoalState.requested,
+                     description: sdmGoal.description,
+                 });
+             } else if (sdmGoal.state === SdmGoalState.approved) {
+                 await updateGoal(context, sdmGoal, {
+                     state: SdmGoalState.success,
+                     description: sdmGoal.description,
+                 });
+             }
         } else {
-            const goal: SdmGoalEvent = {
-                ...sdmGoal,
-                approval: undefined,
-            };
-            await updateGoal(context, goal, {
-                state: SdmGoalState.waiting_for_approval,
-                description: `${sdmGoal.description} | approval request by @${sdmGoal.approval.userId} denied`,
-            });
+            if (sdmGoal.state === SdmGoalState.pre_approved) {
+                const goal: SdmGoalEvent = {
+                    ...sdmGoal,
+                    preApproval: undefined,
+                };
+                await updateGoal(context, goal, {
+                    state: SdmGoalState.waiting_for_pre_approval,
+                    description: `${sdmGoal.description} | start request by @${sdmGoal.preApproval.userId} denied`,
+                });
+            } else if (sdmGoal.state === SdmGoalState.approved) {
+                const goal: SdmGoalEvent = {
+                    ...sdmGoal,
+                    approval: undefined,
+                };
+                await updateGoal(context, goal, {
+                    state: SdmGoalState.waiting_for_approval,
+                    description: `${sdmGoal.description} | approval request by @${sdmGoal.approval.userId} denied`,
+                });
+            }
         }
 
         return Success;
