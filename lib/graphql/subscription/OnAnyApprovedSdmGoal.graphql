@@ -1,5 +1,5 @@
 subscription OnAnyApprovedSdmGoal {
-  SdmGoal(state: [approved]) {
+  SdmGoal(state: [approved, pre_approved]) {
     ...SdmGoalFields
     ...SdmGoalRepo
   }
