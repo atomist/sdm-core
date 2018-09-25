@@ -89,8 +89,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const credentials = this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id);
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
 
-        const { goal, goalExecutor, logInterpreter, progressReporter, projectHooks } =
-            this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
+        const implementation = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
+        const { goal } = implementation;
 
         const progressLog = new WriteToAllProgressLog(
             sdmGoal.name,
@@ -125,11 +125,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                     projectLoader: this.configuration.sdm.projectLoader,
                     goalExecutionListeners: this.goalExecutionListeners,
                 },
-                goalExecutor,
-                goalInvocation,
-                logInterpreter,
-                progressReporter,
-                projectHooks)
+                implementation,
+                goalInvocation)
                 .then(async res => {
                     await reportEndAndClose(res, start, progressLog);
                     return res;
