@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Allow using async function to create SDM. [#57](https://github.com/atomist/sdm-core/pull/57)
 -   New states for stopped and canceled goals. [#59](https://github.com/atomist/sdm-core/pull/59)
+-   Support for code level project listeners. [#63](https://github.com/atomist/sdm-core/issues/63)
 
 ### Changed
 
