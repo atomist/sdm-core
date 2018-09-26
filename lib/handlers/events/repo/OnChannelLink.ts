@@ -55,7 +55,6 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
             repo,
             {
                 branch: repo.defaultBranch,
-                sha: "HEAD",
             });
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
