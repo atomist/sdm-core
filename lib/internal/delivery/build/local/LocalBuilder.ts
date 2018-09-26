@@ -36,6 +36,7 @@ import {
     PushThatTriggersBuild,
     QueryNoCacheOptions,
     SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { sprintf } from "sprintf-js";
 import { SdmBuildIdentifierForRepo } from "../../../../typings/types";
@@ -90,7 +91,7 @@ export interface LocalBuildInProgress {
 export abstract class LocalBuilder implements Builder {
 
     protected constructor(public readonly name: string,
-                          protected readonly sdm: SoftwareDeliveryMachine) {
+                          private readonly sdm: SoftwareDeliveryMachine) {
     }
 
     private get buildStatusUpdater(): BuildStatusUpdater {
@@ -104,13 +105,14 @@ export abstract class LocalBuilder implements Builder {
                                addressChannels: AddressChannels,
                                push: PushThatTriggersBuild,
                                log: ProgressLog,
-                               context: HandlerContext): Promise<HandlerResult> {
-        const as = this.sdm.configuration.sdm.artifactStore;
+                               context: HandlerContext,
+                               configuration: SoftwareDeliveryMachineConfiguration): Promise<HandlerResult> {
+        const as = configuration.sdm.artifactStore;
         const atomistTeam = context.workspaceId;
         const buildNumber = await this.obtainBuildIdentifier(push, context);
 
         try {
-            const rb = await this.startBuild(credentials, id, atomistTeam, log, addressChannels);
+            const rb = await this.startBuild(credentials, id, atomistTeam, log, addressChannels, configuration);
             await this.onStarted(credentials, id, push, rb, buildNumber, context);
             try {
                 const br = await rb.buildResult;
@@ -164,7 +166,8 @@ export abstract class LocalBuilder implements Builder {
                                   id: RemoteRepoRef,
                                   atomistTeam: string,
                                   log: ProgressLog,
-                                  addressChannels: AddressChannels): Promise<LocalBuildInProgress>;
+                                  addressChannels: AddressChannels,
+                                  configuration: SoftwareDeliveryMachineConfiguration): Promise<LocalBuildInProgress>;
 
     protected onStarted(credentials: ProjectOperationCredentials,
                         id: RemoteRepoRef,
