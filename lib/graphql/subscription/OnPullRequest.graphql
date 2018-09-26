@@ -11,6 +11,8 @@ subscription OnPullRequest {
       sha
       message
     }
+    createdAt
+    updatedAt
     head {
       sha
       message
