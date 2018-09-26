@@ -89,16 +89,22 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
          */
         await Promise.all(goalsToRequest.map(async goal => {
             const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(goal);
-            let g = goal;
-            for (const cb of cbs) {
-                g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
+            if (goal.preApprovalRequired) {
+                return updateGoal(context, goal, {
+                    state: SdmGoalState.waiting_for_pre_approval,
+                    description: `Start required: ${goal.name}`,
+                });
+            } else {
+                let g = goal;
+                for (const cb of cbs) {
+                    g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
+                }
+                return updateGoal(context, g, {
+                    state: SdmGoalState.requested,
+                    description: `Ready to ` + g.name,
+                    data: g.data,
+                });
             }
-
-            return updateGoal(context, g, {
-                state: SdmGoalState.requested,
-                description: `Ready to ` + g.name,
-                data: g.data,
-            });
         }));
         return Success;
     }
