@@ -81,12 +81,12 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
              if (sdmGoal.state === SdmGoalState.pre_approved) {
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.requested,
-                     description: sdmGoal.description,
+                     description: cleanDescription(sdmGoal.description),
                  });
              } else if (sdmGoal.state === SdmGoalState.approved) {
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.success,
-                     description: sdmGoal.description,
+                     description: cleanDescription(sdmGoal.description),
                  });
              }
         } else {
@@ -97,7 +97,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                 };
                 await updateGoal(context, goal, {
                     state: SdmGoalState.waiting_for_pre_approval,
-                    description: `${sdmGoal.description} | start request by @${sdmGoal.preApproval.userId} denied`,
+                    description: `${sdmGoal.description} | start by @${sdmGoal.preApproval.userId} denied`,
                 });
             } else if (sdmGoal.state === SdmGoalState.approved) {
                 const goal: SdmGoalEvent = {
@@ -106,11 +106,21 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                 };
                 await updateGoal(context, goal, {
                     state: SdmGoalState.waiting_for_approval,
-                    description: `${sdmGoal.description} | approval request by @${sdmGoal.approval.userId} denied`,
+                    description: `${sdmGoal.description} | approval by @${sdmGoal.approval.userId} denied`,
                 });
             }
         }
 
         return Success;
+    }
+}
+
+function cleanDescription(description: string): string {
+    if (description.startsWith("Start required: ")) {
+        return description.slice("Start required:".length).trim();
+    } else if (description.startsWith("Approval required:")) {
+        return description.slice("Approval required:".length).trim();
+    } else {
+        return description;
     }
 }
