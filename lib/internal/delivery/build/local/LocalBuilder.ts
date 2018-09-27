@@ -115,7 +115,7 @@ export abstract class LocalBuilder implements Builder {
             const rb = await this.startBuild(credentials, id, atomistTeam, log, addressChannels, configuration);
             await this.onStarted(credentials, id, push, rb, buildNumber, context);
             try {
-                const br = await rb.buildResult;
+                const br = rb.buildResult;
                 log.write(`Build result: ${br.error ? "Error" : "Success"}${br.message ? " " + br.message : ""}`);
                 await this.onExit(
                     credentials,
