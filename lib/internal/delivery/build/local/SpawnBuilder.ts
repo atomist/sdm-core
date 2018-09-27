@@ -173,26 +173,19 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                         });
                 }
 
-                let buildResult: Promise<ChildProcessResult> = executeOne(commands[0]);
+                let buildResult = await executeOne(commands[0]);
                 for (const buildCommand of commands.slice(1)) {
-                    buildResult = buildResult
-                        .then(br => {
-                            if (br.error) {
-                                throw new Error("Build failure: " + br.error);
-                            }
-                            log.write("/--");
-                            log.write(`Result: ${serializeResult(br)}`);
-                            log.write("\\--");
-                            return executeOne(buildCommand);
-                        });
+                    if (buildResult.error) {
+                        throw new Error("Build failure: " + buildResult.error);
+                    }
+                    log.write("/--");
+                    log.write(`Result: ${serializeResult(buildResult)}`);
+                    log.write("\\--");
+                    buildResult = await executeOne(buildCommand);
                 }
-                buildResult = buildResult.then(br => {
-                    logger.info("Build RETURN: %j", br);
-                    return br;
-                });
-                const b = new SpawnedBuild(appId, id, buildResult, team, log.url,
+                logger.info("Build RETURN: %j", buildResult);
+                return new SpawnedBuild(appId, id, buildResult, team, log.url,
                     !!this.options.deploymentUnitFor ? await this.options.deploymentUnitFor(p, appId) : undefined);
-                return b;
             });
     }
 
@@ -218,7 +211,7 @@ class SpawnedBuild implements LocalBuildInProgress {
 
     constructor(public appInfo: AppInfo,
                 public repoRef: RemoteRepoRef,
-                public buildResult: Promise<ChildProcessResult>,
+                public buildResult: ChildProcessResult,
                 public team: string,
                 public url: string,
                 public deploymentUnitFile: string) {

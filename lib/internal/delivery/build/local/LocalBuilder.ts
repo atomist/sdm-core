@@ -69,7 +69,7 @@ function isBuildStatusUpdater(a: object): a is BuildStatusUpdater {
  */
 export interface LocalBuildInProgress {
 
-    readonly buildResult: Promise<ChildProcessResult>;
+    readonly buildResult: ChildProcessResult;
 
     readonly repoRef: RemoteRepoRef;
 
