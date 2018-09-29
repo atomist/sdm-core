@@ -33,9 +33,11 @@ import {
     pushTest,
     PushTest,
     whenPushSatisfies,
+    Goal,
+    Goals,
+    Build,
+    PushImpact,
 } from "@atomist/sdm";
-import { NoGoals } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
-import { HttpServiceGoals } from "@atomist/sdm/lib/pack/well-known-goals/httpServiceGoals";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
@@ -67,6 +69,12 @@ const fakeBuilder: Builder = {
     },
 };
 
+const NoGoals = new Goals("No action needed", new Goal({
+    uniqueName: "nevermind",
+    displayName: "immaterial",
+    completedDescription: "No material changes",
+}));
+
 describe("SDM handler creation", () => {
 
     describe("emits event handlers", () => {
@@ -96,6 +104,8 @@ describe("SDM handler creation", () => {
         });
 
     });
+
+    const HttpServiceGoals = new Goals("pretend HTTP Service Goals", new Build(), new PushImpact())
 
     describe("can test goal setting", () => {
 

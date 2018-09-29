@@ -29,7 +29,6 @@ import {
     JustBuildGoal,
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
-import { WellKnownGoals } from "@atomist/sdm/lib/pack/well-known-goals/addWellKnownGoals";
 import * as _ from "lodash";
 import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";
@@ -266,12 +265,11 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
      * @param {GoalSetter} goalSetters tell me what to do on a push. Hint: start with "whenPushSatisfies(...)"
      */
     constructor(name: string,
-                configuration: Configuration & SoftwareDeliveryMachineConfiguration,
-                goalSetters: Array<GoalSetter | GoalSetter[]>) {
+        configuration: Configuration & SoftwareDeliveryMachineConfiguration,
+        goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
         // This hits the Atomist service
         this.addFingerprintListener(SendFingerprintToAtomist);
-        this.addExtensionPacks(WellKnownGoals);
     }
 
 }
