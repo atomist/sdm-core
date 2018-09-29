@@ -23,20 +23,20 @@ import {
 import {
     AnyPush,
     AutofixRegistration,
+    Build,
     Builder,
     ExtensionPack,
     fakePush,
+    Goal,
+    Goals,
     GoalsSetListener,
     hasFile,
     MessageGoal,
-    PushListenerInvocation,
-    pushTest,
-    PushTest,
-    whenPushSatisfies,
-    Goal,
-    Goals,
-    Build,
     PushImpact,
+    PushListenerInvocation,
+    PushTest,
+    pushTest,
+    whenPushSatisfies,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
@@ -105,7 +105,7 @@ describe("SDM handler creation", () => {
 
     });
 
-    const HttpServiceGoals = new Goals("pretend HTTP Service Goals", new Build(), new PushImpact())
+    const HttpServiceGoals = new Goals("pretend HTTP Service Goals", new Build(), new PushImpact());
 
     describe("can test goal setting", () => {
 

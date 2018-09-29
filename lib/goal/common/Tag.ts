@@ -29,7 +29,7 @@ import { executeTag } from "../../internal/delivery/build/executeTag";
 export class Tag extends FulfillableGoal {
 
     constructor(private readonly goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("tag"),
-        ...dependsOn: Goal[]) {
+                ...dependsOn: Goal[]) {
 
         super({
             workingDescription: "Tagging",
