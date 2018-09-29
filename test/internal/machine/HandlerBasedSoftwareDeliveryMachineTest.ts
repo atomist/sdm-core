@@ -34,8 +34,8 @@ import {
     MessageGoal,
     PushImpact,
     PushListenerInvocation,
-    PushTest,
     pushTest,
+    PushTest,
     whenPushSatisfies,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
