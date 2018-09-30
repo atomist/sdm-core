@@ -19,11 +19,10 @@ import {
     DefaultGoalNameGenerator,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
-    getGoalDefintionFrom,
+    getGoalDefinitionFrom,
     Goal,
     ImplementationRegistration,
 } from "@atomist/sdm";
-import { VersionGoal } from "@atomist/sdm/lib/pack/well-known-goals/commonGoals";
 import {
     executeVersioner,
     ProjectVersioner,
@@ -45,8 +44,9 @@ export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRe
                 ...dependsOn: Goal[]) {
 
         super({
-            ...VersionGoal.definition,
-            ...getGoalDefintionFrom(goalDetailsOrUniqueName, DefaultGoalNameGenerator.generateName("version")),
+            workingDescription: "Calculating project version",
+            completedDescription: "Versioned",
+            ...getGoalDefinitionFrom(goalDetailsOrUniqueName, DefaultGoalNameGenerator.generateName("version")),
             displayName: "version",
         }, ...dependsOn);
     }
