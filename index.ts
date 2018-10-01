@@ -19,7 +19,12 @@ export {
 } from "./lib/goal/common/Tag";
 export {
     Version,
+    ProjectVersionerRegistration,
 } from "./lib/goal/common/Version";
+export {
+    Build,
+    BuilderRegistration,
+} from "./lib/goal/common/Build";
 export {
     DisplayDeployEnablement,
 } from "./lib/handlers/commands/DisplayDeployEnablement";
@@ -56,11 +61,6 @@ export {
     K8sAutomationBuilder,
 } from "./lib/internal/delivery/build/k8s/K8AutomationBuilder";
 export {
-    BuildStatusUpdater,
-    LocalBuilder,
-    LocalBuildInProgress,
-} from "./lib/internal/delivery/build/local/LocalBuilder";
-export {
     ProjectIdentifier,
 } from "./lib/internal/delivery/build/local/projectIdentifier";
 export {
@@ -69,9 +69,14 @@ export {
     readSdmVersion,
 } from "./lib/internal/delivery/build/local/projectVersioner";
 export {
-    SpawnBuilder,
+    executeBuild,
+    Builder,
+    BuildInProgress,
+} from "./lib/internal/delivery/build/local/executeBuild";
+export {
+    spawnBuilder,
     SpawnBuilderOptions,
-} from "./lib/internal/delivery/build/local/SpawnBuilder";
+} from "./lib/internal/delivery/build/local/spawnBuilder";
 export {
     DefaultLocalDeployerOptions,
     LocalDeployerOptions,
@@ -118,7 +123,9 @@ export {
     PersonByChatId,
     SdmVersionForCommit,
 } from "./lib/typings/types";
+import * as pack from "./lib/pack";
 import * as github from "./lib/util/github/ghub";
+
 export { github };
 export {
     tagRepo,
@@ -140,7 +147,6 @@ export * from "./lib/util/webhook/ImageLink";
 export {
     SendFingerprintToAtomist,
 } from "./lib/util/webhook/sendFingerprintToAtomist";
-import * as pack from "./lib/pack";
 export {
     pack,
 };
