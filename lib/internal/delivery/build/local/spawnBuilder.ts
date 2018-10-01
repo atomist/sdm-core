@@ -153,7 +153,7 @@ export function spawnBuilder(options: SpawnBuilderOptions): Builder {
                 }
                 logger.info("Build RETURN: %j", buildResult);
                 return new SpawnedBuild(appId, buildResult,
-                    !!this.options.deploymentUnitFor ? await this.options.deploymentUnitFor(p, appId) : undefined);
+                    !!options.deploymentUnitFor ? await options.deploymentUnitFor(p, appId) : undefined);
             });
 
     };
