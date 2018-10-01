@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-M.5...HEAD)
 
+### Changed
+
+-   **BREAKING** Remove Builder indirection. [#68](https://github.com/atomist/sdm-core/issues/68)
+
 ### Removed
 
 -   **BREAKING** Remove well known goals. [#67](https://github.com/atomist/sdm-core/issues/67)
