@@ -22,10 +22,6 @@ export {
     ProjectVersionerRegistration,
 } from "./lib/goal/common/Version";
 export {
-    Build,
-    BuilderRegistration,
-} from "./lib/goal/common/Build";
-export {
     DisplayDeployEnablement,
 } from "./lib/handlers/commands/DisplayDeployEnablement";
 export {
@@ -68,15 +64,6 @@ export {
     ProjectVersioner,
     readSdmVersion,
 } from "./lib/internal/delivery/build/local/projectVersioner";
-export {
-    executeBuild,
-    Builder,
-    BuildInProgress,
-} from "./lib/internal/delivery/build/local/executeBuild";
-export {
-    spawnBuilder,
-    SpawnBuilderOptions,
-} from "./lib/internal/delivery/build/local/spawnBuilder";
 export {
     DefaultLocalDeployerOptions,
     LocalDeployerOptions,

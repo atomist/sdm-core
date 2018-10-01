@@ -22,6 +22,7 @@ import {
 } from "@atomist/automation-client";
 import {
     AnyPush,
+    Autofix,
     AutofixRegistration,
     Builder,
     ExtensionPack,
@@ -38,7 +39,6 @@ import {
     whenPushSatisfies,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
-import { Build } from "../../../lib/goal/common/Build";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementation.test";
@@ -105,7 +105,7 @@ describe("SDM handler creation", () => {
 
     });
 
-    const HttpServiceGoals = new Goals("pretend HTTP Service Goals", new Build(), new PushImpact());
+    const HttpServiceGoals = new Goals("pretend HTTP Service Goals", new Autofix(), new PushImpact());
 
     describe("can test goal setting", () => {
 
