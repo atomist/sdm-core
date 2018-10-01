@@ -21,29 +21,22 @@ import {
     GitProject,
     logger,
     Project,
-    ProjectOperationCredentials,
-    RemoteRepoRef,
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
 } from "@atomist/automation-client";
 import {
-    AddressChannels,
     AppInfo,
     InterpretLog,
-    LogInterpretation,
-    ProgressLog,
     serializeResult,
-    SoftwareDeliveryMachine,
-    SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { SpawnOptions } from "child_process";
 import * as _ from "lodash";
 import { sprintf } from "sprintf-js";
 import {
-    LocalBuilder,
-    LocalBuildInProgress,
-} from "./LocalBuilder";
+    Builder,
+    BuildInProgress,
+} from "./executeBuild";
 
 export interface SpawnBuilderOptions {
 
@@ -102,71 +95,46 @@ export interface SpawnBuilderOptions {
 
 }
 
-/**
- * Build using spawn on the automation client node.
- * Note it is NOT intended for use for multiple organizations. It's OK
- * for one organization to use inside its firewall, but there is potential
- * vulnerability in builds of unrelated tenants getting at each others
- * artifacts.
- */
-export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
-
-    private readonly options: SpawnBuilderOptions;
-
-    constructor(params: {
-        sdm: SoftwareDeliveryMachine,
-        options: SpawnBuilderOptions,
-    }) {
-        super(params.options.name, params.sdm);
-        this.options = params.options;
-        if (!this.options.commands && !this.options.commandFile) {
-            throw new Error("Please supply either commands or a path to a file in the project containing them");
-        }
+export function spawnBuilder(options: SpawnBuilderOptions): Builder {
+    if (!options.commands && !options.commandFile) {
+        throw new Error("Please supply either commands or a path to a file in the project containing them");
     }
+    return async goalInvocation => {
+        const { configuration, credentials, id, progressLog } = goalInvocation;
+        const errorFinder = options.errorFinder;
 
-    public get logInterpreter(): InterpretLog {
-        return this.options.logInterpreter;
-    }
+        logger.info("Starting build on %s/%s, buildCommands '%j' or file '%s'", id.owner, id.repo, options.commands,
+            options.commandFile);
 
-    protected async startBuild(credentials: ProjectOperationCredentials,
-                               id: RemoteRepoRef,
-                               team: string,
-                               log: ProgressLog,
-                               addressChannels: AddressChannels,
-                               configuration: SoftwareDeliveryMachineConfiguration): Promise<LocalBuildInProgress> {
-        const errorFinder = this.options.errorFinder;
-        logger.info("%s.startBuild on %s, buildCommands=[%j] or file=[%s]", this.name, id.url, this.options.commands,
-            this.options.commandFile);
         return configuration.sdm.projectLoader.doWithProject({
-                    credentials,
-                    id,
-                    readOnly: true,
-                    cloneOptions: { detachHead: true },
-                },
+                credentials,
+                id,
+                readOnly: true,
+                cloneOptions: { detachHead: true },
+            },
             async p => {
-                const commands: SpawnCommand[] = this.options.commands || await loadCommandsFromFile(p, this.options.commandFile);
+                const commands: SpawnCommand[] = options.commands || await loadCommandsFromFile(p, options.commandFile);
 
-                const appId: AppInfo = await this.options.projectToAppInfo(p);
+                const appId: AppInfo = await options.projectToAppInfo(p);
 
-                let optionsToUse = this.options.options || {};
-                if (!!this.options.enrich) {
-                    logger.info("Enriching options from project %s:%s", p.id.owner, p.id.repo);
-                    optionsToUse = await this.options.enrich(optionsToUse, p);
+                let optionsToUse = options.options || {};
+                if (!!options.enrich) {
+                    logger.info("Enriching options from project %s/%s", p.id.owner, p.id.repo);
+                    optionsToUse = await options.enrich(optionsToUse, p);
                 }
                 const opts = _.merge({ cwd: p.baseDir }, optionsToUse);
 
                 function executeOne(buildCommand: SpawnCommand): Promise<ChildProcessResult> {
                     return spawnAndWatch(buildCommand,
                         _.merge(opts, buildCommand.options),
-                        log,
+                        progressLog,
                         {
                             errorFinder,
-                            stripAnsi: true,
                         })
                         .then(br => {
                             if (br.error) {
                                 const message = "Stopping build commands due to error on " + stringifySpawnCommand(buildCommand);
-                                log.write(message);
+                                progressLog.write(message);
                                 return { error: true, code: br.code, message, childProcess: undefined };
                             }
                             return br;
@@ -178,17 +146,17 @@ export class SpawnBuilder extends LocalBuilder implements LogInterpretation {
                     if (buildResult.error) {
                         throw new Error("Build failure: " + buildResult.error);
                     }
-                    log.write("/--");
-                    log.write(`Result: ${serializeResult(buildResult)}`);
-                    log.write("\\--");
+                    progressLog.write("/--");
+                    progressLog.write(`Result: ${serializeResult(buildResult)}`);
+                    progressLog.write("\\--");
                     buildResult = await executeOne(buildCommand);
                 }
                 logger.info("Build RETURN: %j", buildResult);
-                return new SpawnedBuild(appId, id, buildResult, team, log.url,
+                return new SpawnedBuild(appId, buildResult,
                     !!this.options.deploymentUnitFor ? await this.options.deploymentUnitFor(p, appId) : undefined);
             });
-    }
 
+    };
 }
 
 async function loadCommandsFromFile(p: Project, path: string) {
@@ -207,13 +175,10 @@ async function loadCommandsFromFile(p: Project, path: string) {
     return commands;
 }
 
-class SpawnedBuild implements LocalBuildInProgress {
+class SpawnedBuild implements BuildInProgress {
 
     constructor(public appInfo: AppInfo,
-                public repoRef: RemoteRepoRef,
                 public buildResult: ChildProcessResult,
-                public team: string,
-                public url: string,
                 public deploymentUnitFile: string) {
     }
 
