@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 -   **BREAKING** Remove well known goals. [#67](https://github.com/atomist/sdm-core/issues/67)
+-   Move build support to sdm-pack-build. [9a73bf9](https://github.com/atomist/sdm-core/commit/9a73bf9c6dbeb6092394a43f748194683ef7c535)
 
 ## [1.0.0-M.5](https://github.com/atomist/sdm/compare/1.0.0-M.4...1.0.0-M.5) - 2018-09-26
 
