@@ -23,7 +23,6 @@ import {
 import {
     AnyPush,
     AutofixRegistration,
-    Build,
     Builder,
     ExtensionPack,
     fakePush,
@@ -39,6 +38,7 @@ import {
     whenPushSatisfies,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
+import { Build } from "../../../lib/goal/common/Build";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementation.test";
