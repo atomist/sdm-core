@@ -34,15 +34,6 @@ export {
     DefaultRepoRefResolver,
 } from "./lib/handlers/common/DefaultRepoRefResolver";
 export {
-    NoticeK8sTestDeployCompletionOnStatus,
-} from "./lib/handlers/events/delivery/deploy/k8s/NoticeK8sDeployCompletion";
-export {
-    NoticeK8sProdDeployCompletionOnStatus,
-} from "./lib/handlers/events/delivery/deploy/k8s/NoticeK8sProdDeployCompletion";
-export {
-    requestDeployToK8s,
-} from "./lib/handlers/events/delivery/deploy/k8s/RequestK8sDeploys";
-export {
     createKubernetesData,
     KubernetesOptions,
 } from "./lib/handlers/events/delivery/goals/k8s/launchGoalK8";
@@ -53,9 +44,6 @@ export {
     createTagForStatus,
     executeTag,
 } from "./lib/internal/delivery/build/executeTag";
-export {
-    K8sAutomationBuilder,
-} from "./lib/internal/delivery/build/k8s/K8AutomationBuilder";
 export {
     ProjectIdentifier,
 } from "./lib/internal/delivery/build/local/projectIdentifier";
