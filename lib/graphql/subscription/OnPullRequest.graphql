@@ -11,6 +11,7 @@ subscription OnPullRequest {
       sha
       message
     }
+    action
     createdAt
     updatedAt
     head {
