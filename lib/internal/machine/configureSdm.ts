@@ -164,6 +164,8 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
         "atomist.sdm.extension-packs": machine.extensionPacks.map(ex => `${ex.name}:${ex.version}`).join(", "),
     };
 
+    config.sdm.name = machine.name;
+
     await doWithSdmLocal(() => {
         // tslint:disable-next-line:no-implicit-dependencies
         const sdmLocalPj = require("@atomist/sdm-local/package.json");
