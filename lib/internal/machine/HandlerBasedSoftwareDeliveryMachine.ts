@@ -119,7 +119,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new VoteOnGoalApprovalRequest(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalApprovalRequestVoters)],
+                        this.goalApprovalRequestVoters,
+                        this.goalFulfillmentMapper)],
                 commandHandlers: [],
                 ingesters: [],
             };
