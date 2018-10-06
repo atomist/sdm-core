@@ -22,39 +22,31 @@ import {
     HandlerContext,
     HandlerResult,
     logger,
-    RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
 import {
-    AddressChannels,
-    addressChannelsFor,
     BuildStatus,
     descriptionFromState,
     findSdmGoalOnCommit,
     Goal,
-    LogInterpretation,
     RepoRefResolver,
-    reportFailureInterpretation,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalState,
     updateGoal,
 } from "@atomist/sdm";
-import * as slack from "@atomist/slack-messages";
-import axios from "axios";
-import * as stringify from "json-stringify-safe";
 import { OnBuildComplete } from "../../../../typings/types";
 
 /**
  * Set build status on complete build
  */
+// TODO CD move to sdm-pack-build
 @EventHandler("Set build goal to successful on build complete, if it's side-effecting",
     GraphQL.subscription("OnBuildComplete"))
 export class SetGoalOnBuildComplete implements HandleEvent<OnBuildComplete.Subscription> {
 
     constructor(private readonly buildGoals: Goal[],
-                private readonly repoRefResolver: RepoRefResolver,
-                private readonly logInterpretation?: LogInterpretation) {
+                private readonly repoRefResolver: RepoRefResolver) {
     }
 
     public async handle(event: EventFired<OnBuildComplete.Subscription>,
@@ -80,35 +72,9 @@ export class SetGoalOnBuildComplete implements HandleEvent<OnBuildComplete.Subsc
                 build.status,
                 build.buildUrl);
         }
-        if (build.status === "failed" && build.buildUrl) {
-            const ac = addressChannelsFor(commit.repo, ctx);
-            await displayBuildLogFailure(id, build, ac, params.logInterpretation);
-        }
+
         return Success;
     }
-}
-
-export async function displayBuildLogFailure(id: RemoteRepoRef,
-                                             build: { buildUrl?: string, status?: string },
-                                             addressChannels: AddressChannels,
-                                             logInterpretation: LogInterpretation) {
-    const buildUrl = build.buildUrl;
-    if (buildUrl) {
-        logger.info("Retrieving failed build log from " + buildUrl);
-        const buildLog = (await axios.get(buildUrl)).data;
-        logger.debug("Do we have a log interpretation? " + !!logInterpretation);
-        const interpretation = logInterpretation && logInterpretation.logInterpreter(buildLog);
-        logger.debug("What did it say? " + stringify(interpretation));
-        await reportFailureInterpretation("external-build", interpretation,
-            { log: buildLog, url: buildUrl }, id, addressChannels);
-
-    } else {
-        return addressChannels("No build log detected for " + linkToSha(id));
-    }
-}
-
-function linkToSha(id: RemoteRepoRef) {
-    return slack.url(id.url + "/tree/" + id.sha, id.sha.substr(0, 6));
 }
 
 function buildStatusToSdmGoalState(buildStatus: BuildStatus): SdmGoalState {

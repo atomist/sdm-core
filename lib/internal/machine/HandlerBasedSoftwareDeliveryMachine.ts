@@ -22,26 +22,19 @@ import {
 } from "@atomist/automation-client";
 import {
     AbstractSoftwareDeliveryMachine,
-    ArtifactGoal,
-    BuildGoal,
     FunctionalUnit,
     GoalSetter,
-    JustBuildGoal,
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import { FindArtifactOnImageLinked } from "../../handlers/events/delivery/build/FindArtifactOnImageLinked";
 import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";
-import { SetGoalOnBuildComplete } from "../../handlers/events/delivery/build/SetStatusOnBuildComplete";
 import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery/code/ReactToSemanticDiffsOnPushImpact";
-import { OnDeployStatus } from "../../handlers/events/delivery/deploy/OnDeployStatus";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
 import { VoteOnGoalApprovalRequest } from "../../handlers/events/delivery/goals/VoteOnGoalApprovalRequest";
-import { OnVerifiedDeploymentStatus } from "../../handlers/events/delivery/verify/OnVerifiedDeploymentStatus";
 import { ClosedIssueHandler } from "../../handlers/events/issue/ClosedIssueHandler";
 import { NewIssueHandler } from "../../handlers/events/issue/NewIssueHandler";
 import { UpdatedIssueHandler } from "../../handlers/events/issue/UpdatedIssueHandler";
@@ -139,32 +132,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
         }
     }
 
-    private readonly artifactFinder = () => new FindArtifactOnImageLinked(
-        ArtifactGoal,
-        this.artifactListenerRegistrations,
-        this.configuration.sdm)
-
-    private get notifyOnDeploy(): Maker<OnDeployStatus> {
-        return this.deploymentListeners.length > 0 ?
-            () => new OnDeployStatus(
-                this.deploymentListeners,
-                this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver) :
-            undefined;
-    }
-
-    private get onVerifiedStatus(): Maker<OnVerifiedDeploymentStatus> {
-        return this.verifiedDeploymentListeners.length > 0 ?
-            () => new OnVerifiedDeploymentStatus(
-                this.verifiedDeploymentListeners,
-                this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver) :
-            undefined;
-    }
-
-    private readonly onBuildComplete: Maker<SetGoalOnBuildComplete> =
-        () => new SetGoalOnBuildComplete([BuildGoal, JustBuildGoal], this.configuration.sdm.repoRefResolver)
-
     private get allFunctionalUnits(): FunctionalUnit[] {
         return []
             .concat([
@@ -238,10 +205,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.onRepoCreation,
                 this.onFirstPush,
                 this.semanticDiffReactor,
-                this.notifyOnDeploy,
-                this.onVerifiedStatus,
             ])
-            .concat(this.pushMapping ? [this.onBuildComplete, this.artifactFinder] : [])
             .filter(m => !!m);
     }
 
