@@ -30,6 +30,7 @@ import {
     GoalApprovalRequestVote,
     GoalApprovalRequestVoter,
     GoalApprovalRequestVoterInvocation,
+    GoalImplementationMapper,
     RepoRefResolver,
     SdmGoalEvent,
     SdmGoalState,
@@ -52,7 +53,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
-                private readonly voters: GoalApprovalRequestVoter[]) {
+                private readonly voters: GoalApprovalRequestVoter[],
+                private readonly implementationMapper: GoalImplementationMapper) {
     }
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
@@ -75,52 +77,43 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         };
 
         const votes = await Promise.all(this.voters.map(v => v(garvi)));
+        const goal = this.implementationMapper.findGoalBySdmGoal(sdmGoal);
 
         // Policy for now is if one vote denies, we deny the request.
         if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
              if (sdmGoal.state === SdmGoalState.pre_approved) {
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.requested,
-                     description: cleanDescription(sdmGoal.description),
+                     description: goal.requestedDescription,
                  });
              } else if (sdmGoal.state === SdmGoalState.approved) {
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.success,
-                     description: cleanDescription(sdmGoal.description),
+                     description: goal.successDescription,
                  });
              }
         } else {
             if (sdmGoal.state === SdmGoalState.pre_approved) {
-                const goal: SdmGoalEvent = {
+                const g: SdmGoalEvent = {
                     ...sdmGoal,
                     preApproval: undefined,
                 };
-                await updateGoal(context, goal, {
+                await updateGoal(context, g, {
                     state: SdmGoalState.waiting_for_pre_approval,
-                    description: `${sdmGoal.description} | start by @${sdmGoal.preApproval.userId} denied`,
+                    description: `${goal.waitingForPreApprovalDescription} | start by @${sdmGoal.preApproval.userId} denied`,
                 });
             } else if (sdmGoal.state === SdmGoalState.approved) {
-                const goal: SdmGoalEvent = {
+                const g: SdmGoalEvent = {
                     ...sdmGoal,
                     approval: undefined,
                 };
-                await updateGoal(context, goal, {
+                await updateGoal(context, g, {
                     state: SdmGoalState.waiting_for_approval,
-                    description: `${sdmGoal.description} | approval by @${sdmGoal.approval.userId} denied`,
+                    description: `${goal.waitingForApprovalDescription} | approval by @${sdmGoal.approval.userId} denied`,
                 });
             }
         }
 
         return Success;
-    }
-}
-
-function cleanDescription(description: string): string {
-    if (description.startsWith("Start required: ")) {
-        return description.slice("Start required:".length).trim();
-    } else if (description.startsWith("Approval required:")) {
-        return description.slice("Approval required:".length).trim();
-    } else {
-        return description;
     }
 }

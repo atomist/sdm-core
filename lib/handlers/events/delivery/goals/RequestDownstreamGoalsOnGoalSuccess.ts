@@ -80,22 +80,22 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                 goalsToRequest.map(goalKeyString).join(", "));
         }
 
-        await Promise.all(goalsToRequest.map(async sdmGoal => {
-            const goal = this.implementationMapper.findGoalBySdmGoal(sdmGoal);
-            if (sdmGoal.preApprovalRequired) {
-                return updateGoal(context, sdmGoal, {
+        await Promise.all(goalsToRequest.map(async sdmG => {
+            const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
+            if (sdmG.preApprovalRequired) {
+                return updateGoal(context, sdmG, {
                     state: SdmGoalState.waiting_for_pre_approval,
-                    description: goal ? goal.waitingForPreApprovalDescription : `Start required: ${sdmGoal.name}`,
+                    description: goal ? goal.waitingForPreApprovalDescription : `Start required: ${sdmG.name}`,
                 });
             } else {
-                let g = sdmGoal;
-                const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
+                let g = sdmG;
+                const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmG);
                 for (const cb of cbs) {
                     g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
                 }
                 return updateGoal(context, g, {
                     state: SdmGoalState.requested,
-                    description: goal ? goal.requestedDescription : `Ready to ${g.name}`,
+                    description: goal ? goal.requestedDescription : `Ready: ${g.name}`,
                     data: g.data,
                 });
             }
