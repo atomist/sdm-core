@@ -67,11 +67,12 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         }
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         const garvi: GoalApprovalRequestVoterInvocation = {
             id,
             context,
-            credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
+            credentials,
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
             goal: sdmGoal,
         };
@@ -82,9 +83,15 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         // Policy for now is if one vote denies, we deny the request.
         if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
              if (sdmGoal.state === SdmGoalState.pre_approved) {
+                 let g = sdmGoal;
+                 const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
+                 for (const cb of cbs) {
+                     g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
+                 }
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.requested,
                      description: goal.requestedDescription,
+                     data: g.data,
                  });
              } else if (sdmGoal.state === SdmGoalState.approved) {
                  await updateGoal(context, sdmGoal, {
