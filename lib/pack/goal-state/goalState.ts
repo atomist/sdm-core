@@ -24,7 +24,7 @@ import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";
 
 /**
- * allow goal setting
+ * Allow goal setting
  */
 export const GoalState: ExtensionPack = {
     ...metadata("goal-state"),
