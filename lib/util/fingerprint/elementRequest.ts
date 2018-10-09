@@ -15,8 +15,8 @@
  */
 
 import {
+    astUtils,
     FileParser,
-    findMatches,
     MatchResult,
     Project,
 } from "@atomist/automation-client";
@@ -79,7 +79,7 @@ export async function findElements(p: Project,
         ...JavaScriptElementRequest,
         ...opts,
     };
-    const matches = await findMatches(p,
+    const matches = await astUtils.findMatches(p,
         optsToUse.fileParser,
         optsToUse.globPattern,
         optsToUse.pathExpression,

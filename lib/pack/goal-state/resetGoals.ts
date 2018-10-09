@@ -30,10 +30,10 @@ import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
     GitHubRepoTargets,
+    slackSuccessMessage,
+    slackWarningMessage,
     SoftwareDeliveryMachine,
-    success,
     toRepoTargetingParametersMaker,
-    warning,
 } from "@atomist/sdm";
 import {
     bold,
@@ -114,7 +114,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
         });
 
         if (goals) {
-            await cli.addressChannels(success(
+            await cli.addressChannels(slackSuccessMessage(
                 "Plan Goals",
                 `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
                     bold(`${cli.parameters.owner}/${cli.parameters.repo}/${push.branch}`)} to ${italic(goals.name)}`,
@@ -122,7 +122,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
                     footer: `${cli.parameters.name}:${cli.parameters.version}`,
                 }));
         } else {
-            await cli.addressChannels(warning(
+            await cli.addressChannels(slackWarningMessage(
                 "Plan Goals",
                 `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
                     bold(`${cli.parameters.owner}/${cli.parameters.repo}/${push.branch}`)}`,

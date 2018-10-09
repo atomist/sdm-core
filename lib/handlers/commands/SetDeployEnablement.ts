@@ -29,7 +29,7 @@ import {
 import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
-    success,
+    slackSuccessMessage,
 } from "@atomist/sdm";
 import { bold } from "@atomist/slack-messages";
 import {
@@ -75,7 +75,7 @@ export function setDeployEnablement(cli: CommandListenerInvocation<SetDeployEnab
     };
     return cli.context.messageClient.send(deployEnablement, addressEvent(DeployEnablementRootType))
         .then(() => cli.context.messageClient.respond(
-            success(
+            slackSuccessMessage(
                 "Deploy Enablement",
                 `Successfully ${enable ? "enabled" : "disabled"} deployment of ${
                     bold(`${cli.parameters.owner}/${cli.parameters.repo}`)}`,

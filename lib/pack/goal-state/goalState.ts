@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import {
     ExtensionPack,
-    logger,
     metadata,
 } from "@atomist/sdm";
 import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";

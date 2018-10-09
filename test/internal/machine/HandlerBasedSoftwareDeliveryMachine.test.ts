@@ -15,9 +15,9 @@
  */
 
 import {
-    fileExists,
     InMemoryFile,
     InMemoryProject,
+    projectUtils,
     toFactory,
 } from "@atomist/automation-client";
 import {
@@ -31,7 +31,6 @@ import {
     Goals,
     GoalsSetListener,
     hasFile,
-    MessageGoal,
     PushImpact,
     PushListenerInvocation,
     pushTest,
@@ -45,7 +44,7 @@ import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoa
 
 export const IsTypeScript: PushTest = pushTest(
     "Is TypeScript",
-    async (pi: PushListenerInvocation) => fileExists(pi.project, "**/*.ts", () => true),
+    async (pi: PushListenerInvocation) => projectUtils.fileExists(pi.project, "**/*.ts", () => true),
 );
 
 const AddThingAutofix: AutofixRegistration = {
@@ -74,6 +73,8 @@ const NoGoals = new Goals("No action needed", new Goal({
     displayName: "immaterial",
     completedDescription: "No material changes",
 }));
+
+const MessageGoal = new Goal({ uniqueName: "messageGoal" });
 
 describe("SDM handler creation", () => {
 
