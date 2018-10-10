@@ -27,7 +27,6 @@ import {
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import { InvokeListenersOnBuildComplete } from "../../handlers/events/delivery/build/InvokeListenersOnBuildComplete";
 import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery/code/ReactToSemanticDiffsOnPushImpact";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
@@ -151,12 +150,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 this.userJoiningChannelListeners.length > 0 ?
                     () => new OnUserJoiningChannel(
                         this.userJoiningChannelListeners,
-                        this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
-                    undefined,
-                this.buildListeners.length > 0 ?
-                    () => new InvokeListenersOnBuildComplete(
-                        this.buildListeners,
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver) :
                     undefined,
