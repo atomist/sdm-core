@@ -233,8 +233,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 configuration: Configuration & SoftwareDeliveryMachineConfiguration,
                 goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
-        // This hits the Atomist service
-        this.addFingerprintListener(SendFingerprintToAtomist);
     }
 
 }
