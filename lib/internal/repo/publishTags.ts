@@ -16,7 +16,6 @@
 
 import {
     doWithRetry,
-    EditorOrReviewerParameters,
     GitCommandGitProject,
     GitHubRepoRef,
     HandlerContext,
@@ -24,6 +23,7 @@ import {
     Tagger,
     TaggerTags,
 } from "@atomist/automation-client";
+import { EditorOrReviewerParameters } from "@atomist/automation-client/lib/operations/common/params/BaseEditorOrReviewerParameters";
 import { AddressChannels } from "@atomist/sdm";
 import { listTopics } from "../../util/github/ghub";
 import { GitHubTagRouter } from "../../util/github/gitHubTagRouter";

@@ -16,20 +16,21 @@
 
 import {
     EventFired,
-    EventHandler,
     GraphQL,
-    HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
+import { EventHandler } from "@atomist/automation-client/lib/decorators";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     CredentialsResolver,
     GoalApprovalRequestVote,
     GoalApprovalRequestVoter,
     GoalApprovalRequestVoterInvocation,
+    GoalImplementationMapper,
     RepoRefResolver,
     SdmGoalEvent,
     SdmGoalState,
@@ -52,7 +53,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
-                private readonly voters: GoalApprovalRequestVoter[]) {
+                private readonly voters: GoalApprovalRequestVoter[],
+                private readonly implementationMapper: GoalImplementationMapper) {
     }
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
@@ -65,62 +67,60 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         }
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         const garvi: GoalApprovalRequestVoterInvocation = {
             id,
             context,
-            credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
+            credentials,
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
             goal: sdmGoal,
         };
 
         const votes = await Promise.all(this.voters.map(v => v(garvi)));
+        const goal = this.implementationMapper.findGoalBySdmGoal(sdmGoal);
 
         // Policy for now is if one vote denies, we deny the request.
         if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
              if (sdmGoal.state === SdmGoalState.pre_approved) {
+                 let g = sdmGoal;
+                 const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
+                 for (const cb of cbs) {
+                     g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
+                 }
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.requested,
-                     description: cleanDescription(sdmGoal.description),
+                     description: goal.requestedDescription,
+                     data: g.data,
                  });
              } else if (sdmGoal.state === SdmGoalState.approved) {
                  await updateGoal(context, sdmGoal, {
                      state: SdmGoalState.success,
-                     description: cleanDescription(sdmGoal.description),
+                     description: goal.successDescription,
                  });
              }
         } else {
             if (sdmGoal.state === SdmGoalState.pre_approved) {
-                const goal: SdmGoalEvent = {
+                const g: SdmGoalEvent = {
                     ...sdmGoal,
                     preApproval: undefined,
                 };
-                await updateGoal(context, goal, {
+                await updateGoal(context, g, {
                     state: SdmGoalState.waiting_for_pre_approval,
-                    description: `${sdmGoal.description} | start by @${sdmGoal.preApproval.userId} denied`,
+                    description: `${goal.waitingForPreApprovalDescription} | start by @${sdmGoal.preApproval.userId} denied`,
                 });
             } else if (sdmGoal.state === SdmGoalState.approved) {
-                const goal: SdmGoalEvent = {
+                const g: SdmGoalEvent = {
                     ...sdmGoal,
                     approval: undefined,
                 };
-                await updateGoal(context, goal, {
+                await updateGoal(context, g, {
                     state: SdmGoalState.waiting_for_approval,
-                    description: `${sdmGoal.description} | approval by @${sdmGoal.approval.userId} denied`,
+                    description: `${goal.waitingForApprovalDescription} | approval by @${sdmGoal.approval.userId} denied`,
                 });
             }
         }
 
         return Success;
-    }
-}
-
-function cleanDescription(description: string): string {
-    if (description.startsWith("Start required: ")) {
-        return description.slice("Start required:".length).trim();
-    } else if (description.startsWith("Approval required:")) {
-        return description.slice("Approval required:".length).trim();
-    } else {
-        return description;
     }
 }

@@ -16,11 +16,11 @@
 
 import {
     GitHubRepoRef,
-    isGitHubRepoRef,
     logger,
-    successOn,
-    TagRouter,
 } from "@atomist/automation-client";
+import { successOn } from "@atomist/automation-client/lib/action/ActionResult";
+import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { TagRouter } from "@atomist/automation-client/lib/operations/tagger/Tagger";
 
 import { toToken } from "@atomist/sdm";
 import axios, { AxiosRequestConfig } from "axios";

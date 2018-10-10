@@ -16,9 +16,7 @@
 
 import {
     buttonForCommand,
-    commandHandlerFrom,
     GitHubRepoRef,
-    HandleCommand,
     HandlerContext,
     MappedParameter,
     MappedParameters,
@@ -29,6 +27,8 @@ import {
     success,
     Success,
 } from "@atomist/automation-client";
+import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
+import { commandHandlerFrom } from "@atomist/automation-client/lib/onCommand";
 import {
     ExecuteGoal,
     GoalInvocation,

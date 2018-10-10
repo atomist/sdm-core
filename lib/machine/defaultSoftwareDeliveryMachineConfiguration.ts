@@ -16,8 +16,8 @@
 
 import {
     Configuration,
-    RemoteGitProjectPersister,
 } from "@atomist/automation-client";
+import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operations/generate/remoteGitProjectPersister";
 import {
     allReposInTeam,
     CachingProjectLoader,

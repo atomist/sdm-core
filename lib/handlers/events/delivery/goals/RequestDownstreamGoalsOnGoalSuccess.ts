@@ -16,14 +16,14 @@
 
 import {
     EventFired,
-    EventHandler,
     GraphQL,
-    HandleEvent,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
+import { EventHandler } from "@atomist/automation-client/lib/decorators";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     CredentialsResolver,
     fetchGoalsForCommit,
@@ -80,28 +80,22 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                 goalsToRequest.map(goalKeyString).join(", "));
         }
 
-        /*
-         * #294 Intention: for custom descriptions per goal, we need to look up the Goal.
-         * This is the only reason to do that here.
-         * I want to maintain a list in the SDM of all goals that can be assigned by rules,
-         * and pass them here for mapping from SdmGoalKey -> Goal. Then, we can use
-         * the requestDescription defined on that Goal.
-         */
-        await Promise.all(goalsToRequest.map(async goal => {
-            const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(goal);
-            if (goal.preApprovalRequired) {
-                return updateGoal(context, goal, {
+        await Promise.all(goalsToRequest.map(async sdmG => {
+            const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
+            if (sdmG.preApprovalRequired) {
+                return updateGoal(context, sdmG, {
                     state: SdmGoalState.waiting_for_pre_approval,
-                    description: `Start required: ${goal.name}`,
+                    description: goal ? goal.waitingForPreApprovalDescription : `Start required: ${sdmG.name}`,
                 });
             } else {
-                let g = goal;
+                let g = sdmG;
+                const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmG);
                 for (const cb of cbs) {
                     g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
                 }
                 return updateGoal(context, g, {
                     state: SdmGoalState.requested,
-                    description: `Ready to ` + g.name,
+                    description: goal ? goal.requestedDescription : `Ready: ${g.name}`,
                     data: g.data,
                 });
             }

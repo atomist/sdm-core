@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import { HandlerContext } from "@atomist/automation-client";
+import {
+    HandlerContext,
+    RemoteRepoRef,
+} from "@atomist/automation-client";
 import {
     PushFields,
-    RemoteRepoRef,
 } from "@atomist/sdm";
 import * as stringify from "json-stringify-safe";
 import {

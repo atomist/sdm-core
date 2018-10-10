@@ -28,6 +28,7 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
+import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import {
     sdmExtensionPackStartupMessage,
@@ -144,7 +145,9 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.events = [];
     mergedConfig.ingesters = [];
 
-    mergedConfig.listeners.push(new GoalAutomationEventListener(machine));
+    mergedConfig.listeners.push(
+        new GoalAutomationEventListener(machine),
+        new CacheCleanupAutomationEventListener(machine));
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;

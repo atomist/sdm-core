@@ -16,10 +16,10 @@
 
 import {
     Configuration,
-    HandleCommand,
-    HandleEvent,
     Maker,
 } from "@atomist/automation-client";
+import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     AbstractSoftwareDeliveryMachine,
     FunctionalUnit,
@@ -118,7 +118,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new VoteOnGoalApprovalRequest(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalApprovalRequestVoters)],
+                        this.goalApprovalRequestVoters,
+                        this.goalFulfillmentMapper)],
                 commandHandlers: [],
                 ingesters: [],
             };

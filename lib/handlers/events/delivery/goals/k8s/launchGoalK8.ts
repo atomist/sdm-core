@@ -18,6 +18,7 @@ import {
     automationClientInstance,
     AutomationContextAware,
     configurationValue,
+    GitProject,
     HandlerContext,
     HandlerResult,
     logger,
@@ -25,7 +26,6 @@ import {
     SuccessIsReturn0ErrorFinder,
 } from "@atomist/automation-client";
 import {
-    GitProject,
     IsolatedGoalLauncher,
     LoggingProgressLog,
     OnAnyRequestedSdmGoal,

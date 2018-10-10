@@ -15,19 +15,24 @@
  */
 
 import {
-    SoftwareDeliveryMachine,
-    SoftwareDeliveryMachineConfiguration,
+    ExtensionPack,
+    metadata,
 } from "@atomist/sdm";
-import { isInLocalMode } from "../../../machine/LocalSoftwareDeliveryMachineOptions";
+import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import {
     createPendingGitHubStatusOnGoalSet,
-    SetGitHubStatusOnGoalCompletion,
-} from "./github/gitHubStatusSetters";
+    setGitHubStatusOnGoalCompletion,
+} from "./statusSetters";
 
-export function summarizeGoalsInGitHubStatus(sdm: SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration>): SoftwareDeliveryMachine {
-    if (!isInLocalMode()) {
-        sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm.configuration.sdm.credentialsResolver));
-        sdm.addGoalCompletionListener(SetGitHubStatusOnGoalCompletion());
-    }
-    return sdm;
-}
+/**
+ * Manage a GitHub status per SDM
+ */
+export const GitHubGoalStatus: ExtensionPack = {
+    ...metadata("github-goal-status"),
+    configure: sdm => {
+        if (!isInLocalMode()) {
+            sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm));
+            sdm.addGoalCompletionListener(setGitHubStatusOnGoalCompletion(sdm));
+        }
+    },
+};

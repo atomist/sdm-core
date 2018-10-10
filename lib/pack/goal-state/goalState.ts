@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import {
     ExtensionPack,
-    logger,
     metadata,
 } from "@atomist/sdm";
 import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
@@ -24,7 +24,7 @@ import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";
 
 /**
- * allow goal setting
+ * Allow goal setting
  */
 export const GoalState: ExtensionPack = {
     ...metadata("goal-state"),

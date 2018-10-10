@@ -29,8 +29,8 @@ import {
     CommandHandlerRegistration,
     fetchGoalsForCommit,
     SdmGoalState,
+    slackSuccessMessage,
     SoftwareDeliveryMachine,
-    success,
     updateGoal,
 } from "@atomist/sdm";
 import {
@@ -101,7 +101,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
 
             if (chi.parameters.cancel) {
                 return chi.context.messageClient.respond(
-                    success(
+                    slackSuccessMessage(
                         "Set Goal State",
                         "Successfully canceled setting goal state",
                         { footer }),
@@ -116,7 +116,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                         options: v.map(g => ({
                             text: g.name,
                             value: JSON.stringify({ id: (g as any).id, name: g.name }),
-                        })),
+                        })).sort((o1, o2) => o1.text.localeCompare(o2.text)),
                     };
                 });
 
@@ -177,7 +177,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                 });
 
                 return chi.context.messageClient.respond(
-                    success(
+                    slackSuccessMessage(
                         "Set Goal State",
                         `Successfully set state of ${italic(goal.name)} on ${codeLine(sha.slice(0, 7))} of ${
                         bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`,

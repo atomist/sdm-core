@@ -15,18 +15,18 @@
  */
 
 import {
-    ApolloGraphClient,
     automationClientInstance,
     AutomationEventListenerSupport,
     EventIncoming,
     guid,
     logger,
-    metadataFromInstance,
     QueryNoCacheOptions,
-    RegistrationConfirmation,
     RequestProcessor,
     Secrets,
 } from "@atomist/automation-client";
+import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
+import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
+import { RegistrationConfirmation } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketRequestProcessor";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";

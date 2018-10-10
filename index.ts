@@ -66,9 +66,6 @@ export {
     ManagedDeploymentTargetInfo,
 } from "./lib/internal/delivery/deploy/local/ManagedDeployments";
 export {
-    summarizeGoalsInGitHubStatus,
-} from "./lib/internal/delivery/goals/support/githubStatusSummarySupport";
-export {
     ConfigureOptions,
     configureSdm,
     SoftwareDeliveryMachineMaker,

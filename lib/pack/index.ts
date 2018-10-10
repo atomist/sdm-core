@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
+import * as githubGoalStatus from "./github-goal-status";
 import * as goalState from "./goal-state";
 import * as info from "./info";
 
 export {
+    githubGoalStatus,
     goalState,
     info,
 };

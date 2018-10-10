@@ -14,20 +14,4 @@
  * limitations under the License.
  */
 
-import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import {
-    pushTest,
-    PushTest,
-} from "@atomist/sdm";
-import { isPublicRepo } from "../../util/github/ghub";
-
-/**
- * Match only pushes on a public repo
- * @param {PushListenerInvocation} p
- * @return {Promise<boolean>}
- * @constructor
- */
-export const ToPublicRepo: PushTest = pushTest("To public repo", async p =>
-    // Ask GitHub if the repo is public as we do not have this information in our model
-    isGitHubRepoRef(p.id) && isPublicRepo(p.credentials, p.id),
-);
+export { GitHubGoalStatus } from "./github";
