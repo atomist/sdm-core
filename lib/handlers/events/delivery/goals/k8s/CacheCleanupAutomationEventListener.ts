@@ -23,7 +23,11 @@ import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
+import * as path from "path";
 
+/**
+ * Event listener that cleans up cached artifacts that are older then 2 hours.
+ */
 export class CacheCleanupAutomationEventListener extends AutomationEventListenerSupport {
 
     constructor(private readonly sdm: SoftwareDeliveryMachine) {
@@ -32,19 +36,23 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
         if (cluster.isMaster && _.get(this.sdm, "configuration.sdm.cache.enabled")) {
-            const path = _.get(this.sdm, "configuration.sdm.cache.path", "/opt/data");
+            const cachePath = _.get(this.sdm, "configuration.sdm.cache.path", "/opt/data");
 
             setTimeout(() => {
                 const ts = Date.now() - (1000 * 60 * 60 * 2); // 2 hour threshold
-                if (fs.existsSync(path)) {
-                    fs.readdirSync(path).forEach(f => {
-                        const p = path.join(path, f);
-                        const st = fs.statSync(p);
-                        if (st.mtimeMs < ts) {
-                            logger.debug(`Deleting cached file '${p}'`);
-                            fs.removeSync(p);
-                        }
-                    });
+                if (fs.existsSync(cachePath)) {
+                    try {
+                        fs.readdirSync(cachePath).forEach(f => {
+                            const p = path.join(cachePath, f);
+                            const st = fs.statSync(p);
+                            if (st.mtimeMs < ts) {
+                                logger.debug(`Deleting cached file '${p}'`);
+                                fs.removeSync(p);
+                            }
+                        });
+                    } catch (err) {
+                        logger.debug("Failed to clean cache directory '%s': %s", cachePath, err.message);
+                    }
                 }
             });
         }
