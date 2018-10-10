@@ -15,8 +15,8 @@
  */
 
 import {
-    InMemoryProjectFile,
     InMemoryProject,
+    InMemoryProjectFile,
     projectUtils,
 } from "@atomist/automation-client";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
