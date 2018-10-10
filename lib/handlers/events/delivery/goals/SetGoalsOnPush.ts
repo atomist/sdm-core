@@ -16,14 +16,14 @@
 
 import {
     EventFired,
-    EventHandler,
     GraphQL,
-    HandleEvent,
     HandlerContext,
     HandlerResult,
     RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
+import { EventHandler } from "@atomist/automation-client/lib/decorators";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     chooseAndSetGoals,
     CredentialsResolver,

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    isGitHubRepoRef,
-    Tagger,
-} from "@atomist/automation-client";
+import { Tagger } from "@atomist/automation-client";
+import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { PushListener } from "@atomist/sdm";
 import { publishTags } from "../../internal/repo/publishTags";
 

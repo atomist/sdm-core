@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isGitHubRepoRef } from "@atomist/automation-client";
+import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {
     pushTest,
     PushTest,

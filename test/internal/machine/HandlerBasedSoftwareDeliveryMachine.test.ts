@@ -15,11 +15,11 @@
  */
 
 import {
-    InMemoryFile,
+    InMemoryProjectFile,
     InMemoryProject,
     projectUtils,
-    toFactory,
 } from "@atomist/automation-client";
+import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     AnyPush,
     Autofix,
@@ -149,7 +149,7 @@ describe("SDM handler creation", () => {
         });
 
         it("sets goals on particular push", async () => {
-            const project = InMemoryProject.of(new InMemoryFile("thing", "1"));
+            const project = InMemoryProject.of(new InMemoryProjectFile("thing", "1"));
             const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
@@ -159,7 +159,7 @@ describe("SDM handler creation", () => {
         });
 
         it("sets goals on particular push with extra goals", async () => {
-            const project = InMemoryProject.of(new InMemoryFile("thing", "1"));
+            const project = InMemoryProject.of(new InMemoryProjectFile("thing", "1"));
             const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))

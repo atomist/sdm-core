@@ -17,12 +17,12 @@
 import {
     doWithRetry,
     GitHubRepoRef,
-    isGitHubRepoRef,
     Issue,
     logger,
     ProjectOperationCredentials,
     RemoteRepoRef,
 } from "@atomist/automation-client";
+import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { toToken } from "@atomist/sdm";
 import axios, {
     AxiosPromise,

@@ -16,10 +16,10 @@
 
 import {
     Configuration,
-    HandleCommand,
-    HandleEvent,
     Maker,
 } from "@atomist/automation-client";
+import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     AbstractSoftwareDeliveryMachine,
     FunctionalUnit,

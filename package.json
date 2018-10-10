@@ -49,8 +49,8 @@
     "@atomist/microgrammar": "*"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.0.0-master.20181008113855",
-    "@atomist/sdm": "1.0.0-master.20181009132540",
+    "@atomist/automation-client": "1.0.0-master.20181010081045",
+    "@atomist/sdm": "1.0.0-master.20181010081849",
     "@types/lodash": "^4.14.116",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.7.1",
