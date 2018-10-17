@@ -29,6 +29,7 @@ import {
     fetchGoalsForCommit,
     GoalImplementationMapper,
     goalKeyString,
+    mapKeyToGoal,
     preconditionsAreMet,
     RepoRefResolver,
     SdmGoalEvent,
@@ -61,7 +62,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
+            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
 
@@ -109,14 +110,14 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
         return true;
     }
     if (dependentGoal.state === SdmGoalState.skipped) {
-        logger.info("Goal %s was skipped, but now maybe it can go", dependentGoal.name);
+        logger.info("Goal %s was skipped, but now maybe it can go", dependentGoal.uniqueName);
         return true;
     }
     if (dependentGoal.state === SdmGoalState.failure && dependentGoal.retryFeasible) {
-        logger.info("Goal %s failed, but maybe we will retry it", dependentGoal.name);
+        logger.info("Goal %s failed, but maybe we will retry it", dependentGoal.uniqueName);
         return true;
     }
-    logger.warn("Goal %s in state %s will not be requested", dependentGoal.name, dependentGoal.state);
+    logger.warn("Goal %s in state %s will not be requested", dependentGoal.uniqueName, dependentGoal.state);
     return false;
 }
 
@@ -132,15 +133,6 @@ function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: stri
     }
 }
 
-function mapKeyToGoal<T extends SdmGoalKey>(goals: T[]): (SdmGoalKey) => T {
-    return (keyToFind: SdmGoalKey) => {
-        const found = goals.find(g =>
-            g.environment === keyToFind.environment &&
-            g.name === keyToFind.name);
-        return found;
-    };
-}
-
 function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoalEvent): boolean {
     if (!goal) {
         logger.warn("Internal error: Trying to work out if %j is dependent on null or undefined goal", successfulGoal);
@@ -150,7 +142,7 @@ function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoalEvent): 
         return false; // no preconditions? not dependent
     }
     if (mapKeyToGoal(goal.preConditions)(successfulGoal)) {
-        logger.debug("%s depends on %s", goal.name, successfulGoal.name);
+        logger.debug("%s depends on %s", goal.uniqueName, successfulGoal.uniqueName);
         return true; // the failed goal is one of my preconditions? dependent
     }
     return false;

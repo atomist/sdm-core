@@ -52,7 +52,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
         const sdmGoal: SdmGoalEvent = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
+            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
 

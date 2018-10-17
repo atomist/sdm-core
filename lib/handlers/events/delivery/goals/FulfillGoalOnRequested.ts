@@ -65,7 +65,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
+            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
 
@@ -80,7 +80,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 sdmGoal,
                 {
                     state: SdmGoalState.failure,
-                    description: `No fulfillment for ${sdmGoal.name}`,
+                    description: `No fulfillment for ${sdmGoal.uniqueName}`,
                 });
             return Success;
         }

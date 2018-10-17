@@ -26,7 +26,7 @@ import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     fetchGoalsForCommit,
-    goalKeyEquals,
+    mapKeyToGoal,
     RepoRefResolver,
     SdmGoalEvent,
     SdmGoalKey,
@@ -51,7 +51,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
         const failedGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(failedGoal)) {
-            logger.debug(`Goal ${failedGoal.name} skipped because not relevant for this SDM`);
+            logger.debug(`Goal ${failedGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
 
@@ -80,13 +80,6 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
 
         return Success;
     }
-}
-
-function mapKeyToGoal<T extends SdmGoalKey>(goals: T[]): (SdmGoalKey) => T {
-    return (keyToFind: SdmGoalKey) => {
-        const found = goals.find(g => goalKeyEquals(keyToFind, g));
-        return found;
-    };
 }
 
 function isDependentOn(failedGoal: SdmGoalKey, goal: SdmGoalEvent, preconditionToGoal: (g: SdmGoalKey) => SdmGoalEvent): boolean {
