@@ -142,7 +142,8 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
     progressLog.write(`/--`);
     progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}/${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
-    progressLog.write(`Goal: ${sdmGoal.name} - ${sdmGoal.environment.slice(2)}`);
+    progressLog.write(`Goal: ${sdmGoal.name} (${sdmGoal.uniqueName})`);
+    progressLog.write(`Environment: ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);
     progressLog.write(
         `SDM: ${automationClientInstance().configuration.name}:${automationClientInstance().configuration.version}`);
