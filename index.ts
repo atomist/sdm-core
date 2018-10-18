@@ -15,6 +15,12 @@
  */
 
 export {
+    GitHubCredentialsResolver,
+} from "./lib/handlers/common/GitHubCredentialsResolver";
+export {
+    ConfigurationBackedCredentialsResolver,
+} from "./lib/handlers/common/ConfigurationBackedCredentialsResolver";
+export {
     Tag,
 } from "./lib/goal/common/Tag";
 export {
