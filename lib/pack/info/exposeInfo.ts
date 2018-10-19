@@ -30,4 +30,4 @@ export function exposeInfo(): ExtensionPack {
             sdm.addCommand(selfDescribeCommand(sdm));
         },
     };
-};
+}

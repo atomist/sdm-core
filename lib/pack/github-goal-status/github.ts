@@ -37,4 +37,4 @@ export function gitHubGoalStatus(): ExtensionPack {
             }
         },
     };
-};
+}
