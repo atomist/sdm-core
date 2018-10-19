@@ -20,7 +20,10 @@ import {
 } from "@atomist/automation-client";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import chalk from "chalk";
-import { isInLocalMode } from "../machine/LocalSoftwareDeliveryMachineOptions";
+import {
+    isGitHubAction,
+    isInLocalMode,
+} from "../machine/modes";
 
 /**
  * Print some SDM details to the startup banner of the client
@@ -30,7 +33,8 @@ export function sdmStartupMessage(sdm: SoftwareDeliveryMachine):
     (configuration: Configuration) => string | BannerSection {
     return () => ({
         title: "SDM",
-        body: `${sdm.name}${isInLocalMode() ? `  ${chalk.grey("started in")} ${chalk.green("local mode")}` : ""}`,
+        body: `${sdm.name}${isInLocalMode() ? `  ${chalk.grey("started in")} ${chalk.green("local mode")}` : (
+            isGitHubAction() ? `  ${chalk.grey("started as")} ${chalk.green("GitHub action")}` : "")}`,
     });
 }
 

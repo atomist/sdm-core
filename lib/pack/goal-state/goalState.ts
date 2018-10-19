@@ -19,7 +19,7 @@ import {
     ExtensionPack,
     metadata,
 } from "@atomist/sdm";
-import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
+import { isInLocalMode } from "../../internal/machine/modes";
 import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";
 

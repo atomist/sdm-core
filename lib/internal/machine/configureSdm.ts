@@ -36,9 +36,12 @@ import {
 } from "../util/startupMessage";
 import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
 import {
-    isInLocalMode,
     LocalSoftwareDeliveryMachineConfiguration,
 } from "./LocalSoftwareDeliveryMachineOptions";
+import {
+    isGitHubAction,
+    isInLocalMode,
+} from "./modes";
 
 /**
  * Options passed to the set up of the SDM.
@@ -183,7 +186,7 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
  * @return {any}
  */
 async function doWithSdmLocal<R>(callback: (sdmLocal: any) => any): Promise<R | null> {
-    if (isInLocalMode()) {
+    if (isInLocalMode() || isGitHubAction()) {
         // tslint:disable-next-line:no-implicit-dependencies
         const local = attemptToRequire("@atomist/sdm-local", !process.env.ATOMIST_NPM_LOCAL_LINK);
         if (local) {

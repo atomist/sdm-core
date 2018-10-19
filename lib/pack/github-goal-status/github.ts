@@ -18,7 +18,7 @@ import {
     ExtensionPack,
     metadata,
 } from "@atomist/sdm";
-import { isInLocalMode } from "../../internal/machine/LocalSoftwareDeliveryMachineOptions";
+import { isGitHubAction } from "../../internal/machine/modes";
 import {
     createPendingGitHubStatusOnGoalSet,
     setGitHubStatusOnGoalCompletion,
@@ -31,7 +31,7 @@ export function gitHubGoalStatus(): ExtensionPack {
     return {
         ...metadata("github-goal-status"),
         configure: sdm => {
-            if (!isInLocalMode()) {
+            if (!isGitHubAction()) {
                 sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm));
                 sdm.addGoalCompletionListener(setGitHubStatusOnGoalCompletion(sdm));
             }
