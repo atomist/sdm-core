@@ -18,8 +18,8 @@ export {
     GitHubCredentialsResolver,
 } from "./lib/handlers/common/GitHubCredentialsResolver";
 export {
-    ConfigurationBackedCredentialsResolver,
-} from "./lib/handlers/common/ConfigurationBackedCredentialsResolver";
+    ConfigurationBasedBasicCredentialsResolver,
+} from "./lib/handlers/common/ConfigurationBasedBasicCredentialsResolver";
 export {
     Tag,
 } from "./lib/goal/common/Tag";
@@ -77,11 +77,15 @@ export {
     SoftwareDeliveryMachineMaker,
 } from "./lib/internal/machine/configureSdm";
 export {
-    isInLocalMode,
-    IsInLocalMode,
     LocalSoftwareDeliveryMachineConfiguration,
     LocalSoftwareDeliveryMachineOptions,
 } from "./lib/internal/machine/LocalSoftwareDeliveryMachineOptions";
+export {
+    isInLocalMode,
+    isGitHubAction,
+    IsGitHubAction,
+    IsInLocalMode,
+} from "./lib/internal/machine/modes";
 export {
     constructLogPath,
 } from "./lib/log/DashboardDisplayProgressLog";
@@ -101,9 +105,17 @@ export {
     PersonByChatId,
     SdmVersionForCommit,
 } from "./lib/typings/types";
-import * as pack from "./lib/pack";
 import * as github from "./lib/util/github/ghub";
 
+export {
+    gitHubGoalStatus,
+} from "./lib/pack/github-goal-status/github";
+export {
+    goalState,
+} from "./lib/pack/goal-state/goalState";
+export {
+    exposeInfo,
+} from "./lib/pack/info/exposeInfo";
 export { github };
 export {
     tagRepo,
@@ -125,6 +137,3 @@ export * from "./lib/util/webhook/ImageLink";
 export {
     SendFingerprintToAtomist,
 } from "./lib/util/webhook/sendFingerprintToAtomist";
-export {
-    pack,
-};
