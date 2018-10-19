@@ -59,22 +59,6 @@ export interface LocalSoftwareDeliveryMachineOptions {
 }
 
 /**
- * Is this automation client in local mode?
- * Invoked on client startup.
- */
-export function isInLocalMode(): boolean {
-    return process.env.ATOMIST_MODE === "local";
-}
-
-/**
- * Is this SDM running in local mode?
- */
-export const IsInLocalMode: PushTest = {
-    name: "IsInLocalMode",
-    mapping: async () => isInLocalMode(),
-};
-
-/**
  * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
  */
 export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
