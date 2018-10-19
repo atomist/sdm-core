@@ -27,12 +27,14 @@ import {
 /**
  * Manage a GitHub status per SDM
  */
-export const GitHubGoalStatus: ExtensionPack = {
-    ...metadata("github-goal-status"),
-    configure: sdm => {
-        if (!isInLocalMode()) {
-            sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm));
-            sdm.addGoalCompletionListener(setGitHubStatusOnGoalCompletion(sdm));
-        }
-    },
+export function gitHubGoalStatus(): ExtensionPack {
+    return {
+        ...metadata("github-goal-status"),
+        configure: sdm => {
+            if (!isInLocalMode()) {
+                sdm.addGoalsSetListener(createPendingGitHubStatusOnGoalSet(sdm));
+                sdm.addGoalCompletionListener(setGitHubStatusOnGoalCompletion(sdm));
+            }
+        },
+    };
 };

@@ -26,15 +26,17 @@ import { setGoalStateCommand } from "./setGoalState";
 /**
  * Allow goal setting
  */
-export const GoalState: ExtensionPack = {
-    ...metadata("goal-state"),
-    configure: sdm => {
-        if (isInLocalMode()) {
-            logger.warn("Setting goal state is not available in local mode.");
-            logger.warn("Resetting goals does not work in local mode. Use `atomist trigger post-commit` instead.");
-        } else {
-            sdm.addCommand(setGoalStateCommand(sdm));
-            sdm.addCommand(resetGoalsCommand(sdm));
-        }
-    },
+export function goalState(): ExtensionPack {
+    return {
+        ...metadata("goal-state"),
+        configure: sdm => {
+            if (isInLocalMode()) {
+                logger.warn("Setting goal state is not available in local mode.");
+                logger.warn("Resetting goals does not work in local mode. Use `atomist trigger post-commit` instead.");
+            } else {
+                sdm.addCommand(setGoalStateCommand(sdm));
+                sdm.addCommand(resetGoalsCommand(sdm));
+            }
+        },
+    };
 };

@@ -23,9 +23,11 @@ import { selfDescribeCommand } from "./SelfDescribe";
 /**
  * Expose information about this machine
  */
-export const ExposeInfo: ExtensionPack = {
-    ...metadata("info"),
-    configure: sdm => {
-        sdm.addCommand(selfDescribeCommand(sdm));
-    },
+export function exposeInfo(): ExtensionPack {
+    return {
+        ...metadata("info"),
+        configure: sdm => {
+            sdm.addCommand(selfDescribeCommand(sdm));
+        },
+    };
 };
