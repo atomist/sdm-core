@@ -85,8 +85,7 @@
     "clean:npm": "rimraf node_modules",
     "clean:run": "rimraf *-v8.log profile.txt log",
     "clean:test": "rimraf .nyc_output coverage",
-    "compile": "run-s compile:gql compile:ts",
-    "compile:gql": "run-s gql:gen",
+    "compile": "run-s gql:gen compile:ts",
     "compile:ts": "tsc --project .",
     "doc": "typedoc --mode modules --ignoreCompilerErrors --excludeExternals --exclude \"**/*.d.ts\" --out doc lib",
     "gql:gen": "atm-gql-gen",
@@ -101,7 +100,7 @@
     "typedoc": "npm run doc"
   },
   "engines": {
-    "node": ">=8.0.0",
+    "node": ">=8.1.0",
     "npm": ">=5.0.0"
   },
   "nyc": {
