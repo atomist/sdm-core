@@ -18,7 +18,6 @@ import {
     automationClientInstance,
     AutomationContextAware,
     configurationValue,
-    GitProject,
     HandlerContext,
     HandlerResult,
     logger,
@@ -30,12 +29,10 @@ import {
     LoggingProgressLog,
     OnAnyRequestedSdmGoal,
     ProgressLog,
-    SdmGoalEvent,
     StringCapturingProgressLog,
 } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
-import * as path from "path";
 
 /**
  * Create the Kubernetes IsolatedGoalLauncher.
@@ -268,47 +265,3 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
     // query kube to make sure the job got scheduled
     // kubectl get job <jobname> -o json
 };
-
-export interface KubernetesOptions {
-    name: string;
-    environment: string;
-
-    ns?: string;
-    imagePullSecret?: string;
-    port?: number;
-    path?: string;
-    host?: string;
-    protocol?: string;
-    replicas?: number;
-}
-
-/**
- * Sets kubernetes deployment specific data to an SdmGoal
- * @param {SdmGoal} goal
- * @param {KubernetesOptions} options
- * @param {GitProject} p
- * @returns {Promise<SdmGoal>}
- */
-export async function createKubernetesData(goal: SdmGoalEvent, options: KubernetesOptions, p: GitProject): Promise<SdmGoalEvent> {
-    const deploymentSpec = await readKubernetesSpec(p, "deployment.json");
-    const serviceSpec = await readKubernetesSpec(p, "service.json");
-    return {
-        ...goal,
-        data: JSON.stringify({
-            kubernetes: {
-                ...options,
-                deploymentSpec,
-                serviceSpec,
-            },
-        }),
-    };
-}
-
-async function readKubernetesSpec(p: GitProject, name: string): Promise<string> {
-    const specPath = path.join(".atomist", "kubernetes", name);
-    if (p.fileExistsSync(specPath)) {
-        return (await p.getFile(specPath)).getContent();
-    } else {
-        return undefined;
-    }
-}

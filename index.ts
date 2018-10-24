@@ -40,10 +40,6 @@ export {
     DefaultRepoRefResolver,
 } from "./lib/handlers/common/DefaultRepoRefResolver";
 export {
-    createKubernetesData,
-    KubernetesOptions,
-} from "./lib/handlers/events/delivery/goals/k8s/launchGoalK8";
-export {
     EphemeralLocalArtifactStore,
 } from "./lib/internal/artifact/local/EphemeralLocalArtifactStore";
 export {
