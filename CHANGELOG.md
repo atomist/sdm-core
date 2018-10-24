@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Add ConfigurationBackedCredentialsResolver. [c1caf1a](https://github.com/atomist/sdm-core/commit/c1caf1a48a57e1903626993a719b1752918fb053)
 
+### Changed
+
+-   Don't approve goal if there are no success votes and only abstain. [#73](https://github.com/atomist/sdm-core/issues/73)
+
 ## [1.0.0-RC.1](https://github.com/atomist/sdm/compare/1.0.0-M.5...1.0.0-RC.1) - 2018-10-15
 
 ### Changed
