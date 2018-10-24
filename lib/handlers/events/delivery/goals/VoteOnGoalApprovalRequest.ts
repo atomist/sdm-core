@@ -55,6 +55,9 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly voters: GoalApprovalRequestVoter[],
                 private readonly implementationMapper: GoalImplementationMapper) {
+        if (this.voters.length === 0) {
+            this.voters.push(async () => ({ vote: GoalApprovalRequestVote.Granted }));
+        }
     }
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
@@ -82,23 +85,26 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
         // Policy for now is if one vote denies, we deny the request.
         if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
-             if (sdmGoal.state === SdmGoalState.pre_approved) {
-                 let g = sdmGoal;
-                 const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
-                 for (const cb of cbs) {
-                     g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
-                 }
-                 await updateGoal(context, sdmGoal, {
-                     state: SdmGoalState.requested,
-                     description: goal.requestedDescription,
-                     data: g.data,
-                 });
-             } else if (sdmGoal.state === SdmGoalState.approved) {
-                 await updateGoal(context, sdmGoal, {
-                     state: SdmGoalState.success,
-                     description: goal.successDescription,
-                 });
-             }
+            // If there isn't a single granted void. we don't change the request
+            if (votes.some(v => v.vote === GoalApprovalRequestVote.Granted)) {
+                if (sdmGoal.state === SdmGoalState.pre_approved) {
+                    let g = sdmGoal;
+                    const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
+                    for (const cb of cbs) {
+                        g = await cb.callback(g, { id, addressChannels: undefined, credentials, context });
+                    }
+                    await updateGoal(context, sdmGoal, {
+                        state: SdmGoalState.requested,
+                        description: goal.requestedDescription,
+                        data: g.data,
+                    });
+                } else if (sdmGoal.state === SdmGoalState.approved) {
+                    await updateGoal(context, sdmGoal, {
+                        state: SdmGoalState.success,
+                        description: goal.successDescription,
+                    });
+                }
+            }
         } else {
             if (sdmGoal.state === SdmGoalState.pre_approved) {
                 const g: SdmGoalEvent = {
