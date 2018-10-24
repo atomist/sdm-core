@@ -56,7 +56,7 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
             goalKeyString(completedGoal), completedGoal.state, completedGoal.goalSetId);
 
         if (completedGoal.state === "failure") {
-            logger.info("Setting GitHub status to failed on %s" + id.sha);
+            logger.info("Setting GitHub status to failed on %s", id.sha);
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)}: ${completedGoal.description}`,
