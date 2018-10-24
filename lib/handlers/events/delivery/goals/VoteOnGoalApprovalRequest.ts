@@ -55,6 +55,9 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly voters: GoalApprovalRequestVoter[],
                 private readonly implementationMapper: GoalImplementationMapper) {
+        if (this.voters.length === 0) {
+            this.voters.push(async () => ({ vote: GoalApprovalRequestVote.Granted }));
+        }
     }
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
