@@ -51,7 +51,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             return Success;
         }
 
-        const goals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSet === failedGoal.goalSetId) as SdmGoalEvent[];
+        const goals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSetId === failedGoal.goalSetId) as SdmGoalEvent[];
         const push = _.cloneDeep(event.data.SdmGoal[0].push);
         delete push.goals;
         goals.forEach(g => g.push = push);

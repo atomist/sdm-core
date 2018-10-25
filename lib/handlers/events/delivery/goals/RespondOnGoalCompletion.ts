@@ -59,7 +59,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
-        const allGoals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSet === sdmGoal.goalSetId) as SdmGoalEvent[];
+        const allGoals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSetId === sdmGoal.goalSetId) as SdmGoalEvent[];
         const push = _.cloneDeep(event.data.SdmGoal[0].push);
         delete push.goals;
         allGoals.forEach(g => g.push = push);
