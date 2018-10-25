@@ -27,7 +27,9 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import { DeferredHandlerRegistrationAutomationEventListener } from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
+import {
+    DeferredHandlerRegistrationAutomationEventListener,
+} from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
@@ -153,8 +155,8 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
     mergedConfig.listeners.push(
         new DeferredHandlerRegistrationAutomationEventListener([() => new FulfillGoalOnRequested(
-            this.sdm.goalFulfillmentMapper,
-            this.sdm.goalExecutionListeners)]),
+            machine.goalFulfillmentMapper,
+            machine.goalExecutionListeners)]),
         new GoalAutomationEventListener(),
         new CacheCleanupAutomationEventListener(machine));
 
