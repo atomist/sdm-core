@@ -25,13 +25,13 @@ import {
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
+    fetchGoalsFromPush,
     mapKeyToGoal,
     SdmGoalEvent,
     SdmGoalKey,
     SdmGoalState,
     updateGoal,
 } from "@atomist/sdm";
-import * as _ from "lodash";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
@@ -51,10 +51,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             return Success;
         }
 
-        const goals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSetId === failedGoal.goalSetId) as SdmGoalEvent[];
-        const push = _.cloneDeep(event.data.SdmGoal[0].push);
-        delete push.goals;
-        goals.forEach(g => g.push = push);
+        const goals = fetchGoalsFromPush(failedGoal);
 
         const goalsToSkip = goals.filter(g => isDependentOn(failedGoal, g, mapKeyToGoal(goals)))
             .filter(g => g.state === "planned");

@@ -27,6 +27,7 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     CredentialsResolver,
+    fetchGoalsFromPush,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
     RepoRefResolver,
@@ -59,17 +60,14 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
-        const allGoals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSetId === sdmGoal.goalSetId) as SdmGoalEvent[];
-        const push = _.cloneDeep(event.data.SdmGoal[0].push);
-        delete push.goals;
-        allGoals.forEach(g => g.push = push);
+        const goals = fetchGoalsFromPush(sdmGoal);
 
         const gsi: GoalCompletionListenerInvocation = {
             id,
             context,
             credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
-            allGoals,
+            allGoals: goals,
             completedGoal: sdmGoal,
         };
 

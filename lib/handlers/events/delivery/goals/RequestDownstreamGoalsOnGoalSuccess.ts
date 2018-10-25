@@ -26,6 +26,7 @@ import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     CredentialsResolver,
+    fetchGoalsFromPush,
     GoalImplementationMapper,
     goalKeyString,
     mapKeyToGoal,
@@ -69,10 +70,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         const id = params.repoRefResolver.repoRefFromPush(sdmGoal.push) ;
         const credentials = this.credentialsResolver.eventHandlerCredentials(context, id);
 
-        const goals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSetId === sdmGoal.goalSetId) as SdmGoalEvent[];
-        const push = _.cloneDeep(event.data.SdmGoal[0].push);
-        delete push.goals;
-        goals.forEach(g => g.push = push);
+        const goals = fetchGoalsFromPush(sdmGoal);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
             .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
