@@ -27,7 +27,6 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     CredentialsResolver,
-    fetchGoalsForCommit,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
     RepoRefResolver,
@@ -35,11 +34,13 @@ import {
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
+import * as _ from "lodash";
 
 /**
  * Respond to a failure or success status by running listeners
  */
-@EventHandler("Run a listener on goal failure or success", GraphQL.subscription("OnAnyCompletedSdmGoal"))
+@EventHandler("Run a listener on goal failure or success",
+    GraphQL.subscription("OnAnyCompletedSdmGoal"))
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
@@ -57,7 +58,11 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
         }
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const allGoals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
+
+        const allGoals = event.data.SdmGoal[0].push.goals.filter(g => g.goalSet === sdmGoal.goalSetId) as SdmGoalEvent[];
+        const push = _.cloneDeep(event.data.SdmGoal[0].push);
+        delete push.goals;
+        allGoals.forEach(g => g.push = push);
 
         const gsi: GoalCompletionListenerInvocation = {
             id,

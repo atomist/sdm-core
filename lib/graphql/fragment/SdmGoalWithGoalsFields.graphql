@@ -1,0 +1,127 @@
+fragment SdmGoalWithGoalsFields on SdmGoal {
+  environment
+  uniqueName
+  name
+  sha
+  branch
+  fulfillment {
+    method
+    name
+  }
+  description
+  url
+  externalUrl
+  externalUrls {
+    label
+    url
+  }
+  state
+  phase
+  externalKey
+  goalSet
+  goalSetId
+  ts
+  error
+  retryFeasible
+  preConditions {
+    environment
+    uniqueName
+    name
+  }
+  approval {
+    correlationId
+    registration
+    name
+    version
+    ts
+    userId
+    channelId
+  }
+  approvalRequired
+  preApproval {
+    correlationId
+    registration
+    name
+    version
+    ts
+    userId
+    channelId
+  }
+  preApprovalRequired
+  provenance {
+    correlationId
+    registration
+    name
+    version
+    ts
+    userId
+    channelId
+  }
+  data
+  push {
+    ...PushFields
+    goals {
+      environment
+      uniqueName
+      name
+      sha
+      branch
+      fulfillment {
+        method
+        name
+      }
+      description
+      url
+      externalUrl
+      externalUrls {
+        label
+        url
+      }
+      state
+      phase
+      externalKey
+      goalSet
+      goalSetId
+      ts
+      error
+      retryFeasible
+      preConditions {
+        environment
+        uniqueName
+        name
+      }
+      approval {
+        correlationId
+        registration
+        name
+        version
+        ts
+        userId
+        channelId
+      }
+      approvalRequired
+      preApproval {
+        correlationId
+        registration
+        name
+        version
+        ts
+        userId
+        channelId
+      }
+      preApprovalRequired
+      provenance {
+        correlationId
+        registration
+        name
+        version
+        ts
+        userId
+        channelId
+      }
+      data
+      version
+    }
+  }
+  version
+}
