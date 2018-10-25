@@ -15,7 +15,6 @@
  */
 
 import {
-    automationClientInstance,
     AutomationEventListenerSupport,
     EventIncoming,
     guid,
@@ -25,29 +24,13 @@ import {
     Secrets,
 } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
-import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
 import { RegistrationConfirmation } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketRequestProcessor";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
-
-    constructor(private readonly sdm: SoftwareDeliveryMachine) {
-        super();
-    }
-
-    public eventIncoming(payload: EventIncoming) {
-        if (cluster.isWorker) {
-            // Register event handler locally only
-            const maker = () => new FulfillGoalOnRequested(
-                this.sdm.goalFulfillmentMapper,
-                this.sdm.goalExecutionListeners);
-            automationClientInstance().withEventHandler(maker);
-        }
-    }
 
     public async registrationSuccessful(eventHandler: RequestProcessor) {
         if (cluster.isMaster) {
@@ -70,12 +53,6 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 options: QueryNoCacheOptions,
             });
 
-            // Register event handler locally only
-            const maker = () => new FulfillGoalOnRequested(
-                this.sdm.goalFulfillmentMapper,
-                this.sdm.goalExecutionListeners);
-            automationClientInstance().withEventHandler(maker);
-
             // Create event and run event handler
             const event: EventIncoming = {
                 data: _.cloneDeep(goal),
@@ -83,7 +60,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     correlation_id: correlationId,
                     team_id: teamId,
                     team_name: teamName,
-                    operationName: metadataFromInstance(maker()).name,
+                    operationName: "FulfillGoalOnRequested",
                 },
                 secrets: [{
                     uri: Secrets.OrgToken,

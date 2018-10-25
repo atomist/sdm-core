@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { PushTest } from "@atomist/sdm";
+import {
+    PushTest,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
+import * as _ from "lodash";
 
 /**
  * Is this SDM in local mode?
@@ -38,6 +42,14 @@ export const IsInLocalMode: PushTest = {
  */
 export function isGitHubAction(): boolean {
     return !!process.env.GITHUB_WORKFLOW && !!process.env.GITHUB_ACTION && !!process.env.GITHUB_WORKSPACE;
+}
+
+/**
+ * Is this SDM running as a GitHub action but connected to the Atomist API?
+ * @param configuration
+ */
+export function isConnectedGitHubAction(configuration: SoftwareDeliveryMachineConfiguration): boolean {
+    return isGitHubAction() && !_.isEmpty(configuration.apiKey) && !_.isEmpty(configuration.workspaceIds);
 }
 
 /**

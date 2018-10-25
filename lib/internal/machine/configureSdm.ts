@@ -27,6 +27,8 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { DeferredHandlerRegistrationAutomationEventListener } from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
+import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
@@ -35,10 +37,9 @@ import {
     sdmStartupMessage,
 } from "../util/startupMessage";
 import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
+import { LocalSoftwareDeliveryMachineConfiguration } from "./LocalSoftwareDeliveryMachineOptions";
 import {
-    LocalSoftwareDeliveryMachineConfiguration,
-} from "./LocalSoftwareDeliveryMachineOptions";
-import {
+    isConnectedGitHubAction,
     isGitHubAction,
     isInLocalMode,
 } from "./modes";
@@ -114,6 +115,8 @@ function configureJobLaunching(mergedConfig, machine) {
     const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);
+    } else if (isConnectedGitHubAction(mergedConfig)) {
+        configureSdmWithLocalHandlers(mergedConfig, machine);
     } else {
         _.update(mergedConfig, "commands",
             old => !!old ? old : []);
@@ -149,11 +152,39 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.ingesters = [];
 
     mergedConfig.listeners.push(
-        new GoalAutomationEventListener(machine),
+        new DeferredHandlerRegistrationAutomationEventListener([() => new FulfillGoalOnRequested(
+            this.sdm.goalFulfillmentMapper,
+            this.sdm.goalExecutionListeners)]),
+        new GoalAutomationEventListener(),
         new CacheCleanupAutomationEventListener(machine));
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
+}
+
+/**
+ * Configure SDM to run as GitHub action
+ * @param mergedConfig
+ * @param machine
+ */
+function configureSdmWithLocalHandlers(mergedConfig: SoftwareDeliveryMachineConfiguration,
+                                       machine: SoftwareDeliveryMachine) {
+    mergedConfig.name = `${mergedConfig.name}-${guid().slice(0, 7)}`;
+
+    // Force ephemeral policy and no handlers or ingesters
+    mergedConfig.policy = "ephemeral";
+    mergedConfig.commands = [];
+    mergedConfig.events = [];
+    mergedConfig.ingesters = [];
+
+    mergedConfig.listeners.push(
+        new DeferredHandlerRegistrationAutomationEventListener(machine.eventHandlers, machine.commandHandlers));
+
+    // Disable app events for forked clients
+    mergedConfig.applicationEvents.enabled = false;
+
+    // Enable WS connection
+    mergedConfig.ws.enabled = true;
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
