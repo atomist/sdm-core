@@ -25,9 +25,8 @@ import {
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
-    fetchGoalsForCommit,
+    fetchGoalsFromPush,
     mapKeyToGoal,
-    RepoRefResolver,
     SdmGoalEvent,
     SdmGoalKey,
     SdmGoalState,
@@ -39,15 +38,12 @@ import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 /**
  * Skip downstream goals on failed, stopped or canceled goal
  */
-@EventHandler("Skip downstream goals on failed, stopped or canceled goal", GraphQL.subscription("OnAnyFailedSdmGoal"))
+@EventHandler("Skip downstream goals on failed, stopped or canceled goal",
+    GraphQL.subscription("OnAnyFailedSdmGoal"))
 export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailedSdmGoal.Subscription> {
 
-    constructor(private readonly repoRefResolver: RepoRefResolver) {}
-
     public async handle(event: EventFired<OnAnyFailedSdmGoal.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
-
+                        context: HandlerContext): Promise<HandlerResult> {
         const failedGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(failedGoal)) {
@@ -55,8 +51,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             return Success;
         }
 
-        const id = params.repoRefResolver.repoRefFromPush(failedGoal.push);
-        const goals = await fetchGoalsForCommit(context, id, failedGoal.repo.providerId, failedGoal.goalSetId);
+        const goals = fetchGoalsFromPush(failedGoal);
 
         const goalsToSkip = goals.filter(g => isDependentOn(failedGoal, g, mapKeyToGoal(goals)))
             .filter(g => g.state === "planned");
