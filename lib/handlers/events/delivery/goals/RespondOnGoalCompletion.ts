@@ -32,9 +32,9 @@ import {
     RepoRefResolver,
     SdmGoalEvent,
 } from "@atomist/sdm";
+import * as _ from "lodash";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
-import * as _ from "lodash";
 
 /**
  * Respond to a failure or success status by running listeners
