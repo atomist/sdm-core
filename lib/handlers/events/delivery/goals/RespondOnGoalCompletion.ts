@@ -27,7 +27,7 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     CredentialsResolver,
-    fetchGoalsForCommit,
+    fetchGoalsFromPush,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
     RepoRefResolver,
@@ -39,7 +39,8 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 /**
  * Respond to a failure or success status by running listeners
  */
-@EventHandler("Run a listener on goal failure or success", GraphQL.subscription("OnAnyCompletedSdmGoal"))
+@EventHandler("Run a listener on goal failure or success",
+    GraphQL.subscription("OnAnyCompletedSdmGoal"))
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
@@ -57,14 +58,15 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
         }
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const allGoals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
+
+        const goals = fetchGoalsFromPush(sdmGoal);
 
         const gsi: GoalCompletionListenerInvocation = {
             id,
             context,
             credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
-            allGoals,
+            allGoals: goals,
             completedGoal: sdmGoal,
         };
 

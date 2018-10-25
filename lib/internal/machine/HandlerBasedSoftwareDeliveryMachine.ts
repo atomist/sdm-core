@@ -105,7 +105,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
         if (this.pushMapping) {
             return {
                 eventHandlers: [
-                    () => new SkipDownstreamGoalsOnGoalFailure(this.configuration.sdm.repoRefResolver),
+                    () => new SkipDownstreamGoalsOnGoalFailure(),
                     () => new RequestDownstreamGoalsOnGoalSuccess(
                         this.configuration.name,
                         this.goalFulfillmentMapper,

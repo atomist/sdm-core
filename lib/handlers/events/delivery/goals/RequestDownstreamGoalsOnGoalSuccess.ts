@@ -26,7 +26,7 @@ import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     CredentialsResolver,
-    fetchGoalsForCommit,
+    fetchGoalsFromPush,
     GoalImplementationMapper,
     goalKeyString,
     mapKeyToGoal,
@@ -37,6 +37,7 @@ import {
     SdmGoalKey,
     updateGoal,
 } from "@atomist/sdm";
+import * as _ from "lodash";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
     OnAnySuccessfulSdmGoal,
@@ -66,10 +67,10 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             return Success;
         }
 
-        const id = params.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const id = params.repoRefResolver.repoRefFromPush(sdmGoal.push) ;
         const credentials = this.credentialsResolver.eventHandlerCredentials(context, id);
 
-        const goals = await fetchGoalsForCommit(context, id, sdmGoal.repo.providerId, sdmGoal.goalSetId);
+        const goals = fetchGoalsFromPush(sdmGoal);
 
         const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
             .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
