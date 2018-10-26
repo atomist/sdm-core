@@ -60,4 +60,4 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
         return true;
     }
 
-}   
+}
