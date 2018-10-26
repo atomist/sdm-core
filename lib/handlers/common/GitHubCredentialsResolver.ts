@@ -53,10 +53,11 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
     private hasToken(token: string) {
         if (!token) {
             return false;
-        } else if (token === "null") { // "null" as string is being sent when the orgToken can't be determined by the api
+        // "null" or "undefined" as string is being sent when the orgToken can't be determined by the api
+        } else if (token === "null" || token === "undefined") {
             return false;
         }
         return true;
     }
 
-}
+}   
