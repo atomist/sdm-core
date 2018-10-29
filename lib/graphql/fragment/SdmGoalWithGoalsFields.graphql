@@ -61,6 +61,7 @@ fragment SdmGoalWithGoalsFields on SdmGoal {
   push {
     ...PushFields
     goals {
+      ...SdmGoalRepo
       environment
       uniqueName
       name
