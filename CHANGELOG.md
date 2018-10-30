@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Don't approve goal if there are no success votes and only abstain. [#73](https://github.com/atomist/sdm-core/issues/73)
 -   Move goals into subscription. [#75](https://github.com/atomist/sdm-core/issues/75)
+-   Add commit-images link to GraphQL. [#77](https://github.com/atomist/sdm-core/issues/77)
 
 ### Fixed
 
