@@ -15,6 +15,8 @@
  */
 
 import {
+    AutomationContextAware,
+    HandlerContext,
     Parameters,
     ProjectOperationCredentials,
     Secret,
@@ -32,15 +34,25 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
     @Value({ path: "token", required: false, type: "string" })
     private readonly clientToken: string;
 
-    public eventHandlerCredentials(): ProjectOperationCredentials {
-        return this.credentials();
+    public eventHandlerCredentials(context: HandlerContext): ProjectOperationCredentials {
+        return this.credentials(context);
     }
 
-    public commandHandlerCredentials(): ProjectOperationCredentials {
-        return this.credentials();
+    public commandHandlerCredentials(context: HandlerContext): ProjectOperationCredentials {
+        return this.credentials(context);
     }
 
-    private credentials() {
+    private credentials(context: HandlerContext) {
+
+        // First try to obtain the token from the incoming event or command request
+        const actx: AutomationContextAware = context as any;
+        if (actx.trigger && actx.trigger.secrets) {
+            const secret = actx.trigger.secrets.find(s => s.uri === Secrets.OrgToken);
+            if (secret) {
+                return { token: secret.value };
+            }
+        }
+
         if (this.hasToken(this.orgToken)) {
             return { token: this.orgToken };
         } else if (this.hasToken(this.clientToken)) {
@@ -53,7 +65,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
     private hasToken(token: string) {
         if (!token) {
             return false;
-        // "null" as string is being sent when the orgToken can't be determined by the api
+            // "null" as string is being sent when the orgToken can't be determined by the api
         } else if (token === "null" || token === "undefined") {
             return false;
         }
