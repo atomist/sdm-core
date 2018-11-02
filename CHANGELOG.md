@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Use incoming event and command to retrieve token. [bcbc3b0](https://github.com/atomist/sdm-core/commit/bcbc3b033027aa79413d87b7d038ac729c7de4d6)
 
+### Fixed
+
+-   `GoalAutomationEventListener` always uses prod GraphQL urls. [#79](https://github.com/atomist/sdm-core/issues/79)
+
 ## [1.0.0-RC.2](https://github.com/atomist/sdm/compare/1.0.0-RC.1...1.0.0-RC.2) - 2018-10-30
 
 ### Added
