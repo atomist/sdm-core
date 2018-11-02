@@ -59,7 +59,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
 
             // Obtain goal via graphql query
             const graphClient = new ApolloGraphClient(
-                `https://automation.atomist.com/graphql/team/${teamId}`,
+                `${this.sdm.configuration.endpoints.graphql}/${teamId}`,
                 { Authorization: `Bearer ${registration.jwt}` });
 
             const goal = await graphClient.query<SdmGoalById.Query, SdmGoalById.Variables>({
