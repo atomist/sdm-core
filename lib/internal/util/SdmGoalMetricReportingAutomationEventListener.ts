@@ -40,7 +40,7 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
         if (cluster.isMaster && this.statsd && process.env.ATOMIST_ISOLATED_GOAL !== "forked") {
             const ts = _.get(payload.data, "SdmGoal[0].ts");
             if (ts) {
-                this.statsd.gauge(
+                this.statsd.timing(
                     "goal.round_trip",
                     Date.now() - ts,
                     1,
