@@ -30,6 +30,7 @@ import * as _ from "lodash";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
+import { SdmGoalMetricReportingAutomationEventListener } from "../util/SdmGoalMetricReportingAutomationEventListener";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
@@ -99,7 +100,9 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         _.update(mergedConfig, "listeners",
             old => !!old ? old : []);
-        mergedConfig.listeners.push(new InvokeSdmStartupListenersAutomationEventListener(sdm));
+        mergedConfig.listeners.push(
+            new InvokeSdmStartupListenersAutomationEventListener(sdm),
+            new SdmGoalMetricReportingAutomationEventListener());
 
         return mergedConfig;
     };
