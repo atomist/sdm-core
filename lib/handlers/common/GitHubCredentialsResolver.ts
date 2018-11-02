@@ -48,7 +48,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
         const actx: AutomationContextAware = context as any;
         if (actx.trigger && actx.trigger.secrets) {
             const secret = actx.trigger.secrets.find(s => s.uri === Secrets.OrgToken);
-            if (secret) {
+            if (secret && this.hasToken(secret.value)) {
                 return { token: secret.value };
             }
         }
