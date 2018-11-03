@@ -186,8 +186,10 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
 
     mergedConfig.name = `${mergedConfig.name}-${(process.env.GITHUB_SHA || guid()).slice(0, 7)}`;
 
-    mergedConfig.logging.level = "debug";
     mergedConfig.policy = "ephemeral";
+    mergedConfig.logging.level = "debug";
+    mergedConfig.cluster.enabled = false;
+
     mergedConfig.commands = [() => gitHubActionShutdownCommand(machine)];
     mergedConfig.events = machine.eventHandlers.filter(eh => !setGoalsOnPushFilter(eh));
     mergedConfig.ingesters = [];
