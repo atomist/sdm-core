@@ -27,6 +27,7 @@ import {
     OwnerType,
     ProviderType,
 } from "@atomist/sdm";
+import * as cluster from "cluster";
 import * as fs from "fs-extra";
 import * as os from "os";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
@@ -35,13 +36,15 @@ import { DefaultGitHubApiUrl } from "../../util/lifecycleHelpers";
 export class InvokeFromitHubActionAutomationEventListener extends AutomationEventListenerSupport {
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
-        const event = process.env.GITHUB_EVENT_NAME;
-        switch (event) {
-            case "push":
-                return handlePush(client);
-                break;
-            default:
-                logger.info(`Unknown GitHub event '${event}'`);
+        if (cluster.isMaster) {
+            const event = process.env.GITHUB_EVENT_NAME;
+            switch (event) {
+                case "push":
+                    return handlePush(client);
+                    break;
+                default:
+                    logger.info(`Unknown GitHub event '${event}'`);
+            }
         }
     }
 }
@@ -105,7 +108,7 @@ async function handlePush(client: AutomationClient): Promise<void> {
         }],
     };
 
-    await client.httpHandler.processEvent(ei, async results => {
+    await client.processEvent(ei, async results => {
         const r = await results;
         logger.info(`Returned '${JSON.stringify(r)}'`);
     });
