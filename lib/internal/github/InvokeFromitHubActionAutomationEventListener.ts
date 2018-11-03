@@ -20,6 +20,7 @@ import {
     EventIncoming,
     guid,
     logger,
+    Secrets,
 } from "@atomist/automation-client";
 import {
     OnPushToAnyBranch,
@@ -98,7 +99,10 @@ async function handlePush(client: AutomationClient): Promise<void> {
                 ? client.configuration.workspaceIds[0] : event.repository.owner.name,
             team_name: os.hostname(),
         },
-        secrets: [],
+        secrets: [{
+            uri: Secrets.OrgToken,
+            value: null
+        }],
     };
 
     await client.httpHandler.processEvent(ei, async results => {
