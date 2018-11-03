@@ -17,11 +17,24 @@
 import { NoParameters } from "@atomist/automation-client";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { commandHandlerFrom } from "@atomist/automation-client/lib/onCommand";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import {
+    slackWarningMessage,
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 
 export function gitHubActionShutdownCommand(machine: SoftwareDeliveryMachine): HandleCommand<NoParameters> {
     return commandHandlerFrom(
-        async (ctx, parameters) => process.exit(1),
+        async ctx => {
+            await ctx.messageClient.respond(
+                slackWarningMessage(
+                    "SDM Shutdown",
+                    `Triggering shutdown of _${machine.configuration.name}_`,
+                    ctx,
+                    {
+                        footer: `${machine.configuration.name}:${machine.configuration.version}`,
+                    }));
+            setInterval(() => process.exit(1), 2500);
+        },
         NoParameters,
         "GitHubActionShutdown",
         "Shutdown the running SDM",
