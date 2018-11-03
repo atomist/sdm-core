@@ -44,6 +44,8 @@ export class InvokeFromitHubActionAutomationEventListener extends AutomationEven
                     break;
                 default:
                     logger.info(`Unknown GitHub event '${event}'`);
+                    process.exit(1);
+                    break;
             }
         }
     }
@@ -54,7 +56,7 @@ async function handlePush(client: AutomationClient): Promise<void> {
 
     // Don't build tags
     if (!event.ref.startsWith("refs/heads/")) {
-        return;
+        process.exit(0);
     }
 
     const push: OnPushToAnyBranch.Push = {
