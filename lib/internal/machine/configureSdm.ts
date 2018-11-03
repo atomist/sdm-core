@@ -19,7 +19,11 @@ import {
     ConfigurationPostProcessor,
     guid,
     logger,
+    Maker,
 } from "@atomist/automation-client";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
+import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     ConfigurationValues,
     SoftwareDeliveryMachine,
@@ -27,9 +31,7 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import {
-    DeferredHandlerRegistrationAutomationEventListener,
-} from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
+import { DeferredHandlerRegistrationAutomationEventListener } from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
@@ -172,16 +174,21 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
  */
 function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineConfiguration,
                                          machine: SoftwareDeliveryMachine) {
+
+    const setGoalsOnPushFilter =
+        (eh: Maker<HandleEvent<any>>) => metadataFromInstance(toFactory(eh)()).name === "SetGoalsOnPush";
+
+    const setGoalsOnPushMaker = machine.eventHandlers.find(setGoalsOnPushFilter);
+
     mergedConfig.name = `${mergedConfig.name}-${guid().slice(0, 7)}`;
 
-    // Force ephemeral policy and no handlers or ingesters
     mergedConfig.policy = "ephemeral";
     mergedConfig.commands = [];
-    mergedConfig.events = [];
+    mergedConfig.events = machine.eventHandlers.filter(eh => !setGoalsOnPushFilter(eh));
     mergedConfig.ingesters = [];
 
     mergedConfig.listeners.push(
-        new DeferredHandlerRegistrationAutomationEventListener(machine.eventHandlers, machine.commandHandlers),
+        new DeferredHandlerRegistrationAutomationEventListener([setGoalsOnPushMaker], []),
         new InvokeFromitHubActionAutomationEventListener());
 
     // Disable app events for forked clients
@@ -192,6 +199,16 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
 
     // Register the GitHub specific project loader
     mergedConfig.sdm.projectLoader = new GitHubActionProjectLoader(mergedConfig.sdm.projectLoader);
+
+    // Add some more metadata into the registration
+    mergedConfig.metadata = {
+        ...mergedConfig.metadata,
+        "github.action.repository": process.env.GITHUB_REPOSITORY,
+        "github.action.workflow": process.env.GITHUB_WORKFLOW,
+        "github.action.action": process.env.GITHUB_ACTION,
+        "github.action.event": process.env.GITHUB_EVENT_NAME,
+        "github.action.sha": process.env.GITHUB_SHA,
+    };
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
