@@ -39,6 +39,7 @@ import { GoalAutomationEventListener } from "../../handlers/events/delivery/goal
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import { GitHubActionProjectLoader } from "../github/GitHubActionProjectLoader";
+import { gitHubActionShutdownCommand } from "../github/GitHubActionShutdownCommand";
 import { registerExitOnGoalSetCompletionListener } from "../github/goalSetShutdown";
 import { InvokeFromitHubActionAutomationEventListener } from "../github/InvokeFromitHubActionAutomationEventListener";
 import {
@@ -183,10 +184,11 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
 
     const setGoalsOnPushMaker = machine.eventHandlers.find(setGoalsOnPushFilter);
 
-    mergedConfig.name = `${mergedConfig.name}-${guid().slice(0, 7)}`;
+    mergedConfig.name = `${mergedConfig.name}-${(process.env.GITHUB_SHA || guid()).slice(0, 7)}`;
 
+    mergedConfig.logging.level = "debug";
     mergedConfig.policy = "ephemeral";
-    mergedConfig.commands = [];
+    mergedConfig.commands = [() => gitHubActionShutdownCommand(machine)];
     mergedConfig.events = machine.eventHandlers.filter(eh => !setGoalsOnPushFilter(eh));
     mergedConfig.ingesters = [];
 
