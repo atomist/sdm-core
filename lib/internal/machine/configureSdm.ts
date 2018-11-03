@@ -31,7 +31,9 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import { DeferredHandlerRegistrationAutomationEventListener } from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
+import {
+    DeferredHandlerRegistrationAutomationEventListener,
+} from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";

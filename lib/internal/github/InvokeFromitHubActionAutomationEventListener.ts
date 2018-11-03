@@ -101,7 +101,7 @@ async function handlePush(client: AutomationClient): Promise<void> {
         },
         secrets: [{
             uri: Secrets.OrgToken,
-            value: null
+            value: null,
         }],
     };
 
