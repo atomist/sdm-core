@@ -39,6 +39,7 @@ import { GoalAutomationEventListener } from "../../handlers/events/delivery/goal
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import { GitHubActionProjectLoader } from "../github/GitHubActionProjectLoader";
+import { registerExitOnGoalSetCompletionListener } from "../github/goalSetShutdown";
 import { InvokeFromitHubActionAutomationEventListener } from "../github/InvokeFromitHubActionAutomationEventListener";
 import {
     sdmExtensionPackStartupMessage,
@@ -196,7 +197,7 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
 
-    // Enable WS connection
+    // Re-enable WS connection
     mergedConfig.ws.enabled = true;
 
     // Register the GitHub specific project loader
@@ -211,6 +212,8 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
         "github.action.event": process.env.GITHUB_EVENT_NAME,
         "github.action.sha": process.env.GITHUB_SHA,
     };
+
+    registerExitOnGoalSetCompletionListener(machine);
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {

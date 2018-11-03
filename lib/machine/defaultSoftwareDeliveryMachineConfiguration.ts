@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    Configuration,
-} from "@atomist/automation-client";
+import { Configuration } from "@atomist/automation-client";
 import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operations/generate/remoteGitProjectPersister";
 import {
     allReposInTeam,
@@ -32,6 +30,12 @@ import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory"
 
 export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
     const repoRefResolver = new DefaultRepoRefResolver();
+
+    // Add a default for rolar into the configuration
+    if (!_.get(configuration, "sdm.rolar.url")) {
+        _.set(configuration, "sdm.rolar.url", "http://rolar.cfapps.io");
+    }
+
     return {
         sdm: {
             artifactStore: new EphemeralLocalArtifactStore(),
