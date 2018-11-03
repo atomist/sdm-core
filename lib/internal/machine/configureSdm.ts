@@ -34,6 +34,8 @@ import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/Ful
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
+import { GitHubActionProjectLoader } from "../github/GitHubActionProjectLoader";
+import { InvokeFromitHubActionAutomationEventListener } from "../github/InvokeFromitHubActionAutomationEventListener";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
@@ -42,7 +44,6 @@ import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmSta
 import { LocalSoftwareDeliveryMachineConfiguration } from "./LocalSoftwareDeliveryMachineOptions";
 import {
     isConnectedGitHubAction,
-    isGitHubAction,
     isInLocalMode,
 } from "./modes";
 
@@ -118,7 +119,7 @@ function configureJobLaunching(mergedConfig, machine) {
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);
     } else if (isConnectedGitHubAction(mergedConfig)) {
-        configureSdmWithLocalHandlers(mergedConfig, machine);
+        configureSdmToRunAsGitHubAction(mergedConfig, machine);
     } else {
         _.update(mergedConfig, "commands",
             old => !!old ? old : []);
@@ -169,8 +170,8 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
  * @param mergedConfig
  * @param machine
  */
-function configureSdmWithLocalHandlers(mergedConfig: SoftwareDeliveryMachineConfiguration,
-                                       machine: SoftwareDeliveryMachine) {
+function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineConfiguration,
+                                         machine: SoftwareDeliveryMachine) {
     mergedConfig.name = `${mergedConfig.name}-${guid().slice(0, 7)}`;
 
     // Force ephemeral policy and no handlers or ingesters
@@ -180,13 +181,17 @@ function configureSdmWithLocalHandlers(mergedConfig: SoftwareDeliveryMachineConf
     mergedConfig.ingesters = [];
 
     mergedConfig.listeners.push(
-        new DeferredHandlerRegistrationAutomationEventListener(machine.eventHandlers, machine.commandHandlers));
+        new DeferredHandlerRegistrationAutomationEventListener(machine.eventHandlers, machine.commandHandlers),
+        new InvokeFromitHubActionAutomationEventListener());
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
 
     // Enable WS connection
     mergedConfig.ws.enabled = true;
+
+    // Register the GitHub specific project loader
+    mergedConfig.sdm.projectLoader = new GitHubActionProjectLoader(mergedConfig.sdm.projectLoader);
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
@@ -219,7 +224,7 @@ async function registerMetadata(config: Configuration, machine: SoftwareDelivery
  * @return {any}
  */
 async function doWithSdmLocal<R>(callback: (sdmLocal: any) => any): Promise<R | null> {
-    if (isInLocalMode() || isGitHubAction()) {
+    if (isInLocalMode()) {
         // tslint:disable-next-line:no-implicit-dependencies
         const local = attemptToRequire("@atomist/sdm-local", !process.env.ATOMIST_NPM_LOCAL_LINK);
         if (local) {
