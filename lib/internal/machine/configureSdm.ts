@@ -39,7 +39,6 @@ import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/Ful
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
-import { GitHubActionProjectLoader } from "../github/GitHubActionProjectLoader";
 import { gitHubActionShutdownCommand } from "../github/GitHubActionShutdownCommand";
 import { registerExitOnGoalSetCompletionListener } from "../github/goalSetShutdown";
 import { InvokeFromitHubActionAutomationEventListener } from "../github/InvokeFromitHubActionAutomationEventListener";
@@ -207,9 +206,6 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
 
     // Re-enable WS connection
     mergedConfig.ws.enabled = true;
-
-    // Register the GitHub specific project loader
-    mergedConfig.sdm.projectLoader = new GitHubActionProjectLoader(mergedConfig.sdm.projectLoader);
 
     // Add some more metadata into the registration
     mergedConfig.metadata = {
