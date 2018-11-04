@@ -37,10 +37,15 @@ export class InvokeFromitHubActionAutomationEventListener extends AutomationEven
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
         if (cluster.isMaster) {
+
             const event = process.env.GITHUB_EVENT_NAME;
+            logger.debug(`Incoming GitHub event is '${event}'`);
+            const payload = await fs.readJSON(process.env.GITHUB_EVENT_PATH);
+            logger.debug(JSON.stringify(payload));
+
             switch (event) {
                 case "push":
-                    return handlePush(client);
+                    return handlePush(client, payload);
                     break;
                 default:
                     logger.info(`Unknown GitHub event '${event}'`);
@@ -51,8 +56,7 @@ export class InvokeFromitHubActionAutomationEventListener extends AutomationEven
     }
 }
 
-async function handlePush(client: AutomationClient): Promise<void> {
-    const event = await fs.readJSON(process.env.GITHUB_EVENT_PATH);
+async function handlePush(client: AutomationClient, event: any): Promise<void> {
 
     // Don't build tags
     if (!event.ref.startsWith("refs/heads/")) {
