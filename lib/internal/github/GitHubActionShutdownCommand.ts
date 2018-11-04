@@ -14,21 +14,46 @@
  * limitations under the License.
  */
 
-import { NoParameters } from "@atomist/automation-client";
+import {
+    configurationValue,
+    NoParameters,
+} from "@atomist/automation-client";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { commandHandlerFrom } from "@atomist/automation-client/lib/onCommand";
 import {
     slackWarningMessage,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
+import axios from "axios";
+import * as fs from "fs-extra";
+import * as path from "path";
 
 export function gitHubActionShutdownCommand(machine: SoftwareDeliveryMachine): HandleCommand<NoParameters> {
     return commandHandlerFrom(
         async ctx => {
+
+            const log = (await fs.readFile(path.join(".", "log", "sdm.log"))).toString();
+            const gist = {
+                description: `SDM log file - ${configurationValue("name")}`,
+                public: false,
+                files: {
+                    "sdm.log": {
+                        "content": log,
+                    },
+                },
+            };
+
+            const response = await axios.post(
+                "https://api.github.com/gists",
+                gist,
+                { headers: { Authorization: `token ${configurationValue("token")}` } });
+
             await ctx.messageClient.respond(
                 slackWarningMessage(
                     "SDM Shutdown",
-                    `Triggering shutdown of _${machine.configuration.name}_`,
+                    `Triggering shutdown of _${machine.configuration.name}_
+
+Captured log to GitHub Gist at: ${response.data.html_url}`,
                     ctx,
                     {
                         footer: `${machine.configuration.name}:${machine.configuration.version}`,

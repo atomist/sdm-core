@@ -31,6 +31,7 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import * as path from "path";
 import {
     DeferredHandlerRegistrationAutomationEventListener,
 } from "../../handlers/events/delivery/goals/DeferredHandlerRegistrationAutomationEventListener";
@@ -187,8 +188,11 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.name = `${mergedConfig.name}-${(process.env.GITHUB_SHA || guid()).slice(0, 7)}`;
 
     mergedConfig.policy = "ephemeral";
-    mergedConfig.logging.level = "debug";
     mergedConfig.cluster.enabled = false;
+    
+    mergedConfig.logging.level = "debug";
+    mergedConfig.logging.file.enabled = true;
+    mergedConfig.logging.file.name = path.join(".", "log", "sdm.log");
 
     mergedConfig.commands = [() => gitHubActionShutdownCommand(machine)];
     mergedConfig.events = machine.eventHandlers.filter(eh => !setGoalsOnPushFilter(eh));
