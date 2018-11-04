@@ -33,12 +33,12 @@ export function gitHubActionShutdownCommand(machine: SoftwareDeliveryMachine): H
         async ctx => {
 
             const log = (await fs.readFile(path.join(".", "log", "sdm.log"))).toString();
-            const gist = {
-                description: `SDM log file - ${configurationValue("name")}`,
+            const gist: any = {
+                description: `SDM log file - ${configurationValue<string>("name")}`,
                 public: false,
                 files: {
                     "sdm.log": {
-                        "content": log,
+                        content: log,
                     },
                 },
             };
@@ -46,14 +46,14 @@ export function gitHubActionShutdownCommand(machine: SoftwareDeliveryMachine): H
             const response = await axios.post(
                 "https://api.github.com/gists",
                 gist,
-                { headers: { Authorization: `token ${configurationValue("token")}` } });
+                { headers: { Authorization: `token ${configurationValue<string>("token")}` } });
 
             await ctx.messageClient.respond(
                 slackWarningMessage(
                     "SDM Shutdown",
                     `Triggering shutdown of _${machine.configuration.name}_
 
-Captured log to GitHub Gist at: ${response.data.html_url}`,
+Uploaded log to GitHub Gist at: ${response.data.html_url}`,
                     ctx,
                     {
                         footer: `${machine.configuration.name}:${machine.configuration.version}`,

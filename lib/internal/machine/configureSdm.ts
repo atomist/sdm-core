@@ -189,7 +189,7 @@ function configureSdmToRunAsGitHubAction(mergedConfig: SoftwareDeliveryMachineCo
 
     mergedConfig.policy = "ephemeral";
     mergedConfig.cluster.enabled = false;
-    
+
     mergedConfig.logging.level = "debug";
     mergedConfig.logging.file.enabled = true;
     mergedConfig.logging.file.name = path.join(".", "log", "sdm.log");
