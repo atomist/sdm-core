@@ -42,6 +42,7 @@ import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defau
 import { gitHubActionShutdownCommand } from "../github/GitHubActionShutdownCommand";
 import { registerExitOnGoalSetCompletionListener } from "../github/goalSetShutdown";
 import { InvokeFromitHubActionAutomationEventListener } from "../github/InvokeFromitHubActionAutomationEventListener";
+import { SdmGoalMetricReportingAutomationEventListener } from "../util/SdmGoalMetricReportingAutomationEventListener";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
@@ -109,7 +110,9 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         _.update(mergedConfig, "listeners",
             old => !!old ? old : []);
-        mergedConfig.listeners.push(new InvokeSdmStartupListenersAutomationEventListener(sdm));
+        mergedConfig.listeners.push(
+            new InvokeSdmStartupListenersAutomationEventListener(sdm),
+            new SdmGoalMetricReportingAutomationEventListener());
 
         return mergedConfig;
     };
@@ -164,7 +167,7 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
         new DeferredHandlerRegistrationAutomationEventListener([() => new FulfillGoalOnRequested(
             machine.goalFulfillmentMapper,
             machine.goalExecutionListeners)]),
-        new GoalAutomationEventListener(),
+        new GoalAutomationEventListener(machine),
         new CacheCleanupAutomationEventListener(machine));
 
     // Disable app events for forked clients

@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-RC.1...HEAD)
+## [Unreleased](https://github.com/atomist/sdm/compare/1.0.0-RC.2...HEAD)
+
+### Added
+
+-   Use incoming event and command to retrieve token. [bcbc3b0](https://github.com/atomist/sdm-core/commit/bcbc3b033027aa79413d87b7d038ac729c7de4d6)
+
+### Fixed
+
+-   `GoalAutomationEventListener` always uses prod GraphQL urls. [#79](https://github.com/atomist/sdm-core/issues/79)
+
+## [1.0.0-RC.2](https://github.com/atomist/sdm/compare/1.0.0-RC.1...1.0.0-RC.2) - 2018-10-30
 
 ### Added
 
@@ -15,6 +25,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Don't approve goal if there are no success votes and only abstain. [#73](https://github.com/atomist/sdm-core/issues/73)
 -   Move goals into subscription. [#75](https://github.com/atomist/sdm-core/issues/75)
+-   Add commit-images link to GraphQL. [#77](https://github.com/atomist/sdm-core/issues/77)
+
+### Fixed
+
+-   Set goal state command doesn't get goals for multiple goal sets correct. [#76](https://github.com/atomist/sdm-core/issues/76)
 
 ## [1.0.0-RC.1](https://github.com/atomist/sdm/compare/1.0.0-M.5...1.0.0-RC.1) - 2018-10-15
 

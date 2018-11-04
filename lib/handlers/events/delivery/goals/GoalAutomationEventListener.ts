@@ -25,12 +25,17 @@ import {
 } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import { RegistrationConfirmation } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketRequestProcessor";
+import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
+
+    constructor(private readonly machine: SoftwareDeliveryMachine) {
+        super();
+    }
 
     public async registrationSuccessful(eventHandler: RequestProcessor) {
         if (cluster.isMaster) {
@@ -42,7 +47,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
 
             // Obtain goal via graphql query
             const graphClient = new ApolloGraphClient(
-                `https://automation.atomist.com/graphql/team/${teamId}`,
+                `${this.machine.configuration.endpoints.graphql}/${teamId}`,
                 { Authorization: `Bearer ${registration.jwt}` });
 
             const goal = await graphClient.query<SdmGoalById.Query, SdmGoalById.Variables>({

@@ -24,7 +24,7 @@ import {
 import { executeTag } from "../../internal/delivery/build/executeTag";
 
 /**
- * Goal that performs project tagging
+ * Goal that performs project tagging on GitHub
  */
 export class Tag extends FulfillableGoal {
 
