@@ -50,7 +50,7 @@
     "@atomist/microgrammar": "*"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.0.0-gitlab-support.20181105162132",
+    "@atomist/automation-client": "1.0.0-gitlab-support.20181106104653",
     "@atomist/sdm": "1.0.0-RC.2",
     "@types/lodash": "^4.14.116",
     "@types/mocha": "^5.2.5",

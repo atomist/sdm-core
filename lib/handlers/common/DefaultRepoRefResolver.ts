@@ -60,12 +60,14 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                     branch: push.branch,
                 });
             case ProviderType.gitlab:
-                return new GitlabRepoRef(push.repo.owner,
-                    push.repo.name,
-                    push.after.sha,
-                    push.repo.org.provider.apiUrl,
-                    push.repo.org.provider.url,
-                );
+                return GitlabRepoRef.from({
+                    owner: push.repo.owner,
+                    repo: push.repo.name,
+                    sha: push.after.sha,
+                    rawApiBase: push.repo.org.provider.apiUrl,
+                    gitlabRemoteUrl: push.repo.org.provider.url,
+                    branch: push.branch,
+                });
             case ProviderType.bitbucket_cloud:
                 throw new Error("BitBucket Cloud not yet supported");
             default:
@@ -119,12 +121,14 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                     branch: sdmGoal.branch,
                 });
             case ProviderType.gitlab:
-                return new GitlabRepoRef(sdmGoal.push.repo.owner,
-                    sdmGoal.push.repo.name,
-                    sdmGoal.sha,
-                    provider.apiUrl,
-                    provider.url,
-                );
+                return GitlabRepoRef.from({
+                    owner: sdmGoal.push.repo.owner,
+                    repo: sdmGoal.push.repo.name,
+                    sha: sdmGoal.sha,
+                    rawApiBase: provider.apiUrl,
+                    gitlabRemoteUrl: provider.url,
+                    branch: sdmGoal.branch,
+                });
             default:
                 throw new Error(`Provider ${provider.providerType} not currently supported in SDM`);
         }
@@ -164,12 +168,14 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                     providerUrl: apiUrl,
                 });
             case ProviderType.gitlab:
-                return new GitlabRepoRef(
-                    repo.owner,
-                    repo.name,
-                    opts.sha,
-                    apiUrl,
-                    url);
+                return GitlabRepoRef.from({
+                    owner: repo.owner,
+                    repo: repo.name,
+                    sha: opts.sha,
+                    rawApiBase: apiUrl,
+                    gitlabRemoteUrl: url,
+                    branch: opts.branch,
+                });
             default:
                 throw new Error(`Provider ${repo.org.provider.providerType} not currently supported in SDM`);
         }
