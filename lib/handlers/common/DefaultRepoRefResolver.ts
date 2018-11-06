@@ -16,7 +16,8 @@
 
 import {
     BitBucketServerRepoRef,
-    GitHubRepoRef, GitlabRepoRef,
+    GitHubRepoRef,
+    GitlabRepoRef,
     logger,
     RemoteRepoRef,
 } from "@atomist/automation-client";
