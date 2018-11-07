@@ -119,6 +119,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
                         this.goalApprovalRequestVoters,
+                        this.goalApprovalRequestVoteDecisionManager,
                         this.goalFulfillmentMapper)],
                 commandHandlers: [],
                 ingesters: [],
