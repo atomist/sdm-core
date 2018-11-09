@@ -19,7 +19,6 @@ import {
     guid,
     HandlerContext,
     InMemoryProject,
-    logger,
     ProjectOperationCredentials,
     Success,
 } from "@atomist/automation-client";
@@ -100,7 +99,9 @@ describe("implementing goals in the SDM", () => {
                 id: favoriteRepoRef,
                 context: fakeContext,
                 push: aPush,
-                addressChannels: () => Promise.resolve({}),
+                addressChannels: async () => {
+                    return;
+                },
                 goalSetId: "hi",
             },
         );
@@ -139,7 +140,9 @@ describe("implementing goals in the SDM", () => {
                 implementationMapping: mySDM.goalFulfillmentMapper,
             }, {
                 credentials, id: favoriteRepoRef, context: fakeContext, push: aPush,
-                addressChannels: () => Promise.resolve({}),
+                addressChannels: async () => {
+                    return;
+                },
                 goalSetId: "hi",
             },
         );
