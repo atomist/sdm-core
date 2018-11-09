@@ -28,8 +28,8 @@ import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
     GraphQL.subscription({
         name: "OnSpecificCanceledSdmGoal",
         variables: {
-            goalSetId: process.env.ATOMIST_GOAL_SET_ID,
-            uniqueName: process.env.ATOMIST_GOAL_UNIQUE_NAME,
+            goalSetId: process.env.ATOMIST_GOAL_SET_ID || "n/a",
+            uniqueName: process.env.ATOMIST_GOAL_UNIQUE_NAME || "n/a",
         },
     }))
 export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGoal.Subscription> {
