@@ -216,6 +216,14 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
             value: goal.id,
         },
         {
+            name: "ATOMIST_GOAL_SET_ID",
+            value: goal.goalSetId,
+        },
+        {
+            name: "ATOMIST_GOAL_UNIQUE_NAME",
+            value: goal.uniqueName,
+        },
+        {
             name: "ATOMIST_CORRELATION_ID",
             value: ctx.correlationId,
         },
