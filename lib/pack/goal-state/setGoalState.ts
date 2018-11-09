@@ -114,7 +114,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                     return {
                         text: k.slice(0, 7),
                         options: v.map(g => ({
-                            text: g.name,
+                            text: `${g.name} - ${g.state}`,
                             value: JSON.stringify({ id: (g as any).id, name: g.name }),
                         })).sort((o1, o2) => o1.text.localeCompare(o2.text)),
                     };
