@@ -36,7 +36,7 @@ import { isGoalRelevant } from "../../../../internal/delivery/goals/support/vali
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
 /**
- * Skip downstream goals on failed, stopped or canceled goal
+ * Skip downstream goals on failed or stopped goal
  */
 @EventHandler("Skip downstream goals on failed, stopped or canceled goal",
     GraphQL.subscription("OnAnyFailedSdmGoal"))

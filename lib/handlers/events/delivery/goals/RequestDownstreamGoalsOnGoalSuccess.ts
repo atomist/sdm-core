@@ -37,7 +37,6 @@ import {
     SdmGoalKey,
     updateGoal,
 } from "@atomist/sdm";
-import * as _ from "lodash";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import {
     OnAnySuccessfulSdmGoal,
