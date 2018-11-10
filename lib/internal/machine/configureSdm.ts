@@ -151,7 +151,6 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.commands = [];
     mergedConfig.events = [() => new CancelGoalOnCanceled()];
     mergedConfig.ingesters = [];
-    mergedConfig.cluster.enabled = false;
 
     mergedConfig.listeners.push(
         new GoalAutomationEventListener(machine),

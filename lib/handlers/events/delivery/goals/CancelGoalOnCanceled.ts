@@ -38,7 +38,7 @@ export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGo
         logger.info("Exciting this process because goal was canceled");
 
         // Exit with 0 to make sure k8 doesn't re-schedule this pod
-        process.exit(0);
+        process.kill(1, "SIGTERM");
 
         return Success;
     }
