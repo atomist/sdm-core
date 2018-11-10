@@ -15,13 +15,18 @@
  */
 
 import {
+    automationClientInstance,
+    EventFired,
     GraphQL,
+    HandlerContext,
     HandlerResult,
     logger,
     Success,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+import { ClusterWorkerRequestProcessor } from "@atomist/automation-client/lib/internal/transport/cluster/ClusterWorkerRequestProcessor";
+import * as cluster from "cluster";
 import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
 
 @EventHandler("Cancel the currently executing goal",
@@ -34,11 +39,17 @@ import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
     }))
 export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGoal.Subscription> {
 
-    public async handle(): Promise<HandlerResult> {
+    public async handle(e: EventFired<OnSpecificCanceledSdmGoal.Subscription>,
+                        ctx: HandlerContext): Promise<HandlerResult> {
         logger.info("Exciting this process because goal was canceled");
 
         // Exit with 0 to make sure k8 doesn't re-schedule this pod
-        process.kill(1, "SIGTERM");
+        if (cluster.isWorker) {
+            (automationClientInstance().webSocketHandler as ClusterWorkerRequestProcessor).sendShutdown(0, ctx as any);
+        } else {
+            automationClientInstance().configuration.ws.termination.graceful = false;
+            process.exit(0);
+        }
 
         return Success;
     }
