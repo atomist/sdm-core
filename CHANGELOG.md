@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.0.2...HEAD)
 
+### Added
+
+-   Add support canceling goals. [#80](https://github.com/atomist/sdm-core/issues/80)
+
 ## [1.0.2](https://github.com/atomist/sdm/compare/1.0.1...1.0.2) - 2018-11-09
 
 ### Fixed
