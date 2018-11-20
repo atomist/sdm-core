@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Add support canceling goals. [#80](https://github.com/atomist/sdm-core/issues/80)
+-   Add Gitlab support. [#81](https://github.com/atomist/sdm-core/issues/81)
 
 ## [1.0.2](https://github.com/atomist/sdm/compare/1.0.1...1.0.2) - 2018-11-09
 
