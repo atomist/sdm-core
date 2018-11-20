@@ -36,7 +36,7 @@ import { isGoalRelevant } from "../../../../internal/delivery/goals/support/vali
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
 /**
- * Skip downstream goals on failed, stopped or canceled goal
+ * Skip downstream goals on failed or stopped goal
  */
 @EventHandler("Skip downstream goals on failed, stopped or canceled goal",
     GraphQL.subscription("OnAnyFailedSdmGoal"))
@@ -57,20 +57,25 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             .filter(g => g.state === "planned");
 
         let failedGoalState;
+        let failedGoalDescription;
         switch (failedGoal.state) {
             case SdmGoalState.failure:
-                failedGoalState = "failed";
+                failedGoalDescription = "failed";
+                failedGoalState = SdmGoalState.skipped;
                 break;
             case SdmGoalState.stopped:
-                failedGoalState = "stopped goals";
+                failedGoalDescription = "stopped goals";
+                failedGoalState = SdmGoalState.skipped;
                 break;
             case SdmGoalState.canceled:
-                failedGoalState = "was canceled";
+                failedGoalDescription = "was canceled";
+                failedGoalState = SdmGoalState.canceled;
                 break;
         }
         await Promise.all(goalsToSkip.map(g => updateGoal(context, g, {
-            state: SdmGoalState.skipped,
-            description: `Skipped ${g.name} because ${failedGoal.name} ${failedGoalState}`,
+            state: failedGoalState,
+            description: `${failedGoalState === SdmGoalState.skipped ? "Skipped" : "Canceled"
+                } ${g.name} because ${failedGoal.name} ${failedGoalDescription}`,
         })));
 
         return Success;

@@ -27,6 +27,7 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { CancelGoalOnCanceled } from "../../handlers/events/delivery/goals/CancelGoalOnCanceled";
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
@@ -148,7 +149,7 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     // Force ephemeral policy and no handlers or ingesters
     mergedConfig.policy = "ephemeral";
     mergedConfig.commands = [];
-    mergedConfig.events = [];
+    mergedConfig.events = [() => new CancelGoalOnCanceled()];
     mergedConfig.ingesters = [];
 
     mergedConfig.listeners.push(

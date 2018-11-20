@@ -102,7 +102,6 @@ export {
     SdmVersionForCommit,
 } from "./lib/typings/types";
 import * as github from "./lib/util/github/ghub";
-
 export {
     gitHubGoalStatus,
 } from "./lib/pack/github-goal-status/github";

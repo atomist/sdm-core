@@ -29,6 +29,7 @@ import {
     LoggingProgressLog,
     OnAnyRequestedSdmGoal,
     ProgressLog,
+    SdmGoalEvent,
     StringCapturingProgressLog,
 } from "@atomist/sdm";
 import * as cluster from "cluster";
@@ -156,7 +157,7 @@ function jobSpecWithAffinity(goalSetId: string): string {
  * @returns {Promise<HandlerResult>}
  * @constructor
  */
-export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal.SdmGoal,
+export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
                                                      ctx: HandlerContext,
                                                      progressLog: ProgressLog): Promise<HandlerResult> => {
     const deploymentName = process.env.ATOMIST_DEPLOYMENT_NAME || configurationValue<string>("name");
@@ -213,7 +214,15 @@ export const KubernetesIsolatedGoalLauncher = async (goal: OnAnyRequestedSdmGoal
         },
         {
             name: "ATOMIST_GOAL_ID",
-            value: goal.id,
+            value: (goal as any).id,
+        },
+        {
+            name: "ATOMIST_GOAL_SET_ID",
+            value: goal.goalSetId,
+        },
+        {
+            name: "ATOMIST_GOAL_UNIQUE_NAME",
+            value: goal.uniqueName,
         },
         {
             name: "ATOMIST_CORRELATION_ID",

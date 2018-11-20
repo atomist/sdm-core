@@ -28,12 +28,14 @@ import {
     addressChannelsFor,
     CredentialsResolver,
     GoalApprovalRequestVote,
+    GoalApprovalRequestVoteDecisionManager,
     GoalApprovalRequestVoter,
     GoalApprovalRequestVoterInvocation,
     GoalImplementationMapper,
     RepoRefResolver,
     SdmGoalEvent,
     SdmGoalState,
+    UnanimousGoalApprovalRequestVoteDecisionManager,
     updateGoal,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
@@ -45,18 +47,23 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
  * This allows GoalApprovalVoter instances to vote on the approved goal to decide
  * if this approval request can be granted or not.
  *
- * If one voter denies the request, it will we discarded.
+ * The final decision if the request should be granted based on all votes is delegated to the
+ * configured instance of GoalApprovalRequestVoteDecisionManager.
  */
-@EventHandler("Vote on approved goals",
+@EventHandler("Vote on started or approved goals",
     GraphQL.subscription("OnAnyApprovedSdmGoal"))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly voters: GoalApprovalRequestVoter[],
+                private readonly decisionManager: GoalApprovalRequestVoteDecisionManager,
                 private readonly implementationMapper: GoalImplementationMapper) {
         if (this.voters.length === 0) {
             this.voters.push(async () => ({ vote: GoalApprovalRequestVote.Granted }));
+        }
+        if (!this.decisionManager) {
+            this.decisionManager = UnanimousGoalApprovalRequestVoteDecisionManager;
         }
     }
 
@@ -81,12 +88,11 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         };
 
         const votes = await Promise.all(this.voters.map(v => v(garvi)));
+        const decision = this.decisionManager(...votes);
         const goal = this.implementationMapper.findGoalBySdmGoal(sdmGoal);
 
-        // Policy for now is if one vote denies, we deny the request.
-        if (!votes.some(v => v.vote === GoalApprovalRequestVote.Denied)) {
-            // If there isn't a single granted void. we don't change the request
-            if (votes.some(v => v.vote === GoalApprovalRequestVote.Granted)) {
+        switch (decision) {
+            case GoalApprovalRequestVote.Granted:
                 if (sdmGoal.state === SdmGoalState.pre_approved) {
                     let g = sdmGoal;
                     const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
@@ -104,27 +110,31 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                         description: goal.successDescription,
                     });
                 }
-            }
-        } else {
-            if (sdmGoal.state === SdmGoalState.pre_approved) {
-                const g: SdmGoalEvent = {
-                    ...sdmGoal,
-                    preApproval: undefined,
-                };
-                await updateGoal(context, g, {
-                    state: SdmGoalState.waiting_for_pre_approval,
-                    description: `${goal.waitingForPreApprovalDescription} | start by @${sdmGoal.preApproval.userId} denied`,
-                });
-            } else if (sdmGoal.state === SdmGoalState.approved) {
-                const g: SdmGoalEvent = {
-                    ...sdmGoal,
-                    approval: undefined,
-                };
-                await updateGoal(context, g, {
-                    state: SdmGoalState.waiting_for_approval,
-                    description: `${goal.waitingForApprovalDescription} | approval by @${sdmGoal.approval.userId} denied`,
-                });
-            }
+                break;
+            case GoalApprovalRequestVote.Denied:
+                if (sdmGoal.state === SdmGoalState.pre_approved) {
+                    const g: SdmGoalEvent = {
+                        ...sdmGoal,
+                        preApproval: undefined,
+                    };
+                    await updateGoal(context, g, {
+                        state: SdmGoalState.waiting_for_pre_approval,
+                        description: `${goal.waitingForPreApprovalDescription} | start by @${sdmGoal.preApproval.userId} denied`,
+                    });
+                } else if (sdmGoal.state === SdmGoalState.approved) {
+                    const g: SdmGoalEvent = {
+                        ...sdmGoal,
+                        approval: undefined,
+                    };
+                    await updateGoal(context, g, {
+                        state: SdmGoalState.waiting_for_approval,
+                        description: `${goal.waitingForApprovalDescription} | approval by @${sdmGoal.approval.userId} denied`,
+                    });
+                }
+                break;
+            case GoalApprovalRequestVote.Abstain:
+                // We don't do anything if vote isn't either granted or denied
+                break;
         }
 
         return Success;
