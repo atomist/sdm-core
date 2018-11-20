@@ -17,6 +17,7 @@
 import {
     BitBucketServerRepoRef,
     GitHubRepoRef,
+    GitlabRepoRef,
     logger,
     RemoteRepoRef,
 } from "@atomist/automation-client";
@@ -56,6 +57,15 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                     owner: push.repo.owner,
                     name: push.repo.name,
                     sha: push.after.sha,
+                    branch: push.branch,
+                });
+            case ProviderType.gitlab:
+                return GitlabRepoRef.from({
+                    owner: push.repo.owner,
+                    repo: push.repo.name,
+                    sha: push.after.sha,
+                    rawApiBase: push.repo.org.provider.apiUrl,
+                    gitlabRemoteUrl: push.repo.org.provider.url,
                     branch: push.branch,
                 });
             case ProviderType.bitbucket_cloud:
@@ -103,12 +113,20 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                     rawApiBase: provider.apiUrl,
                 });
             case ProviderType.bitbucket:
-                const providerUrl = provider.url;
                 return this.toBitBucketServerRepoRef({
-                    providerUrl,
+                    providerUrl: provider.url,
                     owner: sdmGoal.push.repo.owner,
                     name: sdmGoal.push.repo.name,
                     sha: sdmGoal.sha,
+                    branch: sdmGoal.branch,
+                });
+            case ProviderType.gitlab:
+                return GitlabRepoRef.from({
+                    owner: sdmGoal.push.repo.owner,
+                    repo: sdmGoal.push.repo.name,
+                    sha: sdmGoal.sha,
+                    rawApiBase: provider.apiUrl,
+                    gitlabRemoteUrl: provider.url,
                     branch: sdmGoal.branch,
                 });
             default:
@@ -126,6 +144,7 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
     public toRemoteRepoRef(repo: CoreRepoFieldsAndChannels.Fragment, opts: { sha?: string, branch?: string } = {}): RemoteRepoRef {
         const providerType = _.get(repo, "org.provider.providerType");
         const apiUrl = _.get(repo, "org.provider.apiUrl");
+        const url = _.get(repo, "org.provider.url");
 
         logger.info("toRemoteRepoRef with GraphQL-sourced repo: %j", repo);
         switch (providerType) {
@@ -147,6 +166,15 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                     sha: opts.sha,
                     branch: opts.branch,
                     providerUrl: apiUrl,
+                });
+            case ProviderType.gitlab:
+                return GitlabRepoRef.from({
+                    owner: repo.owner,
+                    repo: repo.name,
+                    sha: opts.sha,
+                    rawApiBase: apiUrl,
+                    gitlabRemoteUrl: url,
+                    branch: opts.branch,
                 });
             default:
                 throw new Error(`Provider ${repo.org.provider.providerType} not currently supported in SDM`);
