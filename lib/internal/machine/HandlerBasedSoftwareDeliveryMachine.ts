@@ -44,7 +44,6 @@ import { OnRepoCreation } from "../../handlers/events/repo/OnRepoCreation";
 import { OnRepoOnboarded } from "../../handlers/events/repo/OnRepoOnboarded";
 import { OnTag } from "../../handlers/events/repo/OnTag";
 import { OnUserJoiningChannel } from "../../handlers/events/repo/OnUserJoiningChannel";
-import { SendFingerprintToAtomist } from "../../util/webhook/sendFingerprintToAtomist";
 
 /**
  * Implementation of SoftwareDeliveryMachine based on Atomist event handlers.
