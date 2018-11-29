@@ -82,9 +82,7 @@ export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerR
         listener: resetGoalsOnCommit(sdm),
         intent: [
             `reset goals ${sdm.configuration.name.replace("@", "")}`,
-            "reset goals",
             `plan goals ${sdm.configuration.name.replace("@", "")}`,
-            "plan goals",
         ],
     };
 }

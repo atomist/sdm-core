@@ -87,7 +87,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
     return {
         name: "SetGoalState",
         description: "Set state of a particular goal",
-        intent: [`set goal state ${sdm.configuration.name.replace("@", "")}`, "set goal state"],
+        intent: [`set goal state ${sdm.configuration.name.replace("@", "")}`],
         paramsMaker: SetGoalStateParameters,
         listener: async chi => {
             if (!chi.parameters.msgId) {
