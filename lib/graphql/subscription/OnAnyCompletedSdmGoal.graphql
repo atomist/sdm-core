@@ -1,5 +1,14 @@
 subscription OnAnyCompletedSdmGoal {
-  SdmGoal(state: [failure, success, stopped, canceled, waiting_for_pre_approval, waiting_for_approval]) {
+  SdmGoal(
+    state: [
+      failure
+      success
+      stopped
+      canceled
+      waiting_for_pre_approval
+      waiting_for_approval
+    ]
+  ) {
     ...SdmGoalWithGoalsFields
     ...SdmGoalRepo
   }
