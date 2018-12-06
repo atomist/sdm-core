@@ -1,6 +1,7 @@
 subscription OnAnyCompletedSdmGoal {
   SdmGoal(
     state: [
+      in_process
       failure
       success
       stopped

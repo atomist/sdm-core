@@ -16,6 +16,7 @@
 
 import {
     GitHubRepoRef,
+    HandlerContext,
     logger,
 } from "@atomist/automation-client";
 import {
@@ -39,7 +40,7 @@ export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine)
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)} in progress`,
-                target_url: "https://app.atomist.com", // TODO: deep link!
+                target_url: link(inv, inv.context),
                 state: "pending",
             });
         } else {
@@ -60,7 +61,7 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)}: ${completedGoal.description}`,
-                target_url: completedGoal.url, // link to the log of the failed goal
+                target_url: link(inv.completedGoal, inv.context),
                 state: "failure",
             });
         }
@@ -69,7 +70,7 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)}: all succeeded`,
-                target_url: "https://app.atomist.com", // TODO: deep link!
+                target_url: link(inv.completedGoal, inv.context),
                 state: "success",
             });
         }
@@ -109,4 +110,8 @@ function prefix(sdm: SoftwareDeliveryMachine): string {
 
 function context(sdm: SoftwareDeliveryMachine): string {
     return `sdm/${sdm.configuration.name.replace("@", "")}`;
+}
+
+function link(event: { goalSetId: string }, ctx: HandlerContext): string {
+    return `https://app.atomist.com/workspace/${ctx.workspaceId}/goalset/${event.goalSetId}`;
 }
