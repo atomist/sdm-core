@@ -15,7 +15,6 @@
  */
 
 import {
-    AutomationClient,
     automationClientInstance,
     AutomationEventListenerSupport,
     EventIncoming,
@@ -40,7 +39,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         super();
     }
 
-    public eventIncoming(payload: EventIncoming): void {
+    public eventIncoming(payload: EventIncoming) {
         if (cluster.isWorker) {
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
@@ -50,9 +49,8 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         }
     }
 
-    public async startupSuccessful(client: AutomationClient): Promise<void> {
+    public async registrationSuccessful(eventHandler: RequestProcessor) {
         if (cluster.isMaster) {
-            const eventHandler = client.httpHandler;
             const registration = (eventHandler as any).registration as RegistrationConfirmation;
             const teamId = process.env.ATOMIST_GOAL_TEAM;
             const teamName = process.env.ATOMIST_GOAL_TEAM_NAME || teamId;
