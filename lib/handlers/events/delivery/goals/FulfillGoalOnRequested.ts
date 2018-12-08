@@ -139,7 +139,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
-            return executeGoal(
+            const result = await executeGoal(
                 {
                     projectLoader: this.configuration.sdm.projectLoader,
                     goalExecutionListeners: this.goalExecutionListeners,
@@ -153,6 +153,10 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                     await reportEndAndClose(err, start, progressLog);
                     throw err;
                 });
+            return {
+                code: 0,
+                ...result,
+            };
         }
     }
 }

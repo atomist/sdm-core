@@ -93,7 +93,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
         const rules = {
             projectLoader: sdm.configuration.sdm.projectLoader,
             repoRefResolver: sdm.configuration.sdm.repoRefResolver,
-            goalsListeners: sdm.goalsSetListeners,
+            goalsListeners: [...sdm.goalsSetListeners],
             goalSetter: sdm.pushMapping,
             implementationMapping: sdm.goalFulfillmentMapper,
         };

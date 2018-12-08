@@ -44,7 +44,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
                 this.sdm.goalFulfillmentMapper,
-                this.sdm.goalExecutionListeners);
+                [...this.sdm.goalExecutionListeners]);
             automationClientInstance().withEventHandler(maker);
         }
     }
@@ -73,7 +73,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
                 this.sdm.goalFulfillmentMapper,
-                this.sdm.goalExecutionListeners);
+                [...this.sdm.goalExecutionListeners]);
             automationClientInstance().withEventHandler(maker);
 
             // Create event and run event handler

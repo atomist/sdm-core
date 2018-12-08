@@ -43,7 +43,7 @@ export function selfDescribeCommand(sdm: SoftwareDeliveryMachine): CommandHandle
         name: "SelfDescribe",
         listener: selfDescribeListener(sdm),
         description: "Describe this SDM",
-        intent: [ `describe sdm ${sdm.configuration.name.replace("@", "")}`, "describe sdm" ],
+        intent: [`describe sdm ${sdm.configuration.name.replace("@", "")}`],
     };
 }
 
@@ -56,7 +56,7 @@ function selfDescribeListener(sdm: SoftwareDeliveryMachine): CommandListener<NoP
         const gitInfo = info(automationClientInstance().automations.automations);
 
         const msg: SlackMessage = {
-            attachments: [ {
+            attachments: [{
                 author_name: pj.author && pj.author.name ? pj.author.name : pj.author,
                 title: sdm.name,
                 title_link: pj.homepage,
@@ -80,7 +80,7 @@ ${codeLine(`${sdmCorePj.name}:${sdmCorePj.version}`)}`,
             }, {
                 author_name: "Extension Packs",
                 fallback: "Extension Packs",
-                text: sdm.extensionPacks
+                text: [...sdm.extensionPacks]
                     .sort((e1, e2) => e1.name.localeCompare(e2.name))
                     .map(e => `${codeLine(`${e.name}:${e.version}`)} ${e.vendor}`).join("\n"),
             }, {
@@ -96,7 +96,7 @@ ${codeLine(`${sdmCorePj.name}:${sdmCorePj.version}`)}`,
                     .sort((e1, e2) => e1.name.localeCompare(e2.name))
                     .map(e => `${bold(e.name)} ${e.intent.map(i => codeLine(i)).join(", ")} ${e.description}`).join("\n"),
                 footer: `${sdm.configuration.name}:${sdm.configuration.version}`,
-            } ],
+            }],
         };
 
         await cli.context.messageClient.respond(msg);
