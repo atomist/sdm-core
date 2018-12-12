@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { HandlerContext } from "@atomist/automation-client";
+import {
+    DefaultHttpClientFactory,
+    HandlerContext,
+} from "@atomist/automation-client";
 import { SdmGoalEvent } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { DashboardDisplayProgressLog } from "../../lib/log/DashboardDisplayProgressLog";
@@ -51,7 +54,7 @@ describe("DashboardDisplayProgressLog", () => {
 
     it("should construct dashboard log URL", () => {
         const log = new DashboardDisplayProgressLog("http://rolarhost", 1000, 0,
-            context, goal);
+            DefaultHttpClientFactory, context, goal);
         assert.equal(log.url,
             "https://app.atomist.com/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/GoalName/GoalSetId/CorrelationID");
     });

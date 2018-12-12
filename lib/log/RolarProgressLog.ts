@@ -15,14 +15,17 @@
  */
 
 import {
+    DefaultHttpClientFactory,
     doWithRetry,
+    HttpClient,
+    HttpClientFactory,
+    HttpMethod,
     logger,
 } from "@atomist/automation-client";
 import { ProgressLog } from "@atomist/sdm";
-import axios, { AxiosInstance } from "axios";
 import * as _ from "lodash";
-import os = require("os");
 import { WrapOptions } from "retry";
+import os = require("os");
 
 function* timestampGenerator() {
     while (true) {
@@ -35,6 +38,7 @@ function* timestampGenerator() {
  */
 export class RolarProgressLog implements ProgressLog {
 
+    private httpClient: HttpClient;
     private localLogs: LogData[] = [];
     private readonly timer: any;
 
@@ -42,13 +46,13 @@ export class RolarProgressLog implements ProgressLog {
                 private readonly logPath: string[],
                 private readonly bufferSizeLimit: number = 1000,
                 private readonly timerInterval: number = 0,
+                private readonly httpClientFactory: HttpClientFactory,
                 private readonly logLevel: string = "info",
-                private readonly timestamper: Iterator<Date> = timestampGenerator(),
-                private readonly retryOptions: WrapOptions = {},
-                private readonly axiosInstance: AxiosInstance = axios) {
+                private readonly timestamper: Iterator<Date> = timestampGenerator()) {
         if (this.timerInterval > 0) {
             this.timer = setInterval(() => this.flush(), 2000);
         }
+        this.httpClient = httpClientFactory.create(rolarBaseUrl);
     }
 
     get name() {
@@ -59,12 +63,10 @@ export class RolarProgressLog implements ProgressLog {
         return `${this.rolarBaseUrl}/logs/${this.name}`;
     }
 
-    public async isAvailable() {
+    public async isAvailable(): Promise<boolean> {
         const url = `${this.rolarBaseUrl}/api/logs`;
         try {
-            await doWithRetry(() => this.axiosInstance.head(url),
-                `check if Rolar service is available`,
-                this.retryOptions);
+            await this.httpClient.exchange(url, { method: HttpMethod.Head });
             return true;
         } catch (e) {
             logger.warn(`Rolar logger is NOT available at ${url}: ${e}`);
@@ -107,20 +109,20 @@ export class RolarProgressLog implements ProgressLog {
 
             const closedRequestParam = isClosed ? "?closed=true" : "";
             const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
-
-            const result = await doWithRetry(() => this.axiosInstance.post(url, {
-                    host: os.hostname(),
-                    content: postingLogs,
-                }, {
+            let result;
+            try {
+                result = await this.httpClient.exchange(url, {
+                    method: HttpMethod.Post,
+                    body: {
+                        host: os.hostname(),
+                        content: postingLogs,
+                    },
                     headers: { "Content-Type": "application/json" },
-                }).catch(axiosError =>
-                    Promise.reject(new Error(`Failure post to ${url}: ${axiosError.message}`))),
-                `post log to Rolar`,
-                this.retryOptions).catch(e => {
-                    this.localLogs = postingLogs.concat(this.localLogs);
-                    logger.error(e);
-                },
-            );
+                })
+            } catch (err) {
+                this.localLogs = postingLogs.concat(this.localLogs);
+                logger.error(err);
+            }
             return result;
         }
         return Promise.resolve();
@@ -136,7 +138,7 @@ export class RolarProgressLog implements ProgressLog {
     }
 
     private constructMillisTimestamp(d: Date): number {
-        return  d.valueOf();
+        return d.valueOf();
     }
 }
 

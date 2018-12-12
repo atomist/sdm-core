@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { HandlerContext } from "@atomist/automation-client";
+import {
+    HandlerContext,
+    HttpClientFactory,
+} from "@atomist/automation-client";
 import {
     ProgressLog,
     SdmGoalEvent,
@@ -31,10 +34,11 @@ export class DashboardDisplayProgressLog implements ProgressLog {
     constructor(rolarBaseUrl: string,
                 bufferSize: number,
                 flushInterval: number,
+                httpClientFactory: HttpClientFactory,
                 private readonly context: HandlerContext,
                 private readonly sdmGoal: SdmGoalEvent) {
         this.rolarProgressLog =
-            new RolarProgressLog(rolarBaseUrl, constructLogPath(context, sdmGoal), bufferSize, flushInterval);
+            new RolarProgressLog(rolarBaseUrl, constructLogPath(context, sdmGoal), bufferSize, flushInterval, httpClientFactory);
     }
 
     get name() {
