@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm/compare/1.1.0...HEAD)
 
+### Changed
+
+-   Move rolar log to use HttpClient and factory. [#87](https://github.com/atomist/sdm-core/issues/87)
+
 ## [1.1.0](https://github.com/atomist/sdm/compare/1.0.2...1.1.0) - 2018-12-08
 
 ### Added
