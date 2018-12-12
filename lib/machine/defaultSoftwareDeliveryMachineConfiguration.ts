@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    Configuration,
-} from "@atomist/automation-client";
+import { Configuration } from "@atomist/automation-client";
 import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operations/generate/remoteGitProjectPersister";
 import {
     allReposInTeam,
@@ -36,9 +34,11 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
         sdm: {
             artifactStore: new EphemeralLocalArtifactStore(),
             projectLoader: new CachingProjectLoader(),
-            logFactory: rolarAndDashboardLogFactory(_.get(configuration, "sdm.rolar.url"),
+            logFactory: rolarAndDashboardLogFactory(
+                _.get(configuration, "sdm.rolar.url", "https://rolar.cfapps.io"),
                 _.get(configuration, "sdm.rolar.bufferSize", 1000),
-                _.get(configuration, "sdm.rolar.flushInterval", 1000)),
+                _.get(configuration, "sdm.rolar.flushInterval", 1000),
+                configuration.http.client.factory),
             credentialsResolver: new GitHubCredentialsResolver(),
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),

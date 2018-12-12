@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
+import {
+    DefaultHttpClientFactory,
+    HttpClientFactory,
+} from "@atomist/automation-client";
 import {
     createEphemeralProgressLog,
     firstAvailableProgressLog,
@@ -33,13 +36,13 @@ import { DashboardDisplayProgressLog } from "./DashboardDisplayProgressLog";
  */
 export function rolarAndDashboardLogFactory(rolarBaseUrl?: string,
                                             bufferSize: number = 1000,
-                                            flushInterval: number = 2000): ProgressLogFactory {
+                                            flushInterval: number = 2000,
+                                            httpClientFactory: HttpClientFactory = DefaultHttpClientFactory): ProgressLogFactory {
     let persistentLogFactory = (context, sdmGoal, fallback) => firstAvailableProgressLog(fallback);
     if (rolarBaseUrl) {
-        logger.info("Logging with Rolar: " + rolarBaseUrl);
         persistentLogFactory = (context, sdmGoal, fallback) => {
             return firstAvailableProgressLog(
-                new DashboardDisplayProgressLog(rolarBaseUrl, bufferSize, flushInterval, context, sdmGoal),
+                new DashboardDisplayProgressLog(rolarBaseUrl, bufferSize, flushInterval, httpClientFactory, context, sdmGoal),
                 fallback,
             );
         };
