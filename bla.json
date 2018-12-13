@@ -1,0 +1,3534 @@
+{
+  "data": {
+    "SdmGoal": [{
+      "externalKey": "sdm/atomist/0-code/publish-approval",
+      "description": "Publishing",
+      "push": {
+        "after": {
+          "committer": {
+            "login": "cdupuis",
+            "person": {
+              "chatId": {
+                "screenName": "cd"
+              },
+              "emails": [{
+                "address": "cd@atomist.com"
+              }],
+              "forename": "Christian",
+              "gitHubId": {
+                "login": "cdupuis"
+              },
+              "name": "Christian Dupuis",
+              "surname": "Dupuis"
+            }
+          },
+          "image": null,
+          "images": [],
+          "message": "Update to latest sdm",
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "tags": [{
+            "description": "",
+            "name": "1.1.1-master.20181213194325",
+            "release": null,
+            "timestamp": "2018-12-13T19:44:27.693Z"
+          }, {
+            "description": "",
+            "name": "1.1.1-master.20181213194325+sdm.590",
+            "release": null,
+            "timestamp": "2018-12-13T19:44:21.630Z"
+          }]
+        },
+        "before": {
+          "committer": {
+            "login": "atomist-bot",
+            "person": {
+              "chatId": {
+                "screenName": "bot"
+              },
+              "emails": [{
+                "address": "bot@atomist.com"
+              }],
+              "forename": "Bot",
+              "gitHubId": {
+                "login": "atomist-bot"
+              },
+              "name": "Bot Bot",
+              "surname": "Bot"
+            }
+          },
+          "message": "Autofix: Third party licenses\n\n[atomist:generated] [atomist:autofix=third_party_licenses]",
+          "sha": "0873e3018da3bd6eb1daa87bc2c9a5cfcbec8900"
+        },
+        "branch": "master",
+        "commits": [{
+          "author": {
+            "_id": 469171,
+            "login": "cdupuis",
+            "name": "Christian Dupuis"
+          },
+          "message": "Update to latest sdm",
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "timestamp": "2018-12-13T20:41:55+01:00"
+        }],
+        "goals": [{
+          "externalKey": "sdm/atomist/0-code/version#goals.ts:40",
+          "description": "Versioned `1.1.1-master.20181213194325`",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }],
+          "uniqueName": "version#goals.ts:40",
+          "name": "version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "post-hook",
+          "state": "success",
+          "ts": 1544730206247,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-versioner"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/version/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730206247,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730203554,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 6,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/version#goals.ts:40",
+          "description": "Calculating project version",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }],
+          "uniqueName": "version#goals.ts:40",
+          "name": "version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730204646,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-versioner"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/version/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730204646,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730203554,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/fingerprint#goals.ts:45",
+          "description": "Running fingerprint calculations",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "fingerprint#goals.ts:45",
+          "name": "fingerprint",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730133344,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "fingerprint-fingerprint#goals.ts:45"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/fingerprint/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730133344,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/2-prod/changelog#goals.ts:50",
+          "description": "Planned: update changelog",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "2-prod",
+            "name": "increment version",
+            "uniqueName": "release-version"
+          }],
+          "uniqueName": "changelog#goals.ts:50",
+          "name": "update changelog",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "changelog-changelog#goals.ts:50"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "2-prod",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/autofix#goals.ts:41",
+          "description": "No autofixes applied",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "autofix#goals.ts:41",
+          "name": "autofix",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "success",
+          "ts": 1544730202474,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "autofix-autofix#goals.ts:41"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/autofix/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-autofix",
+            "ts": 1544730202474,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 5,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730219710,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730219710,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "gql-gen",
+          "state": "in_process",
+          "ts": 1544730224785,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730224785,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 7,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Build successful",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "post-hook",
+          "state": "success",
+          "ts": 1544730261223,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730261223,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 12,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/tag#goals.ts:43",
+          "description": "Tagged",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "tag#goals.ts:43",
+          "name": "tag",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "success",
+          "ts": 1544730267216,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "tag#goals.ts:43"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/tag/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730267216,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263323,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 4,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "pre-hook",
+          "state": "in_process",
+          "ts": 1544730274974,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730274974,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 4,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm version",
+          "state": "in_process",
+          "ts": 1544730278651,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730278651,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 6,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "tsc",
+          "state": "in_process",
+          "ts": 1544730287471,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730287471,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 10,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "post-hook",
+          "state": "in_process",
+          "ts": 1544730309661,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730309661,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 15,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/2-prod/release-npm",
+          "description": "Planned: release NPM package",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "publish",
+            "uniqueName": "publish-approval"
+          }, {
+            "environment": "0-code",
+            "name": "code inspection",
+            "uniqueName": "code-inspection#goals.ts:38"
+          }],
+          "uniqueName": "release-npm",
+          "name": "release NPM package",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126148,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-release"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126148,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "2-prod",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/2-prod/release-docs",
+          "description": "Planned: publish docs",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "publish",
+            "uniqueName": "publish-approval"
+          }, {
+            "environment": "0-code",
+            "name": "code inspection",
+            "uniqueName": "code-inspection#goals.ts:38"
+          }],
+          "uniqueName": "release-docs",
+          "name": "publish docs",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126148,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-docs-release"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126148,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "2-prod",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/push-impact#goals.ts:39",
+          "description": "Ready: push impact",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "push-impact#goals.ts:39",
+          "name": "push impact",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "push-impact-push-impact#goals.ts:39"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/push-impact#goals.ts:39",
+          "description": "Running push impact analysis",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "push-impact#goals.ts:39",
+          "name": "push impact",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730128170,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "push-impact-push-impact#goals.ts:39"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/push impact/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730128170,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/fingerprint#goals.ts:45",
+          "description": "Fingerprinted",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "fingerprint#goals.ts:45",
+          "name": "fingerprint",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "success",
+          "ts": 1544730133545,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "fingerprint-fingerprint#goals.ts:45"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/fingerprint/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730133545,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/version#goals.ts:40",
+          "description": "Ready: version",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }],
+          "uniqueName": "version#goals.ts:40",
+          "name": "version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730203554,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-versioner"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730203554,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/version#goals.ts:40",
+          "description": "Calculating project version",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }],
+          "uniqueName": "version#goals.ts:40",
+          "name": "version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "post-hook",
+          "state": "in_process",
+          "ts": 1544730206159,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-versioner"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/version/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730206159,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730203554,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 5,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "pre-hook",
+          "state": "in_process",
+          "ts": 1544730220270,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730220270,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 4,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm install",
+          "state": "in_process",
+          "ts": 1544730220816,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730220816,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 5,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm compile",
+          "state": "in_process",
+          "ts": 1544730223856,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730223856,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 6,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Approval required: Published",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "post-hook",
+          "state": "waiting_for_approval",
+          "ts": 1544730309745,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [{
+            "label": "NPM package",
+            "url": "https://registry.npmjs.org/@atomist/sdm-core/-/@atomist/sdm-core-1.1.1-master.20181213194325.tgz"
+          }],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730309745,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 16,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "mocha",
+          "state": "in_process",
+          "ts": 1544730242251,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730242251,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 9,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/code-inspection#goals.ts:38",
+          "description": "Running code inspections",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "code-inspection#goals.ts:38",
+          "name": "code inspection",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730265032,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "code-inspections-code-inspection#goals.ts:38"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/code inspection/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730265032,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263323,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/2-prod/release-tag",
+          "description": "Planned: create release tag",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "2-prod",
+            "name": "release NPM package",
+            "uniqueName": "release-npm"
+          }],
+          "uniqueName": "release-tag",
+          "name": "create release tag",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "tag-release"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "2-prod",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/fingerprint#goals.ts:45",
+          "description": "Ready: fingerprint",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "fingerprint#goals.ts:45",
+          "name": "fingerprint",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "fingerprint-fingerprint#goals.ts:45"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/2-prod/release-version",
+          "description": "Planned: increment version",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "publish",
+            "uniqueName": "publish-approval"
+          }, {
+            "environment": "0-code",
+            "name": "code inspection",
+            "uniqueName": "code-inspection#goals.ts:38"
+          }],
+          "uniqueName": "release-version",
+          "name": "increment version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126148,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-release-version"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126148,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "2-prod",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/autofix#goals.ts:41",
+          "description": "Applying autofixes",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "autofix#goals.ts:41",
+          "name": "autofix",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730137249,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "autofix-autofix#goals.ts:41"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/autofix/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-autofix",
+            "ts": 1544730137249,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm install",
+          "state": "in_process",
+          "ts": 1544730275583,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730275583,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 5,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm compile",
+          "state": "in_process",
+          "ts": 1544730279240,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730279240,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 8,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm publish",
+          "state": "in_process",
+          "ts": 1544730296271,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730296271,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 11,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "tsc",
+          "state": "in_process",
+          "ts": 1544730232227,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730232227,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 8,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/version#goals.ts:40",
+          "description": "Calculating project version",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }],
+          "uniqueName": "version#goals.ts:40",
+          "name": "version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "pre-hook",
+          "state": "in_process",
+          "ts": 1544730205175,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-versioner"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/version/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730205175,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730203554,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 4,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/tag#goals.ts:43",
+          "description": "Tagging",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "tag#goals.ts:43",
+          "name": "tag",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730264982,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "tag#goals.ts:43"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/tag/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730264982,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263323,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/autofix#goals.ts:41",
+          "description": "Applying autofixes",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "autofix#goals.ts:41",
+          "name": "autofix",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm install",
+          "state": "in_process",
+          "ts": 1544730202378,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "autofix-autofix#goals.ts:41"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/autofix/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-autofix",
+            "ts": 1544730202378,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 4,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/code-inspection#goals.ts:38",
+          "description": "Ready: code inspection",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "code-inspection#goals.ts:38",
+          "name": "code inspection",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730263323,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "code-inspections-code-inspection#goals.ts:38"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263323,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/push-impact#goals.ts:39",
+          "description": "Completed push impact analysis",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "push-impact#goals.ts:39",
+          "name": "push impact",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "success",
+          "ts": 1544730130530,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "push-impact-push-impact#goals.ts:39"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/push impact/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730130530,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/autofix#goals.ts:41",
+          "description": "Ready: autofix",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "autofix#goals.ts:41",
+          "name": "autofix",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "autofix-autofix#goals.ts:41"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/version#goals.ts:40",
+          "description": "Planned: version",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }],
+          "uniqueName": "version#goals.ts:40",
+          "name": "version",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126147,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-versioner"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm compile",
+          "state": "in_process",
+          "ts": 1544730309654,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730309654,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 14,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm install",
+          "state": "in_process",
+          "ts": 1544730259983,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730259983,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 10,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Building",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "post-hook",
+          "state": "in_process",
+          "ts": 1544730261119,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/build/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-build",
+            "ts": 1544730261119,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 11,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/tag#goals.ts:43",
+          "description": "Planned: tag",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "tag#goals.ts:43",
+          "name": "tag",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "tag#goals.ts:43"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/code-inspection#goals.ts:38",
+          "description": "Planned: code inspection",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "code-inspection#goals.ts:38",
+          "name": "code inspection",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126131,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "code-inspections-code-inspection#goals.ts:38"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Planned: build",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126147,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Planned: publish",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "planned",
+          "ts": 1544730126144,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 1,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/tag#goals.ts:43",
+          "description": "Ready: tag",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "tag#goals.ts:43",
+          "name": "tag",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730263323,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "tag#goals.ts:43"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263323,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Ready: publish",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730263324,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/autofix#goals.ts:41",
+          "description": "Applying autofixes",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [],
+          "uniqueName": "autofix#goals.ts:41",
+          "name": "autofix",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm install",
+          "state": "in_process",
+          "ts": 1544730138850,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "autofix-autofix#goals.ts:41"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/autofix/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-autofix",
+            "ts": 1544730138850,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/build#goals.ts:42",
+          "description": "Ready: build",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "autofix",
+            "uniqueName": "autofix#goals.ts:41"
+          }, {
+            "environment": "0-code",
+            "name": "version",
+            "uniqueName": "version#goals.ts:40"
+          }],
+          "uniqueName": "build#goals.ts:42",
+          "name": "build",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "requested",
+          "ts": 1544730207526,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-run-build"
+          },
+          "url": null,
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730207526,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126147,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 2,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": true,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "in_process",
+          "ts": 1544730274411,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730274412,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 3,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm compile",
+          "state": "in_process",
+          "ts": 1544730279206,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730279206,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 7,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "gql-gen",
+          "state": "in_process",
+          "ts": 1544730279973,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730279973,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 9,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/code-inspection#goals.ts:38",
+          "description": "Approval required: Code inspections passed",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "code-inspection#goals.ts:38",
+          "name": "code inspection",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": null,
+          "state": "waiting_for_approval",
+          "ts": 1544730290547,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "code-inspections-code-inspection#goals.ts:38"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/code inspection/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730290547,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263323,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126131,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 4,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": false,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm install",
+          "state": "in_process",
+          "ts": 1544730309646,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730309646,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 12,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }, {
+          "externalKey": "sdm/atomist/0-code/publish-approval",
+          "description": "Publishing",
+          "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+          "preApproval": null,
+          "preConditions": [{
+            "environment": "0-code",
+            "name": "build",
+            "uniqueName": "build#goals.ts:42"
+          }],
+          "uniqueName": "publish-approval",
+          "name": "publish",
+          "goalSet": "Build with Release",
+          "externalUrl": null,
+          "phase": "npm version",
+          "state": "in_process",
+          "ts": 1544730309648,
+          "fulfillment": {
+            "method": "sdm",
+            "name": "npm-publish"
+          },
+          "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+          "externalUrls": [],
+          "provenance": [{
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "FulfillGoalOnRequested",
+            "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+            "ts": 1544730309648,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "RequestDownstreamGoalsOnGoalSuccess",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730263324,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }, {
+            "channelId": null,
+            "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+            "name": "SetGoalsOnPush",
+            "registration": "@atomist/atomist-sdm",
+            "ts": 1544730126144,
+            "userId": null,
+            "version": "1.0.2-master.20181211174242"
+          }],
+          "error": null,
+          "environment": "0-code",
+          "repo": {
+            "name": "sdm-core",
+            "owner": "atomist",
+            "providerId": "zjlmxjzwhurspem"
+          },
+          "version": 13,
+          "preApprovalRequired": false,
+          "branch": "master",
+          "retryFeasible": false,
+          "approvalRequired": true,
+          "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+          "approval": null,
+          "data": null
+        }],
+        "id": "T29E48P34_ebfede61e57eeed47cc16a7b92f967c65ff6ea51_master",
+        "repo": {
+          "channels": [{
+            "id": "T29E48P34_CBC153VUJ",
+            "name": "sdm-core",
+            "team": {
+              "id": "T29E48P34"
+            }
+          }],
+          "defaultBranch": "master",
+          "name": "sdm-core",
+          "org": {
+            "owner": "atomist",
+            "ownerType": "organization",
+            "provider": {
+              "apiUrl": "https://api.github.com/",
+              "providerId": "zjlmxjzwhurspem",
+              "providerType": "github_com",
+              "url": "https://github.com/"
+            }
+          },
+          "owner": "atomist"
+        },
+        "timestamp": "2018-12-13T19:42:03.851Z"
+      },
+      "goalSetId": "b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d",
+      "preApproval": null,
+      "preConditions": [{
+        "environment": "0-code",
+        "name": "build",
+        "uniqueName": "build#goals.ts:42"
+      }],
+      "uniqueName": "publish-approval",
+      "name": "publish",
+      "goalSet": "Build with Release",
+      "externalUrl": null,
+      "phase": "npm install",
+      "state": "in_process",
+      "ts": 1544730309646,
+      "fulfillment": {
+        "method": "sdm",
+        "name": "npm-publish"
+      },
+      "url": "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-core/ebfede61e57eeed47cc16a7b92f967c65ff6ea51/0-code/publish/b1ccbcb4-11a4-4568-b4a6-07dffaaaef0d/c8524623-b12b-48a5-9845-cb87d3bf8264",
+      "externalUrls": [],
+      "provenance": [{
+        "channelId": null,
+        "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+        "name": "FulfillGoalOnRequested",
+        "registration": "@atomist/atomist-sdm-job-b1ccbcb-publish-approval",
+        "ts": 1544730309646,
+        "userId": null,
+        "version": "1.0.2-master.20181211174242"
+      }, {
+        "channelId": null,
+        "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+        "name": "RequestDownstreamGoalsOnGoalSuccess",
+        "registration": "@atomist/atomist-sdm",
+        "ts": 1544730263324,
+        "userId": null,
+        "version": "1.0.2-master.20181211174242"
+      }, {
+        "channelId": null,
+        "correlationId": "c8524623-b12b-48a5-9845-cb87d3bf8264",
+        "name": "SetGoalsOnPush",
+        "registration": "@atomist/atomist-sdm",
+        "ts": 1544730126144,
+        "userId": null,
+        "version": "1.0.2-master.20181211174242"
+      }],
+      "error": null,
+      "environment": "0-code",
+      "repo": {
+        "name": "sdm-core",
+        "owner": "atomist",
+        "providerId": "zjlmxjzwhurspem"
+      },
+      "version": 12,
+      "preApprovalRequired": false,
+      "branch": "master",
+      "retryFeasible": false,
+      "approvalRequired": true,
+      "sha": "ebfede61e57eeed47cc16a7b92f967c65ff6ea51",
+      "approval": null,
+      "data": null
+    }]
+  },
+  "extensions": {
+    "operationName": "RespondOnGoalCompletion",
+    "query_id": "0f7d2ba7-ad33-4bf5-bc8a-448c68b863c6",
+    "team_id": "T29E48P34",
+    "team_name": "atomist-community",
+    "correlation_id": "c8524623-b12b-48a5-9845-cb87d3bf8264"
+  },
+  "api_version": "1",
+  "secrets": [{
+    "uri": "github://org_token",
+    "value": "a**************************************5"
+  }]
+}
