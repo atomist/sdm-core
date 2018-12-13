@@ -119,6 +119,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const goalInvocation: GoalInvocation = {
             configuration: this.configuration,
             sdmGoal,
+            goalEvent: sdmGoal,
             goal,
             progressLog,
             context: ctx,

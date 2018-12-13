@@ -43,15 +43,15 @@
     "tmp-promise": "^1.0.4"
   },
   "peerDependencies": {
-    "@atomist/automation-client": ">=1.1.0",
-    "@atomist/sdm": ">=1.1.0",
+    "@atomist/automation-client": ">=1.2.0",
+    "@atomist/sdm": ">=1.2.0",
     "@atomist/slack-messages": ">=1.1.0",
     "@atomist/tree-path": ">=1.0.1",
     "@atomist/microgrammar": ">=1.0.1"
   },
   "devDependencies": {
     "@atomist/automation-client": "1.2.0-master.20181212094239",
-    "@atomist/sdm": "^1.1.0",
+    "@atomist/sdm": "1.2.0-master.20181213171110",
     "@atomist/slack-messages": "^1.1.0",
     "@types/lodash": "^4.14.116",
     "@types/mocha": "^5.2.5",
