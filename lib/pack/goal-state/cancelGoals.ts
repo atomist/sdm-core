@@ -47,7 +47,7 @@ export function cancelGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHand
     return {
         name: "CancelGoalSets",
         description: "Cancel one or all pending goal sets of this SDM",
-        intent: `cancel goal sets ${sdm.configuration.name}`,
+        intent: `cancel goal sets ${sdm.configuration.name.replace("@", "")}`,
         parameters: { goalSetId: { required: false, description: "ID of the goal set to cancel" } },
         listener: async ci => {
             if (!!ci.parameters.goalSetId) {
