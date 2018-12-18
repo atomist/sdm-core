@@ -22,6 +22,4 @@
 /assets/kubectl/
 *.log
 *.txt
-*.ts
-!*.d.ts
 graphql.schema.json
