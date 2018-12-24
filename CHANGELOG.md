@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
--   Add command in process goal set. [04e8484](https://github.com/atomist/sdm-core/commit/04e84846100aab4fcc1037613a520bd5b8672f8b)
+-   Add command to cancel in process goal set. [04e8484](https://github.com/atomist/sdm-core/commit/04e84846100aab4fcc1037613a520bd5b8672f8b)
 
 ### Changed
 
