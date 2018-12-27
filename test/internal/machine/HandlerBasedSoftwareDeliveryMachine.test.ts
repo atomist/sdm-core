@@ -17,56 +17,23 @@
 import {
     InMemoryProject,
     InMemoryProjectFile,
-    projectUtils,
 } from "@atomist/automation-client";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     AnyPush,
     Autofix,
-    AutofixRegistration,
-    Builder,
     ExtensionPack,
     fakePush,
     Goal,
     Goals,
     GoalsSetListener,
-    hasFile,
     PushImpact,
-    PushListenerInvocation,
-    pushTest,
-    PushTest,
     whenPushSatisfies,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { fakeSoftwareDeliveryMachineConfiguration } from "../../blueprint/sdmGoalImplementation.test";
-
-export const IsTypeScript: PushTest = pushTest(
-    "Is TypeScript",
-    async (pi: PushListenerInvocation) => projectUtils.fileExists(pi.project, "**/*.ts", () => true),
-);
-
-const AddThingAutofix: AutofixRegistration = {
-    name: "AddThing",
-    pushTest: IsTypeScript,
-    transform: async (p, cri) => {
-        await p.addFile("thing", "1");
-        return { edited: true, success: true, target: p };
-    },
-};
-
-const HasAtomistBuildFile = hasFile(".atomist/build.sh");
-
-const fakeBuilder: Builder = {
-    name: "fake",
-    async initiateBuild() {
-        // do nothing
-    },
-    logInterpreter: () => {
-        return null;
-    },
-};
 
 const NoGoals = new Goals("No action needed", new Goal({
     uniqueName: "nevermind",

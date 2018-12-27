@@ -77,7 +77,7 @@ export class GitHubReleaseArtifactStore implements ArtifactStore {
     // Name is of format fintan-0.1.0-SNAPSHOT.jar
     public async checkout(url: string, id: RemoteRepoRef, creds: ProjectOperationCredentials): Promise<DeployableArtifact> {
         logger.info("Attempting to download artifact [%s] for %j", url, id);
-        const tmpDir = tmp.dirSync({unsafeCleanup: true});
+        const tmpDir = tmp.dirSync({ unsafeCleanup: true });
         const cwd = tmpDir.name;
         const lastSlash = url.lastIndexOf("/");
         const filename = url.substring(lastSlash + 1);
@@ -147,11 +147,13 @@ export function uploadAsset(token: string,
         .then(async result => {
             const file = (await promisify(fs.readFile)(path)).buffer;
             const contentLength = (await promisify(fs.stat)(path)).size;
-            return github.repos.uploadAsset({
+            return github.repos.uploadReleaseAsset({
                 url: result.data.upload_url,
                 file,
-                contentType,
-                contentLength,
+                headers: {
+                    "content-length": contentLength,
+                    "content-type": contentType,
+                },
                 name: p.basename(path),
             });
         })
@@ -168,6 +170,6 @@ export function githubApi(token: string, apiUrl: string = "https://api.github.co
         port: +url.port,
     });
 
-    gitHubApi.authenticate({type: "token", token});
+    gitHubApi.authenticate({ type: "token", token });
     return gitHubApi;
 }
