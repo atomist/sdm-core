@@ -50,8 +50,8 @@
     "@atomist/microgrammar": ">=1.0.1"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.2.0-master.20181227212650",
-    "@atomist/sdm": "1.2.0-master.20181227213905",
+    "@atomist/automation-client": "^1.2.0",
+    "@atomist/sdm": "^1.2.0",
     "@atomist/slack-messages": "^1.1.0",
     "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",
