@@ -16,6 +16,7 @@
 
 import {
     GitHubRepoRef,
+    Maker,
     MappedParameter,
     MappedParameters,
     Parameters,
@@ -28,6 +29,7 @@ import {
     CommandListenerInvocation,
     GitHubRepoTargets,
     RepoTargetingParameters,
+    RepoTargets,
     slackSuccessMessage,
     slackWarningMessage,
     SoftwareDeliveryMachine,
@@ -58,10 +60,11 @@ export class ResetGoalsParameters {
 
 }
 
-export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration {
+export function resetGoalsCommand(sdm: SoftwareDeliveryMachine,
+                                  repoTargets: Maker<RepoTargets> = GitHubRepoTargets): CommandHandlerRegistration {
     return {
         name: "ResetGoalsOnCommit",
-        paramsMaker: toRepoTargetingParametersMaker(ResetGoalsParameters, GitHubRepoTargets),
+        paramsMaker: toRepoTargetingParametersMaker(ResetGoalsParameters, repoTargets),
         listener: resetGoalsOnCommit(sdm),
         intent: [
             `reset goals ${sdm.configuration.name.replace("@", "")}`,

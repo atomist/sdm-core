@@ -18,6 +18,7 @@ import {
     buttonForCommand,
     GitHubRepoRef,
     guid,
+    Maker,
     MappedParameter,
     MappedParameters,
     menuForCommand,
@@ -30,6 +31,7 @@ import {
     fetchGoalsForCommit,
     GitHubRepoTargets,
     RepoTargetingParameters,
+    RepoTargets,
     SdmGoalState,
     slackSuccessMessage,
     SoftwareDeliveryMachine,
@@ -74,12 +76,13 @@ class SetGoalStateParameters {
 
 }
 
-export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<SetGoalStateParameters & RepoTargetingParameters> {
+export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
+                                    repoTargets: Maker<RepoTargets> = GitHubRepoTargets): CommandHandlerRegistration<SetGoalStateParameters & RepoTargetingParameters> {
     return {
         name: "SetGoalState",
         description: "Set state of a particular goal",
         intent: [`set goal state ${sdm.configuration.name.replace("@", "")}`],
-        paramsMaker: toRepoTargetingParametersMaker(SetGoalStateParameters, GitHubRepoTargets),
+        paramsMaker: toRepoTargetingParametersMaker(SetGoalStateParameters, repoTargets),
         listener: async chi => {
             if (!chi.parameters.msgId) {
                 chi.parameters.msgId = guid();

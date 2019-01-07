@@ -16,6 +16,7 @@
 
 import {
     AutomationContextAware,
+    configurationValue,
     HandlerContext,
     Parameters,
     ProjectOperationCredentials,
@@ -57,9 +58,13 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
             return { token: this.orgToken };
         } else if (this.hasToken(this.clientToken)) {
             return { token: this.clientToken };
+        } else if (this.hasToken(configurationValue("token"))) {
+            return { token: configurationValue("token")}
+        } else if (this.hasToken(configurationValue("sdm.github.token"))) {
+            return { token: configurationValue("sdm.github.token")}
         }
         throw new Error("Neither 'orgToken' nor 'clientToken' has been injected. " +
-            "Please add a repo-scoped GitHub token to your configuration.");
+            "Please add a repo-scoped GitHub token to your configuration at 'token' or 'sdm.github.token'.");
     }
 
     private hasToken(token: string) {
