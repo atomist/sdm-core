@@ -24,8 +24,8 @@ import {
 } from "@atomist/automation-client";
 import { ProgressLog } from "@atomist/sdm";
 import * as _ from "lodash";
-import { WrapOptions } from "retry";
 import os = require("os");
+import { WrapOptions } from "retry";
 
 function* timestampGenerator() {
     while (true) {
@@ -38,7 +38,7 @@ function* timestampGenerator() {
  */
 export class RolarProgressLog implements ProgressLog {
 
-    private httpClient: HttpClient;
+    private readonly httpClient: HttpClient;
     private localLogs: LogData[] = [];
     private readonly timer: any;
 
@@ -118,7 +118,7 @@ export class RolarProgressLog implements ProgressLog {
                         content: postingLogs,
                     },
                     headers: { "Content-Type": "application/json" },
-                })
+                });
             } catch (err) {
                 this.localLogs = postingLogs.concat(this.localLogs);
                 logger.error(err);

@@ -31,7 +31,7 @@ describe("RolarProgressLog", () => {
     class MockHttpClientFactory implements HttpClientFactory {
 
         constructor(private readonly axiosInstance: AxiosInstance = axios.create()) {
-        };
+        }
 
         public create() {
             return new MockHttpClient(this.axiosInstance);
@@ -41,7 +41,7 @@ describe("RolarProgressLog", () => {
     class MockHttpClient implements HttpClient {
 
         constructor(private readonly axiosInstance: AxiosInstance) {
-        };
+        }
 
         public exchange<T>(url: string, options?: HttpClientOptions): Promise<HttpResponse<T>> {
             const optionsToUse: HttpClientOptions = {
@@ -70,7 +70,6 @@ describe("RolarProgressLog", () => {
         }
     }
 
-
     function* fakeTimestampGenerator() {
         let index = 0;
         while (true) {
@@ -80,7 +79,14 @@ describe("RolarProgressLog", () => {
 
     it("should be available if returning http 200", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory(axiosInstance), "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(axiosInstance),
+            "info",
+            fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onHead("http://fakehost/api/logs").replyOnce(200);
 
@@ -89,7 +95,14 @@ describe("RolarProgressLog", () => {
 
     it("should not be available if returning http 404", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory(axiosInstance), "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(axiosInstance),
+            "info",
+            fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onHead("http://fakehost/api/logs").replyOnce(404);
 
@@ -97,7 +110,14 @@ describe("RolarProgressLog", () => {
     });
 
     it("should write logs to memory", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory, "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(),
+            "info",
+            fakeTimestampGenerator());
 
         log.write("I'm a lumberjack and I'm OK");
         log.write("I sleep all night and I work all day");
@@ -120,7 +140,15 @@ describe("RolarProgressLog", () => {
 
     it("should flush logs", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory(axiosInstance), "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(axiosInstance),
+            "info",
+            fakeTimestampGenerator());
+
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test")
             .replyOnce(config => {
@@ -152,7 +180,14 @@ describe("RolarProgressLog", () => {
 
     it("should not clear logs if flush fails", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory(axiosInstance), "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(axiosInstance),
+            "info",
+            fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test")
             .replyOnce(404);
@@ -179,7 +214,14 @@ describe("RolarProgressLog", () => {
 
     it("should close logs", async () => {
         const axiosInstance = axios.create();
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory(axiosInstance), "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(axiosInstance),
+            "info",
+            fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test?closed=true")
             .replyOnce(config => {
@@ -204,7 +246,14 @@ describe("RolarProgressLog", () => {
 
     it("should flush logs automatically", async () => {
         const axiosInstance = axios.create();
-        const smallBufferLog = new RolarProgressLog("http://fakehost", ["test"], 50, 0, new MockHttpClientFactory(axiosInstance), "info", fakeTimestampGenerator());
+        const smallBufferLog = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            50,
+            0,
+            new MockHttpClientFactory(axiosInstance),
+            "info",
+            fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
         mockAxios.onPost("http://fakehost/api/logs/test")
             .replyOnce(config => {
@@ -234,13 +283,26 @@ describe("RolarProgressLog", () => {
     });
 
     it("should provide a link to the log", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test", "it"], 10000, 0, new MockHttpClientFactory(), "info", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test", "it"],
+            10000,
+            0,
+            new MockHttpClientFactory(),
+            "info", fakeTimestampGenerator());
 
         assert.equal(log.url, "http://fakehost/logs/test/it");
     });
 
     it("should log as debug", async () => {
-        const log = new RolarProgressLog("http://fakehost", ["test"], 10000, 0, new MockHttpClientFactory(), "debug", fakeTimestampGenerator());
+        const log = new RolarProgressLog(
+            "http://fakehost",
+            ["test"],
+            10000,
+            0,
+            new MockHttpClientFactory(),
+            "debug",
+            fakeTimestampGenerator());
 
         log.write("I'm a lumberjack and I'm OK");
         log.write("I sleep all night and I work all day");
