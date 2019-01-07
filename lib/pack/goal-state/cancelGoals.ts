@@ -115,9 +115,9 @@ async function cancelGoalSet(goalSetId: string, ctx: HandlerContext): Promise<vo
     }
 
     if (result && result.SdmGoalSet && result.SdmGoalSet.length === 1) {
-        const goalSet = result.SdmGoalSet[0];
+        const gs = result.SdmGoalSet[0];
         const newGoalSet = {
-            ...goalSet,
+            ...gs,
             state: SdmGoalState.canceled,
         };
         await ctx.messageClient.send(newGoalSet, addressEvent(GoalSetRootType));

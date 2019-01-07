@@ -18,10 +18,7 @@ import {
     GitHubRepoRef,
     MappedParameter,
     MappedParameters,
-    Parameter,
     Parameters,
-    Secret,
-    Secrets,
     Success,
     Value,
 } from "@atomist/automation-client";
@@ -30,6 +27,7 @@ import {
     CommandHandlerRegistration,
     CommandListenerInvocation,
     GitHubRepoTargets,
+    RepoTargetingParameters,
     slackSuccessMessage,
     slackWarningMessage,
     SoftwareDeliveryMachine,
@@ -49,23 +47,8 @@ import {
 @Parameters()
 export class ResetGoalsParameters {
 
-    @Secret(Secrets.UserToken)
-    public token: string;
-
-    @MappedParameter(MappedParameters.GitHubOwner)
-    public owner: string;
-
-    @MappedParameter(MappedParameters.GitHubRepository)
-    public repo: string;
-
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
-
-    @Parameter({ required: false })
-    public sha: string;
-
-    @Parameter({ required: false })
-    public branch: string;
 
     @Value("name")
     public name: string;
@@ -88,7 +71,7 @@ export function resetGoalsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerR
 }
 
 function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
-    return async (cli: CommandListenerInvocation<ResetGoalsParameters>) => {
+    return async (cli: CommandListenerInvocation<ResetGoalsParameters & RepoTargetingParameters>) => {
 
         const rules = {
             projectLoader: sdm.configuration.sdm.projectLoader,
@@ -98,10 +81,19 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             implementationMapping: sdm.goalFulfillmentMapper,
         };
 
-        const repoData = await fetchBranchTips(cli.context, cli.parameters);
-        const branch = cli.parameters.branch || repoData.defaultBranch;
-        const sha = cli.parameters.sha || tipOfBranch(repoData, branch);
-        const id = GitHubRepoRef.from({ owner: cli.parameters.owner, repo: cli.parameters.repo, sha, branch });
+        const repoData = await fetchBranchTips(cli.context, {
+            providerId: cli.parameters.providerId,
+            owner: cli.parameters.targets.repoRef.owner,
+            repo: cli.parameters.targets.repoRef.repo,
+        });
+        const branch = cli.parameters.targets.repoRef.branch || repoData.defaultBranch;
+        const sha = cli.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
+        const id = GitHubRepoRef.from({
+            owner: cli.parameters.targets.repoRef.owner,
+            repo: cli.parameters.targets.repoRef.repo,
+            sha,
+            branch,
+        });
 
         const push = await fetchPushForCommit(cli.context, id, cli.parameters.providerId);
 
@@ -115,7 +107,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             await cli.addressChannels(slackSuccessMessage(
                 "Plan Goals",
                 `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
-                    bold(`${cli.parameters.owner}/${cli.parameters.repo}/${push.branch}`)} to ${italic(goals.name)}`,
+                    bold(`${id.owner}/${id.repo}/${push.branch}`)} to ${italic(goals.name)}`,
                 {
                     footer: `${cli.parameters.name}:${cli.parameters.version}`,
                 }));
@@ -123,7 +115,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             await cli.addressChannels(slackWarningMessage(
                 "Plan Goals",
                 `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
-                    bold(`${cli.parameters.owner}/${cli.parameters.repo}/${push.branch}`)}`,
+                    bold(`${id.owner}/${id.repo}/${push.branch}`)}`,
                 cli.context,
                 {
                     footer: `${cli.parameters.name}:${cli.parameters.version}`,

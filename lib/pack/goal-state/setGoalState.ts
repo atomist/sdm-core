@@ -28,9 +28,12 @@ import {
 import {
     CommandHandlerRegistration,
     fetchGoalsForCommit,
+    GitHubRepoTargets,
+    RepoTargetingParameters,
     SdmGoalState,
     slackSuccessMessage,
     SoftwareDeliveryMachine,
+    toRepoTargetingParametersMaker,
     updateGoal,
 } from "@atomist/sdm";
 import {
@@ -48,20 +51,8 @@ import {
 @Parameters()
 class SetGoalStateParameters {
 
-    @MappedParameter(MappedParameters.GitHubOwner)
-    public owner: string;
-
-    @MappedParameter(MappedParameters.GitHubRepository)
-    public repo: string;
-
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
-
-    @Parameter({ required: false })
-    public sha: string;
-
-    @Parameter({ required: false })
-    public branch: string;
 
     @Parameter({ required: false })
     public goal: string;
@@ -83,21 +74,40 @@ class SetGoalStateParameters {
 
 }
 
-export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<SetGoalStateParameters> {
+export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<SetGoalStateParameters & RepoTargetingParameters> {
     return {
         name: "SetGoalState",
         description: "Set state of a particular goal",
         intent: [`set goal state ${sdm.configuration.name.replace("@", "")}`],
-        paramsMaker: SetGoalStateParameters,
+        paramsMaker: toRepoTargetingParametersMaker(SetGoalStateParameters, GitHubRepoTargets),
         listener: async chi => {
             if (!chi.parameters.msgId) {
                 chi.parameters.msgId = guid();
             }
             const footer = `${chi.parameters.name}:${chi.parameters.version}`;
-            const repoData = await fetchBranchTips(chi.context, chi.parameters);
-            const branch = chi.parameters.branch || repoData.defaultBranch;
-            const sha = chi.parameters.sha || tipOfBranch(repoData, branch);
-            const id = GitHubRepoRef.from({ owner: chi.parameters.owner, repo: chi.parameters.repo, sha, branch });
+            const repoData = await fetchBranchTips(chi.context, {
+                providerId: chi.parameters.providerId,
+                owner: chi.parameters.targets.repoRef.owner,
+                repo: chi.parameters.targets.repoRef.repo,
+            });
+            const branch = chi.parameters.targets.repoRef.branch || repoData.defaultBranch;
+            const sha = chi.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
+            const id = GitHubRepoRef.from({
+                owner: chi.parameters.targets.repoRef.owner,
+                repo: chi.parameters.targets.repoRef.repo,
+                sha,
+                branch,
+            });
+
+            const newParams = {
+                ...chi.parameters,
+                targets: {
+                    owner: chi.parameters.targets.repoRef.owner,
+                    repo: chi.parameters.targets.repoRef.repo,
+                    branch: chi.parameters.targets.repoRef.branch,
+                    sha: chi.parameters.targets.repoRef.sha,
+                },
+            } as any;
 
             if (chi.parameters.cancel) {
                 return chi.context.messageClient.respond(
@@ -132,11 +142,11 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                             },
                                 "SetGoalState",
                                 "goal",
-                                { ...chi.parameters }),
+                                { ...newParams }),
                             buttonForCommand(
                                 { text: "Cancel" },
                                 "SetGoalState",
-                                { ...chi.parameters, cancel: true }),
+                                { ...newParams, cancel: true }),
                         ],
                         fallback: "Select Goal",
                         footer,
@@ -155,11 +165,11 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine): CommandHandle
                             menuForCommand({
                                 text: "Goal States",
                                 options: _.map(SdmGoalState, v => ({ text: v, value: v })),
-                            }, "SetGoalState", "state", { ...chi.parameters }),
+                            }, "SetGoalState", "state", { ...newParams }),
                             buttonForCommand(
                                 { text: "Cancel" },
                                 "SetGoalState",
-                                { ...chi.parameters, cancel: true }),
+                                { ...newParams, cancel: true }),
                         ],
                         fallback: "Select Goal",
                         footer,
