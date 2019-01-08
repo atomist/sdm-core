@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://github.com/atomist/sdm/compare/1.2.0...HEAD)
+## [Unreleased](https://github.com/atomist/sdm-core/compare/1.2.0...HEAD)
 
-## [1.2.0](https://github.com/atomist/sdm/compare/1.1.0...1.2.0) - 2018-12-27
+## [1.2.0](https://github.com/atomist/sdm-core/compare/1.1.0...1.2.0) - 2018-12-27
 
 ### Added
 
@@ -17,22 +17,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Move rolar log to use HttpClient and factory. [#87](https://github.com/atomist/sdm-core/issues/87)
 
-## [1.1.0](https://github.com/atomist/sdm/compare/1.0.2...1.1.0) - 2018-12-08
+## [1.1.0](https://github.com/atomist/sdm-core/compare/1.0.2...1.1.0) - 2018-12-08
 
 ### Added
 
 -   Add support canceling goals. [#80](https://github.com/atomist/sdm-core/issues/80)
 -   Add Gitlab support. [#81](https://github.com/atomist/sdm-core/issues/81)
 
-## [1.0.2](https://github.com/atomist/sdm/compare/1.0.1...1.0.2) - 2018-11-09
+## [1.0.2](https://github.com/atomist/sdm-core/compare/1.0.1...1.0.2) - 2018-11-09
 
 ### Fixed
 
 -   Don't attempt to update GitHub status when running in local mode
 
-## [1.0.1](https://github.com/atomist/sdm/compare/1.0.0...1.0.1) - 2018-11-09
+## [1.0.1](https://github.com/atomist/sdm-core/compare/1.0.0...1.0.1) - 2018-11-09
 
-## [1.0.0](https://github.com/atomist/sdm/compare/1.0.0-RC.2...1.0.0) - 2018-11-09
+## [1.0.0](https://github.com/atomist/sdm-core/compare/1.0.0-RC.2...1.0.0) - 2018-11-09
 
 ### Added
 
@@ -42,7 +42,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   `GoalAutomationEventListener` always uses prod GraphQL urls. [#79](https://github.com/atomist/sdm-core/issues/79)
 
-## [1.0.0-RC.2](https://github.com/atomist/sdm/compare/1.0.0-RC.1...1.0.0-RC.2) - 2018-10-30
+## [1.0.0-RC.2](https://github.com/atomist/sdm-core/compare/1.0.0-RC.1...1.0.0-RC.2) - 2018-10-30
 
 ### Added
 
@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Set goal state command doesn't get goals for multiple goal sets correct. [#76](https://github.com/atomist/sdm-core/issues/76)
 
-## [1.0.0-RC.1](https://github.com/atomist/sdm/compare/1.0.0-M.5...1.0.0-RC.1) - 2018-10-15
+## [1.0.0-RC.1](https://github.com/atomist/sdm-core/compare/1.0.0-M.5...1.0.0-RC.1) - 2018-10-15
 
 ### Changed
 
@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Moved build event handlers to build pack. [#69](https://github.com/atomist/sdm-core/issues/69)
 -   Remove Atomist pre-code-build hook. [#70](https://github.com/atomist/sdm-core/issues/70)
 
-## [1.0.0-M.5](https://github.com/atomist/sdm/compare/1.0.0-M.4...1.0.0-M.5) - 2018-09-26
+## [1.0.0-M.5](https://github.com/atomist/sdm-core/compare/1.0.0-M.4...1.0.0-M.5) - 2018-09-26
 
 ### Added
 
@@ -87,7 +87,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   **BREAKING** Removed "freeze" pack. In sample-sdm pending a new home.
 
-## [1.0.0-M.4](https://github.com/atomist/sdm/compare/1.0.0-M.3...1.0.0-M.4) - 2018-09-16
+## [1.0.0-M.4](https://github.com/atomist/sdm-core/compare/1.0.0-M.3...1.0.0-M.4) - 2018-09-16
 
 ### Added
 
@@ -104,7 +104,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   **BREAKING** Goal contexts no longer have an order but splitContext expects one. [#47](https://github.com/atomist/sdm-core/issues/47)
 
-## [1.0.0-M.3](https://github.com/atomist/sdm/compare/1.0.0-M.1...1.0.0-M.3) - 2018-09-04
+## [1.0.0-M.3](https://github.com/atomist/sdm-core/compare/1.0.0-M.1...1.0.0-M.3) - 2018-09-04
 
 ### Added
 
@@ -121,33 +121,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   **BREAKING** Moved docker functionality to separate pack. [#44](https://github.com/atomist/sdm-core/issues/44)
 
-## [1.0.0-M.1](https://github.com/atomist/sdm/compare/0.4.10...1.0.0-M.1) - 2018-08-27
+## [1.0.0-M.1](https://github.com/atomist/sdm-core/compare/0.4.10...1.0.0-M.1) - 2018-08-27
 
-## [0.4.10](https://github.com/atomist/sdm/compare/0.4.9...0.4.10) - 2018-08-27
+## [0.4.10](https://github.com/atomist/sdm-core/compare/0.4.9...0.4.10) - 2018-08-27
 
-## [0.4.9](https://github.com/atomist/sdm/compare/0.4.8...0.4.9) - 2018-08-24
+## [0.4.9](https://github.com/atomist/sdm-core/compare/0.4.8...0.4.9) - 2018-08-24
 
-## [0.4.8](https://github.com/atomist/sdm/compare/0.4.7...0.4.8) - 2018-08-24
+## [0.4.8](https://github.com/atomist/sdm-core/compare/0.4.7...0.4.8) - 2018-08-24
 
-## [0.4.7](https://github.com/atomist/sdm/compare/0.4.6...0.4.7) - 2018-08-23
+## [0.4.7](https://github.com/atomist/sdm-core/compare/0.4.6...0.4.7) - 2018-08-23
 
-## [0.4.6](https://github.com/atomist/sdm/compare/0.4.5...0.4.6) - 2018-08-22
+## [0.4.6](https://github.com/atomist/sdm-core/compare/0.4.5...0.4.6) - 2018-08-22
 
-## [0.4.5](https://github.com/atomist/sdm/compare/0.4.4...0.4.5) - 2018-08-21
+## [0.4.5](https://github.com/atomist/sdm-core/compare/0.4.4...0.4.5) - 2018-08-21
 
-## [0.4.4](https://github.com/atomist/sdm/compare/0.4.3...0.4.4) - 2018-08-21
+## [0.4.4](https://github.com/atomist/sdm-core/compare/0.4.3...0.4.4) - 2018-08-21
 
-## [0.4.3](https://github.com/atomist/sdm/compare/0.4.2...0.4.3) - 2018-08-21
+## [0.4.3](https://github.com/atomist/sdm-core/compare/0.4.2...0.4.3) - 2018-08-21
 
-## [0.4.2](https://github.com/atomist/sdm/compare/0.4.1...0.4.2) - 2018-08-17
+## [0.4.2](https://github.com/atomist/sdm-core/compare/0.4.1...0.4.2) - 2018-08-17
 
-## [0.4.1](https://github.com/atomist/sdm/compare/0.4.0...0.4.1) - 2018-08-09
+## [0.4.1](https://github.com/atomist/sdm-core/compare/0.4.0...0.4.1) - 2018-08-09
 
 ### Fixed
 
 -   Corrected GraphQL file/name agreement.
 
-## [0.4.0](https://github.com/atomist/sdm/compare/0.2.4...0.4.0) - 2018-08-07
+## [0.4.0](https://github.com/atomist/sdm-core/compare/0.2.4...0.4.0) - 2018-08-07
 
 ### Added
 
@@ -176,7 +176,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Link is missing on npm publish goal. [#11](https://github.com/atomist/sdm-core/issues/11)
 -   Use credentialsResolver consistently. [#18](https://github.com/atomist/sdm-core/issues/18)
 
-## [0.2.3](https://github.com/atomist/sdm/compare/0.2.2...0.2.3) - 2018-06-18
+## [0.2.3](https://github.com/atomist/sdm-core/compare/0.2.2...0.2.3) - 2018-06-18
 
 ### Fixed
 
@@ -186,9 +186,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
--   Can provide tag when publishing NPM package. [#404](https://github.com/atomist/sdm/issues/404)
+-   Can provide tag when publishing NPM package. [#404](https://github.com/atomist/sdm-core/issues/404)
 
-## [0.1.0](https://github.com/atomist/sdm/tree/0.1.0) - 2018-05-16
+## [0.1.0](https://github.com/atomist/sdm-core/tree/0.1.0) - 2018-05-16
 
 ### Added
 
