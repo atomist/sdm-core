@@ -18,22 +18,18 @@ import {
     automationClientInstance,
     AutomationContextAware,
     configurationValue,
+    Failure,
     HandlerContext,
     HandlerResult,
     logger,
-    spawnAndWatch,
-    SuccessIsReturn0ErrorFinder,
 } from "@atomist/automation-client";
 import {
     IsolatedGoalLauncher,
-    LoggingProgressLog,
     OnAnyRequestedSdmGoal,
-    ProgressLog,
     SdmGoalEvent,
-    StringCapturingProgressLog,
 } from "@atomist/sdm";
+import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
-import * as fs from "fs-extra";
 
 /**
  * Create the Kubernetes IsolatedGoalLauncher.
@@ -62,22 +58,12 @@ export async function cleanCompletedJobs() {
     const deploymentName = process.env.ATOMIST_DEPLOYMENT_NAME || configurationValue<string>("name");
     const deploymentNamespace = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
-    let log = new StringCapturingProgressLog();
+    const kc = new k8s.KubeConfig();
+    kc.loadFromDefault();
+    const batch = kc.makeApiClient(k8s.Batch_v1Api);
+    const jobs = await batch.listNamespacedJob(deploymentNamespace);
 
-    await spawnAndWatch({
-        command: "kubectl",
-        args: ["get", "jobs", "-n", deploymentNamespace, "-o", "json"],
-    },
-        {},
-        log,
-        {
-            errorFinder: SuccessIsReturn0ErrorFinder,
-            logCommand: false,
-        },
-    );
-
-    const jobs = JSON.parse(log.log).items;
-    const sdmJobs = jobs.filter(j => j.metadata.name.startsWith(`${deploymentName}-job-`));
+    const sdmJobs = jobs.body.items.filter(j => j.metadata.name.startsWith(`${deploymentName}-job-`));
     const completedSdmJobs =
         sdmJobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0)
             .map(j => j.metadata.name);
@@ -86,19 +72,8 @@ export async function cleanCompletedJobs() {
         logger.info(`Deleting the following goal jobs from namespace '${deploymentNamespace}': ${
             completedSdmJobs.join(", ")}`);
 
-        log = new LoggingProgressLog("");
-
         for (const completedSdmJob of completedSdmJobs) {
-            await spawnAndWatch({
-                command: "kubectl",
-                args: ["delete", "job", completedSdmJob, "-n", deploymentNamespace],
-            },
-                {},
-                log,
-                {
-                    errorFinder: SuccessIsReturn0ErrorFinder,
-                },
-            );
+            await batch.deleteNamespacedJob(completedSdmJob, deploymentNamespace, {} as any);
         }
     }
 }
@@ -153,40 +128,32 @@ function jobSpecWithAffinity(goalSetId: string): string {
  * Launch a goal as a kubernetes job
  * @param {OnAnyRequestedSdmGoal.SdmGoal} goal
  * @param {HandlerContext} ctx
- * @param {ProgressLog} progressLog
  * @returns {Promise<HandlerResult>}
  * @constructor
  */
 export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
-                                                     ctx: HandlerContext,
-                                                     progressLog: ProgressLog): Promise<HandlerResult> => {
+                                                     ctx: HandlerContext): Promise<HandlerResult> => {
     const deploymentName = process.env.ATOMIST_DEPLOYMENT_NAME || configurationValue<string>("name");
     const deploymentNamespace = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
-    const log = new StringCapturingProgressLog();
+    const kc = new k8s.KubeConfig();
+    kc.loadFromDefault();
+    const apps = kc.makeApiClient(k8s.Apps_v1Api);
+    const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
-    let result = await spawnAndWatch({
-        command: "kubectl",
-        args: ["get", "deployment", deploymentName, "-n", deploymentNamespace, "-o", "json"],
-    },
-        {},
-        log,
-        {
-            errorFinder: SuccessIsReturn0ErrorFinder,
-            logCommand: false,
-        },
-    );
-
-    if (result.code !== 0) {
-        return result;
+    let deploymentResult: k8s.V1Deployment;
+    try {
+        deploymentResult = (await apps.readNamespacedDeployment(deploymentName, deploymentNamespace)).body;
+    } catch (e) {
+        logger.error(`Failed to obtain parent deployment spec from K8: ${e.message}`);
+        return Failure;
     }
-
     const goalName = goal.uniqueName.split("#")[0].toLowerCase();
 
-    const jobSpec = JSON.parse(jobSpecWithAffinity(goal.goalSetId));
+    const jobSpec: k8s.V1Job = JSON.parse(jobSpecWithAffinity(goal.goalSetId));
     const affinity = jobSpec.spec.template.spec.affinity;
 
-    const containerSpec = JSON.parse(log.log).spec.template.spec;
+    const containerSpec = deploymentResult.spec.template.spec;
 
     jobSpec.spec.template.spec = containerSpec;
     jobSpec.spec.template.spec.affinity = affinity;
@@ -197,80 +164,54 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
     jobSpec.spec.template.spec.restartPolicy = "Never";
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
     jobSpec.spec.template.spec.containers[0].env.push({
-        name: "ATOMIST_JOB_NAME",
-        value: jobSpec.metadata.name,
-    },
+            name: "ATOMIST_JOB_NAME",
+            value: jobSpec.metadata.name,
+        } as any,
         {
             name: "ATOMIST_REGISTRATION_NAME",
             value: `${automationClientInstance().configuration.name}-job-${goal.goalSetId.slice(0, 7)}-${goalName}`,
-        },
+        } as any,
         {
             name: "ATOMIST_GOAL_TEAM",
             value: ctx.workspaceId,
-        },
+        } as any,
         {
             name: "ATOMIST_GOAL_TEAM_NAME",
             value: (ctx as any as AutomationContextAware).context.workspaceName,
-        },
+        } as any,
         {
             name: "ATOMIST_GOAL_ID",
             value: (goal as any).id,
-        },
+        } as any,
         {
             name: "ATOMIST_GOAL_SET_ID",
             value: goal.goalSetId,
-        },
+        } as any,
         {
             name: "ATOMIST_GOAL_UNIQUE_NAME",
             value: goal.uniqueName,
-        },
+        } as any,
         {
             name: "ATOMIST_CORRELATION_ID",
             value: ctx.correlationId,
-        },
+        } as any,
         {
             name: "ATOMIST_ISOLATED_GOAL",
             value: "true",
-        });
+        } as any);
 
-    const tempfile = require("tempfile")(".json");
-    await fs.writeFile(tempfile, JSON.stringify(jobSpec, null, 2));
-
-    // Check if this job was previously launched
-    result = await spawnAndWatch({
-        command: "kubectl",
-        args: ["get", "job", jobSpec.metadata.name, "-n", deploymentNamespace],
-    },
-        {},
-        progressLog,
-        {
-            errorFinder: SuccessIsReturn0ErrorFinder,
-        },
-    );
-
-    if (result.code !== 0) {
-        return spawnAndWatch({
-            command: "kubectl",
-            args: ["apply", "-f", tempfile],
-        },
-            {},
-            progressLog,
-            {
-                errorFinder: SuccessIsReturn0ErrorFinder,
-            },
-        );
-    } else {
-        return spawnAndWatch({
-            command: "kubectl",
-            args: ["replace", "--force", "-f", tempfile],
-        },
-            {},
-            progressLog,
-            {
-                errorFinder: SuccessIsReturn0ErrorFinder,
-            },
-        );
+    let jobResult: k8s.V1Job;
+    try {
+        // Check if this job was previously launched
+        await batch.readNamespacedJob(jobSpec.metadata.name, deploymentNamespace);
+        jobResult = (await batch.replaceNamespacedJob(jobSpec.metadata.name, deploymentNamespace, jobSpec, {} as any)).body;
+    } catch (e) {
+        jobResult = (await batch.createNamespacedJob(deploymentNamespace, jobSpec)).body;
     }
+
+    logger.info(`Scheduling K8 job for goal '${goal.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
+    logger.log("silly", JSON.stringify(jobResult));
+
     // query kube to make sure the job got scheduled
     // kubectl get job <jobname> -o json
 };
