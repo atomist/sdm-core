@@ -34,6 +34,7 @@ import {
     SdmGoalState,
     slackFooter,
     slackSuccessMessage,
+    slackWarningMessage,
     SoftwareDeliveryMachine,
     toRepoTargetingParametersMaker,
     updateGoal,
@@ -49,7 +50,6 @@ import {
     fetchBranchTips,
     tipOfBranch,
 } from "../../util/graph/queryCommits";
-
 
 enum SdmGoalStateOrder {
     planned,
@@ -86,7 +86,8 @@ class SetGoalStateParameters {
 }
 
 export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
-                                    repoTargets: Maker<RepoTargets> = GitHubRepoTargets): CommandHandlerRegistration<SetGoalStateParameters & RepoTargetingParameters> {
+                                    repoTargets: Maker<RepoTargets> = GitHubRepoTargets)
+    : CommandHandlerRegistration<SetGoalStateParameters & RepoTargetingParameters> {
     return {
         name: "SetGoalState",
         description: "Set state of a particular goal",
@@ -96,13 +97,35 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
             if (!chi.parameters.msgId) {
                 chi.parameters.msgId = guid();
             }
-            const repoData = await fetchBranchTips(chi.context, {
-                providerId: chi.parameters.providerId,
-                owner: chi.parameters.targets.repoRef.owner,
-                repo: chi.parameters.targets.repoRef.repo,
-            });
+            let repoData;
+            try {
+                repoData = await fetchBranchTips(chi.context, {
+                    providerId: chi.parameters.providerId,
+                    owner: chi.parameters.targets.repoRef.owner,
+                    repo: chi.parameters.targets.repoRef.repo,
+                });
+            } catch (e) {
+                return chi.context.messageClient.respond(
+                    slackWarningMessage(
+                        "Set Goal State",
+                        `Repository ${bold(`${
+                            chi.parameters.targets.repoRef.owner}/${chi.parameters.targets.repoRef.repo}`)} not found`,
+                        chi.context),
+                    { id: chi.parameters.msgId });
+            }
             const branch = chi.parameters.targets.repoRef.branch || repoData.defaultBranch;
-            const sha = chi.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
+            let sha;
+            try {
+                sha = chi.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
+            } catch (e) {
+                return chi.context.messageClient.respond(
+                    slackWarningMessage(
+                        "Set Goal State",
+                        `Branch ${bold(branch)} not found on ${bold(`${
+                            chi.parameters.targets.repoRef.owner}/${chi.parameters.targets.repoRef.repo}`)}`,
+                        chi.context),
+                    { id: chi.parameters.msgId });
+            }
             const id = GitHubRepoRef.from({
                 owner: chi.parameters.targets.repoRef.owner,
                 repo: chi.parameters.targets.repoRef.repo,
@@ -179,8 +202,8 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                             menuForCommand({
                                 text: "Goal States",
                                 options: [
-                                    { text: "current state", options: states.filter(s => s.value === goal.state)},
-                                    { text: "available states", options: states.filter(s => s.value !== goal.state)}
+                                    { text: "current state", options: states.filter(s => s.value === goal.state) },
+                                    { text: "available states", options: states.filter(s => s.value !== goal.state) },
                                 ],
                             }, "SetGoalState", "state", newParams),
                             buttonForCommand(
@@ -208,7 +231,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                     slackSuccessMessage(
                         "Set Goal State",
                         `Successfully set state of ${italic(goal.name)} on ${codeLine(sha.slice(0, 7))} of ${
-                            bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`),
+                            bold(`${id.owner}/${id.repo}/${branch}`)} to ${italic(chi.parameters.state)}`),
                     { id: chi.parameters.msgId });
             }
         },

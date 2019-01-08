@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,13 +84,34 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             implementationMapping: sdm.goalFulfillmentMapper,
         };
 
-        const repoData = await fetchBranchTips(cli.context, {
-            providerId: cli.parameters.providerId,
-            owner: cli.parameters.targets.repoRef.owner,
-            repo: cli.parameters.targets.repoRef.repo,
-        });
+        let repoData;
+        try {
+            repoData = await fetchBranchTips(cli.context, {
+                providerId: cli.parameters.providerId,
+                owner: cli.parameters.targets.repoRef.owner,
+                repo: cli.parameters.targets.repoRef.repo,
+            });
+        } catch (e) {
+            return cli.context.messageClient.respond(
+                slackWarningMessage(
+                    "Set Goal State",
+                    `Repository ${bold(`${
+                        cli.parameters.targets.repoRef.owner}/${cli.parameters.targets.repoRef.repo}`)} not found`,
+                    cli.context));
+        }
         const branch = cli.parameters.targets.repoRef.branch || repoData.defaultBranch;
-        const sha = cli.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
+        let sha;
+        try {
+            sha = cli.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
+        } catch (e) {
+            return cli.context.messageClient.respond(
+                slackWarningMessage(
+                    "Set Goal State",
+                    `Branch ${bold(branch)} not found on ${bold(`${
+                        cli.parameters.targets.repoRef.owner}/${cli.parameters.targets.repoRef.repo}`)}`,
+                    cli.context));
+        }
+
         const id = GitHubRepoRef.from({
             owner: cli.parameters.targets.repoRef.owner,
             repo: cli.parameters.targets.repoRef.repo,
