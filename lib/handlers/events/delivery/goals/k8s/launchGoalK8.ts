@@ -209,7 +209,8 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
         jobResult = (await batch.createNamespacedJob(deploymentNamespace, jobSpec)).body;
     }
 
-    logger.info(`Scheduling K8 job for goal '${goal.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
+    logger.info(
+        `Scheduling K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
     logger.log("silly", JSON.stringify(jobResult));
 
     // query kube to make sure the job got scheduled
