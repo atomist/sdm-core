@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import {
     GoalExecutionListener,
     GoalImplementationMapper,
     GoalInvocation,
+    GoalLauncher,
     LoggingProgressLog,
     ProgressLog,
     SdmGoalEvent,
@@ -128,12 +129,22 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             credentials,
         };
 
-        const isolatedGoalLauncher = this.configuration.sdm.goalLauncher;
-
-        if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
-            const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
-            await progressLog.close();
-            return result;
+        const goalLauncher = await findGoalLauncher(goalInvocation, this.configuration);
+        if (!!goalLauncher) {
+            const result = await goalLauncher.launch(goalInvocation);
+            if (!!result && result.code !== 0) {
+                await updateGoal(ctx, sdmGoal, {
+                    state: SdmGoalState.failure,
+                    description: goal.failureDescription,
+                    url: progressLog.url,
+                });
+                progressLog.write(`Goal launching failed with: ${JSON.stringify(result)}`);
+                await progressLog.close();
+            } 
+            return {
+                code: 0,
+                ...result as any,
+            };
         } else {
             delete (sdmGoal as any).id;
 
@@ -160,6 +171,24 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             };
         }
     }
+}
+
+async function findGoalLauncher(gi: GoalInvocation,
+                                configuration: SoftwareDeliveryMachineConfiguration): Promise<GoalLauncher | undefined> {
+    let goalLauncher: GoalLauncher[];
+    if (!configuration.sdm.goalLauncher) {
+        return undefined;
+    } else if (!Array.isArray(configuration.sdm.goalLauncher)) {
+        goalLauncher = [configuration.sdm.goalLauncher];
+    } else {
+        goalLauncher = configuration.sdm.goalLauncher;
+    }
+    for (const gl of goalLauncher) {
+        if (await gl.supports(gi)) {
+            return gl;
+        }
+    }
+    return undefined;
 }
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {

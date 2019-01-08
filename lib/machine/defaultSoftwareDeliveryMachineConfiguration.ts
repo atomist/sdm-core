@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import {
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
-import { createKubernetesGoalLauncher } from "../handlers/events/delivery/goals/k8s/launchGoalK8";
+import { KubernetesGoalLauncher } from "../handlers/events/delivery/goals/k8s/KubernetesGoalLauncher";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
@@ -43,7 +43,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
-            goalLauncher: process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes" ? createKubernetesGoalLauncher() : undefined,
+            goalLauncher: [new KubernetesGoalLauncher()],
         },
         local: {
             preferLocalSeeds: true,
