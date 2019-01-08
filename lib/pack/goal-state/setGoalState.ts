@@ -105,10 +105,10 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
             const newParams = {
                 ...chi.parameters,
                 targets: {
-                    owner: chi.parameters.targets.repoRef.owner,
-                    repo: chi.parameters.targets.repoRef.repo,
-                    branch: chi.parameters.targets.repoRef.branch,
-                    sha: chi.parameters.targets.repoRef.sha,
+                    owner: id.owner,
+                    repo: id.repo,
+                    branch: id.branch,
+                    sha: id.sha,
                 },
             } as any;
 
@@ -145,7 +145,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                             },
                                 "SetGoalState",
                                 "goal",
-                                { ...newParams }),
+                                 newParams),
                             buttonForCommand(
                                 { text: "Cancel" },
                                 "SetGoalState",
@@ -168,7 +168,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                             menuForCommand({
                                 text: "Goal States",
                                 options: _.map(SdmGoalState, v => ({ text: v, value: v })),
-                            }, "SetGoalState", "state", { ...newParams }),
+                            }, "SetGoalState", "state", newParams),
                             buttonForCommand(
                                 { text: "Cancel" },
                                 "SetGoalState",
