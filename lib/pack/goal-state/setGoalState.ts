@@ -24,7 +24,6 @@ import {
     menuForCommand,
     Parameter,
     Parameters,
-    Value,
 } from "@atomist/automation-client";
 import {
     CommandHandlerRegistration,
@@ -33,6 +32,7 @@ import {
     RepoTargetingParameters,
     RepoTargets,
     SdmGoalState,
+    slackFooter,
     slackSuccessMessage,
     SoftwareDeliveryMachine,
     toRepoTargetingParametersMaker,
@@ -49,6 +49,22 @@ import {
     fetchBranchTips,
     tipOfBranch,
 } from "../../util/graph/queryCommits";
+
+
+enum SdmGoalStateOrder {
+    planned,
+    requested,
+    waiting_for_pre_approval,
+    pre_approved,
+    in_process,
+    waiting_for_approval,
+    approved,
+    success,
+    failure,
+    stopped,
+    skipped,
+    canceled,
+}
 
 @Parameters()
 class SetGoalStateParameters {
@@ -67,13 +83,6 @@ class SetGoalStateParameters {
 
     @Parameter({ required: false, type: "boolean" })
     public cancel: boolean;
-
-    @Value("name")
-    public name: string;
-
-    @Value("version")
-    public version: string;
-
 }
 
 export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
@@ -87,7 +96,6 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
             if (!chi.parameters.msgId) {
                 chi.parameters.msgId = guid();
             }
-            const footer = `${chi.parameters.name}:${chi.parameters.version}`;
             const repoData = await fetchBranchTips(chi.context, {
                 providerId: chi.parameters.providerId,
                 owner: chi.parameters.targets.repoRef.owner,
@@ -116,11 +124,9 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                 return chi.context.messageClient.respond(
                     slackSuccessMessage(
                         "Set Goal State",
-                        "Successfully canceled setting goal state",
-                        { footer }),
+                        "Successfully canceled setting goal state"),
                     { id: chi.parameters.msgId });
             } else if (!chi.parameters.goal) {
-
                 const goals = await fetchGoalsForCommit(chi.context, id, chi.parameters.providerId);
                 const goalSets = _.groupBy(goals, "goalSetId");
                 const optionsGroups = _.map(goalSets, (v, k) => {
@@ -128,7 +134,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                         text: k.slice(0, 7),
                         options: v.map(g => ({
                             text: `${g.name} - ${g.state}`,
-                            value: JSON.stringify({ id: (g as any).id, name: g.name }),
+                            value: JSON.stringify({ id: (g as any).id, name: g.name, state: g.state }),
                         })).sort((o1, o2) => o1.text.localeCompare(o2.text)),
                     };
                 });
@@ -140,25 +146,30 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                             codeLine(sha.slice(0, 7))} of ${bold(`${id.owner}/${id.repo}/${branch}`)}:`,
                         actions: [
                             menuForCommand({
-                                text: "Goals",
-                                options: optionsGroups,
-                            },
+                                    text: "Goals",
+                                    options: optionsGroups,
+                                },
                                 "SetGoalState",
                                 "goal",
-                                 newParams),
+                                newParams),
                             buttonForCommand(
                                 { text: "Cancel" },
                                 "SetGoalState",
                                 { ...newParams, cancel: true }),
                         ],
                         fallback: "Select Goal",
-                        footer,
+                        footer: slackFooter(),
                     }],
                 };
+
                 return chi.context.messageClient.respond(msg, { id: chi.parameters.msgId });
             } else if (!chi.parameters.state) {
                 const goal = JSON.parse(chi.parameters.goal);
-
+                const states = _.map(SdmGoalState, v =>
+                    ({ text: v, value: v }))
+                    .sort((s1, s2) => {
+                        return SdmGoalStateOrder[s1.value] - SdmGoalStateOrder[s2.value];
+                    });
                 const msg: SlackMessage = {
                     attachments: [{
                         title: "Select Goal State",
@@ -167,7 +178,10 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                         actions: [
                             menuForCommand({
                                 text: "Goal States",
-                                options: _.map(SdmGoalState, v => ({ text: v, value: v })),
+                                options: [
+                                    { text: "current state", options: states.filter(s => s.value === goal.state)},
+                                    { text: "available states", options: states.filter(s => s.value !== goal.state)}
+                                ],
                             }, "SetGoalState", "state", newParams),
                             buttonForCommand(
                                 { text: "Cancel" },
@@ -175,9 +189,10 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                                 { ...newParams, cancel: true }),
                         ],
                         fallback: "Select Goal",
-                        footer,
+                        footer: slackFooter(),
                     }],
                 };
+
                 return chi.context.messageClient.respond(msg, { id: chi.parameters.msgId });
             } else {
                 const goal = JSON.parse(chi.parameters.goal);
@@ -193,11 +208,9 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                     slackSuccessMessage(
                         "Set Goal State",
                         `Successfully set state of ${italic(goal.name)} on ${codeLine(sha.slice(0, 7))} of ${
-                        bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`,
-                        { footer }),
+                            bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`),
                     { id: chi.parameters.msgId });
             }
-
         },
     };
 }
