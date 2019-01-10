@@ -18,6 +18,7 @@ import {
     automationClientInstance,
     AutomationContextAware,
     configurationValue,
+    doWithRetry,
     HandlerContext,
     HandlerResult,
     logger,
@@ -172,7 +173,10 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
     }
 
     try {
-        const jobResult = (await batch.createNamespacedJob(podNs, jobSpec)).body;
+        // Previous deletion might not have completed; hence the retry here
+        const jobResult = (await doWithRetry<{ body: k8s.V1Job }>(
+            () => batch.createNamespacedJob(podNs, jobSpec),
+            `Scheduling K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}'`)).body;
         logger.info(
             `Scheduled K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
         logger.log("silly", JSON.stringify(jobResult));
@@ -217,8 +221,7 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V
     return {
         kind: "Job",
         apiVersion: "batch/v1",
-        metadata: {
-        },
+        metadata: {},
         spec: {
             template: {
                 metadata: {
