@@ -22,6 +22,7 @@ import {
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
+import * as glob from "glob";
 import * as _ from "lodash";
 import * as path from "path";
 
@@ -42,16 +43,22 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
                 const ts = Date.now() - (1000 * 60 * 60 * 2); // 2 hour threshold
                 if (fs.existsSync(cachePath)) {
                     try {
-                        fs.readdirSync(cachePath).forEach(f => {
-                            const p = path.join(cachePath, f);
-                            const st = fs.statSync(p);
-                            if (st.mtimeMs < ts) {
-                                logger.debug(`Deleting cached file '${p}'`);
-                                fs.removeSync(p);
-                            }
+                        new glob.Glob("**/*", { cwd: cachePath }, (err, matches) => {
+                            matches.forEach(m => {
+                                const p = path.join(cachePath, m);
+                                try {
+                                    const st = fs.statSync(p);
+                                    if (st.mtimeMs < ts && st.isFile()) {
+                                        logger.debug(`Deleting cached file '${p}'`);
+                                        fs.removeSync(p);
+                                    }
+                                } catch (e) {
+                                    logger.warn("Failed to delete cached file '%s': %s", p, e.message);
+                                }
+                            });
                         });
                     } catch (err) {
-                        logger.debug("Failed to clean cache directory '%s': %s", cachePath, err.message);
+                        logger.warn("Failed to clean cache directory '%s': %s", cachePath, err.message);
                     }
                 }
             });

@@ -30,6 +30,8 @@ import {
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
+import { DeepPartial } from "ts-essentials";
+import * as _ from "lodash";
 
 /**
  * Create the Kubernetes IsolatedGoalLauncher.
@@ -78,50 +80,50 @@ export async function cleanCompletedJobs() {
     }
 }
 
-function jobSpecWithAffinity(goalSetId: string): string {
-    return `{
-    "kind": "Job",
-    "apiVersion": "batch/v1",
-    "metadata": {
-        "name": "sample-sdm-job",
-        "namespace": "default"
-    },
-    "spec": {
-        "template": {
-            "metadata": {
-                "labels": {
-                    "goalSetId": "${goalSetId}"
-                }
-            },
-            "spec": {
-                "affinity": {
-                    "podAffinity": {
-                        "preferredDuringSchedulingIgnoredDuringExecution": [
-                            {
-                                "weight": 100,
-                                "podAffinityTerm": {
-                                    "labelSelector": {
-                                        "matchExpressions": [
-                                            {
-                                                "key": "goalSetId",
-                                                "operator": "In",
-                                                "values": [
-                                                    "${goalSetId}"
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    "topologyKey": "kubernetes.io/hostname"
-                                }
-                            }
-                        ]
-                    }
+function jobSpecWithAffinity(goalSetId: string): DeepPartial<k8s.V1Job> {
+    return {
+        kind: "Job",
+        apiVersion: "batch/v1",
+        metadata: {
+            name: "sample-sdm-job",
+            namespace: "default",
+        },
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        goalSetId: goalSetId,
+                    },
                 },
-                "containers": []
-            }
-        }
-    }
-}`;
+                spec: {
+                    affinity: {
+                        podAffinity: {
+                            preferredDuringSchedulingIgnoredDuringExecution: [
+                                {
+                                    weight: 100,
+                                    podAffinityTerm: {
+                                        labelSelector: {
+                                            matchExpressions: [
+                                                {
+                                                    key: "goalSetId",
+                                                    operator: "In",
+                                                    values: [
+                                                        goalSetId,
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                        topologyKey: "kubernetes.io/hostname",
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    containers: [],
+                },
+            },
+        },
+    };
 }
 
 /**
@@ -150,7 +152,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
     }
     const goalName = goal.uniqueName.split("#")[0].toLowerCase();
 
-    const jobSpec: k8s.V1Job = JSON.parse(jobSpecWithAffinity(goal.goalSetId));
+    const jobSpec = rewriteCachePath(jobSpecWithAffinity(goal.goalSetId) as k8s.V1Job, ctx.workspaceId);
     const affinity = jobSpec.spec.template.spec.affinity;
 
     const containerSpec = deploymentResult.spec.template.spec;
@@ -216,3 +218,35 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
     // query kube to make sure the job got scheduled
     // kubectl get job <jobname> -o json
 };
+
+/**
+ * Rewrite the volume host path to include the workspace id to prevent cross workspace content ending
+ * up in the same directory.
+ * @param deploymentSpec
+ * @param workspaceId
+ */
+function rewriteCachePath(deploymentSpec: k8s.V1Job, workspaceId: string): k8s.V1Job {
+    const cachePath = configurationValue("sdm.cache.path", "/opt/data");
+    const containers: k8s.V1Container[] = _.get(deploymentSpec, "spec.template.spec.containers", []);
+
+    const cacheVolumeNames: string[] = [];
+    containers.forEach(c => {
+        cacheVolumeNames.push(...c.volumeMounts.filter(vm => vm.mountPath === cachePath).map(cm => cm.name));
+    });
+
+    _.uniq(cacheVolumeNames).forEach(vn => {
+        const volume: k8s.V1Volume = _.get(deploymentSpec, "spec.template.spec.volumes", []).find(v => v.name === vn);
+        if (!!volume && !!volume.hostPath && !!volume.hostPath.path) {
+            const path = volume.hostPath.path;
+            if (!path.endsWith(workspaceId) || !path.endsWith(`${workspaceId}/`)) {
+                if (path.endsWith("/")) {
+                    volume.hostPath.path = `${path}${workspaceId}`;
+                } else {
+                    volume.hostPath.path = `${path}/${workspaceId}`;
+                }
+            }
+        }
+    });
+
+    return deploymentSpec;
+}
