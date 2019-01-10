@@ -18,7 +18,6 @@ import {
     automationClientInstance,
     AutomationContextAware,
     configurationValue,
-    Failure,
     HandlerContext,
     HandlerResult,
     logger,
@@ -30,8 +29,9 @@ import {
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
-import { DeepPartial } from "ts-essentials";
 import * as _ from "lodash";
+import * as os from "os";
+import { loadKubeConfig } from "./k8config";
 
 /**
  * Create the Kubernetes IsolatedGoalLauncher.
@@ -56,74 +56,36 @@ export function createKubernetesGoalLauncher(): IsolatedGoalLauncher {
  * Cleanup scheduled kubernetes goal jobs
  * @returns {Promise<void>}
  */
-export async function cleanCompletedJobs() {
-    const deploymentName = process.env.ATOMIST_DEPLOYMENT_NAME || configurationValue<string>("name");
-    const deploymentNamespace = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+async function cleanCompletedJobs() {
+    const podName = process.env.ATOMIST_DEPLOYMENT_NAME || os.hostname();
+    const podNs = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
-    const kc = new k8s.KubeConfig();
-    kc.loadFromDefault();
+    const kc = loadKubeConfig();
+    const apps = kc.makeApiClient(k8s.Core_v1Api);
     const batch = kc.makeApiClient(k8s.Batch_v1Api);
-    const jobs = await batch.listNamespacedJob(deploymentNamespace);
 
-    const sdmJobs = jobs.body.items.filter(j => j.metadata.name.startsWith(`${deploymentName}-job-`));
+    let podSpec: k8s.V1Pod;
+    try {
+        podSpec = (await apps.readNamespacedPod(podName, podNs)).body;
+    } catch (e) {
+        logger.error(`Failed to obtain parent pod spec from K8: ${e.message}`);
+        return { code: 1, message: `Failed to obtain parent pod spec from K8: ${e.message}` };
+    }
+
+    const jobs = await batch.listNamespacedJob(podNs);
+
+    const sdmJobs = jobs.body.items.filter(j => j.metadata.name.startsWith(`${podSpec.spec.containers[0].name}-job-`));
     const completedSdmJobs =
-        sdmJobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0)
-            .map(j => j.metadata.name);
+        sdmJobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
 
     if (completedSdmJobs.length > 0) {
-        logger.info(`Deleting the following goal jobs from namespace '${deploymentNamespace}': ${
+        logger.info(`Deleting the following goal jobs from namespace '${podNs}': ${
             completedSdmJobs.join(", ")}`);
 
         for (const completedSdmJob of completedSdmJobs) {
-            await batch.deleteNamespacedJob(completedSdmJob, deploymentNamespace, {} as any);
+            await batch.deleteNamespacedJob(completedSdmJob.metadata.name, completedSdmJob.metadata.namespace, {} as any);
         }
     }
-}
-
-function jobSpecWithAffinity(goalSetId: string): DeepPartial<k8s.V1Job> {
-    return {
-        kind: "Job",
-        apiVersion: "batch/v1",
-        metadata: {
-            name: "sample-sdm-job",
-            namespace: "default",
-        },
-        spec: {
-            template: {
-                metadata: {
-                    labels: {
-                        goalSetId: goalSetId,
-                    },
-                },
-                spec: {
-                    affinity: {
-                        podAffinity: {
-                            preferredDuringSchedulingIgnoredDuringExecution: [
-                                {
-                                    weight: 100,
-                                    podAffinityTerm: {
-                                        labelSelector: {
-                                            matchExpressions: [
-                                                {
-                                                    key: "goalSetId",
-                                                    operator: "In",
-                                                    values: [
-                                                        goalSetId,
-                                                    ],
-                                                },
-                                            ],
-                                        },
-                                        topologyKey: "kubernetes.io/hostname",
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                    containers: [],
-                },
-            },
-        },
-    };
 }
 
 /**
@@ -135,36 +97,30 @@ function jobSpecWithAffinity(goalSetId: string): DeepPartial<k8s.V1Job> {
  */
 export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
                                                      ctx: HandlerContext): Promise<HandlerResult> => {
-    const deploymentName = process.env.ATOMIST_DEPLOYMENT_NAME || configurationValue<string>("name");
-    const deploymentNamespace = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
-
-    const kc = new k8s.KubeConfig();
-    kc.loadFromDefault();
-    const apps = kc.makeApiClient(k8s.Apps_v1Api);
-    const batch = kc.makeApiClient(k8s.Batch_v1Api);
-
-    let deploymentResult: k8s.V1Deployment;
-    try {
-        deploymentResult = (await apps.readNamespacedDeployment(deploymentName, deploymentNamespace)).body;
-    } catch (e) {
-        logger.error(`Failed to obtain parent deployment spec from K8: ${e.message}`);
-        return Failure;
-    }
+    const podName = process.env.ATOMIST_DEPLOYMENT_NAME || os.hostname();
+    const podNs = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
     const goalName = goal.uniqueName.split("#")[0].toLowerCase();
 
-    const jobSpec = jobSpecWithAffinity(goal.goalSetId) as k8s.V1Job;
-    const affinity = jobSpec.spec.template.spec.affinity;
+    const kc = loadKubeConfig();
+    const apps = kc.makeApiClient(k8s.Core_v1Api);
+    const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
-    const containerSpec = deploymentResult.spec.template.spec;
+    let podSpec: k8s.V1Pod;
+    try {
+        podSpec = (await apps.readNamespacedPod(podName, podNs)).body;
+    } catch (e) {
+        logger.error(`Failed to obtain parent pod spec from K8: ${e.message}`);
+        return { code: 1, message: `Failed to obtain parent pod spec from K8: ${e.message}` };
+    }
 
-    jobSpec.spec.template.spec = containerSpec;
-    jobSpec.spec.template.spec.affinity = affinity;
+    const jobSpec = createJobSpecWithAffinity(podSpec, goal.goalSetId);
 
-    jobSpec.metadata.name =
-        `${deploymentName}-job-${goal.goalSetId.slice(0, 7)}-${goalName}`;
-    jobSpec.metadata.namespace = deploymentNamespace;
+    jobSpec.metadata.name = `${podSpec.spec.containers[0].name}-job-${goal.goalSetId.slice(0, 7)}-${goalName}`;
+    jobSpec.metadata.namespace = podNs;
+
     jobSpec.spec.template.spec.restartPolicy = "Never";
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
+
     jobSpec.spec.template.spec.containers[0].env.push({
             name: "ATOMIST_JOB_NAME",
             value: jobSpec.metadata.name,
@@ -204,22 +160,75 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
 
     rewriteCachePath(jobSpec, ctx.workspaceId);
 
-    let jobResult: k8s.V1Job;
     try {
         // Check if this job was previously launched
-        await batch.readNamespacedJob(jobSpec.metadata.name, deploymentNamespace);
-        jobResult = (await batch.replaceNamespacedJob(jobSpec.metadata.name, deploymentNamespace, jobSpec, {} as any)).body;
+        await batch.readNamespacedJob(jobSpec.metadata.name, podNs);
+        logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' already exists. Deleting...`);
+        await batch.deleteNamespacedJob(jobSpec.metadata.name, podNs, {} as any);
+        logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' deleted`);
     } catch (e) {
-        jobResult = (await batch.createNamespacedJob(deploymentNamespace, jobSpec)).body;
+        logger.error(`Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}': ${JSON.stringify(e.body)}`);
+        return { code: 1, message: `Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}'` };
     }
 
-    logger.info(
-        `Scheduling K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
-    logger.log("silly", JSON.stringify(jobResult));
-
-    // query kube to make sure the job got scheduled
-    // kubectl get job <jobname> -o json
+    try {
+        const jobResult = (await batch.createNamespacedJob(podNs, jobSpec)).body;
+        logger.info(
+            `Scheduled K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
+        logger.log("silly", JSON.stringify(jobResult));
+    } catch (e) {
+        logger.error(`Failed to schedule K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}': ${JSON.stringify(e.body)}`);
+        return {
+            code: 1,
+            message: `Failed to schedule K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}'`,
+        };
+    }
 };
+
+/**
+ * Create a k8 Job spec with affinity to jobs for the same goal set
+ * @param goalSetId
+ */
+function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V1Job {
+    podSpec.spec.affinity = {
+        podAffinity: {
+            preferredDuringSchedulingIgnoredDuringExecution: [
+                {
+                    weight: 100,
+                    podAffinityTerm: {
+                        labelSelector: {
+                            matchExpressions: [
+                                {
+                                    key: "goalSetId",
+                                    operator: "In",
+                                    values: [
+                                        goalSetId,
+                                    ],
+                                },
+                            ],
+                        },
+                        topologyKey: "kubernetes.io/hostname",
+                    },
+                },
+            ],
+        },
+    } as any;
+
+    return {
+        kind: "Job",
+        apiVersion: "batch/v1",
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        goalSetId,
+                    },
+                },
+                spec: podSpec.spec,
+            },
+        },
+    } as any;
+}
 
 /**
  * Rewrite the volume host path to include the workspace id to prevent cross workspace content ending
