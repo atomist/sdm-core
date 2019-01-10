@@ -217,6 +217,8 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V
     return {
         kind: "Job",
         apiVersion: "batch/v1",
+        metadata: {
+        },
         spec: {
             template: {
                 metadata: {
