@@ -165,11 +165,15 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
         // Check if this job was previously launched
         await batch.readNamespacedJob(jobSpec.metadata.name, podNs);
         logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' already exists. Deleting...`);
-        await batch.deleteNamespacedJob(jobSpec.metadata.name, podNs, {} as any);
-        logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' deleted`);
+        try {
+            await batch.deleteNamespacedJob(jobSpec.metadata.name, podNs, {} as any);
+            logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}' deleted`);
+        } catch (e) {
+            logger.error(`Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}': ${JSON.stringify(e.body)}`);
+            return { code: 1, message: `Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}'` };
+        }
     } catch (e) {
-        logger.error(`Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}': ${JSON.stringify(e.body)}`);
-        return { code: 1, message: `Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goal.uniqueName}'` };
+        // This is ok to ignore as it just means the job doesn't exist
     }
 
     try {
