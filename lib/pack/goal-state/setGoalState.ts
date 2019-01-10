@@ -231,7 +231,7 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
                     slackSuccessMessage(
                         "Set Goal State",
                         `Successfully set state of ${italic(goal.name)} on ${codeLine(sha.slice(0, 7))} of ${
-                            bold(`${id.owner}/${id.repo}`)} to ${italic(chi.parameters.state)}`),
+                            bold(`${id.owner}/${id.repo}/${branch}`)} to ${italic(chi.parameters.state)}`),
                     { id: chi.parameters.msgId });
             }
         },
