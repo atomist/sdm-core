@@ -152,7 +152,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
     }
     const goalName = goal.uniqueName.split("#")[0].toLowerCase();
 
-    const jobSpec = rewriteCachePath(jobSpecWithAffinity(goal.goalSetId) as k8s.V1Job, ctx.workspaceId);
+    const jobSpec = jobSpecWithAffinity(goal.goalSetId) as k8s.V1Job;
     const affinity = jobSpec.spec.template.spec.affinity;
 
     const containerSpec = deploymentResult.spec.template.spec;
@@ -202,6 +202,8 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
             value: "true",
         } as any);
 
+    rewriteCachePath(jobSpec, ctx.workspaceId);
+
     let jobResult: k8s.V1Job;
     try {
         // Check if this job was previously launched
@@ -225,7 +227,7 @@ export const KubernetesIsolatedGoalLauncher = async (goal: SdmGoalEvent,
  * @param deploymentSpec
  * @param workspaceId
  */
-function rewriteCachePath(deploymentSpec: k8s.V1Job, workspaceId: string): k8s.V1Job {
+function rewriteCachePath(deploymentSpec: k8s.V1Job, workspaceId: string): void {
     const cachePath = configurationValue("sdm.cache.path", "/opt/data");
     const containers: k8s.V1Container[] = _.get(deploymentSpec, "spec.template.spec.containers", []);
 
@@ -247,6 +249,4 @@ function rewriteCachePath(deploymentSpec: k8s.V1Job, workspaceId: string): k8s.V
             }
         }
     });
-
-    return deploymentSpec;
 }
