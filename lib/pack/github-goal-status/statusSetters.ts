@@ -78,7 +78,6 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
 }
 
 function allSuccessful(goals: SdmGoalEvent[]): boolean {
-    goals.forEach(g => logger.debug("goal %s is %s", g.name, g.state));
     return !goals.some(g => g.state !== "success");
 }
 
