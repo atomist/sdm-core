@@ -43,7 +43,7 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
                 const ts = Date.now() - (1000 * 60 * 60 * 2); // 2 hour threshold
                 if (fs.existsSync(cachePath)) {
                     try {
-                        new glob.Glob("**/*", { cwd: cachePath }, (err, matches) => {
+                        const g = new glob.Glob("**/*", { cwd: cachePath }, (err, matches) => {
                             matches.forEach(m => {
                                 const p = path.join(cachePath, m);
                                 try {

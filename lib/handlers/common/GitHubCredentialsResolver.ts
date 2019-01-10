@@ -43,7 +43,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
         return this.credentials(context);
     }
 
-    private credentials(context: HandlerContext) {
+    private credentials(context: HandlerContext): ProjectOperationCredentials {
 
         // First try to obtain the token from the incoming event or command request
         const actx: AutomationContextAware = context as any;
@@ -59,15 +59,15 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
         } else if (this.hasToken(this.clientToken)) {
             return { token: this.clientToken };
         } else if (this.hasToken(configurationValue("token"))) {
-            return { token: configurationValue("token")}
+            return { token: configurationValue<string>("token")};
         } else if (this.hasToken(configurationValue("sdm.github.token"))) {
-            return { token: configurationValue("sdm.github.token")}
+            return { token: configurationValue<string>("sdm.github.token")};
         }
         throw new Error("Neither 'orgToken' nor 'clientToken' has been injected. " +
             "Please add a repo-scoped GitHub token to your configuration at 'token' or 'sdm.github.token'.");
     }
 
-    private hasToken(token: string) {
+    private hasToken(token: string): boolean {
         if (!token) {
             return false;
             // "null" as string is being sent when the orgToken can't be determined by the api
