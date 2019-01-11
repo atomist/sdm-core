@@ -222,6 +222,9 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V
         },
     } as any;
 
+    // Clean up podSpec
+    delete podSpec.spec.nodeName;
+
     return {
         kind: "Job",
         apiVersion: "batch/v1",
