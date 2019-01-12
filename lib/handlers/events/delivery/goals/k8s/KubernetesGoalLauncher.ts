@@ -97,7 +97,7 @@ export class KubernetesGoalLauncher implements GoalLauncher {
             } as any,
             {
                 name: "ATOMIST_GOAL_ID",
-                value: (context as any).id,
+                value: (goalEvent as any).id,
             } as any,
             {
                 name: "ATOMIST_GOAL_SET_ID",
