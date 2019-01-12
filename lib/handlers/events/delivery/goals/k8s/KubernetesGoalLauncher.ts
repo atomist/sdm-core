@@ -46,7 +46,7 @@ export class KubernetesGoalLauncher implements GoalLauncher {
                 // Force all goals to run isolated via env var
                 process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes-all" ||
                 // Force all goals to run isolated via explicit configuration
-                (this.options.isolateAll === true && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes")
+                (this.options.isolateAll && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes")
             );
     }
 
