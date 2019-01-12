@@ -130,7 +130,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         };
 
         const goalLauncher = await findGoalLauncher(goalInvocation, this.configuration);
-        if (!goalLauncher) {
+        if (!!goalLauncher) {
             const result = await goalLauncher.launch(goalInvocation);
             if (!!result && result.code !== 0) {
                 await updateGoal(ctx, sdmGoal, {
