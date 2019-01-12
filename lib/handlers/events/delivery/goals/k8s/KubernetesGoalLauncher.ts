@@ -191,6 +191,7 @@ async function cleanCompletedJobs(): Promise<void> {
                 await batch.deleteNamespacedJob(
                     completedSdmJob.metadata.name,
                     completedSdmJob.metadata.namespace,
+                    // progagationPolicy is needed so that pods of the job are also deleted
                     { propagationPolicy: "Background" } as any);
             } catch (e) {
                 logger.warn(`Failed to delete K8 goal job '${completedSdmJob.metadata.name}': ${e.message}`);
