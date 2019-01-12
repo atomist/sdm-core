@@ -34,14 +34,20 @@ import { loadKubeConfig } from "./k8config";
 
 export class KubernetesGoalLauncher implements GoalLauncher {
 
-    constructor() {
+    constructor(private readonly options: { isolateAll?: boolean } = { isolateAll: false }) {
         this.init();
     }
 
     public async supports(gi: GoalInvocation): Promise<boolean> {
-        return gi.goal.definition.isolated
-            && !process.env.ATOMIST_ISOLATED_GOAL
-            && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes";
+        return !process.env.ATOMIST_ISOLATED_GOAL &&
+            (
+                // Goal is marked as isolated and SDM is configured to use K8 jobs
+                (gi.goal.definition.isolated && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes") ||
+                // Force all goals to run isolated via env var
+                process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes-all" ||
+                // Force all goals to run isolated via explicit configuration
+                (this.options.isolateAll === true && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes")
+            );
     }
 
     public async launch(gi: GoalInvocation): Promise<ExecuteGoalResult> {
@@ -121,7 +127,10 @@ export class KubernetesGoalLauncher implements GoalLauncher {
                 logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
             } catch (e) {
                 logger.error(`Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
-                return { code: 1, message: `Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'` };
+                return {
+                    code: 1,
+                    message: `Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                };
             }
         } catch (e) {
             // This is ok to ignore as it just means the job doesn't exist
