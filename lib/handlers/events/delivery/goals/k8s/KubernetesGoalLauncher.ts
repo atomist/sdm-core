@@ -144,6 +144,9 @@ export class KubernetesGoalLauncher implements GoalLauncher {
             logger.info(
                 `Scheduled K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
             logger.log("silly", JSON.stringify(jobResult));
+            gi.progressLog.write(`/--`);
+            gi.progressLog.write(`Starting K8 job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.name} (${goalEvent.uniqueName})'`);
+            gi.progressLog.write("\\--");
         } catch (e) {
             logger.error(`Failed to schedule K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
             return {
@@ -151,6 +154,7 @@ export class KubernetesGoalLauncher implements GoalLauncher {
                 message: `Failed to schedule K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
             };
         }
+        await gi.progressLog.flush();
     }
 
     private init(): void {
