@@ -32,6 +32,13 @@ import * as _ from "lodash";
 import * as os from "os";
 import { loadKubeConfig } from "./k8config";
 
+/**
+ * GoalLauncher implementation that runs SDM goals inside k8s jobs.
+ *
+ * It reuses the podSpec of the deployed SDM to create a new jobSpec from.
+ * Subclasses may change the spec and job creation behavior by overwriting beforeCreation
+ * and/or afterCreation methods.
+ */
 export class KubernetesGoalLauncher implements GoalLauncher {
 
     constructor(private readonly options: { isolateAll?: boolean } = { isolateAll: false }) {
@@ -41,12 +48,14 @@ export class KubernetesGoalLauncher implements GoalLauncher {
     public async supports(gi: GoalInvocation): Promise<boolean> {
         return !process.env.ATOMIST_ISOLATED_GOAL &&
             (
-                // Goal is marked as isolated and SDM is configured to use K8 jobs
+                // Goal is marked as isolated and SDM is configured to use k8s jobs
                 (gi.goal.definition.isolated && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes") ||
                 // Force all goals to run isolated via env var
                 process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes-all" ||
+                // Force all goals to run isolated via explicit option
+                (this.options.isolateAll && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes") ||
                 // Force all goals to run isolated via explicit configuration
-                (this.options.isolateAll && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes")
+                _.get(gi.configuration, "sdm.kubernetes.isolateAll", false) === true
             );
     }
 
@@ -67,8 +76,8 @@ export class KubernetesGoalLauncher implements GoalLauncher {
         try {
             podSpec = (await apps.readNamespacedPod(podName, podNs)).body;
         } catch (e) {
-            logger.error(`Failed to obtain parent pod spec from K8: ${e.message}`);
-            return { code: 1, message: `Failed to obtain parent pod spec from K8: ${e.message}` };
+            logger.error(`Failed to obtain parent pod spec from k8s: ${e.message}`);
+            return { code: 1, message: `Failed to obtain parent pod spec from k8s: ${e.message}` };
         }
 
         const jobSpec = createJobSpecWithAffinity(podSpec, goalEvent.goalSetId);
@@ -121,15 +130,15 @@ export class KubernetesGoalLauncher implements GoalLauncher {
         try {
             // Check if this job was previously launched
             await batch.readNamespacedJob(jobSpec.metadata.name, podNs);
-            logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' already exists. Deleting...`);
+            logger.debug(`k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' already exists. Deleting...`);
             try {
                 await batch.deleteNamespacedJob(jobSpec.metadata.name, podNs, {} as any);
-                logger.debug(`K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
+                logger.debug(`k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
             } catch (e) {
-                logger.error(`Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
+                logger.error(`Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
                 return {
                     code: 1,
-                    message: `Failed to delete K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                    message: `Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
                 };
             }
         } catch (e) {
@@ -137,24 +146,50 @@ export class KubernetesGoalLauncher implements GoalLauncher {
         }
 
         try {
+            await this.beforeCreation(gi, jobSpec);
+
             // Previous deletion might not have completed; hence the retry here
             const jobResult = (await doWithRetry<{ body: k8s.V1Job }>(
                 () => batch.createNamespacedJob(podNs, jobSpec),
-                `Scheduling K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`)).body;
+                `Scheduling k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`)).body;
+
+            await this.afterCreation(gi, jobResult);
+
             logger.info(
-                `Scheduled K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
+                `Scheduled k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
             logger.log("silly", JSON.stringify(jobResult));
             gi.progressLog.write(`/--`);
-            gi.progressLog.write(`Starting K8 job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.name} (${goalEvent.uniqueName})'`);
+            gi.progressLog.write(`Starting k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.name} (${goalEvent.uniqueName})'`);
             gi.progressLog.write("\\--");
         } catch (e) {
-            logger.error(`Failed to schedule K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
+            logger.error(`Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
             return {
                 code: 1,
-                message: `Failed to schedule K8 job '${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                message: `Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
             };
         }
         await gi.progressLog.flush();
+    }
+
+    /**
+     * Extension point for sub classes to modify k8s resources or provided jobSpec before the
+     * Job gets created in k8s.
+     * Note: A potentially existing job with the same name has already been deleted at this point
+     * @param gi
+     * @param jobSpec
+     */
+    protected async beforeCreation(gi: GoalInvocation, jobSpec: k8s.V1Job): Promise<void> {
+        // Intentionally left empty
+    }
+
+    /**
+     * Extension point for sub classes to modify k8s resources after the job has been created.
+     * The provided jobSpec contains the result of the job creation API call.
+     * @param gi
+     * @param jobSpec
+     */
+    protected async afterCreation(gi: GoalInvocation, jobSpec: k8s.V1Job): Promise<void> {
+        // Intentionally left empty
     }
 
     private init(): void {
@@ -170,7 +205,7 @@ export class KubernetesGoalLauncher implements GoalLauncher {
 }
 
 /**
- * Cleanup scheduled kubernetes goal jobs
+ * Cleanup scheduled k8s goal jobs
  * @returns {Promise<void>}
  */
 async function cleanCompletedJobs(): Promise<void> {
@@ -196,25 +231,25 @@ async function cleanCompletedJobs(): Promise<void> {
         sdmJobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
 
     if (completedSdmJobs.length > 0) {
-        logger.info(`Deleting the following goal jobs from namespace '${podNs}': ${
-            completedSdmJobs.join(", ")}`);
+        logger.info(`Deleting the following k8s goal jobs: ${
+            completedSdmJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
         for (const completedSdmJob of completedSdmJobs) {
             try {
                 await batch.deleteNamespacedJob(
                     completedSdmJob.metadata.name,
                     completedSdmJob.metadata.namespace,
-                    // progagationPolicy is needed so that pods of the job are also deleted
+                    // propagationPolicy is needed so that pods of the job are also deleted
                     { propagationPolicy: "Background" } as any);
             } catch (e) {
-                logger.warn(`Failed to delete K8 goal job '${completedSdmJob.metadata.name}': ${e.message}`);
+                logger.warn(`Failed to delete k8s goal job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${e.message}`);
             }
         }
     }
 }
 
 /**
- * Create a k8 Job spec with affinity to jobs for the same goal set
+ * Create a k8s Job spec with affinity to jobs for the same goal set
  * @param goalSetId
  */
 function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V1Job {

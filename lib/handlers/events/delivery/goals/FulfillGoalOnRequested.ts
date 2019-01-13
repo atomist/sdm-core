@@ -136,10 +136,11 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 await updateGoal(ctx, sdmGoal, {
                     state: SdmGoalState.failure,
                     description: goal.failureDescription,
+                    url: progressLog.url,
                 });
                 progressLog.write(`Goal launching failed with: ${JSON.stringify(result)}`);
                 await progressLog.close();
-            }
+            } 
             return {
                 code: 0,
                 ...result as any,
