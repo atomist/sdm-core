@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import {
     GoalExecutionListener,
     GoalImplementationMapper,
     GoalInvocation,
+    GoalScheduler,
     LoggingProgressLog,
     ProgressLog,
     SdmGoalEvent,
@@ -128,12 +129,22 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             credentials,
         };
 
-        const isolatedGoalLauncher = this.configuration.sdm.goalLauncher;
-
-        if (goal.definition.isolated && !process.env.ATOMIST_ISOLATED_GOAL && isolatedGoalLauncher) {
-            const result = isolatedGoalLauncher(sdmGoal, ctx, progressLog);
-            await progressLog.close();
-            return result;
+        const goalScheduler = await findGoalScheduler(goalInvocation, this.configuration);
+        if (!!goalScheduler) {
+            const start = Date.now();
+            const result = await goalScheduler.schedule(goalInvocation);
+            if (!!result && result.code !== 0) {
+                await updateGoal(ctx, sdmGoal, {
+                    state: SdmGoalState.failure,
+                    description: `Failed to schedule goal`,
+                    url: progressLog.url,
+                });
+                await reportEndAndClose(result, start, progressLog);
+            }
+            return {
+                code: 0,
+                ...result as any,
+            };
         } else {
             delete (sdmGoal as any).id;
 
@@ -160,6 +171,24 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             };
         }
     }
+}
+
+async function findGoalScheduler(gi: GoalInvocation,
+                                 configuration: SoftwareDeliveryMachineConfiguration): Promise<GoalScheduler | undefined> {
+    let goalSchedulers: GoalScheduler[];
+    if (!configuration.sdm.goalLauncher) {
+        return undefined;
+    } else if (!Array.isArray(configuration.sdm.goalLauncher)) {
+        goalSchedulers = [configuration.sdm.goalLauncher];
+    } else {
+        goalSchedulers = configuration.sdm.goalLauncher;
+    }
+    for (const gl of goalSchedulers) {
+        if (await gl.supports(gi)) {
+            return gl;
+        }
+    }
+    return undefined;
 }
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog) {
