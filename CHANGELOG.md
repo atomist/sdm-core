@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.2.0...HEAD)
 
+### Changed
+
+-   Make K8 goal launcher more extensible . [#90](https://github.com/atomist/sdm-core/issues/90)
+
 ## [1.2.0](https://github.com/atomist/sdm-core/compare/1.1.0...1.2.0) - 2018-12-27
 
 ### Added
