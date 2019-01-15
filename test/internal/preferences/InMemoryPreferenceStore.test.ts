@@ -15,7 +15,7 @@
  */
 
 import { InMemoryPreferenceStore } from "../../../lib/internal/preferences/InMemoryPreferenceStore";
-import { assertPreferences } from "./preferences.test";
+import { assertPreferences } from "./preferences";
 
 describe("InMemoryPreferenceStore", () => {
 

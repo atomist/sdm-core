@@ -28,9 +28,7 @@ import {
     Preference,
 } from "./AbstractPreferenceStore";
 
-interface PreferenceFile {
-    [key: string]: { value: string, ttl?: number };
-}
+type PreferenceFile = Record<string, { value: string, ttl?: number }>;
 
 /**
  * Factory to create a new FilePreferenceStore instance
@@ -49,18 +47,11 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
     constructor(private readonly context: HandlerContext,
                 private readonly fileName: string = "client.prefs.json") {
         super(context);
+        this.init();
     }
 
     public path(): string {
-        const p = path.join(os.userInfo().homedir, ".atomist", "prefs");
-        if (!fs.pathExistsSync(p)) {
-            fs.mkdirsSync(p);
-        }
-        const f = path.join(p, this.fileName);
-        if (!fs.existsSync(f)) {
-            fs.writeJSONSync(f, {});
-        }
-        return f;
+        return path.join(os.homedir(), ".atomist", "prefs", this.fileName);
     }
 
     protected async doGet(key: string): Promise<Preference | undefined> {
@@ -91,10 +82,22 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
 
     private async read(): Promise<PreferenceFile> {
         const p = this.path();
-        if (fs.existsSync(p)) {
+        try {
             return (await fs.readJSON(p)) as PreferenceFile;
-        } else {
+        } catch (e) {
+            await fs.writeJSON(p, {});
             return {};
+        }
+    }
+
+    private init() {
+        const p = this.path();
+        fs.ensureDirSync(path.dirname(p));
+        // sync for the constructor
+        try {
+            fs.readJSONSync(p);
+        } catch (e) {
+            fs.writeJSONSync(p, {});
         }
     }
 }

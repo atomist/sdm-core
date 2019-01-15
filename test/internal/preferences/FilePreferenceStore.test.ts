@@ -17,7 +17,7 @@
 import { formatDate } from "@atomist/sdm";
 import * as fs from "fs-extra";
 import { FilePreferenceStore } from "../../../lib/internal/preferences/FilePreferenceStore";
-import { assertPreferences } from "./preferences.test";
+import { assertPreferences } from "./preferences";
 
 describe("FilePreferenceStore", () => {
 

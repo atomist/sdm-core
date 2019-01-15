@@ -15,7 +15,7 @@
  */
 
 import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
-import { assertPreferences } from "./preferences.test";
+import { assertPreferences } from "./preferences";
 
 describe("GraphQLPreferenceStore", () => {
 
