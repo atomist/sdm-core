@@ -64,7 +64,7 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
     protected abstract doPut(pref: Preference): Promise<void>;
 
     private scopeKey(key: string, options?: { scope?: PreferenceScope }): string {
-        let k = key;
+        const k = key;
         if (options) {
             switch (options.scope) {
                 case "sdm":
