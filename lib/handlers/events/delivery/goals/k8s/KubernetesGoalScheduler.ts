@@ -95,7 +95,8 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                 await batch.deleteNamespacedJob(jobSpec.metadata.name, podNs, {} as any);
                 logger.debug(`k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
             } catch (e) {
-                logger.error(`Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
+                logger.error(`Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
+                    JSON.stringify(e.body)}`);
                 return {
                     code: 1,
                     message: `Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
@@ -116,10 +117,12 @@ export class KubernetesGoalScheduler implements GoalScheduler {
             await this.afterCreation(gi, jobResult);
 
             logger.info(
-                `Scheduled k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${JSON.stringify(jobResult.status)}`);
+                `Scheduled k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${
+                    JSON.stringify(jobResult.status)}`);
             logger.log("silly", JSON.stringify(jobResult));
         } catch (e) {
-            logger.error(`Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${JSON.stringify(e.body)}`);
+            logger.error(`Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
+                JSON.stringify(e.body)}`);
             return {
                 code: 1,
                 message: `Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
@@ -266,7 +269,7 @@ export function createJobSpec(podSpec: k8s.V1Pod,
 
     rewriteCachePath(jobSpec, context.workspaceId);
     return jobSpec;
-};
+}
 
 /**
  * Create a k8s Job spec with affinity to jobs for the same goal set

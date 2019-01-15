@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     AddressNoChannels,
     CredentialsResolver,
+    PreferenceStoreFactory,
     RepoCreationListener,
     RepoCreationListenerInvocation,
     RepoRefResolver,
@@ -42,24 +43,27 @@ export class OnRepoCreation implements HandleEvent<schema.OnRepoCreation.Subscri
 
     constructor(newRepoActions: RepoCreationListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
         this.newRepoActions = newRepoActions;
     }
 
     public async handle(event: EventFired<schema.OnRepoCreation.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const repo = event.data.Repo[0];
-        const id = params.repoRefResolver.toRemoteRepoRef(repo, {});
+        const id = this.repoRefResolver.toRemoteRepoRef(repo, {});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
+
         const invocation: RepoCreationListenerInvocation = {
             addressChannels: AddressNoChannels,
+            preferences,
             id,
             context,
             repo,
             credentials,
         };
-        await Promise.all(params.newRepoActions.map(a => a(invocation)));
+        await Promise.all(this.newRepoActions.map(a => a(invocation)));
         return Success;
     }
 }

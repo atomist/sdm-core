@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import {
     FingerprintDifferenceListener,
     FingerprintDifferenceListenerInvocation,
     FingerprintValue,
+    PreferenceStoreFactory,
     RepoRefResolver,
 } from "@atomist/sdm";
 import * as _ from "lodash";
@@ -44,16 +45,16 @@ export class ReactToSemanticDiffsOnPushImpact
 
     constructor(private readonly differenceListeners: FingerprintDifferenceListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferencesStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<schema.OnPushImpact.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const pushImpact = event.data.PushImpact[0];
 
         const after = pushImpact.push.after;
-        const id = params.repoRefResolver.toRemoteRepoRef(after.repo, { sha: after.sha });
+        const id = this.repoRefResolver.toRemoteRepoRef(after.repo, { sha: after.sha });
 
         const oldFingerprints = pushImpact.push.before.fingerprints;
         const newFingerprints = after.fingerprints;
@@ -75,11 +76,13 @@ export class ReactToSemanticDiffsOnPushImpact
                 .filter(fv => _.get(fv, "oldValue.sha") !== _.get(fv, "newValue.sha"));
 
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferencesStoreFactory(context);
         const inv: FingerprintDifferenceListenerInvocation = {
             id,
             context,
             credentials,
             addressChannels: addressChannelsFor(after.repo, context),
+            preferences,
             diffs,
         };
         await Promise.all(this.differenceListeners.map(dh => dh(inv)));

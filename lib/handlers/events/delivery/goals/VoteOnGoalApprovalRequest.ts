@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import {
     GoalApprovalRequestVoter,
     GoalApprovalRequestVoterInvocation,
     GoalImplementationMapper,
+    PreferenceStoreFactory,
     RepoRefResolver,
     SdmGoalEvent,
     SdmGoalState,
@@ -58,7 +59,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly voters: GoalApprovalRequestVoter[],
                 private readonly decisionManager: GoalApprovalRequestVoteDecisionManager,
-                private readonly implementationMapper: GoalImplementationMapper) {
+                private readonly implementationMapper: GoalImplementationMapper,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
         if (this.voters.length === 0) {
             this.voters.push(async () => ({ vote: GoalApprovalRequestVote.Granted }));
         }
@@ -78,12 +80,14 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
 
         const garvi: GoalApprovalRequestVoterInvocation = {
             id,
             context,
             credentials,
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
+            preferences,
             goal: sdmGoal,
         };
 
@@ -97,7 +101,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                     let g = sdmGoal;
                     const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
                     for (const cb of cbs) {
-                        g = await cb.callback(g, { id, addressChannels: undefined, credentials, context });
+                        g = await cb.callback(g, { id, addressChannels: undefined, preferences, credentials, context });
                     }
                     await updateGoal(context, sdmGoal, {
                         state: SdmGoalState.requested,
