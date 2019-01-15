@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import {
     ClosedIssueListener,
     ClosedIssueListenerInvocation,
     CredentialsResolver,
+    PreferenceStoreFactory,
     RepoRefResolver,
 } from "@atomist/sdm";
 import * as schema from "@atomist/sdm/lib/typings/types";
@@ -42,26 +43,28 @@ export class ClosedIssueHandler implements HandleEvent<schema.OnClosedIssue.Subs
 
     constructor(closedIssueListeners: ClosedIssueListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
         this.closedIssueListeners = closedIssueListeners;
     }
 
     public async handle(event: EventFired<schema.OnClosedIssue.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const issue = event.data.Issue[0];
-        const id = params.repoRefResolver.toRemoteRepoRef(issue.repo, {});
+        const id = this.repoRefResolver.toRemoteRepoRef(issue.repo, {});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
 
         const addressChannels = addressChannelsFor(issue.repo, context);
         const inv: ClosedIssueListenerInvocation = {
             id,
             addressChannels,
+            preferences,
             context,
             issue,
             credentials,
         };
-        await Promise.all(params.closedIssueListeners
+        await Promise.all(this.closedIssueListeners
             .map(l => l(inv)));
         return Success;
     }

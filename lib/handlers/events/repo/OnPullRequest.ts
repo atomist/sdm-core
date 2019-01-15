@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import {
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
-    AddressChannels,
     addressChannelsFor,
     CredentialsResolver,
+    PreferenceStoreFactory,
     ProjectLoader,
     PullRequestListener,
     PullRequestListenerInvocation,
@@ -44,33 +44,35 @@ export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscript
         private readonly projectLoader: ProjectLoader,
         private readonly repoRefResolver: RepoRefResolver,
         private readonly listeners: PullRequestListener[],
-        private readonly credentialsFactory: CredentialsResolver) {
+        private readonly credentialsFactory: CredentialsResolver,
+        private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<schema.OnPullRequest.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const pullRequest = event.data.PullRequest[0];
         const repo = pullRequest.repo;
-        const id = params.repoRefResolver.toRemoteRepoRef(
+        const id = this.repoRefResolver.toRemoteRepoRef(
             repo,
             {
                 sha: pullRequest.head.sha,
                 branch: pullRequest.branch.name,
             });
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const addressChannels = addressChannelsFor(repo, context);
+        const preferences = this.preferenceStoreFactory(context);
 
-        const addressChannels: AddressChannels = addressChannelsFor(repo, context);
         await this.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async project => {
             const prli: PullRequestListenerInvocation = {
                 id,
                 context,
                 addressChannels,
+                preferences,
                 credentials,
                 project,
                 pullRequest,
             };
-            await Promise.all(params.listeners
+            await Promise.all(this.listeners
                 .map(l => l(prli)),
             );
         });
