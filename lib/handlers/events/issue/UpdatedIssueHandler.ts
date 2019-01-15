@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     CredentialsResolver,
+    PreferenceStoreFactory,
     RepoRefResolver,
     UpdatedIssueListener,
     UpdatedIssueListenerInvocation,
@@ -43,17 +44,18 @@ export class UpdatedIssueHandler implements HandleEvent<schema.OnIssueAction.Sub
 
     constructor(updatedIssueListeners: UpdatedIssueListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
         this.updatedIssueListeners = updatedIssueListeners;
     }
 
     public async handle(event: EventFired<schema.OnIssueAction.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const issue = event.data.Issue[0];
         const addressChannels = addressChannelsFor(issue.repo, context);
         const id = this.repoRefResolver.toRemoteRepoRef(issue.repo, {});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
 
         if (issue.updatedAt === issue.createdAt) {
             logger.debug("Issue created, not updated: %s on %j", issue.number, id);
@@ -63,11 +65,12 @@ export class UpdatedIssueHandler implements HandleEvent<schema.OnIssueAction.Sub
         const inv: UpdatedIssueListenerInvocation = {
             id,
             addressChannels,
+            preferences,
             context,
             issue,
             credentials,
         };
-        await Promise.all(params.updatedIssueListeners
+        await Promise.all(this.updatedIssueListeners
             .map(l => l(inv)));
         return Success;
     }

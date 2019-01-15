@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import {
     GoalImplementationMapper,
     GoalSetter,
     GoalsSetListener,
+    PreferenceStoreFactory,
     ProjectLoader,
     RepoRefResolver,
 } from "@atomist/sdm";
@@ -53,24 +54,26 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
     constructor(private readonly projectLoader: ProjectLoader,
                 private readonly repoRefResolver: RepoRefResolver,
                 private readonly goalSetter: GoalSetter,
+                // public for tests only
                 public readonly goalsListeners: GoalsSetListener[],
                 private readonly implementationMapping: GoalImplementationMapper,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<OnPushToAnyBranch.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const push: OnPushToAnyBranch.Push = event.data.Push[0];
         const id: RemoteRepoRef = this.repoRefResolver.toRemoteRepoRef(push.repo, {});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         await chooseAndSetGoals({
-            projectLoader: params.projectLoader,
-            repoRefResolver: params.repoRefResolver,
-            goalsListeners: params.goalsListeners,
-            goalSetter: params.goalSetter,
-            implementationMapping: params.implementationMapping,
+            projectLoader: this.projectLoader,
+            repoRefResolver: this.repoRefResolver,
+            goalsListeners: this.goalsListeners,
+            goalSetter: this.goalSetter,
+            implementationMapping: this.implementationMapping,
+            preferencesFactory: this.preferenceStoreFactory,
         }, {
                 context,
                 credentials,

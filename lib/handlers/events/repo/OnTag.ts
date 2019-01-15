@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     CredentialsResolver,
+    PreferenceStoreFactory,
     RepoRefResolver,
     TagListener,
     TagListenerInvocation,
@@ -40,24 +41,28 @@ export class OnTag implements HandleEvent<schema.OnTag.Subscription> {
 
     constructor(private readonly listeners: TagListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {}
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {}
 
     public async handle(event: EventFired<schema.OnTag.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const tag = event.data.Tag[0];
         const repo = tag.commit.repo;
-        const id = params.repoRefResolver.toRemoteRepoRef(repo, {});
+
+        const id = this.repoRefResolver.toRemoteRepoRef(repo, {});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
         const addressChannels = addressChannelsFor(repo, context);
+        const preferences = this.preferenceStoreFactory(context);
+
         const invocation: TagListenerInvocation = {
             addressChannels,
+            preferences,
             id,
             context,
             tag,
             credentials,
         };
-        await Promise.all(params.listeners.map(l => l(invocation)));
+        await Promise.all(this.listeners.map(l => l(invocation)));
         return Success;
     }
 }
