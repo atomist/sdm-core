@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.2.0...HEAD)
 
+### Added
+
+-   Add PreferenceStore implementations. [#93](https://github.com/atomist/sdm-core/issues/93)
+
 ### Changed
 
 -   Make K8 goal scheduling more extensible. [#90](https://github.com/atomist/sdm-core/issues/90)
