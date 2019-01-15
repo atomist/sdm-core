@@ -82,6 +82,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
             goalsListeners: [...sdm.goalsSetListeners],
             goalSetter: sdm.pushMapping,
             implementationMapping: sdm.goalFulfillmentMapper,
+            preferencesFactory: sdm.configuration.sdm.preferenceStoreFactory,
         };
 
         let repoData;

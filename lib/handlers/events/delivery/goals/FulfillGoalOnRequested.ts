@@ -108,6 +108,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         const id = this.configuration.sdm.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
         const credentials = this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id);
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
+        const preferences = this.configuration.sdm.preferenceStoreFactory(ctx);
 
         const implementation = this.implementationMapper.findImplementationBySdmGoal(sdmGoal);
         const { goal } = implementation;
@@ -125,6 +126,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             progressLog,
             context: ctx,
             addressChannels,
+            preferences,
             id,
             credentials,
         };
