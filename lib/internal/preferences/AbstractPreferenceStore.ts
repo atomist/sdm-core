@@ -18,7 +18,10 @@ import {
     ConfigurationAware,
     HandlerContext,
 } from "@atomist/automation-client";
-import { PreferenceStore } from "@atomist/sdm";
+import {
+    PreferenceScope,
+    PreferenceStore,
+} from "@atomist/sdm";
 
 export interface Preference {
     key: string;
@@ -34,7 +37,7 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
     protected constructor(private readonly ctx: HandlerContext) {
     }
 
-    public async get<V>(key: string, options?: { scoped?: boolean }): Promise<V | undefined> {
+    public async get<V>(key: string, options?: { scope?: PreferenceScope }): Promise<V | undefined> {
         const pref = await this.doGet(this.scopeKey(key, options));
         if (!pref) {
             return undefined;
@@ -46,7 +49,7 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
         }
     }
 
-    public async put<V>(key: string, value: V, options: { ttl?: number; scoped?: boolean } = {}): Promise<V> {
+    public async put<V>(key: string, value: V, options: { ttl?: number; scope?: PreferenceScope } = {}): Promise<V> {
         const pref: Preference = {
             key: this.scopeKey(key, options),
             value: JSON.stringify(value),
@@ -60,10 +63,16 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
 
     protected abstract doPut(pref: Preference): Promise<void>;
 
-    private scopeKey(key: string, options?: { scoped?: boolean }): string {
+    private scopeKey(key: string, options?: { scope?: PreferenceScope }): string {
         let k = key;
-        if (options && options.scoped) {
-            k = `${(this.ctx as any as ConfigurationAware).configuration.name}.${key}`;
+        if (options) {
+            switch (options.scope) {
+                case "sdm":
+                    return `${(this.ctx as any as ConfigurationAware).configuration.name}.${key}`;
+                case "workspace":
+                default:
+                    return k;
+            }
         }
         return k;
     }

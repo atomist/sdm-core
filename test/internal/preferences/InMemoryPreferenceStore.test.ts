@@ -21,12 +21,12 @@ describe("InMemoryPreferenceStore", () => {
 
     it("should correctly handle preferences", async () => {
         const prefs = new InMemoryPreferenceStore({ configuration: { name: "my-sdm" } } as any);
-        await assertPreferences(prefs, false);
+        await assertPreferences(prefs);
     });
 
     it("should correctly handle scoped preferences", async () => {
         const prefs = new InMemoryPreferenceStore({ configuration: { name: "my-sdm" } } as any);
-        await assertPreferences(prefs, true);
+        await assertPreferences(prefs, "sdm");
     });
 
 });

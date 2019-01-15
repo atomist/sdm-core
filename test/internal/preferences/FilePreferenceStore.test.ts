@@ -26,14 +26,14 @@ describe("FilePreferenceStore", () => {
     it("should correctly handle preferences", async () => {
         const p = path.join(os.homedir(), ".atomist", "prefs", `client.prefs-${formatDate()}.json`);
         const prefs = new FilePreferenceStore({ configuration: { name: "my-sdm" } } as any, p);
-        await assertPreferences(prefs, false);
+        await assertPreferences(prefs);
         await fs.unlink(p);
     });
 
     it("should correctly handle scoped preferences", async () => {
         const p = path.join(os.homedir(), ".atomist", "prefs", `client.prefs-${formatDate()}.json`);
         const prefs = new FilePreferenceStore({ configuration: { name: "my-sdm" } } as any, p);
-        await assertPreferences(prefs, true);
+        await assertPreferences(prefs, "sdm");
         await fs.unlink(p);
     });
 

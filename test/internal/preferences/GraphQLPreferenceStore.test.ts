@@ -46,13 +46,13 @@ describe("GraphQLPreferenceStore", () => {
     it("should correctly handle preferences", async () => {
         const store = {};
         const prefs = new GraphQLPreferenceStore(ctx(store) as any);
-        await assertPreferences(prefs, false);
+        await assertPreferences(prefs);
     });
 
     it("should correctly handle scoped preferences", async () => {
         const store = {};
         const prefs = new GraphQLPreferenceStore(ctx(store) as any);
-        await assertPreferences(prefs, true);
+        await assertPreferences(prefs, "sdm");
     });
 
 });

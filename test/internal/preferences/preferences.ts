@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
-import { PreferenceStore } from "@atomist/sdm";
+import {
+    PreferenceScope,
+    PreferenceStore,
+} from "@atomist/sdm";
 import * as assert from "power-assert";
 
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function assertPreferences(prefs: PreferenceStore, scoped: boolean) {
-    assert(!(await prefs.get("foo", { scoped })));
-    await prefs.put("foo", "bar", { scoped });
-    assert.strictEqual(await prefs.get("foo", { scoped }), "bar");
+export async function assertPreferences(prefs: PreferenceStore, scope?: PreferenceScope) {
+    assert(!(await prefs.get("foo", { scope })));
+    await prefs.put("foo", "bar", { scope });
+    assert.strictEqual(await prefs.get("foo", { scope }), "bar");
 
-    await prefs.put("foo", "barbar", { scoped });
-    assert.strictEqual(await prefs.get("foo", { scoped }), "barbar");
+    await prefs.put("foo", "barbar", { scope });
+    assert.strictEqual(await prefs.get("foo", { scope }), "barbar");
 
-    await prefs.put("bar", "foo", { scoped, ttl: 10 });
+    await prefs.put("bar", "foo", { scope, ttl: 10 });
     await sleep(20);
-    assert(!(await prefs.get("bar", { scoped })));
+    assert(!(await prefs.get("bar", { scope })));
 
     const b = { foo: "bar" };
-    await prefs.put("bar", b, { scoped });
-    assert.deepStrictEqual((await prefs.get("bar", { scoped })), b);
-    assert(!(await prefs.get("bar", { scoped: !scoped })));
+    await prefs.put("bar", b, { scope });
+    assert.deepStrictEqual((await prefs.get("bar", { scope })), b);
+    assert(!(await prefs.get("bar", { scope: scope === "sdm" ? "workspace" : "sdm" })));
 }
