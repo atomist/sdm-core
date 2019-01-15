@@ -26,6 +26,7 @@ import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsR
 import { KubernetesGoalScheduler } from "../handlers/events/delivery/goals/k8s/KubernetesGoalScheduler";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
+import { GraphQLPreferenceStoreFactory } from "../internal/preferences/GraphQLPreferenceStore";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
 
 export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
@@ -44,6 +45,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
             goalLauncher: [new KubernetesGoalScheduler()],
+            preferenceStoreFactory: GraphQLPreferenceStoreFactory,
         },
         local: {
             preferLocalSeeds: true,
