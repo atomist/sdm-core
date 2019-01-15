@@ -29,6 +29,7 @@ import {
     ChannelLinkListener,
     ChannelLinkListenerInvocation,
     CredentialsResolver,
+    PreferenceStoreFactory,
     ProjectLoader,
     RepoRefResolver,
 } from "@atomist/sdm";
@@ -44,14 +45,14 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
         private readonly projectLoader: ProjectLoader,
         private readonly repoRefResolver: RepoRefResolver,
         private readonly listeners: ChannelLinkListener[],
-        private readonly credentialsFactory: CredentialsResolver) {
+        private readonly credentialsFactory: CredentialsResolver,
+        private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<schema.OnChannelLink.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const repo = event.data.ChannelLink[0].repo;
-        const id = params.repoRefResolver.toRemoteRepoRef(
+        const id = this.repoRefResolver.toRemoteRepoRef(
             repo,
             {
                 branch: repo.defaultBranch,
@@ -59,18 +60,21 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
 
         const addressChannels: AddressChannels = addressChannelsFor(repo, context);
+        const preferences = this.preferenceStoreFactory(context);
+
         const newlyLinkedChannelName = event.data.ChannelLink[0].channel.name;
         await this.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async project => {
             const invocation: ChannelLinkListenerInvocation = {
                 id,
                 context,
                 addressChannels,
+                preferences,
                 credentials,
                 project,
                 newlyLinkedChannelName,
                 addressNewlyLinkedChannel: (msg, opts) => context.messageClient.addressChannels(msg, newlyLinkedChannelName, opts),
             };
-            await Promise.all(params.listeners
+            await Promise.all(this.listeners
                 .map(l => l(invocation)),
             );
         });

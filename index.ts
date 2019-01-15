@@ -102,6 +102,7 @@ export {
     SdmVersionForCommit,
 } from "./lib/typings/types";
 import * as github from "./lib/util/github/ghub";
+
 export {
     gitHubGoalStatus,
 } from "./lib/pack/github-goal-status/github";
@@ -129,3 +130,9 @@ export {
     lookFor200OnEndpointRootGet,
 } from "./lib/util/verify/lookFor200OnEndpointRootGet";
 export * from "./lib/util/webhook/ImageLink";
+export {
+    Preference,
+    AbstractPreferenceStore,
+} from "./lib/internal/preferences/AbstractPreferenceStore";
+export { FileBasedPreferenceStoreFactory } from "./lib/internal/preferences/FilePreferenceStore";
+export { GraphQLPreferenceStoreFactory } from "./lib/internal/preferences/GraphQLPreferenceStore";

@@ -28,6 +28,7 @@ import {
     AddressChannels,
     addressChannelsFor,
     CredentialsResolver,
+    PreferenceStoreFactory,
     ProjectListener,
     ProjectListenerInvocation,
     RepoRefResolver,
@@ -42,26 +43,28 @@ export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subsc
 
     constructor(private readonly actions: ProjectListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<schema.OnRepoOnboarded.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const repoOnboarded = event.data.RepoOnboarded[0];
-        const id = params.repoRefResolver.toRemoteRepoRef(repoOnboarded.repo, {branch: repoOnboarded.repo.defaultBranch});
+        const id = this.repoRefResolver.toRemoteRepoRef(repoOnboarded.repo, {branch: repoOnboarded.repo.defaultBranch});
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
-
         const addressChannels: AddressChannels = addressChannelsFor(repoOnboarded.repo, context);
+        const preferences = this.preferenceStoreFactory(context);
+
         const project = await GitCommandGitProject.cloned(credentials, id);
         const invocation: ProjectListenerInvocation = {
             id,
             context,
             addressChannels,
+            preferences,
             credentials,
             project,
         };
-        await Promise.all(params.actions
+        await Promise.all(this.actions
             .map(l => l(invocation)),
         );
         return Success;

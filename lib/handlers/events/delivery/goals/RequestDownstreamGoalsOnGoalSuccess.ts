@@ -31,6 +31,7 @@ import {
     goalKeyString,
     mapKeyToGoal,
     preconditionsAreMet,
+    PreferenceStoreFactory,
     RepoRefResolver,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
@@ -53,12 +54,12 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
     constructor(private readonly name,
                 private readonly implementationMapper: GoalImplementationMapper,
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsResolver: CredentialsResolver) {
+                private readonly credentialsResolver: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<OnAnySuccessfulSdmGoal.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
@@ -66,8 +67,9 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             return Success;
         }
 
-        const id = params.repoRefResolver.repoRefFromPush(sdmGoal.push) ;
+        const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
         const credentials = this.credentialsResolver.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
 
         const goals = fetchGoalsFromPush(sdmGoal);
 
@@ -92,7 +94,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                 let g = sdmG;
                 const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmG);
                 for (const cb of cbs) {
-                    g = await cb.callback(g, {id, addressChannels: undefined, credentials, context});
+                    g = await cb.callback(g, { id, addressChannels: undefined, preferences, credentials, context });
                 }
                 return updateGoal(context, g, {
                     state: SdmGoalState.requested,

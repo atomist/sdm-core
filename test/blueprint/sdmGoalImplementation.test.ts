@@ -28,6 +28,7 @@ import {
     determineGoals,
     Goals,
     GoalWithFulfillment,
+    NoPreferenceStore,
     PushFields,
     resetRegistrableManager,
     SdmGoalEvent,
@@ -102,6 +103,7 @@ describe("implementing goals in the SDM", () => {
                 addressChannels: async () => {
                     return;
                 },
+                preferences: NoPreferenceStore,
                 goalSetId: "hi",
             },
         );
@@ -143,6 +145,7 @@ describe("implementing goals in the SDM", () => {
                 addressChannels: async () => {
                     return;
                 },
+                preferences: NoPreferenceStore,
                 goalSetId: "hi",
             },
         );

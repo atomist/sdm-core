@@ -25,6 +25,7 @@ import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     CredentialsResolver,
+    PreferenceStoreFactory,
     RepoRefResolver,
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
@@ -39,26 +40,30 @@ export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningCha
 
     constructor(private readonly listeners: UserJoiningChannelListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<schema.OnUserJoiningChannel.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const joinEvent = event.data.UserJoinedChannel[0];
         const repos = joinEvent.channel.repos.map(
-            repo => params.repoRefResolver.toRemoteRepoRef(repo, {}));
+            repo => this.repoRefResolver.toRemoteRepoRef(repo, {}));
+
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, repos[0]);
         const addressChannels = (msg, opts) => context.messageClient.addressChannels(msg, joinEvent.channel.name, opts);
+        const preferences = this.preferenceStoreFactory(context);
+
         const invocation: UserJoiningChannelListenerInvocation = {
             addressChannels,
+            preferences,
             context,
             credentials,
             joinEvent,
             repos,
         };
 
-        await Promise.all(params.listeners
+        await Promise.all(this.listeners
             .map(l => l(invocation)),
         );
         return Success;

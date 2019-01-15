@@ -29,6 +29,7 @@ import {
     CredentialsResolver,
     NewIssueListener,
     NewIssueListenerInvocation,
+    PreferenceStoreFactory,
     RepoRefResolver,
 } from "@atomist/sdm";
 import * as schema from "@atomist/sdm/lib/typings/types";
@@ -43,31 +44,33 @@ export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscri
 
     constructor(newIssueListeners: NewIssueListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
         this.newIssueListeners = newIssueListeners;
     }
 
     public async handle(event: EventFired<schema.OnIssueAction.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const issue = event.data.Issue[0];
         const addressChannels = addressChannelsFor(issue.repo, context);
-        const id = params.repoRefResolver.toRemoteRepoRef(issue.repo, {});
+        const id = this.repoRefResolver.toRemoteRepoRef(issue.repo, {});
 
         if (issue.updatedAt !== issue.createdAt) {
             logger.debug("Issue updated, not created: %s on %j", issue.number, id);
             return Success;
         }
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
 
         const inv: NewIssueListenerInvocation = {
             id,
             addressChannels,
+            preferences,
             context,
             issue,
             credentials,
         };
-        await Promise.all(params.newIssueListeners
+        await Promise.all(this.newIssueListeners
             .map(l => l(inv)));
         return Success;
     }

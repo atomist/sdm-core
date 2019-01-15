@@ -56,7 +56,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             () => new OnRepoCreation(
                 this.repoCreationListeners,
                 this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver) :
+                this.configuration.sdm.credentialsResolver,
+                this.configuration.sdm.preferenceStoreFactory) :
             undefined;
     }
 
@@ -65,7 +66,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             () => new OnFirstPushToRepo(
                 this.firstPushListeners,
                 this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver) :
+                this.configuration.sdm.credentialsResolver,
+                this.configuration.sdm.preferenceStoreFactory) :
             undefined;
     }
 
@@ -74,7 +76,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
             () => new ReactToSemanticDiffsOnPushImpact(
                 this.fingerprintDifferenceListeners,
                 this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver) :
+                this.configuration.sdm.credentialsResolver,
+                this.configuration.sdm.preferenceStoreFactory) :
             undefined;
     }
 
@@ -87,7 +90,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     this.pushMapping,
                     this.goalsSetListeners,
                     this.goalFulfillmentMapper,
-                    this.configuration.sdm.credentialsResolver)],
+                    this.configuration.sdm.credentialsResolver,
+                    this.configuration.sdm.preferenceStoreFactory)],
                 commandHandlers: [],
                 ingesters: [],
             };
@@ -109,17 +113,20 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                         this.configuration.name,
                         this.goalFulfillmentMapper,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver),
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory),
                     () => new RespondOnGoalCompletion(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
-                        this.goalCompletionListeners),
+                        this.goalCompletionListeners,
+                        this.configuration.sdm.preferenceStoreFactory),
                     () => new VoteOnGoalApprovalRequest(
                         this.configuration.sdm.repoRefResolver,
                         this.configuration.sdm.credentialsResolver,
                         this.goalApprovalRequestVoters,
                         this.goalApprovalRequestVoteDecisionManager,
-                        this.goalFulfillmentMapper)],
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.preferenceStoreFactory)],
                 commandHandlers: [],
                 ingesters: [],
             };
@@ -151,50 +158,58 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     () => new OnUserJoiningChannel(
                         this.userJoiningChannelListeners,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.tagListeners.length > 0 ?
                     () => new OnTag(
                         this.tagListeners,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.newIssueListeners.length > 0 ?
                     () => new NewIssueHandler(
                         this.newIssueListeners,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.updatedIssueListeners.length > 0 ?
                     () => new UpdatedIssueHandler(
                         this.updatedIssueListeners,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.closedIssueListeners.length > 0 ?
                     () => new ClosedIssueHandler(
                         this.closedIssueListeners,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.channelLinkListeners.length > 0 ?
                     () => new OnChannelLink(
                         this.configuration.sdm.projectLoader,
                         this.configuration.sdm.repoRefResolver,
                         this.channelLinkListeners,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.pullRequestListeners.length > 0 ?
                     () => new OnPullRequest(
                         this.configuration.sdm.projectLoader,
                         this.configuration.sdm.repoRefResolver,
                         this.pullRequestListeners,
-                        this.configuration.sdm.credentialsResolver) : undefined,
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) : undefined,
                 this.repoOnboardingListeners.length > 0 ?
                     () => new OnRepoOnboarded(
                         this.repoOnboardingListeners,
                         this.configuration.sdm.repoRefResolver,
-                        this.configuration.sdm.credentialsResolver) :
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory) :
                     undefined,
                 this.onRepoCreation,
                 this.onFirstPush,

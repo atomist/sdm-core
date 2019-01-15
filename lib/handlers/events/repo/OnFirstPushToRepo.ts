@@ -29,6 +29,7 @@ import {
     AddressChannels,
     AddressNoChannels,
     CredentialsResolver,
+    PreferenceStoreFactory,
     PushListener,
     PushListenerInvocation,
     RepoRefResolver,
@@ -45,12 +46,12 @@ export class OnFirstPushToRepo
 
     constructor(private readonly actions: PushListener[],
                 private readonly repoRefResolver: RepoRefResolver,
-                private readonly credentialsFactory: CredentialsResolver) {
+                private readonly credentialsFactory: CredentialsResolver,
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<schema.OnFirstPushToRepo.Subscription>,
-                        context: HandlerContext,
-                        params: this): Promise<HandlerResult> {
+                        context: HandlerContext): Promise<HandlerResult> {
         const push = event.data.Push[0];
 
         if (!!push.before) {
@@ -64,8 +65,9 @@ export class OnFirstPushToRepo
         }
 
         const screenName = _.get(push, "after.committer.person.chatId.screenName");
-        const id = params.repoRefResolver.toRemoteRepoRef(push.repo, { sha: push.after.sha });
+        const id = this.repoRefResolver.toRemoteRepoRef(push.repo, { sha: push.after.sha });
         const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const preferences = this.preferenceStoreFactory(context);
 
         let addressChannels: AddressChannels;
         if (!screenName) {
@@ -80,11 +82,12 @@ export class OnFirstPushToRepo
             id,
             context,
             addressChannels,
+            preferences,
             credentials,
             project,
             push,
         };
-        await Promise.all(params.actions
+        await Promise.all(this.actions
             .map(l => l(invocation)),
         );
         return Success;

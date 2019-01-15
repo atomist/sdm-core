@@ -30,6 +30,7 @@ import {
     fetchGoalsFromPush,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
+    PreferenceStoreFactory,
     RepoRefResolver,
     SdmGoalEvent,
 } from "@atomist/sdm";
@@ -45,7 +46,8 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
-                private readonly goalCompletionListeners: GoalCompletionListener[]) {
+                private readonly goalCompletionListeners: GoalCompletionListener[],
+                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
     }
 
     public async handle(event: EventFired<OnAnyCompletedSdmGoal.Subscription>,
@@ -66,6 +68,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             context,
             credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
+            preferences: this.preferenceStoreFactory(context),
             allGoals: goals,
             completedGoal: sdmGoal,
         };
