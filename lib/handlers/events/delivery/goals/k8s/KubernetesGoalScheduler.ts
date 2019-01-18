@@ -82,24 +82,27 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         }
 
         const jobSpec = createJobSpec(podSpec, podNs, goalEvent, context);
+        await this.beforeCreation(gi, jobSpec);
 
         gi.progressLog.write(`/--`);
-        gi.progressLog.write(`Scheduling k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.name} (${goalEvent.uniqueName})'`);
+        gi.progressLog.write(
+            `Scheduling k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.name} (${goalEvent.uniqueName})'`);
         gi.progressLog.write("\\--");
 
         try {
             // Check if this job was previously launched
-            await batch.readNamespacedJob(jobSpec.metadata.name, podNs);
-            logger.debug(`k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' already exists. Deleting...`);
+            await batch.readNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace);
+            logger.debug(
+                `k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' already exists. Deleting...`);
             try {
-                await batch.deleteNamespacedJob(jobSpec.metadata.name, podNs, {} as any);
-                logger.debug(`k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
+                await batch.deleteNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace, {} as any);
+                logger.debug(`k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
             } catch (e) {
-                logger.error(`Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
+                logger.error(`Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
                     JSON.stringify(e.body)}`);
                 return {
                     code: 1,
-                    message: `Failed to delete k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                    message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
                 };
             }
         } catch (e) {
@@ -107,25 +110,23 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         }
 
         try {
-            await this.beforeCreation(gi, jobSpec);
-
             // Previous deletion might not have completed; hence the retry here
             const jobResult = (await doWithRetry<{ body: k8s.V1Job }>(
-                () => batch.createNamespacedJob(podNs, jobSpec),
-                `Scheduling k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`)).body;
+                () => batch.createNamespacedJob(jobSpec.metadata.namespace, jobSpec),
+                `Scheduling k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`)).body;
 
             await this.afterCreation(gi, jobResult);
 
             logger.info(
-                `Scheduled k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${
+                `Scheduled k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${
                     JSON.stringify(jobResult.status)}`);
             logger.log("silly", JSON.stringify(jobResult));
         } catch (e) {
-            logger.error(`Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
+            logger.error(`Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
                 JSON.stringify(e.body)}`);
             return {
                 code: 1,
-                message: `Failed to schedule k8s job '${podNs}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
             };
         }
         await gi.progressLog.flush();
