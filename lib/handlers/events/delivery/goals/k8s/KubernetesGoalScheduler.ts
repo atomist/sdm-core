@@ -154,14 +154,21 @@ export class KubernetesGoalScheduler implements GoalScheduler {
     }
 
     private init(): void {
-        if (cluster.isMaster && process.env.ATOMIST_GOAL_LAUNCHER === "kubernetes") {
+        if (cluster.isMaster && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
             setInterval(() => {
-                return cleanCompletedJobs()
+                return this.cleanUp()
                     .then(() => {
                         logger.debug("Finished cleaning scheduled goal jobs");
                     });
             }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
         }
+    }
+
+    /**
+     * Extension point to allow for custom clean up logic.
+     */
+    protected async cleanUp(): Promise<void> {
+        return cleanCompletedJobs(true);
     }
 }
 
@@ -169,9 +176,9 @@ export class KubernetesGoalScheduler implements GoalScheduler {
  * Cleanup scheduled k8s goal jobs
  * @returns {Promise<void>}
  */
-async function cleanCompletedJobs(): Promise<void> {
-    const podName = process.env.ATOMIST_DEPLOYMENT_NAME || os.hostname();
-    const podNs = process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+export async function cleanCompletedJobs(ownNamespaceOnly: boolean = true): Promise<void> {
+    const podName = process.env.ATOMIST_POD_NAME || os.hostname();
+    const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
     const kc = loadKubeConfig();
     const apps = kc.makeApiClient(k8s.Core_v1Api);
@@ -185,7 +192,12 @@ async function cleanCompletedJobs(): Promise<void> {
         return;
     }
 
-    const jobs = await batch.listNamespacedJob(podNs);
+    let jobs;
+    if (ownNamespaceOnly) {
+        jobs = await batch.listNamespacedJob(podNs);
+    } else {
+        jobs = await batch.listJobForAllNamespaces();
+    }
 
     const sdmJobs = jobs.body.items.filter(j => j.metadata.name.startsWith(`${podSpec.spec.containers[0].name}-job-`));
     const completedSdmJobs =
