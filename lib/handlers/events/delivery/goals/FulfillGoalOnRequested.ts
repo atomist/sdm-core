@@ -178,12 +178,12 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 async function findGoalScheduler(gi: GoalInvocation,
                                  configuration: SoftwareDeliveryMachineConfiguration): Promise<GoalScheduler | undefined> {
     let goalSchedulers: GoalScheduler[];
-    if (!configuration.sdm.goalLauncher) {
+    if (!configuration.sdm.goalScheduler) {
         return undefined;
-    } else if (!Array.isArray(configuration.sdm.goalLauncher)) {
-        goalSchedulers = [configuration.sdm.goalLauncher];
+    } else if (!Array.isArray(configuration.sdm.goalScheduler)) {
+        goalSchedulers = [configuration.sdm.goalScheduler];
     } else {
-        goalSchedulers = configuration.sdm.goalLauncher;
+        goalSchedulers = configuration.sdm.goalScheduler;
     }
     for (const gl of goalSchedulers) {
         if (await gl.supports(gi)) {

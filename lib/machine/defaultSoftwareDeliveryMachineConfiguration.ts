@@ -44,7 +44,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
-            goalLauncher: [new KubernetesGoalScheduler()],
+            goalScheduler: [new KubernetesGoalScheduler()],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
         },
         local: {
