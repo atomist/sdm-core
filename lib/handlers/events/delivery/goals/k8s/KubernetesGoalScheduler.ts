@@ -265,6 +265,20 @@ export function createJobSpec(podSpec: k8s.V1Pod,
         } as any);
 
     rewriteCachePath(jobSpec, context.workspaceId);
+
+    // Add additional specs from registered services to the job
+    if (!!goalEvent.data) {
+        const data = JSON.parse(goalEvent.data);
+        if (!!data.services) {
+            _.forEach(data.services, (v, k) => {
+                if (v.type === "kubernetes") {
+                    const spec = v.spec as k8s.V1Container;
+                    jobSpec.spec.template.spec.containers.push(spec);
+                }
+            });
+        }
+    }
+
     return jobSpec;
 }
 
