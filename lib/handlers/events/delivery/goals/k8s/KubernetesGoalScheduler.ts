@@ -19,14 +19,12 @@ import {
     AutomationContextAware,
     configurationValue,
     doWithRetry,
-    HandlerContext,
     logger,
 } from "@atomist/automation-client";
 import {
     ExecuteGoalResult,
     GoalInvocation,
     GoalScheduler,
-    SdmGoalEvent,
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
@@ -81,7 +79,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
             return { code: 1, message: `Failed to obtain parent pod spec from k8s: ${e.message}` };
         }
 
-        const jobSpec = createJobSpec(podSpec, podNs, goalEvent, context);
+        const jobSpec = createJobSpec(podSpec, podNs, gi);
         await this.beforeCreation(gi, jobSpec);
 
         gi.progressLog.write(`/--`);
@@ -168,7 +166,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
      * Extension point to allow for custom clean up logic.
      */
     protected async cleanUp(): Promise<void> {
-        return cleanCompletedJobs(true);
+        return cleanCompletedJobs();
     }
 }
 
@@ -176,7 +174,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
  * Cleanup scheduled k8s goal jobs
  * @returns {Promise<void>}
  */
-export async function cleanCompletedJobs(ownNamespaceOnly: boolean = true): Promise<void> {
+export async function cleanCompletedJobs(): Promise<void> {
     const podName = process.env.ATOMIST_POD_NAME || os.hostname();
     const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
@@ -184,35 +182,22 @@ export async function cleanCompletedJobs(ownNamespaceOnly: boolean = true): Prom
     const apps = kc.makeApiClient(k8s.Core_v1Api);
     const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
-    let podSpec: k8s.V1Pod;
-    try {
-        podSpec = (await apps.readNamespacedPod(podName, podNs)).body;
-    } catch (e) {
-        logger.error(`Failed to obtain parent pod spec from K8: ${e.message}`);
-        return;
-    }
+    const selector = `creator=${sanitizeName(configurationValue<string>("name"))}`;
+    const jobs = await batch.listJobForAllNamespaces(undefined, undefined, undefined, selector);
 
-    let jobs;
-    if (ownNamespaceOnly) {
-        jobs = await batch.listNamespacedJob(podNs);
-    } else {
-        jobs = await batch.listJobForAllNamespaces();
-    }
+    const completedJobs =
+        jobs.body.items.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
 
-    const sdmJobs = jobs.body.items.filter(j => j.metadata.name.startsWith(`${podSpec.spec.containers[0].name}-job-`));
-    const completedSdmJobs =
-        sdmJobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
-
-    if (completedSdmJobs.length > 0) {
+    if (completedJobs.length > 0) {
         logger.info(`Deleting the following k8s goal jobs: ${
-            completedSdmJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
+            completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
-        for (const completedSdmJob of completedSdmJobs) {
+        for (const completedSdmJob of completedJobs) {
             try {
                 await batch.deleteNamespacedJob(
                     completedSdmJob.metadata.name,
                     completedSdmJob.metadata.namespace,
-                    // propagationPolicy is needed so that pods of the job are also deleted
+                    // propagationPolicy is needed so that pods of the job are also getting deleted
                     { propagationPolicy: "Background" } as any);
             } catch (e) {
                 logger.warn(`Failed to delete k8s goal job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${e.message}`);
@@ -225,17 +210,16 @@ export async function cleanCompletedJobs(ownNamespaceOnly: boolean = true): Prom
  * Create a jobSpec by modifying the provided podSpec
  * @param podSpec
  * @param podNs
- * @param goalEvent
- * @param goalName
+ * @param gi
  * @param context
  */
 export function createJobSpec(podSpec: k8s.V1Pod,
                               podNs: string,
-                              goalEvent: SdmGoalEvent,
-                              context: HandlerContext): k8s.V1Job {
+                              gi: GoalInvocation): k8s.V1Job {
+    const { goalEvent, context } = gi;
     const goalName = goalEvent.uniqueName.split("#")[0].toLowerCase();
 
-    const jobSpec = createJobSpecWithAffinity(podSpec, goalEvent.goalSetId);
+    const jobSpec = createJobSpecWithAffinity(podSpec, gi);
 
     jobSpec.metadata.name = `${podSpec.spec.containers[0].name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`;
     jobSpec.metadata.namespace = podNs;
@@ -288,7 +272,9 @@ export function createJobSpec(podSpec: k8s.V1Pod,
  * Create a k8s Job spec with affinity to jobs for the same goal set
  * @param goalSetId
  */
-function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V1Job {
+function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.V1Job {
+    const { goalEvent, configuration, context } = gi;
+    
     podSpec.spec.affinity = {
         podAffinity: {
             preferredDuringSchedulingIgnoredDuringExecution: [
@@ -301,7 +287,7 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V
                                     key: "goalSetId",
                                     operator: "In",
                                     values: [
-                                        goalSetId,
+                                        goalEvent.goalSetId,
                                     ],
                                 },
                             ],
@@ -317,16 +303,40 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, goalSetId: string): k8s.V
     // See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#pod-v1-core note on nodeName
     delete podSpec.spec.nodeName;
 
+    const labels = {
+        goalSetId: goalEvent.goalSetId,
+        goalId: (goalEvent as any).id,
+        creator: sanitizeName(configuration.name),
+        workspaceId: context.workspaceId,
+    };
+
+    const detail = {
+        sdm: {
+            name: configuration.name,
+            version: configuration.version,
+        },
+        goal: {
+            goalId: (goalEvent as any).id,
+            goalSetId: goalEvent.goalSetId,
+            uniqueName: goalEvent.uniqueName,
+        },
+    };
+
+    const annotations = {
+        "atomist.com/sdm": JSON.stringify(detail),
+    };
+
     return {
         kind: "Job",
         apiVersion: "batch/v1",
-        metadata: {},
+        metadata: {
+            labels,
+            annotations,
+        },
         spec: {
             template: {
                 metadata: {
-                    labels: {
-                        goalSetId,
-                    },
+                    labels,
                 },
                 spec: podSpec.spec,
             },
@@ -372,4 +382,8 @@ function rewriteCachePath(jobSpec: k8s.V1Job, workspaceId: string): void {
 function isConfiguredInEnv(...values: string[]): boolean {
     const value = process.env.ATOMIST_GOAL_SCHEDULER || process.env.ATOMIST_GOAL_LAUNCHER;
     return values.includes(value);
+}
+
+function sanitizeName(name: string): string {
+    return name.replace(/@/g, "").replace(/\//g, ".")
 }
