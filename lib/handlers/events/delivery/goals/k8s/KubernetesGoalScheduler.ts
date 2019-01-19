@@ -274,7 +274,7 @@ export function createJobSpec(podSpec: k8s.V1Pod,
  */
 function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.V1Job {
     const { goalEvent, configuration, context } = gi;
-    
+
     podSpec.spec.affinity = {
         podAffinity: {
             preferredDuringSchedulingIgnoredDuringExecution: [
@@ -385,5 +385,5 @@ function isConfiguredInEnv(...values: string[]): boolean {
 }
 
 function sanitizeName(name: string): string {
-    return name.replace(/@/g, "").replace(/\//g, ".")
+    return name.replace(/@/g, "").replace(/\//g, ".");
 }
