@@ -262,7 +262,6 @@ export function createJobSpec(podSpec: k8s.V1Pod,
 
     rewriteCachePath(jobSpec, context.workspaceId);
 
-
     // Add additional specs from registered services to the job spec
     if (_.get(gi.configuration, "sdm.kubernetes.service.enabled", true)) {
         if (!!goalEvent.data) {
