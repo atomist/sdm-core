@@ -158,7 +158,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                     .then(() => {
                         logger.debug("Finished cleaning scheduled goal jobs");
                     });
-            }, configurationValue<number>("sdm.kubernetes.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
+            }, configurationValue<number>("sdm.kubernetes.job.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
         }
     }
 
@@ -175,11 +175,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
  * @returns {Promise<void>}
  */
 export async function cleanCompletedJobs(): Promise<void> {
-    const podName = process.env.ATOMIST_POD_NAME || os.hostname();
-    const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
-
     const kc = loadKubeConfig();
-    const apps = kc.makeApiClient(k8s.Core_v1Api);
     const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
     const selector = `creator=${sanitizeName(configurationValue<string>("name"))}`;
@@ -189,7 +185,7 @@ export async function cleanCompletedJobs(): Promise<void> {
         jobs.body.items.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
 
     if (completedJobs.length > 0) {
-        logger.info(`Deleting the following k8s goal jobs: ${
+        logger.info(`Deleting the following k8s jobs: ${
             completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
         for (const completedSdmJob of completedJobs) {
@@ -200,7 +196,7 @@ export async function cleanCompletedJobs(): Promise<void> {
                     // propagationPolicy is needed so that pods of the job are also getting deleted
                     { propagationPolicy: "Background" } as any);
             } catch (e) {
-                logger.warn(`Failed to delete k8s goal job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${e.message}`);
+                logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${e.message}`);
             }
         }
     }
@@ -266,16 +262,19 @@ export function createJobSpec(podSpec: k8s.V1Pod,
 
     rewriteCachePath(jobSpec, context.workspaceId);
 
-    // Add additional specs from registered services to the job
-    if (!!goalEvent.data) {
-        const data = JSON.parse(goalEvent.data);
-        if (!!data.services) {
-            _.forEach(data.services, (v, k) => {
-                if (v.type === "kubernetes") {
-                    const spec = v.spec as k8s.V1Container;
-                    jobSpec.spec.template.spec.containers.push(spec);
-                }
-            });
+
+    // Add additional specs from registered services to the job spec
+    if (_.get(gi.configuration, "sdm.kubernetes.service.enabled", true)) {
+        if (!!goalEvent.data) {
+            const data = JSON.parse(goalEvent.data);
+            if (!!data.services) {
+                _.forEach(data.services, (v, k) => {
+                    if (v.type === "kubernetes") {
+                        const spec = v.spec as k8s.V1Container;
+                        jobSpec.spec.template.spec.containers.push(spec);
+                    }
+                });
+            }
         }
     }
 
@@ -393,11 +392,15 @@ function rewriteCachePath(jobSpec: k8s.V1Job, workspaceId: string): void {
  * for backwards compatibility reasons - ATOMIST_GOAL_LAUNCHER.
  * @param values
  */
-function isConfiguredInEnv(...values: string[]): boolean {
+export function isConfiguredInEnv(...values: string[]): boolean {
     const value = process.env.ATOMIST_GOAL_SCHEDULER || process.env.ATOMIST_GOAL_LAUNCHER;
     return values.includes(value);
 }
 
-function sanitizeName(name: string): string {
+/**
+ * Strip out any characters that aren't allowed a k8s label value
+ * @param name
+ */
+export function sanitizeName(name: string): string {
     return name.replace(/@/g, "").replace(/\//g, ".");
 }
