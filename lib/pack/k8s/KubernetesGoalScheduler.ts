@@ -75,8 +75,8 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         try {
             podSpec = (await core.readNamespacedPod(podName, podNs)).body;
         } catch (e) {
-            logger.error(`Failed to obtain parent pod spec from k8s: ${e.message}`);
-            return { code: 1, message: `Failed to obtain parent pod spec from k8s: ${e.message}` };
+            logger.error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+            return { code: 1, message: `Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}` };
         }
 
         const jobSpec = createJobSpec(podSpec, podNs, gi);
@@ -100,7 +100,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                     JSON.stringify(e.body)}`);
                 return {
                     code: 1,
-                    message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                    message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
                 };
             }
         } catch (e) {
@@ -124,7 +124,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                 JSON.stringify(e.body)}`);
             return {
                 code: 1,
-                message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`,
+                message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
             };
         }
         await gi.progressLog.flush();
@@ -195,7 +195,7 @@ export async function cleanCompletedJobs(): Promise<void> {
                     // propagationPolicy is needed so that pods of the job are also getting deleted
                     { propagationPolicy: "Background" } as any);
             } catch (e) {
-                logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${e.message}`);
+                logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${prettyPrintError(e)}`);
             }
         }
     }
@@ -428,5 +428,13 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
             undefined,
             labelSelector,
         )).body.items;
+    }
+}
+
+export function prettyPrintError(e: any): string {
+    if (!!e.body) {
+        return e.body.message;
+    } else {
+        return e.message;
     }
 }

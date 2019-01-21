@@ -25,6 +25,7 @@ import * as _ from "lodash";
 import { loadKubeConfig } from "./k8config";
 import {
     listJobs,
+    prettyPrintError,
     sanitizeName,
 } from "./KubernetesGoalScheduler";
 
@@ -52,10 +53,17 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
             }
 
             const selector = `goalSetId=${goalEvent.goalSetId},creator=${sanitizeName(this.sdm.configuration.name)}`;
-            const jobs = await listJobs(selector);
+            let jobs;
+
+            try {
+                jobs = await listJobs(selector);
+            } catch (e) {
+                logger.warn(`Failed to read k8s jobs: ${prettyPrintError(e)}`);
+                return;
+            }
 
             logger.debug(
-                `k8s jobs for goal set '${goalEvent.goalSetId}' found: '${
+                `Found k8s jobs for goal set '${goalEvent.goalSetId}': '${
                     jobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
             const goalJobs = jobs.filter(j => {
@@ -100,7 +108,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                                     job.namespace,
                                     { propagationPolicy: "Background" } as any);
                             } catch (e) {
-                                logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${e.message}`);
+                                logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${prettyPrintError(e)}`);
                             }
                         } catch (e) {
                             // This is ok to ignore because the job doesn't exist any more
