@@ -158,6 +158,9 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
+
+    // Set workers to one but leave enablement unset so that it can be defined elsewhere.
+    mergedConfig.cluster.workers = 1;
 }
 
 async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
