@@ -23,7 +23,6 @@ import {
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
-import { KubernetesGoalScheduler } from "../handlers/events/delivery/goals/k8s/KubernetesGoalScheduler";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { GraphQLPreferenceStoreFactory } from "../internal/preferences/GraphQLPreferenceStore";
@@ -44,7 +43,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
-            goalScheduler: [new KubernetesGoalScheduler()],
+            goalScheduler: [],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
         },
         local: {

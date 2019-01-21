@@ -136,3 +136,14 @@ export {
 } from "./lib/internal/preferences/AbstractPreferenceStore";
 export { FilePreferenceStoreFactory } from "./lib/internal/preferences/FilePreferenceStore";
 export { GraphQLPreferenceStoreFactory } from "./lib/internal/preferences/GraphQLPreferenceStore";
+export {
+    KubernetesGoalScheduler,
+    sanitizeName,
+    isConfiguredInEnv,
+} from "./lib/pack/k8s/KubernetesGoalScheduler";
+export {
+    KubernetesJobDeletingGoalCompletionListenerFactory,
+} from "./lib/pack/k8s/KubernetesJobDeletingGoalCompletionListener";
+export {
+    goalScheduling,
+} from "./lib/pack/k8s/goalScheduling";

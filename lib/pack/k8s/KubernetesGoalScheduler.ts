@@ -152,7 +152,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
     }
 
     private init(): void {
-        if (cluster.isMaster && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
+        if (cluster.isMaster) {
             setInterval(() => {
                 return this.cleanUp()
                     .then(() => {
