@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Make K8 goal scheduling more extensible. [#90](https://github.com/atomist/sdm-core/issues/90)
 -   Move k8s goal launching into extension pack. [ccb6fbc](https://github.com/atomist/sdm-core/commit/ccb6fbcb0be52a7267936344a452c7b48703ac1b)
+-   Only one worker for goal jobs. [119fea6](https://github.com/atomist/sdm-core/commit/119fea6022229389069f26c68475b34decf9447c)
 
 ## [1.2.0](https://github.com/atomist/sdm-core/compare/1.1.0...1.2.0) - 2018-12-27
 
