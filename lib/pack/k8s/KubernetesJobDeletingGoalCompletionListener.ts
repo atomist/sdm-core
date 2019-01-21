@@ -58,7 +58,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
             logger.debug(
                 `k8s jobs for goal set '${goalEvent.goalSetId}' found: '${
-                    jobs.body.items.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`)
+                    jobs.body.items.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
             const goalJobs = jobs.body.items.filter(j => {
                 const annotations = j.metadata.annotations;
