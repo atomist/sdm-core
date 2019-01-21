@@ -27,6 +27,7 @@
     "@kubernetes/client-node": "^0.7.2",
     "@octokit/rest": "^16.3.0",
     "@types/proper-lockfile": "^3.0.0",
+    "@types/request": "^2.48.1",
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
