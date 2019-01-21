@@ -23,7 +23,10 @@ import {
 import * as k8s from "@kubernetes/client-node";
 import * as _ from "lodash";
 import { loadKubeConfig } from "./k8config";
-import { sanitizeName } from "./KubernetesGoalScheduler";
+import {
+    listJobs,
+    sanitizeName,
+} from "./KubernetesGoalScheduler";
 
 /**
  * GoalCompletionListener that puts completed goal jobs into a ttl cache for later deletion.
@@ -49,18 +52,13 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
             }
 
             const selector = `goalSetId=${goalEvent.goalSetId},creator=${sanitizeName(this.sdm.configuration.name)}`;
-
-            const jobs = await this.batch.listJobForAllNamespaces(
-                undefined,
-                undefined,
-                undefined,
-                selector);
+            const jobs = await listJobs(selector);
 
             logger.debug(
                 `k8s jobs for goal set '${goalEvent.goalSetId}' found: '${
-                    jobs.body.items.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
+                    jobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
-            const goalJobs = jobs.body.items.filter(j => {
+            const goalJobs = jobs.filter(j => {
                 const annotations = j.metadata.annotations;
                 if (!!annotations && !!annotations["atomist.com/sdm"]) {
                     const sdmAnnotation = JSON.parse(annotations["atomist.com/sdm"]);

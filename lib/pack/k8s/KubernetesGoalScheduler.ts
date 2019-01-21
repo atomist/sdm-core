@@ -60,7 +60,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
     }
 
     public async schedule(gi: GoalInvocation): Promise<ExecuteGoalResult> {
-        const { goalEvent, context } = gi;
+        const { goalEvent } = gi;
 
         // Using new ATOMIST_POD_NAME to overwrite the host name default
         // This is to prevent breakage when users still have old ATOMIST_DEPLOYMENT_NAME env var defined
@@ -175,19 +175,18 @@ export class KubernetesGoalScheduler implements GoalScheduler {
  * @returns {Promise<void>}
  */
 export async function cleanCompletedJobs(): Promise<void> {
-    const kc = loadKubeConfig();
-    const batch = kc.makeApiClient(k8s.Batch_v1Api);
-
     const selector = `creator=${sanitizeName(configurationValue<string>("name"))}`;
-    const jobs = await batch.listJobForAllNamespaces(undefined, undefined, undefined, selector);
 
+    const jobs = await listJobs(selector);
     const completedJobs =
-        jobs.body.items.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
+        jobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
 
     if (completedJobs.length > 0) {
         logger.info(`Deleting the following k8s jobs: ${
             completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
+        const kc = loadKubeConfig();
+        const batch = kc.makeApiClient(k8s.Batch_v1Api);
         for (const completedSdmJob of completedJobs) {
             try {
                 await batch.deleteNamespacedJob(
@@ -402,4 +401,32 @@ export function isConfiguredInEnv(...values: string[]): boolean {
  */
 export function sanitizeName(name: string): string {
     return name.replace(/@/g, "").replace(/\//g, ".");
+}
+
+/**
+ * List k8s jobs for a single namespace or cluster-wide depending on evn configuration
+ * @param labelSelector
+ */
+export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
+    const kc = loadKubeConfig();
+    const batch = kc.makeApiClient(k8s.Batch_v1Api);
+
+    if (configurationValue<boolean>("sdm.kubernetes.job.singleNamespace", true)) {
+        const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+        return (await batch.listNamespacedJob(
+            podNs,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            labelSelector,
+        )).body.items;
+    } else {
+        return (await batch.listJobForAllNamespaces(
+            undefined,
+            undefined,
+            undefined,
+            labelSelector,
+        )).body.items;
+    }
 }
