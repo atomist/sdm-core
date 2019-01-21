@@ -32,8 +32,8 @@ export function goalScheduling(): ExtensionPack {
         ...metadata("k8s-goal-scheduling"),
         configure: sdm => {
             if (!process.env.ATOMIST_ISOLATED_GOAL && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
-                sdm.addGoalCompletionListener(new KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
                 sdm.configuration.sdm.goalScheduler = [new KubernetesGoalScheduler()];
+                sdm.addGoalCompletionListener(new KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
             }
         },
     };

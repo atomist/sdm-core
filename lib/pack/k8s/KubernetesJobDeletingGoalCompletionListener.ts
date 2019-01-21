@@ -56,6 +56,10 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                 undefined,
                 selector);
 
+            logger.debug(
+                `k8s jobs for goal set '${goalEvent.goalSetId}' found: '${
+                    jobs.body.items.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`)
+
             const goalJobs = jobs.body.items.filter(j => {
                 const annotations = j.metadata.annotations;
                 if (!!annotations && !!annotations["atomist.com/sdm"]) {
@@ -64,6 +68,10 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                 }
                 return false;
             });
+
+            logger.debug(
+                `Matching k8s job for goal '${goalEvent.uniqueName}' found: '${
+                    goalJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
             const ttl: number = _.get(this.sdm.configuration, "sdm.kubernetes.job.ttl", 1000 * 60 * 2);
 
