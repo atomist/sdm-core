@@ -19,6 +19,7 @@ import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operat
 import {
     allReposInTeam,
     CachingProjectLoader,
+    commandRequestParameterPromptFactory,
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
@@ -45,6 +46,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             projectPersister: RemoteGitProjectPersister,
             goalScheduler: [],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
+            parameterPromptFactory: commandRequestParameterPromptFactory,
         },
         local: {
             preferLocalSeeds: true,
