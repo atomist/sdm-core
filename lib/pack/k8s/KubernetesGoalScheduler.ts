@@ -277,7 +277,7 @@ export function createJobSpec(podSpec: k8s.V1Pod,
             }
             if (!!data[ServiceRegistrationGoalDataKey]) {
                 _.forEach(data[ServiceRegistrationGoalDataKey], (v, k) => {
-                    if (v.type === K8sServiceRegistrationType) {
+                    if (v.type === K8sServiceRegistrationType.K8sService) {
                         const spec = v as K8sServiceSpec;
                         if (!!spec.container) {
                             if (Array.isArray(spec.container)) {

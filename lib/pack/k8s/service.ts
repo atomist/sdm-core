@@ -24,7 +24,9 @@ import * as k8s from "@kubernetes/client-node";
 /**
  * Key of k8s services inside the service structure of goal data
  */
-export const K8sServiceRegistrationType: string = "atomist.com/sdm/service/k8s";
+export enum K8sServiceRegistrationType {
+    K8sService = "atomist.com/sdm/service/k8s"
+};
 
 /**
  * K8s specific service spec
@@ -41,7 +43,8 @@ export interface K8sServiceSpec {
  */
 export interface K8sServiceRegistration extends ServiceRegistration<K8sServiceSpec> {
     service: (goalEvent: SdmGoalEvent, repo: RepoContext) => Promise<{
-        type: "atomist.com/sdm/service/k8s";
+        type: K8sServiceRegistrationType.K8sService;
         spec: K8sServiceSpec;
     } | undefined>;
 }
+
