@@ -147,3 +147,7 @@ export {
 export {
     goalScheduling,
 } from "./lib/pack/k8s/goalScheduling";
+export {
+    K8sServiceSpec,
+    K8sServiceRegistration,
+} from "./lib/pack/k8s/service";

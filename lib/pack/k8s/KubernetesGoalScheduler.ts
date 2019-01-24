@@ -25,12 +25,17 @@ import {
     ExecuteGoalResult,
     GoalInvocation,
     GoalScheduler,
+    ServiceRegistrationGoalDataKey,
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import * as os from "os";
-import { loadKubeConfig } from "./k8config";
+import { loadKubeConfig } from "./config";
+import {
+    K8sServiceRegistrationType,
+    K8sServiceSpec,
+} from "./service";
 
 /**
  * GoalScheduler implementation that schedules SDM goals inside k8s jobs.
@@ -55,7 +60,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                 // Force all goals to run isolated via explicit option
                 (this.options.isolateAll && isConfiguredInEnv("kubernetes")) ||
                 // Force all goals to run isolated via explicit configuration
-                _.get(gi.configuration, "sdm.kubernetes.isolateAll", false) === true
+                _.get(gi.configuration, "sdm.k8s.isolateAll", false) === true
             );
     }
 
@@ -158,7 +163,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                     .then(() => {
                         logger.debug("Finished cleaning scheduled goal jobs");
                     });
-            }, configurationValue<number>("sdm.kubernetes.job.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
+            }, configurationValue<number>("sdm.k8s.job.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
         }
     }
 
@@ -262,14 +267,25 @@ export function createJobSpec(podSpec: k8s.V1Pod,
     rewriteCachePath(jobSpec, context.workspaceId);
 
     // Add additional specs from registered services to the job spec
-    if (_.get(gi.configuration, "sdm.kubernetes.service.enabled", true)) {
+    if (_.get(gi.configuration, "sdm.k8s.service.enabled", true)) {
         if (!!goalEvent.data) {
-            const data = JSON.parse(goalEvent.data);
-            if (!!data.services) {
-                _.forEach(data.services, (v, k) => {
-                    if (v.type === "kubernetes") {
-                        const spec = v.spec as k8s.V1Container;
-                        jobSpec.spec.template.spec.containers.push(spec);
+            let data: any = {};
+            try {
+                data = JSON.parse(goalEvent.data);
+            } catch (e) {
+                logger.warn(`Failed to parse goal data on '${goalEvent.uniqueName}'`);
+            }
+            if (!!data[ServiceRegistrationGoalDataKey]) {
+                _.forEach(data[ServiceRegistrationGoalDataKey], (v, k) => {
+                    if (v.type === K8sServiceRegistrationType) {
+                        const spec = v as K8sServiceSpec;
+                        if (!!spec.container) {
+                            if (Array.isArray(spec.container)) {
+                                jobSpec.spec.template.spec.containers.push(...spec.container);
+                            } else {
+                                jobSpec.spec.template.spec.containers.push(spec.container);
+                            }
+                        }
                     }
                 });
             }
@@ -411,7 +427,7 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
     const kc = loadKubeConfig();
     const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
-    if (configurationValue<boolean>("sdm.kubernetes.job.singleNamespace", true)) {
+    if (configurationValue<boolean>("sdm.k8s.job.singleNamespace", true)) {
         const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
         return (await batch.listNamespacedJob(
             podNs,

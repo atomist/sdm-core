@@ -22,7 +22,7 @@ import {
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as _ from "lodash";
-import { loadKubeConfig } from "./k8config";
+import { loadKubeConfig } from "./config";
 import {
     listJobs,
     prettyPrintError,
@@ -30,7 +30,7 @@ import {
 } from "./KubernetesGoalScheduler";
 
 /**
- * GoalCompletionListener that puts completed goal jobs into a ttl cache for later deletion.
+ * GoalCompletionListener factory that puts completed goal jobs into a ttl cache for later deletion.
  */
 export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
@@ -79,7 +79,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                 `Matching k8s job for goal '${goalEvent.uniqueName}' found: '${
                     goalJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
-            const ttl: number = _.get(this.sdm.configuration, "sdm.kubernetes.job.ttl", 1000 * 60 * 2);
+            const ttl: number = _.get(this.sdm.configuration, "sdm.k8s.job.ttl", 1000 * 60 * 2);
 
             for (const goalJob of goalJobs) {
                 this.cache.set(
@@ -117,6 +117,6 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                     }
                 }
             },
-            _.get(this.sdm.configuration, "sdm.kubernetes.job.ttlCheckInterval", 15000));
+            _.get(this.sdm.configuration, "sdm.k8s.job.ttlCheckInterval", 15000));
     }
 }
