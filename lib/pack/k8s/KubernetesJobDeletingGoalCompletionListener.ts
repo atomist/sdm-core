@@ -106,7 +106,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                                 await this.batch.deleteNamespacedJob(
                                     job.name,
                                     job.namespace,
-                                    { propagationPolicy: "Background" } as any);
+                                    { propagationPolicy: "Foreground" } as any);
                             } catch (e) {
                                 logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${prettyPrintError(e)}`);
                             }

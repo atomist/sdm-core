@@ -198,7 +198,7 @@ export async function cleanCompletedJobs(): Promise<void> {
                     completedSdmJob.metadata.name,
                     completedSdmJob.metadata.namespace,
                     // propagationPolicy is needed so that pods of the job are also getting deleted
-                    { propagationPolicy: "Background" } as any);
+                    { propagationPolicy: "Foreground" } as any);
             } catch (e) {
                 logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${prettyPrintError(e)}`);
             }
