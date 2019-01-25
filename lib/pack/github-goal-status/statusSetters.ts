@@ -36,7 +36,6 @@ export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine)
     return async (inv: GoalsSetListenerInvocation) => {
         const { id, credentials } = inv;
         if (inv.goalSet && inv.goalSet.goals && inv.goalSet.goals.length > 0) {
-            logger.info("Created goal set '%s'. Creating in progress GitHub status", inv.goalSetId);
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)} in progress`,
@@ -44,7 +43,6 @@ export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine)
                 state: "pending",
             });
         } else {
-            logger.info("No goals planned. Not creating in progress GitHub status");
             return Promise.resolve();
         }
     };
@@ -53,7 +51,6 @@ export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine)
 export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): GoalCompletionListener {
     return async (inv: GoalCompletionListenerInvocation) => {
         const { id, completedGoal, allGoals, credentials } = inv;
-        logger.info("Completed goal: '%s' with '%s' in set '%s'",
             goalKeyString(completedGoal), completedGoal.state, completedGoal.goalSetId);
 
         if (completedGoal.state === "failure") {
