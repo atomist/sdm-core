@@ -105,7 +105,8 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                     JSON.stringify(e.body)}`);
                 return {
                     code: 1,
-                    message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
+                    message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' ` +
+                        `for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
                 };
             }
         } catch (e) {
@@ -129,7 +130,8 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                 JSON.stringify(e.body)}`);
             return {
                 code: 1,
-                message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
+                message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' ` +
+                    `for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
             };
         }
         await gi.progressLog.flush();
@@ -200,7 +202,8 @@ export async function cleanCompletedJobs(): Promise<void> {
                     // propagationPolicy is needed so that pods of the job are also getting deleted
                     { propagationPolicy: "Foreground" } as any);
             } catch (e) {
-                logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ${prettyPrintError(e)}`);
+                logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ` +
+                    prettyPrintError(e));
             }
         }
     }
