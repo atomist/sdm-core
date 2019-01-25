@@ -51,7 +51,6 @@ export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine)
 export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): GoalCompletionListener {
     return async (inv: GoalCompletionListenerInvocation) => {
         const { id, completedGoal, allGoals, credentials } = inv;
-            goalKeyString(completedGoal), completedGoal.state, completedGoal.goalSetId);
 
         if (completedGoal.state === "failure") {
             logger.info("Setting GitHub status to failed on %s", id.sha);
