@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { PreferenceScope } from "@atomist/sdm";
 import { InMemoryPreferenceStore } from "../../../lib/internal/preferences/InMemoryPreferenceStore";
 import { assertPreferences } from "./preferences";
 
@@ -26,7 +27,7 @@ describe("InMemoryPreferenceStore", () => {
 
     it("should correctly handle scoped preferences", async () => {
         const prefs = new InMemoryPreferenceStore({ configuration: { name: "my-sdm" } } as any);
-        await assertPreferences(prefs, "sdm");
+        await assertPreferences(prefs, PreferenceScope.Sdm);
     });
 
 });

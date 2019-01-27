@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { formatDate } from "@atomist/sdm";
+import {
+    formatDate,
+    PreferenceScope,
+} from "@atomist/sdm";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
@@ -33,7 +36,7 @@ describe("FilePreferenceStore", () => {
     it("should correctly handle scoped preferences", async () => {
         const p = path.join(os.homedir(), ".atomist", "prefs", `client.prefs-${formatDate()}.json`);
         const prefs = new FilePreferenceStore({ configuration: { name: "my-sdm" } } as any, p);
-        await assertPreferences(prefs, "sdm");
+        await assertPreferences(prefs, PreferenceScope.Sdm);
         await fs.unlink(p);
     });
 

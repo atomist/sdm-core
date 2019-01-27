@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { PreferenceScope } from "@atomist/sdm";
 import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
 import { assertPreferences } from "./preferences";
 
@@ -52,7 +53,7 @@ describe("GraphQLPreferenceStore", () => {
     it("should correctly handle scoped preferences", async () => {
         const store = {};
         const prefs = new GraphQLPreferenceStore(ctx(store) as any);
-        await assertPreferences(prefs, "sdm");
+        await assertPreferences(prefs, PreferenceScope.Sdm);
     });
 
 });

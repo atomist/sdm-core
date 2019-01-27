@@ -24,8 +24,9 @@ function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function assertPreferences(prefs: PreferenceStore, scope?: PreferenceScope) {
+export async function assertPreferences(prefs: PreferenceStore, scope?: PreferenceScope): Promise<void> {
     assert(!(await prefs.get("foo", { scope })));
+    assert(await prefs.get<boolean>("foo", { scope, defaultValue: true }));
     await prefs.put("foo", "bar", { scope });
     assert.strictEqual(await prefs.get("foo", { scope }), "bar");
 
@@ -39,5 +40,6 @@ export async function assertPreferences(prefs: PreferenceStore, scope?: Preferen
     const b = { foo: "bar" };
     await prefs.put("bar", b, { scope });
     assert.deepStrictEqual((await prefs.get("bar", { scope })), b);
-    assert(!(await prefs.get("bar", { scope: scope === "sdm" ? "workspace" : "sdm" })));
+    assert(!(await prefs.get("bar",
+        { scope: scope === PreferenceScope.Sdm ? PreferenceScope.Workspace : PreferenceScope.Sdm })));
 }

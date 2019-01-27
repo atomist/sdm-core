@@ -37,13 +37,14 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
     protected constructor(private readonly ctx: HandlerContext) {
     }
 
-    public async get<V>(key: string, options?: { scope?: PreferenceScope }): Promise<V | undefined> {
+    public async get<V>(key: string, options?: { scope?: PreferenceScope, defaultValue?: V }): Promise<V | undefined> {
         const pref = await this.doGet(this.scopeKey(key, options));
+        const defaultValue = !!options ? options.defaultValue : undefined;
         if (!pref) {
-            return undefined;
+            return defaultValue;
         }
         if (!!pref.ttl && pref.ttl < Date.now()) {
-            return undefined;
+            return defaultValue;
         } else {
             return JSON.parse(pref.value) as V;
         }
