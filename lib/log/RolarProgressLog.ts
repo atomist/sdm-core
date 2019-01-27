@@ -15,8 +15,6 @@
  */
 
 import {
-    DefaultHttpClientFactory,
-    doWithRetry,
     HttpClient,
     HttpClientFactory,
     HttpMethod,
@@ -25,9 +23,8 @@ import {
 import { ProgressLog } from "@atomist/sdm";
 import * as _ from "lodash";
 import os = require("os");
-import { WrapOptions } from "retry";
 
-function* timestampGenerator() {
+function* timestampGenerator(): Iterator<Date> {
     while (true) {
         yield new Date();
     }
@@ -55,11 +52,11 @@ export class RolarProgressLog implements ProgressLog {
         this.httpClient = httpClientFactory.create(rolarBaseUrl);
     }
 
-    get name() {
+    get name(): string {
         return this.logPath.join("/");
     }
 
-    get url() {
+    get url(): string {
         return `${this.rolarBaseUrl}/logs/${this.name}`;
     }
 
@@ -74,7 +71,7 @@ export class RolarProgressLog implements ProgressLog {
         }
     }
 
-    public write(what: string) {
+    public write(what: string): void {
         const line = what || "";
         const now: Date = this.timestamper.next().value;
         this.localLogs.push({
@@ -82,7 +79,7 @@ export class RolarProgressLog implements ProgressLog {
             message: line,
             timestamp: this.constructUtcTimestamp(now),
             timestampMillis: this.constructMillisTimestamp(now),
-        } as LogData);
+        });
         const bufferSize = this.localLogs.reduce((acc, logData) => acc + logData.message.length, 0);
         if (bufferSize > this.bufferSizeLimit) {
             // tslint:disable-next-line:no-floating-promises

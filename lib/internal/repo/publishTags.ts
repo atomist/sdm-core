@@ -68,6 +68,6 @@ export async function publishTags(tagger: Tagger,
     }
 }
 
-function format(tags: string[]) {
+function format(tags: string[]): string {
     return tags.map(t => "`" + t + "`").join(", ");
 }

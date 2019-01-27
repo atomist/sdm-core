@@ -58,7 +58,7 @@ export async function fetchBranchTips(ctx: HandlerContext,
     return repo;
 }
 
-export function tipOfBranch(repo: RepoBranchTips.Repo, branchName: string) {
+export function tipOfBranch(repo: RepoBranchTips.Repo, branchName: string): string {
     const branchData = repo.branches.find(b => b.name === branchName);
     if (!branchData) {
         throw new Error("Branch not found: " + branchName);

@@ -82,7 +82,7 @@ describe("SDM handler creation", () => {
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(AnyPush)
                     .itMeans("do nothing")
-                    .setGoals(null)]);
+                    .setGoals(undefined)]);
             const p = fakePush();
             assert.equal(await sdm.pushMapping.mapping(p), undefined);
         });
@@ -92,7 +92,7 @@ describe("SDM handler creation", () => {
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(AnyPush)
                     .itMeans("do nothing")
-                    .setGoals(null)]);
+                    .setGoals(undefined)]);
             const p = fakePush();
             const ep: ExtensionPack = {
                 name: "x",

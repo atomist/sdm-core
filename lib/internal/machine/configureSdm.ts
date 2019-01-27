@@ -114,7 +114,8 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
  * @param mergedConfig
  * @param machine
  */
-function configureJobLaunching(mergedConfig, machine) {
+function configureJobLaunching(mergedConfig: SoftwareDeliveryMachineConfiguration,
+                               machine: SoftwareDeliveryMachine): void {
     const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);
@@ -139,7 +140,7 @@ function configureJobLaunching(mergedConfig, machine) {
  * @param machine
  */
 function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
-                                         machine: SoftwareDeliveryMachine) {
+                                         machine: SoftwareDeliveryMachine): void {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {
@@ -163,7 +164,8 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.cluster.workers = 1;
 }
 
-async function registerMetadata(config: Configuration, machine: SoftwareDeliveryMachine) {
+async function registerMetadata(config: Configuration,
+                                machine: SoftwareDeliveryMachine): Promise<void> {
     // tslint:disable-next-line:no-implicit-dependencies
     const sdmPj = require("@atomist/sdm/package.json");
     // tslint:disable-next-line:no-implicit-dependencies
@@ -201,7 +203,7 @@ async function doWithSdmLocal<R>(callback: (sdmLocal: any) => any): Promise<R | 
         } else {
             logger.warn("Skipping local mode configuration because 'ATOMIST_NPM_LOCAL_LINK' was defined, " +
                 "but '@atomist/sdm-local' could not be loaded");
-            return null;
+            return undefined;
         }
     }
 }
@@ -218,7 +220,7 @@ function attemptToRequire<T = any>(module: string, failOnError: boolean): T | nu
         if (failOnError) {
             throw new Error(`Unable to load '${module}'. Please install with 'npm install ${module}'.`);
         } else {
-            return null;
+            return undefined;
         }
     }
 

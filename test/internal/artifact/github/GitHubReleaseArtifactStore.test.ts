@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    execIn,
-    GitHubRepoRef,
-} from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client";
+import { execPromise } from "@atomist/sdm";
 import * as fs from "fs";
 import * as p from "path";
 import * as assert from "power-assert";
@@ -40,7 +38,7 @@ describe("GitHubReleaseArtifactStore", () => {
                     assert(fs.existsSync(path), `File [${path}] must exist`);
                     const cwd = p.dirname(path);
                     const filename = p.basename(path);
-                    return execIn(cwd, "unzip", [filename]);
+                    return execPromise("unzip", [filename], { cwd });
                 });
         }).timeout(60000);
 

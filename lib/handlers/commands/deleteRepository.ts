@@ -20,6 +20,7 @@ import {
     HandlerContext,
     MappedParameter,
     MappedParameters,
+    OnCommand,
     Parameter,
     Parameters,
     Secret,
@@ -69,7 +70,7 @@ export function deleteRepositoryCommand(): HandleCommand {
         "delete this repository");
 }
 
-function deleteRepositoryPlease() {
+function deleteRepositoryPlease(): OnCommand<DeleteRepositoryParameters> {
     return async (ctx: HandlerContext, commandParams: DeleteRepositoryParameters) => {
         if (commandParams.areYouSure.toLowerCase() !== "yes") {
             return ctx.messageClient.respond("You didn't say 'yes' to 'are you sure?' so I won't do anything.")

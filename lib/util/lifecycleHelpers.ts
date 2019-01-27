@@ -110,7 +110,7 @@ export interface RepoInfo {
 }
 
 export function avatarUrl(repo: any, login: string): string {
-    if (repo.org != null && repo.org.provider != null && repo.org.provider.url != null) {
+    if (repo.org !== undefined && repo.org.provider !== undefined && repo.org.provider.url !== undefined) {
         return `${htmlUrl(repo)}/avatars/${login}`;
     } else {
         return `https://avatars.githubusercontent.com/${login}`;
@@ -139,7 +139,7 @@ function urlToImageAttachment(url: string): slack.Attachment {
             fallback: image,
         };
     } else {
-        return null;
+        return undefined;
     }
 }
 

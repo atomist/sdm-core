@@ -94,7 +94,7 @@ ${codeLine(`${sdmCorePj.name}:${sdmCorePj.version}`)}`,
                 fallback: "Commands",
                 text: automationClientInstance().automations.automations.commands
                     .sort((e1, e2) => e1.name.localeCompare(e2.name))
-                    .map(e => `${bold(e.name)} ${e.intent.map(i => codeLine(i)).join(", ")} ${e.description}`).join("\n"),
+                    .map(e => `${bold(e.name)} ${e.intent.map(codeLine).join(", ")} ${e.description}`).join("\n"),
                 footer: `${sdm.configuration.name}:${sdm.configuration.version}`,
             }],
         };

@@ -51,7 +51,7 @@ import {
     GraphQL.subscription("OnAnySuccessfulSdmGoal"))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
-    constructor(private readonly name,
+    constructor(private readonly name: string,
                 private readonly implementationMapper: GoalImplementationMapper,
                 private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsResolver: CredentialsResolver,
@@ -107,7 +107,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
     }
 }
 
-function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
+function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent): boolean {
     if (dependentGoal.state === SdmGoalState.planned) {
         return true;
     }
@@ -123,7 +123,7 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent) {
     return false;
 }
 
-function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: string) {
+function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: string): boolean {
     switch (dependentGoal.fulfillment.method) {
         case SdmGoalFulfillmentMethod.Sdm:
             return true;

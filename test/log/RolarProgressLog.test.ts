@@ -33,7 +33,7 @@ describe("RolarProgressLog", () => {
         constructor(private readonly axiosInstance: AxiosInstance = axios.create()) {
         }
 
-        public create() {
+        public create(): HttpClient {
             return new MockHttpClient(this.axiosInstance);
         }
     }
@@ -70,7 +70,7 @@ describe("RolarProgressLog", () => {
         }
     }
 
-    function* fakeTimestampGenerator() {
+    function* fakeTimestampGenerator(): IterableIterator<Date> {
         let index = 0;
         while (true) {
             yield new Date(index++);

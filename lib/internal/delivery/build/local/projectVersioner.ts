@@ -45,18 +45,18 @@ export type ProjectVersioner =
  */
 export function executeVersioner(projectVersioner: ProjectVersioner): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { configuration, sdmGoal, credentials, id, context, progressLog } = goalInvocation;
+        const { configuration, goalEvent, credentials, id, context, progressLog } = goalInvocation;
 
         return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async p => {
-            const version = await projectVersioner(sdmGoal, p, progressLog);
+            const version = await projectVersioner(goalEvent, p, progressLog);
             const sdmVersion: SdmVersion = {
-                sha: sdmGoal.sha,
+                sha: goalEvent.sha,
                 branch: id.branch,
                 version,
                 repo: {
-                    owner: sdmGoal.repo.owner,
-                    name: sdmGoal.repo.name,
-                    providerId: sdmGoal.repo.providerId,
+                    owner: goalEvent.repo.owner,
+                    name: goalEvent.repo.name,
+                    providerId: goalEvent.repo.providerId,
                 },
             };
             await context.messageClient.send(sdmVersion, addressEvent(SdmVersionRootType));

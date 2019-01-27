@@ -39,7 +39,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         super();
     }
 
-    public eventIncoming(payload: EventIncoming) {
+    public eventIncoming(payload: EventIncoming): void {
         if (cluster.isWorker) {
             // Register event handler locally only
             const maker = () => new FulfillGoalOnRequested(
@@ -49,7 +49,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         }
     }
 
-    public async registrationSuccessful(eventHandler: RequestProcessor) {
+    public async registrationSuccessful(eventHandler: RequestProcessor): Promise<void> {
         if (cluster.isMaster) {
             const registration = (eventHandler as any).registration as RegistrationConfirmation;
             const teamId = process.env.ATOMIST_GOAL_TEAM;

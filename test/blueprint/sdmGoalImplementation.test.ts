@@ -62,7 +62,7 @@ const credentials: ProjectOperationCredentials = { token: "ab123bbbaaa" };
 
 const fakeContext = { context: { name: "my favorite context " } } as any as HandlerContext;
 
-const aPush = {
+const aPush: PushFields.Fragment = {
     repo: {
         org: {
             provider: {
@@ -74,7 +74,7 @@ const aPush = {
         sha: guid(),
     }],
 
-} as PushFields.Fragment;
+} as any;
 
 describe("implementing goals in the SDM", () => {
 

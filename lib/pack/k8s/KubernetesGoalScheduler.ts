@@ -38,6 +38,13 @@ import {
 } from "./service";
 
 /**
+ * Options to configure the k8s goal scheduling support
+ */
+export interface KubernetesGoalSchedulerOptions {
+    isolateAll?: boolean;
+}
+
+/**
  * GoalScheduler implementation that schedules SDM goals inside k8s jobs.
  *
  * It reuses the podSpec of the deployed SDM to create a new jobSpec from.
@@ -46,7 +53,7 @@ import {
  */
 export class KubernetesGoalScheduler implements GoalScheduler {
 
-    constructor(private readonly options: { isolateAll?: boolean } = { isolateAll: false }) {
+    constructor(private readonly options: KubernetesGoalSchedulerOptions = { isolateAll: false }) {
         this.init();
     }
 

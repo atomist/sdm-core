@@ -41,11 +41,11 @@ export class DashboardDisplayProgressLog implements ProgressLog {
             new RolarProgressLog(rolarBaseUrl, constructLogPath(context, sdmGoal), bufferSize, flushInterval, httpClientFactory);
     }
 
-    get name() {
+    get name(): string {
         return this.rolarProgressLog.name;
     }
 
-    get url() {
+    get url(): string {
         const path = constructLogPath(this.context, this.sdmGoal);
         return `https://app.atomist.com/workspace/${path[0]}/logs/${path.slice(1).join("/")}`;
     }
@@ -54,7 +54,7 @@ export class DashboardDisplayProgressLog implements ProgressLog {
         return this.rolarProgressLog.isAvailable();
     }
 
-    public write(what: string) {
+    public write(what: string): void {
         this.rolarProgressLog.write(what);
     }
 

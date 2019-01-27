@@ -16,12 +16,12 @@
 
 import {
     logger,
-    poisonAndWait,
     RemoteRepoRef,
     RepoRef,
 } from "@atomist/automation-client";
 import {
     Deployment,
+    killAndWait,
     Targeter,
     TargetInfo,
 } from "@atomist/sdm";
@@ -101,7 +101,7 @@ export class ManagedDeployments {
         return !!running ? running.port : this.nextFreePort(host);
     }
 
-    public recordDeployment(da: DeployedApp) {
+    public recordDeployment(da: DeployedApp): void {
         logger.info("Recording app [%s:%s] on port [%d]", da.id.owner, da.id.repo, da.port);
         this.deployments.push(da);
     }
@@ -135,7 +135,7 @@ export class ManagedDeployments {
     public async terminateIfRunning(id: RemoteRepoRef, lookupStrategy: LookupStrategy): Promise<any> {
         const victim = this.findDeployment(id, lookupStrategy);
         if (!!victim && !!victim.childProcess) {
-            await poisonAndWait(victim.childProcess);
+            await killAndWait(victim.childProcess);
             // Keep the port but deallocate the process
             logger.info("Killed app [%j] with pid %d, but continuing to reserve port [%d]",
                 id, victim.childProcess.pid, victim.port);
@@ -163,7 +163,7 @@ export class ManagedDeployments {
 
 }
 
-export async function portIsInUse(host: string, port: number) {
+export async function portIsInUse(host: string, port: number): Promise<boolean> {
     const agent = new https.Agent({
         rejectUnauthorized: false,
     });

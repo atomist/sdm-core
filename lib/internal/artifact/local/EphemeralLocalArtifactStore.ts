@@ -65,13 +65,13 @@ export class EphemeralLocalArtifactStore implements ArtifactStore {
     }
 }
 
-function parseUrl(targetUrl: string) {
-        // Form is http:///var/folders/86/p817yp991bdddrqr_bdf20gh0000gp/T/tmp-20964EBUrRVIZ077a/target/losgatos1-0.1.0-SNAPSHOT.jar
+function parseUrl(targetUrl: string): { cwd: string, filename: string } {
+    // Form is http:///var/folders/86/p817yp991bdddrqr_bdf20gh0000gp/T/tmp-20964EBUrRVIZ077a/target/losgatos1-0.1.0-SNAPSHOT.jar
     const lastSlash = targetUrl.lastIndexOf("/");
     const filename = targetUrl.substr(lastSlash + 1);
     const cwd = targetUrl.substring(7, lastSlash);
 
     logger.debug("Parsing results: url [%s]\n filename [%s]\n cwd [%s]", targetUrl, filename, cwd);
 
-    return {cwd, filename};
+    return { cwd, filename };
 }

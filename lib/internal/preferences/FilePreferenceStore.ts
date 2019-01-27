@@ -105,7 +105,7 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
         return result.value as V;
     }
 
-    private init() {
+    private init(): void {
         fs.ensureDirSync(path.dirname(this.filePath));
         try {
             fs.readFileSync(this.filePath);

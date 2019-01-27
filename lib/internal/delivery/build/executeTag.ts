@@ -34,12 +34,12 @@ import { readSdmVersion } from "./local/projectVersioner";
 
 export function executeTag(): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { configuration, sdmGoal, credentials, id, context } = goalInvocation;
+        const { configuration, goalEvent, credentials, id, context } = goalInvocation;
 
         return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
-            const version = await readSdmVersion(sdmGoal.repo.owner, sdmGoal.repo.name,
-                sdmGoal.repo.providerId, sdmGoal.sha, id.branch, context);
-            await createTagForStatus(id, sdmGoal.sha, sdmGoal.push.after.message, version, credentials);
+            const version = await readSdmVersion(goalEvent.repo.owner, goalEvent.repo.name,
+                goalEvent.repo.providerId, goalEvent.sha, id.branch, context);
+            await createTagForStatus(id, goalEvent.sha, goalEvent.push.after.message, version, credentials);
 
             return Success;
         });
@@ -50,7 +50,7 @@ export async function createTagForStatus(id: RemoteRepoRef,
                                          sha: string,
                                          message: string,
                                          version: string,
-                                         credentials: ProjectOperationCredentials) {
+                                         credentials: ProjectOperationCredentials): Promise<void> {
     const tag: Tag = {
         tag: version,
         message,

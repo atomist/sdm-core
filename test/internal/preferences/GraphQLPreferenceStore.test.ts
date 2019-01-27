@@ -34,7 +34,7 @@ describe("GraphQLPreferenceStore", () => {
                     };
                 } else {
                     return {
-                        SdmPreference: null,
+                        SdmPreference: undefined,
                     };
                 }
             },

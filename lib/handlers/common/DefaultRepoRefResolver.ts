@@ -96,7 +96,7 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
         return id;
     }
 
-    public providerIdFromPush(push: OnPushToAnyBranch.Push) {
+    public providerIdFromPush(push: OnPushToAnyBranch.Push): string {
         return push.repo.org.provider.providerId;
     }
 
@@ -149,6 +149,7 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
         logger.info("toRemoteRepoRef with GraphQL-sourced repo: %j", repo);
         switch (providerType) {
             case undefined:
+            // tslint:disable-next-line:no-null-keyword
             case null:
             case ProviderType.github_com:
             case ProviderType.ghe:

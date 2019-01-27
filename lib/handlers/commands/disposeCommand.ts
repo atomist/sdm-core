@@ -19,6 +19,7 @@ import {
     HandlerContext,
     MappedParameter,
     MappedParameters,
+    OnCommand,
     Parameter,
     Parameters,
     Secret,
@@ -65,7 +66,7 @@ export function disposeCommand(rules: ChooseAndSetGoalsRules): HandleCommand {
         ["dispose of this project", "exterminate"]);
 }
 
-function disposeOfProject(rules: ChooseAndSetGoalsRules) {
+function disposeOfProject(rules: ChooseAndSetGoalsRules): OnCommand<DisposeParameters> {
     return async (ctx: HandlerContext, commandParams: DisposeParameters) => {
         if (commandParams.areYouSure.toLowerCase() !== "yes") {
             return ctx.messageClient.respond("You didn't say 'yes' to 'are you sure?' so I won't do anything.")

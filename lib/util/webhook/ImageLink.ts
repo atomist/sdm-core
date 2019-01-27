@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
+import {
+    logger,
+    RetryOptions,
+} from "@atomist/automation-client";
 import axios from "axios";
 import promiseRetry = require("promise-retry");
 
@@ -73,7 +76,7 @@ export function postBuildWebhook(
     commit: string,
     status: AtomistBuildStatus,
     teamId: string,
-    retryOptions = DefaultRetryOptions,
+    retryOptions: RetryOptions = DefaultRetryOptions,
 ): Promise<boolean> {
 
     const payload: AtomistBuild = {
@@ -121,7 +124,7 @@ export function postLinkImageWebhook(
     commit: string,
     image: string,
     teamId: string,
-    retryOptions = DefaultRetryOptions,
+    retryOptions: RetryOptions = DefaultRetryOptions,
 ): Promise<boolean> {
 
     const payload: AtomistLinkImage = {
@@ -152,7 +155,7 @@ export function postWebhook(
     webhook: AtomistWebhookType,
     payload: any,
     teamId: string,
-    retryOptions = DefaultRetryOptions,
+    retryOptions: RetryOptions = DefaultRetryOptions,
 ): Promise<boolean> {
     logger.info("Posting webhook: %j", payload);
 

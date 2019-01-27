@@ -26,6 +26,7 @@ import {
 import {
     chooseAndSetGoals,
     CommandHandlerRegistration,
+    CommandListener,
     CommandListenerInvocation,
     GitHubRepoTargets,
     RepoTargetingParameters,
@@ -73,7 +74,7 @@ export function resetGoalsCommand(sdm: SoftwareDeliveryMachine,
     };
 }
 
-function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine) {
+function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<ResetGoalsParameters> {
     return async (cli: CommandListenerInvocation<ResetGoalsParameters & RepoTargetingParameters>) => {
 
         const rules = {

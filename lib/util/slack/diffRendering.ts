@@ -34,11 +34,11 @@ import {
 
 /* tslint:disable:no-unused-variable */
 
-export function linkToDiff(id: RemoteRepoRef, start: string, end: string, endDescription?: string) {
+export function linkToDiff(id: RemoteRepoRef, start: string, end: string, endDescription?: string): string {
     return url(diffUrl(id, start, end), `(Compare with ${endDescription || end.substr(0, 6)})`);
 }
 
-function diffUrl(id: RemoteRepoRef, start: string, end: string) {
+function diffUrl(id: RemoteRepoRef, start: string, end: string): string {
     return `${id.url}/compare/${start}...${end}`;
 }
 
@@ -68,18 +68,18 @@ function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: str
 
     const commitsGroupedByAuthor = [];
 
-    let author = null;
+    let author;
     let commitsByAuthor: any = {};
     let unknownCommitter = false;
     for (const commit of commits) {
-        const ca = (commit.author != null && commit.author.login && commit.author.login !== ""
+        const ca = (commit.author !== undefined && commit.author.login && commit.author.login !== ""
             ? commit.author.login : "(unknown)");
 
         if (ca === "(unknown)") {
             unknownCommitter = true;
         }
 
-        if (author == null || author !== ca) {
+        if (author === undefined || author !== ca) {
             commitsByAuthor = {
                 author: ca,
                 commits: [],
