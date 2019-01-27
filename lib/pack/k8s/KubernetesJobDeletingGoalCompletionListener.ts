@@ -36,10 +36,12 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
     private readonly cache: Map<string, { ttl: number, name: string, namespace: string }> = new Map();
     private readonly batch: k8s.Batch_v1Api;
+    private readonly core: k8s.Core_v1Api;
 
     constructor(private readonly sdm: SoftwareDeliveryMachine) {
         const kc = loadKubeConfig();
         this.batch = kc.makeApiClient(k8s.Batch_v1Api);
+        this.core = kc.makeApiClient(k8s.Core_v1Api);
 
         this.init();
     }
@@ -100,23 +102,62 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                     const job = this.cache.get(uid);
                     if (job.ttl <= now) {
                         logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
-                        try {
-                            await this.batch.readNamespacedJob(job.name, job.namespace);
-                            try {
-                                await this.batch.deleteNamespacedJob(
-                                    job.name,
-                                    job.namespace,
-                                    { propagationPolicy: "Foreground" } as any);
-                            } catch (e) {
-                                logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${prettyPrintError(e)}`);
-                            }
-                        } catch (e) {
-                            // This is ok to ignore because the job doesn't exist any more
-                        }
+
+                        // First delete the job
+                        await this.deleteJob(job);
+
+                        logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
+                        // Next, delete all still existing jobs
+                        await this.deletePods(job);
                         this.cache.delete(uid);
                     }
                 }
             },
             _.get(this.sdm.configuration, "sdm.k8s.job.ttlCheckInterval", 15000));
+    }
+
+    private async deleteJob(job: { name: string, namespace: string }): Promise<void> {
+        try {
+            await this.batch.readNamespacedJob(job.name, job.namespace);
+            try {
+                await this.batch.deleteNamespacedJob(
+                    job.name,
+                    job.namespace,
+                    { propagationPolicy: "Foreground" } as any);
+            } catch (e) {
+                logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${
+                    prettyPrintError(e)}`);
+            }
+        } catch (e) {
+            // This is ok to ignore because the job doesn't exist any more
+        }
+    }
+
+    private async deletePods(job: { name: string, namespace: string }): Promise<void> {
+        try {
+            const selector = `job-name=${job.name}`;
+            const pods = await this.core.listNamespacedPod(
+                job.namespace,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                selector);
+            if (pods.body && pods.body.items) {
+                for (const pod of pods.body.items) {
+                    try {
+                        await this.core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
+                    } catch (e) {
+                        // Probably ok because pod might be gone already
+                        logger.debug(
+                            `Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${
+                                prettyPrintError(e)}`);
+                    }
+                }
+            }
+        } catch (e) {
+            logger.warn(`Failed to list pods for k8s job '${job.namespace}:${job.name}': ${
+                prettyPrintError(e)}`);
+        }
     }
 }
