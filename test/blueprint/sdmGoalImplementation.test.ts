@@ -95,6 +95,7 @@ describe("implementing goals in the SDM", () => {
                 repoRefResolver: new DefaultRepoRefResolver(),
                 goalSetter: mySDM.pushMapping,
                 implementationMapping: mySDM.goalFulfillmentMapper,
+                enrichGoal: async g => g,
             }, {
                 credentials,
                 id: favoriteRepoRef,
@@ -140,6 +141,7 @@ describe("implementing goals in the SDM", () => {
                 repoRefResolver: new DefaultRepoRefResolver(),
                 goalSetter: mySDM.pushMapping,
                 implementationMapping: mySDM.goalFulfillmentMapper,
+                enrichGoal: async g => g,
             }, {
                 credentials, id: favoriteRepoRef, context: fakeContext, push: aPush,
                 addressChannels: async () => {

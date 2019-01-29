@@ -91,7 +91,8 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     this.goalsSetListeners,
                     this.goalFulfillmentMapper,
                     this.configuration.sdm.credentialsResolver,
-                    this.configuration.sdm.preferenceStoreFactory)],
+                    this.configuration.sdm.preferenceStoreFactory,
+                    this.configuration.sdm.enrichGoal)],
                 commandHandlers: [],
                 ingesters: [],
             };

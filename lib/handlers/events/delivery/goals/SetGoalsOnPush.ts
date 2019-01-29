@@ -27,12 +27,15 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     chooseAndSetGoals,
     CredentialsResolver,
+    EnrichGoal,
     GoalImplementationMapper,
     GoalSetter,
     GoalsSetListener,
     PreferenceStoreFactory,
     ProjectLoader,
+    PushListenerInvocation,
     RepoRefResolver,
+    SdmGoalMessage,
 } from "@atomist/sdm";
 import { OnPushToAnyBranch } from "../../../../typings/types";
 
@@ -58,7 +61,8 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
                 public readonly goalsListeners: GoalsSetListener[],
                 private readonly implementationMapping: GoalImplementationMapper,
                 private readonly credentialsFactory: CredentialsResolver,
-                private readonly preferenceStoreFactory: PreferenceStoreFactory) {
+                private readonly preferenceStoreFactory: PreferenceStoreFactory,
+                private readonly enrichGoal: EnrichGoal) {
     }
 
     public async handle(event: EventFired<OnPushToAnyBranch.Subscription>,
@@ -74,6 +78,7 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
             goalSetter: this.goalSetter,
             implementationMapping: this.implementationMapping,
             preferencesFactory: this.preferenceStoreFactory,
+            enrichGoal: this.enrichGoal,
         }, {
                 context,
                 credentials,
