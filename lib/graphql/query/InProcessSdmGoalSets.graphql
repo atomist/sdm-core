@@ -1,4 +1,8 @@
-query InProcessSdmGoalSets($fetch: Int!, $offset: Int!, $registration: [String!]) {
+query InProcessSdmGoalSets(
+  $fetch: Int!
+  $offset: Int!
+  $registration: [String!]
+) {
   SdmGoalSet(
     _orderBy: "ts"
     _ordering: asc
@@ -24,4 +28,3 @@ query InProcessSdmGoalSets($fetch: Int!, $offset: Int!, $registration: [String!]
     }
   }
 }
-
