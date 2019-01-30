@@ -1,8 +1,9 @@
-query InProcessSdmGoalSets($fetch: Int!, $registration: [String!]) {
+query InProcessSdmGoalSets($fetch: Int!, $offset: Int!, $registration: [String!]) {
   SdmGoalSet(
     _orderBy: "ts"
     _ordering: asc
     _first: $fetch
+    _offset: $offset
     state: [pre_approved, requested, approved, planned, in_process]
   ) {
     goalSetId
@@ -23,3 +24,4 @@ query InProcessSdmGoalSets($fetch: Int!, $registration: [String!]) {
     }
   }
 }
+

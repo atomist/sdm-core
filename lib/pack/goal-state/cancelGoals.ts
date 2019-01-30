@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2018 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,8 @@ export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): Comman
         intent: `list goal sets ${sdm.configuration.name.replace("@", "")}`,
         listener: async ci => {
             const id = guid();
-            let pgs = await pendingGoalSets(ci.context, sdm.configuration.name);
+            let offset = 0;
+            let pgs = await pendingGoalSets(ci.context, sdm.configuration.name, offset);
             const attachments: Attachment[] = [];
             while (pgs.length > 0) {
                 for (const pg of pgs) {
@@ -71,7 +72,8 @@ export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): Comman
                         ],
                     });
                 }
-                pgs = await pendingGoalSets(ci.context, sdm.configuration.name);
+                offset = offset + pgs.length;
+                pgs = await pendingGoalSets(ci.context, sdm.configuration.name, offset);
             }
 
             let msg: SlackMessage;
@@ -129,11 +131,14 @@ export function cancelGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHand
     };
 }
 
-async function pendingGoalSets(ctx: HandlerContext, name: string): Promise<InProcessSdmGoalSets.SdmGoalSet[]> {
+async function pendingGoalSets(ctx: HandlerContext,
+                               name: string,
+                               offset: number = 0): Promise<InProcessSdmGoalSets.SdmGoalSet[]> {
     const results = await ctx.graphClient.query<InProcessSdmGoalSets.Query, InProcessSdmGoalSets.Variables>({
         name: "InProcessSdmGoalSets",
         variables: {
             fetch: 50,
+            offset,
             registration: [name],
         },
         options: QueryNoCacheOptions,
