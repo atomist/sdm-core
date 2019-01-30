@@ -20,7 +20,10 @@ import {
     metadata,
 } from "@atomist/sdm";
 import { isInLocalMode } from "../../internal/machine/modes";
-import { cancelGoalSetsCommand } from "./cancelGoals";
+import {
+    cancelGoalSetsCommand,
+    listPendingGoalSetsCommand,
+} from "./cancelGoals";
 import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";
 
@@ -38,6 +41,7 @@ export function goalState(): ExtensionPack {
                 sdm.addCommand(setGoalStateCommand(sdm));
                 sdm.addCommand(resetGoalsCommand(sdm));
                 sdm.addCommand(cancelGoalSetsCommand(sdm));
+                sdm.addCommand(listPendingGoalSetsCommand(sdm));
             }
         },
     };

@@ -16,6 +16,8 @@
 
 import {
     addressEvent,
+    buttonForCommand,
+    guid,
     HandlerContext,
     QueryNoCacheOptions,
 } from "@atomist/automation-client";
@@ -24,12 +26,14 @@ import {
     fetchGoalsForCommit,
     GoalSetRootType,
     InProcessSdmGoalSets,
+    slackFooter,
     slackInfoMessage,
     slackSuccessMessage,
     SoftwareDeliveryMachine,
     updateGoal,
 } from "@atomist/sdm";
 import {
+    Attachment,
     bold,
     codeLine,
     italic,
@@ -40,24 +44,69 @@ import {
 } from "../../typings/types";
 
 /**
+ * List all pending goal sets and allow to cancel
+ * @param sdm
+ */
+export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<{}> {
+    return {
+        name: "ListGoalSets",
+        description: "List pending goal sets",
+        intent: `list goal sets ${sdm.configuration.name.replace("@", "")}`,
+        listener: async ci => {
+            const id = guid();
+            let pgs = await pendingGoalSets(ci.context, sdm.configuration.name);
+            const attachments: Attachment[] = [];
+            while (pgs.length > 0) {
+                for (const pg of pgs) {
+                    attachments.push({
+                        text: `Pending goal set ${italic(pg.goalSet)} ${codeLine(pg.goalSetId.slice(0, 7))} on ${
+                            codeLine(pg.sha.slice(0, 7))} of ${bold(`${pg.repo.owner}/${pg.repo.name}/${pg.branch}`)} is ${italic(pg.state)}`,
+                        fallback: pg.goalSet,
+                        actions: [
+                            buttonForCommand({ text: "Cancel" }, cancelGoalSetsCommand(sdm).name, {
+                                goalSetId: pg.goalSetId,
+                                msgId: id,
+                            }),
+                        ],
+                    });
+                }
+                pgs = await pendingGoalSets(ci.context, sdm.configuration.name);
+            }
+            const msg = slackInfoMessage(
+                "Pending Goal Sets",
+                `Following ${attachments.length - 1} goal ${attachments.length - 1 === 1 ? "set is" : "sets are"} pending:`);
+            msg.attachments[0].footer = undefined;
+            msg.attachments.push(...attachments);
+            msg.attachments[msg.attachments.length - 1].footer = slackFooter();
+
+            await ci.context.messageClient.respond(msg, { id });
+        },
+    };
+}
+
+/**
  * Cancel one or all pending goal sets
  * @param sdm
  */
-export function cancelGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<{ goalSetId: string }> {
+export function cancelGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<{ goalSetId: string, msgId: string }> {
     return {
         name: "CancelGoalSets",
         description: "Cancel one or all pending goal sets of this SDM",
         intent: `cancel goal sets ${sdm.configuration.name.replace("@", "")}`,
-        parameters: { goalSetId: { required: false, description: "ID of the goal set to cancel" } },
+        parameters: {
+            goalSetId: { required: false, description: "ID of the goal set to cancel" },
+            msgId: { required: false, displayable: false },
+        },
         listener: async ci => {
+            const id = ci.parameters.msgId || guid();
             if (!!ci.parameters.goalSetId) {
-                await cancelGoalSet(ci.parameters.goalSetId, ci.context);
+                await cancelGoalSet(ci.parameters.goalSetId, ci.context, id);
             } else {
                 let pgs = await pendingGoalSets(ci.context, sdm.configuration.name);
                 let count = 0;
                 while (pgs.length > 0) {
                     for (const pg of pgs) {
-                        await cancelGoalSet(pg, ci.context);
+                        await cancelGoalSet(pg.goalSetId, ci.context);
                         count++;
                     }
                     pgs = await pendingGoalSets(ci.context, sdm.configuration.name);
@@ -71,7 +120,7 @@ export function cancelGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHand
     };
 }
 
-async function pendingGoalSets(ctx: HandlerContext, name: string): Promise<string[]> {
+async function pendingGoalSets(ctx: HandlerContext, name: string): Promise<InProcessSdmGoalSets.SdmGoalSet[]> {
     const results = await ctx.graphClient.query<InProcessSdmGoalSets.Query, InProcessSdmGoalSets.Variables>({
         name: "InProcessSdmGoalSets",
         variables: {
@@ -80,10 +129,10 @@ async function pendingGoalSets(ctx: HandlerContext, name: string): Promise<strin
         },
         options: QueryNoCacheOptions,
     });
-    return (results.SdmGoalSet || []).map(gs => gs.goalSetId);
+    return (results.SdmGoalSet || []).map(gs => gs);
 }
 
-async function cancelGoalSet(goalSetId: string, ctx: HandlerContext): Promise<void> {
+async function cancelGoalSet(goalSetId: string, ctx: HandlerContext, id?: string): Promise<void> {
     const result = await ctx.graphClient.query<SdmGoalSetForId.Query, SdmGoalSetForId.Variables>({
         name: "SdmGoalSetForId",
         variables: {
@@ -127,5 +176,6 @@ async function cancelGoalSet(goalSetId: string, ctx: HandlerContext): Promise<vo
         slackInfoMessage(
             "Cancel Goal Set",
             `Canceled goal set ${italic(goalSet.goalSet)} ${codeLine(goalSetId.slice(0, 7))} on ${
-                codeLine(goalSet.sha.slice(0, 7))} of ${bold(`${goalSet.repo.owner}/${goalSet.repo.name}/${goalSet.branch}`)}`));
+                codeLine(goalSet.sha.slice(0, 7))} of ${bold(`${goalSet.repo.owner}/${goalSet.repo.name}/${goalSet.branch}`)}`),
+        { id });
 }
