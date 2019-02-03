@@ -25,8 +25,8 @@ import * as k8s from "@kubernetes/client-node";
  * Key of k8s services inside the service structure of goal data
  */
 export enum K8sServiceRegistrationType {
-    K8sService = "@atomist/sdm/service/k8s"
-};
+    K8sService = "@atomist/sdm/service/k8s",
+}
 
 /**
  * K8s specific service spec
