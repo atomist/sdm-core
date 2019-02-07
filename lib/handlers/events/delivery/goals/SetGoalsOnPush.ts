@@ -33,9 +33,7 @@ import {
     GoalsSetListener,
     PreferenceStoreFactory,
     ProjectLoader,
-    PushListenerInvocation,
     RepoRefResolver,
-    SdmGoalMessage,
 } from "@atomist/sdm";
 import { OnPushToAnyBranch } from "../../../../typings/types";
 
