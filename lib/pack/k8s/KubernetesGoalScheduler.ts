@@ -29,6 +29,7 @@ import {
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
+import { job } from "cron";
 import * as _ from "lodash";
 import * as os from "os";
 import { loadKubeConfig } from "./config";
@@ -292,11 +293,18 @@ export function createJobSpec(podSpec: k8s.V1Pod,
                     if (v.type === K8sServiceRegistrationType.K8sService) {
                         const spec = v.spec as K8sServiceSpec;
                         if (!!spec.container) {
-                            if (Array.isArray(spec.container)) {
-                                jobSpec.spec.template.spec.containers.push(...spec.container);
-                            } else {
-                                jobSpec.spec.template.spec.containers.push(spec.container);
-                            }
+                            const c = Array.isArray(spec.container) ? spec.container : [spec.container];
+                            jobSpec.spec.template.spec.containers.push(...c);
+                        }
+
+                        if (!!spec.volume) {
+                            const v = Array.isArray(spec.volume) ? spec.volume : [spec.volume];
+                            jobSpec.spec.template.spec.volumes.push(...v);
+                        }
+
+                        if (!!spec.volumeMount) {
+                            const vm = Array.isArray(spec.volumeMount) ? spec.volumeMount : [spec.volumeMount];
+                            jobSpec.spec.template.spec.containers.forEach(c => c.volumeMounts.push(...vm));
                         }
                     }
                 });

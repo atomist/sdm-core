@@ -35,7 +35,12 @@ export enum K8sServiceRegistrationType {
  * Open for future extension to support adding other k8s resource types.
  */
 export interface K8sServiceSpec {
+    // Additional containers to be added into the goal job
     container: k8s.V1Container | k8s.V1Container[];
+
+    // Additional volumes and volumeMounts to be added into the goal job
+    volumeMount: k8s.V1VolumeMount | k8s.V1VolumeMount[];
+    volume: k8s.V1Volume | k8s.V1Volume[];
 }
 
 /**
