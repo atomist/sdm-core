@@ -29,7 +29,6 @@ import {
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
-import { job } from "cron";
 import * as _ from "lodash";
 import * as os from "os";
 import { loadKubeConfig } from "./config";
@@ -298,8 +297,8 @@ export function createJobSpec(podSpec: k8s.V1Pod,
                         }
 
                         if (!!spec.volume) {
-                            const v = Array.isArray(spec.volume) ? spec.volume : [spec.volume];
-                            jobSpec.spec.template.spec.volumes.push(...v);
+                            const vo = Array.isArray(spec.volume) ? spec.volume : [spec.volume];
+                            jobSpec.spec.template.spec.volumes.push(...vo);
                         }
 
                         if (!!spec.volumeMount) {
