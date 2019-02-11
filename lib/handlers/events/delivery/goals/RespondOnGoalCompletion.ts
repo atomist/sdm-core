@@ -34,6 +34,7 @@ import {
     RepoRefResolver,
     SdmGoalEvent,
 } from "@atomist/sdm";
+import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
@@ -73,7 +74,11 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             completedGoal: sdmGoal,
         };
 
-        await Promise.all(this.goalCompletionListeners.map(l => l(gsi)));
+        try {
+            await Promise.all(this.goalCompletionListeners.map(l => l(gsi)));
+        } catch (e) {
+            logger.warn(`Error occurred while running goal completion listener: ${stringify(e)}`);
+        }
         return Success;
     }
 }
