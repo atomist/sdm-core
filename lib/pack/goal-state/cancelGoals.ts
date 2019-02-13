@@ -103,7 +103,6 @@ export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): Comman
                 lastAttachment.actions = [update];
             }
 
-
             await ci.context.messageClient.respond(msg, { id });
         },
     };
