@@ -29,10 +29,12 @@ import {
     slackFooter,
     slackInfoMessage,
     slackSuccessMessage,
+    slackTs,
     SoftwareDeliveryMachine,
     updateGoal,
 } from "@atomist/sdm";
 import {
+    Action,
     Attachment,
     bold,
     codeLine,
@@ -76,19 +78,31 @@ export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): Comman
                 pgs = await pendingGoalSets(ci.context, sdm.configuration.name, offset);
             }
 
+            const update: Action = buttonForCommand({ text: "Refresh" }, "ListGoalSets");
+
             let msg: SlackMessage;
             if (attachments.length > 0) {
                 msg = slackInfoMessage(
                     "Pending Goal Sets",
                     `Following ${attachments.length} goal ${attachments.length === 1 ? "set is" : "sets are"} pending:`);
                 msg.attachments[0].footer = undefined;
+                msg.attachments[0].ts = undefined;
                 msg.attachments.push(...attachments);
-                msg.attachments[msg.attachments.length - 1].footer = slackFooter();
             } else {
                 msg = slackInfoMessage(
                     "Pending Goal Sets",
                     `No pending goal sets found`);
             }
+
+            const lastAttachment = msg.attachments[msg.attachments.length - 1];
+            lastAttachment.footer = slackFooter();
+            lastAttachment.ts = slackTs();
+            if (lastAttachment.actions) {
+                lastAttachment.actions.push(update);
+            } else {
+                lastAttachment.actions = [update];
+            }
+
 
             await ci.context.messageClient.respond(msg, { id });
         },
