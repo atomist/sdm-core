@@ -39,7 +39,7 @@ export class ConfigurationBasedBasicCredentialsResolver implements CredentialsRe
     }
 
     public commandHandlerCredentials(context: HandlerContext, id: RemoteRepoRef): ProjectOperationCredentials {
-        throw this.credentialsFromConfiguration();
+        return this.credentialsFromConfiguration();
     }
 
     private credentialsFromConfiguration(): ProjectOperationCredentials & { username: string, password: string} {
