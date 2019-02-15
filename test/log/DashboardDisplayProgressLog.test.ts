@@ -50,7 +50,7 @@ describe("DashboardDisplayProgressLog", () => {
         ts: undefined,
         provenance: undefined,
         preConditions: undefined,
-    };
+    } as any;
 
     it("should construct dashboard log URL", () => {
         const log = new DashboardDisplayProgressLog("http://rolarhost", 1000, 0,

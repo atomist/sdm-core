@@ -1,4 +1,7 @@
-fragment SdmGoalFields on SdmGoal {
+fragment SdmGoalWithPushFields on SdmGoal {
+  push {
+    ...PushFields
+  }
   repo {
     name
     owner
