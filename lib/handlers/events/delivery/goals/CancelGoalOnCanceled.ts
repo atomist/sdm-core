@@ -22,10 +22,16 @@ import {
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import { ClusterWorkerRequestProcessor } from "@atomist/automation-client/lib/internal/transport/cluster/ClusterWorkerRequestProcessor";
+import {
+    cancelableGoal,
+    SdmGoalEvent,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
 import * as cluster from "cluster";
 import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
 
@@ -39,8 +45,18 @@ import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
     }))
 export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGoal.Subscription> {
 
+    @Value("") // empty path returns the entire configuration
+    public configuration: SoftwareDeliveryMachineConfiguration;
+
     public async handle(e: EventFired<OnSpecificCanceledSdmGoal.Subscription>,
                         ctx: HandlerContext): Promise<HandlerResult> {
+
+        const sdmGoal = e.data.SdmGoal[0] as SdmGoalEvent;
+
+        if (!(await cancelableGoal(sdmGoal, ctx))) {
+            logger.info("Not exciting this process because goal can't be canceled");
+        }
+
         logger.info("Exciting this process because goal was canceled");
 
         // Exit with 0 to make sure k8 doesn't re-schedule this pod

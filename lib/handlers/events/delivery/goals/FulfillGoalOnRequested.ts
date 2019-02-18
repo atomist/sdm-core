@@ -21,7 +21,6 @@ import {
     HandlerContext,
     HandlerResult,
     logger,
-    QueryNoCacheOptions,
     Success,
     Value,
 } from "@atomist/automation-client";
@@ -29,11 +28,13 @@ import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
+    cancelableGoal,
     executeGoal,
     GoalExecutionListener,
     GoalImplementationMapper,
     GoalInvocation,
     GoalScheduler,
+    isGoalCanceled,
     LoggingProgressLog,
     ProgressLog,
     SdmGoalEvent,
@@ -45,10 +46,7 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
-import {
-    CanceledSdmGoal,
-    OnAnyRequestedSdmGoal,
-} from "../../../../typings/types";
+import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
 import { formatDuration } from "../../../../util/misc/time";
 
 /**
@@ -74,17 +72,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
-        // Validate that goal hasn't been canceled in the meantime
-        const goalCanceled = await ctx.graphClient.query<CanceledSdmGoal.Query, CanceledSdmGoal.Variables>({
-            name: "CanceledSdmGoal",
-            variables: {
-                goalSetId: sdmGoal.goalSetId,
-                uniqueName: sdmGoal.uniqueName,
-            },
-            options: QueryNoCacheOptions,
-        });
-
-        if (goalCanceled && goalCanceled.SdmGoal && goalCanceled.SdmGoal.length > 0) {
+        if ((await cancelableGoal(sdmGoal, this.configuration)) && (await isGoalCanceled(sdmGoal, ctx))) {
             logger.info(`Goal ${sdmGoal.uniqueName} has been canceled. Not fulfilling`);
             return Success;
         }
