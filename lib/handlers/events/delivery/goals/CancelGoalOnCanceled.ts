@@ -55,6 +55,7 @@ export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGo
 
         if (!(await cancelableGoal(sdmGoal, ctx))) {
             logger.info("Not exciting this process because goal can't be canceled");
+            return Success;
         }
 
         logger.info("Exciting this process because goal was canceled");
