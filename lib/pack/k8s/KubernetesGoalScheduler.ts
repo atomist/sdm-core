@@ -330,7 +330,7 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.
                         labelSelector: {
                             matchExpressions: [
                                 {
-                                    key: "goalSetId",
+                                    key: "atomist.com/goalSetId",
                                     operator: "In",
                                     values: [
                                         goalEvent.goalSetId,
@@ -350,10 +350,10 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.
     delete podSpec.spec.nodeName;
 
     const labels = {
-        goalSetId: goalEvent.goalSetId,
-        goalId: (goalEvent as any).id,
-        creator: sanitizeName(configuration.name),
-        workspaceId: context.workspaceId,
+        "atomist.com/goalSetId": goalEvent.goalSetId,
+        "atomist.com/goalId": (goalEvent as any).id,
+        "atomist.com/creator": sanitizeName(configuration.name),
+        "atomist.com/workspaceId": context.workspaceId,
     };
 
     const detail = {
