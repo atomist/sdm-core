@@ -17,6 +17,7 @@
 import { logger } from "@atomist/automation-client";
 import {
     GoalCompletionListener,
+    isGoalCanceled,
     SdmGoalState,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
@@ -51,6 +52,10 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
             const goalEvent = gi.completedGoal;
 
             if (goalEvent.state === SdmGoalState.in_process) {
+                return;
+            }
+
+            if (goalEvent.state === SdmGoalState.canceled && !(await isGoalCanceled(goalEvent, gi.context))) {
                 return;
             }
 
