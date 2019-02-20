@@ -53,7 +53,7 @@ describe("DashboardDisplayProgressLog", () => {
     };
 
     it("should construct dashboard log URL", () => {
-        const log = new DashboardDisplayProgressLog("http://rolarhost", 1000, 0,
+        const log = new DashboardDisplayProgressLog("http://rolarhost", "https://app.atomist.com", 1000, 0,
             DefaultHttpClientFactory, context, goal);
         assert.equal(log.url,
             "https://app.atomist.com/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/GoalName/GoalSetId/CorrelationID");

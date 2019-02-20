@@ -32,6 +32,7 @@ export class DashboardDisplayProgressLog implements ProgressLog {
     private readonly rolarProgressLog: RolarProgressLog;
 
     constructor(rolarBaseUrl: string,
+                private readonly dashboardBaseUrl: string,
                 bufferSize: number,
                 flushInterval: number,
                 httpClientFactory: HttpClientFactory,
@@ -47,7 +48,7 @@ export class DashboardDisplayProgressLog implements ProgressLog {
 
     get url(): string {
         const path = constructLogPath(this.context, this.sdmGoal);
-        return `https://app.atomist.com/workspace/${path[0]}/logs/${path.slice(1).join("/")}`;
+        return `${this.dashboardBaseUrl}/workspace/${path[0]}/logs/${path.slice(1).join("/")}`;
     }
 
     public async isAvailable(): Promise<boolean> {

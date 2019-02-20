@@ -30,11 +30,9 @@ import { DashboardDisplayProgressLog } from "./DashboardDisplayProgressLog";
 /**
  * Create a progress log that will use Rolar logging service if available,
  * otherwise falling back to logging.
- * @param {string} rolarBaseUrl
- * @param {string} dashboardBaseUrl
- * @return {ProgressLogFactory}
  */
-export function rolarAndDashboardLogFactory(rolarBaseUrl?: string,
+export function rolarAndDashboardLogFactory(rolarBaseUrl: string,
+                                            dashboardBaseUrl: string,
                                             bufferSize: number = 1000,
                                             flushInterval: number = 2000,
                                             httpClientFactory: HttpClientFactory = DefaultHttpClientFactory): ProgressLogFactory {
@@ -42,7 +40,14 @@ export function rolarAndDashboardLogFactory(rolarBaseUrl?: string,
     if (rolarBaseUrl) {
         persistentLogFactory = (context, sdmGoal, fallback) => {
             return firstAvailableProgressLog(
-                new DashboardDisplayProgressLog(rolarBaseUrl, bufferSize, flushInterval, httpClientFactory, context, sdmGoal),
+                new DashboardDisplayProgressLog(
+                    rolarBaseUrl,
+                    dashboardBaseUrl,
+                    bufferSize,
+                    flushInterval,
+                    httpClientFactory,
+                    context,
+                    sdmGoal),
                 fallback,
             );
         };
