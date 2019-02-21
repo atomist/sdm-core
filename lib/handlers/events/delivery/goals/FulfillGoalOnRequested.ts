@@ -46,6 +46,7 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
 import { formatDuration } from "../../../../util/misc/time";
 
@@ -71,6 +72,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
+
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, ctx);
 
         if ((await cancelableGoal(sdmGoal, this.configuration)) && (await isGoalCanceled(sdmGoal, ctx))) {
             logger.info(`Goal ${sdmGoal.uniqueName} has been canceled. Not fulfilling`);
