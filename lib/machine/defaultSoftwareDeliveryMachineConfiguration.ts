@@ -36,7 +36,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             artifactStore: new EphemeralLocalArtifactStore(),
             projectLoader: new CachingProjectLoader(),
             logFactory: rolarAndDashboardLogFactory(
-                _.get(configuration, "sdm.rolar.url", "https://rolar.cfapps.io"),
+                _.get(configuration, "sdm.rolar.url", "https://rolar.atomist.com"),
                 _.get(configuration, "sdm.dashboard.url", "https://app.atomist.com"),
                 _.get(configuration, "sdm.rolar.bufferSize", 1000),
                 _.get(configuration, "sdm.rolar.flushInterval", 1000),
