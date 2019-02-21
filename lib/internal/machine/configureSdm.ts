@@ -31,15 +31,14 @@ import { CancelGoalOnCanceled } from "../../handlers/events/delivery/goals/Cance
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
+import { GoalSigningAutomationEventListener } from "../signing/goalSigning";
 import { SdmGoalMetricReportingAutomationEventListener } from "../util/SdmGoalMetricReportingAutomationEventListener";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
 import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
-import {
-    LocalSoftwareDeliveryMachineConfiguration,
-} from "./LocalSoftwareDeliveryMachineOptions";
+import { LocalSoftwareDeliveryMachineConfiguration } from "./LocalSoftwareDeliveryMachineOptions";
 import {
     isGitHubAction,
     isInLocalMode,
@@ -162,6 +161,17 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
     // Set workers to one but leave enablement unset so that it can be defined elsewhere.
     mergedConfig.cluster.workers = 1;
+}
+
+function configureGoalSigning(mergedConfig: SoftwareDeliveryMachineConfiguration): void {
+    if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled) {
+        const verificationKeys =
+            Array.isArray(mergedConfig.sdm.goalSigning.verificationKeys)
+                ? mergedConfig.sdm.goalSigning.verificationKeys
+                : [mergedConfig.sdm.goalSigning.verificationKeys];
+        mergedConfig.listeners.push(
+            new GoalSigningAutomationEventListener(verificationKeys, mergedConfig.sdm.goalSigning.signingKey));
+    }
 }
 
 async function registerMetadata(config: Configuration,
