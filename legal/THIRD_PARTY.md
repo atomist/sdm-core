@@ -26,8 +26,8 @@ This page details all runtime OSS dependencies of `@atomist/sdm-core`.
 |[Custom: https://flowtype.org/](#custom-httpsflowtypeorg)|1|
 |[Custom: https://github.com/graphql/graphql-language-service](#custom-httpsgithubcomgraphqlgraphql-language-service)|2|
 |[GPL-3.0](#gpl-30)|3|
-|[ISC](#isc)|125|
-|[MIT](#mit)|859|
+|[ISC](#isc)|126|
+|[MIT](#mit)|861|
 |[UNKNOWN](#unknown)|1|
 |[Unlicense](#unlicense)|1|
 |[WTFPL](#wtfpl)|4|
@@ -43,7 +43,7 @@ Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apa
 
 | Name | Version | Publisher | Repository |
 |------|---------|-----------|------------|
-|`@atomist/sdm`|`1.3.0-master.20190218090039`|Atomist|[https://github.com/atomist/sdm](https://github.com/atomist/sdm)|
+|`@atomist/sdm`|`1.3.0-goal-signing.20190221190343`|Atomist|[https://github.com/atomist/sdm](https://github.com/atomist/sdm)|
 |`@atomist/slack-messages`|`1.1.0`|Atomist|[https://github.com/atomist/slack-messages](https://github.com/atomist/slack-messages)|
 |`@kubernetes/client-node`|`0.7.2`|Kubernetes Authors|[https://github.com/kubernetes-client/javascript](https://github.com/kubernetes-client/javascript)|
 |`JSONStream`|`1.3.5`|Dominic Tarr|[https://github.com/dominictarr/JSONStream](https://github.com/dominictarr/JSONStream)|
@@ -217,7 +217,7 @@ GNU General Public License v3.0 only - [http://www.gnu.org/licenses/gpl-3.0-stan
 
 | Name | Version | Publisher | Repository |
 |------|---------|-----------|------------|
-|`@atomist/automation-client`|`1.3.0-master.20190215144219`|Atomist|[https://github.com/atomist/automation-client](https://github.com/atomist/automation-client)|
+|`@atomist/automation-client`|`1.3.0-master.20190219082917`|Atomist|[https://github.com/atomist/automation-client](https://github.com/atomist/automation-client)|
 |`@atomist/microgrammar`|`1.0.4`|Atomist|[https://github.com/atomist/microgrammar](https://github.com/atomist/microgrammar)|
 |`@atomist/tree-path`|`1.0.2`|Atomist|[https://github.com/atomist/tree-path](https://github.com/atomist/tree-path)|
 
@@ -327,6 +327,7 @@ ISC License - [https://www.isc.org/downloads/software-support-policy/isc-license
 |`semver`|`5.6.0`||[https://github.com/npm/node-semver](https://github.com/npm/node-semver)|
 |`set-blocking`|`2.0.0`|Ben Coe|[https://github.com/yargs/set-blocking](https://github.com/yargs/set-blocking)|
 |`setprototypeof`|`1.1.0`|Wes Todd|[https://github.com/wesleytodd/setprototypeof](https://github.com/wesleytodd/setprototypeof)|
+|`setprototypeof`|`1.1.1`|Wes Todd|[https://github.com/wesleytodd/setprototypeof](https://github.com/wesleytodd/setprototypeof)|
 |`signal-exit`|`3.0.2`|Ben Coe|[https://github.com/tapjs/signal-exit](https://github.com/tapjs/signal-exit)|
 |`slide`|`1.1.6`|Isaac Z. Schlueter|[https://github.com/isaacs/slide-flow-control](https://github.com/isaacs/slide-flow-control)|
 |`ssri`|`6.0.1`|Kat Marchán|[https://github.com/zkat/ssri](https://github.com/zkat/ssri)|
@@ -367,18 +368,19 @@ MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org
 |`@oclif/color`|`0.0.0`|Jeff Dickey @jdxcode|[https://github.com/oclif/color](https://github.com/oclif/color)|
 |`@oclif/command`|`1.5.10`|Jeff Dickey @jdxcode|[https://github.com/oclif/command](https://github.com/oclif/command)|
 |`@oclif/config`|`1.12.0`|Jeff Dickey @jdxcode|[https://github.com/oclif/config](https://github.com/oclif/config)|
+|`@oclif/config`|`1.12.8`|Jeff Dickey @jdxcode|[https://github.com/oclif/config](https://github.com/oclif/config)|
 |`@oclif/errors`|`1.2.2`|Jeff Dickey @jdxcode|[https://github.com/oclif/errors](https://github.com/oclif/errors)|
 |`@oclif/parser`|`3.7.2`|Jeff Dickey @jdxcode|[https://github.com/oclif/parser](https://github.com/oclif/parser)|
 |`@oclif/plugin-autocomplete`|`0.1.0`|Philipe Navarro @RasPhilCo|[https://github.com/oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete)|
 |`@oclif/plugin-help`|`1.2.11`|Jeff Dickey @jdxcode|[https://github.com/oclif/plugin-help](https://github.com/oclif/plugin-help)|
 |`@oclif/plugin-not-found`|`1.2.2`|Jeff Dickey @jdxcode|[https://github.com/oclif/plugin-not-found](https://github.com/oclif/plugin-not-found)|
 |`@oclif/plugin-plugins`|`1.7.7`|Jeff Dickey @jdxcode|[https://github.com/oclif/plugin-plugins](https://github.com/oclif/plugin-plugins)|
-|`@oclif/plugin-warn-if-update-available`|`1.5.4`|Jeff Dickey @jdxcode|[https://github.com/oclif/plugin-warn-if-update-available](https://github.com/oclif/plugin-warn-if-update-available)|
+|`@oclif/plugin-warn-if-update-available`|`1.7.0`|Jeff Dickey @jdxcode|[https://github.com/oclif/plugin-warn-if-update-available](https://github.com/oclif/plugin-warn-if-update-available)|
 |`@oclif/screen`|`1.0.4`|Jeff Dickey @jdxcode|[https://github.com/oclif/screen](https://github.com/oclif/screen)|
 |`@octokit/endpoint`|`3.1.1`|Gregor Martynus|[https://github.com/octokit/endpoint.js](https://github.com/octokit/endpoint.js)|
 |`@octokit/request`|`2.3.0`|Gregor Martynus|[https://github.com/octokit/request.js](https://github.com/octokit/request.js)|
 |`@octokit/rest`|`16.13.1`|Gregor Martynus|[https://github.com/octokit/rest.js](https://github.com/octokit/rest.js)|
-|`@octokit/rest`|`16.15.0`|Gregor Martynus|[https://github.com/octokit/rest.js](https://github.com/octokit/rest.js)|
+|`@octokit/rest`|`16.16.0`|Gregor Martynus|[https://github.com/octokit/rest.js](https://github.com/octokit/rest.js)|
 |`@samverschueren/stream-to-observable`|`0.3.0`||[https://github.com/SamVerschueren/stream-to-observable](https://github.com/SamVerschueren/stream-to-observable)|
 |`@sindresorhus/is`|`0.7.0`|Sindre Sorhus|[https://github.com/sindresorhus/is](https://github.com/sindresorhus/is)|
 |`@typed/curry`|`1.0.1`|Tylor Steinberger|[https://github.com/TylorS/typed-curry](https://github.com/TylorS/typed-curry)|
@@ -502,6 +504,7 @@ MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org
 |`apollo-server-core`|`2.3.4`|Jonas Helfer|[https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-core](https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-core)|
 |`apollo-server-env`|`2.2.0`|opensource@apollographql.com|[https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-env](https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-env)|
 |`apollo-server-errors`|`2.2.0`|opensource@apollographql.com|[https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-errors](https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-errors)|
+|`apollo-server-errors`|`2.2.1`|opensource@apollographql.com|[https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-errors](https://github.com/apollographql/apollo-server/tree/master/packages/apollo-server-errors)|
 |`apollo-server-plugin-base`|`0.2.3`|Apollo||
 |`apollo-tracing`|`0.4.1`|Martijn Walraven|[https://github.com/apollographql/apollo-tracing-js](https://github.com/apollographql/apollo-tracing-js)|
 |`apollo-utilities`|`1.1.3`|James Baxley|[https://github.com/apollographql/apollo-client](https://github.com/apollographql/apollo-client)|
@@ -578,7 +581,7 @@ MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org
 |`cli-table3`|`0.5.1`|James Talmage|[https://github.com/cli-table/cli-table3](https://github.com/cli-table/cli-table3)|
 |`cli-truncate`|`0.2.1`|Sindre Sorhus|[https://github.com/sindresorhus/cli-truncate](https://github.com/sindresorhus/cli-truncate)|
 |`cli-ux`|`4.9.3`|Jeff Dickey @jdxcode|[https://github.com/oclif/cli-ux](https://github.com/oclif/cli-ux)|
-|`cli-ux`|`5.1.0`|Jeff Dickey @jdxcode|[https://github.com/oclif/cli-ux](https://github.com/oclif/cli-ux)|
+|`cli-ux`|`5.2.0`|Jeff Dickey @jdxcode|[https://github.com/oclif/cli-ux](https://github.com/oclif/cli-ux)|
 |`clone-response`|`1.0.2`|Luke Childs|[https://github.com/lukechilds/clone-response](https://github.com/lukechilds/clone-response)|
 |`clone`|`1.0.4`|Paul Vorbach|[https://github.com/pvorb/node-clone](https://github.com/pvorb/node-clone)|
 |`clone`|`2.1.2`|Paul Vorbach|[https://github.com/pvorb/node-clone](https://github.com/pvorb/node-clone)|
@@ -721,7 +724,7 @@ MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org
 |`fresh`|`0.5.2`|TJ Holowaychuk|[https://github.com/jshttp/fresh](https://github.com/jshttp/fresh)|
 |`from2`|`1.3.0`|Hugh Kennedy|[https://github.com/hughsk/from2](https://github.com/hughsk/from2)|
 |`from2`|`2.3.0`|Hugh Kennedy|[https://github.com/hughsk/from2](https://github.com/hughsk/from2)|
-|`fs-capacitor`|`2.0.0`|Mike Marcacci|[https://github.com/mike-marcacci/fs-capacitor](https://github.com/mike-marcacci/fs-capacitor)|
+|`fs-capacitor`|`2.0.1`|Mike Marcacci|[https://github.com/mike-marcacci/fs-capacitor](https://github.com/mike-marcacci/fs-capacitor)|
 |`fs-extra`|`6.0.1`|JP Richardson|[https://github.com/jprichardson/node-fs-extra](https://github.com/jprichardson/node-fs-extra)|
 |`fs-extra`|`7.0.1`|JP Richardson|[https://github.com/jprichardson/node-fs-extra](https://github.com/jprichardson/node-fs-extra)|
 |`function-bind`|`1.1.1`|Raynos|[https://github.com/Raynos/function-bind](https://github.com/Raynos/function-bind)|
@@ -775,7 +778,7 @@ MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org
 |`hpkp`|`2.0.0`|Adam Baldwin|[https://github.com/helmetjs/hpkp](https://github.com/helmetjs/hpkp)|
 |`hsts`|`2.1.0`|Adam Baldwin|[https://github.com/helmetjs/hsts](https://github.com/helmetjs/hsts)|
 |`http-errors`|`1.6.3`|Jonathan Ong|[https://github.com/jshttp/http-errors](https://github.com/jshttp/http-errors)|
-|`http-errors`|`1.7.1`|Jonathan Ong|[https://github.com/jshttp/http-errors](https://github.com/jshttp/http-errors)|
+|`http-errors`|`1.7.2`|Jonathan Ong|[https://github.com/jshttp/http-errors](https://github.com/jshttp/http-errors)|
 |`http-proxy-agent`|`2.1.0`|Nathan Rajlich|[https://github.com/TooTallNate/node-http-proxy-agent](https://github.com/TooTallNate/node-http-proxy-agent)|
 |`http-signature`|`1.2.0`|Joyent, Inc|[https://github.com/joyent/node-http-signature](https://github.com/joyent/node-http-signature)|
 |`https-proxy-agent`|`2.2.1`|Nathan Rajlich|[https://github.com/TooTallNate/node-https-proxy-agent](https://github.com/TooTallNate/node-https-proxy-agent)|
@@ -1236,7 +1239,7 @@ Do What The F*ck You Want To Public License - [http://sam.zoy.org/wtfpl/COPYING]
 | Name | Version | Publisher | Repository |
 |------|---------|-----------|------------|
 |`opener`|`1.5.1`|Domenic Denicola|[https://github.com/domenic/opener](https://github.com/domenic/opener)|
-|`password-prompt`|`1.0.7`|Jeff Dickey @jdxcode|[https://github.com/jdxcode/password-prompt](https://github.com/jdxcode/password-prompt)|
+|`password-prompt`|`1.1.2`|Jeff Dickey @jdxcode|[https://github.com/jdxcode/password-prompt](https://github.com/jdxcode/password-prompt)|
 |`path-is-inside`|`1.0.2`|Domenic Denicola|[https://github.com/domenic/path-is-inside](https://github.com/domenic/path-is-inside)|
 |`sorted-object`|`2.0.1`|Domenic Denicola|[https://github.com/domenic/sorted-object](https://github.com/domenic/sorted-object)|
 
