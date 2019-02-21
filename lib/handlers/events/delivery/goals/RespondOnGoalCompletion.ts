@@ -35,9 +35,11 @@ import {
     PreferenceStoreFactory,
     RepoRefResolver,
     SdmGoalEvent,
+    SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
 /**
@@ -48,7 +50,7 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     @Value("")
-    public configuration: Configuration;
+    public configuration: SoftwareDeliveryMachineConfiguration;
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
@@ -64,6 +66,8 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
+
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
