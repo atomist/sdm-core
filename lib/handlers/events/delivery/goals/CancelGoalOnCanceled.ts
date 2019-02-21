@@ -33,6 +33,7 @@ import {
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import * as cluster from "cluster";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
 
 @EventHandler("Cancel the currently executing goal",
@@ -58,9 +59,11 @@ export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGo
             return Success;
         }
 
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, ctx);
+
         logger.info("Exciting this process because goal was canceled");
 
-        // Exit with 0 to make sure k8 doesn't re-schedule this pod
+        // Exit with 0 to make sure k8s doesn't re-schedule this pod
         if (cluster.isWorker) {
             (automationClientInstance().webSocketHandler as ClusterWorkerRequestProcessor).sendShutdown(0, ctx as any);
         } else {
