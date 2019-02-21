@@ -15,11 +15,13 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -37,6 +39,9 @@ import * as schema from "../../../typings/types";
  */
 @EventHandler("On user joining channel", GraphQL.subscription("OnUserJoiningChannel"))
 export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningChannel.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     constructor(private readonly listeners: UserJoiningChannelListener[],
                 private readonly repoRefResolver: RepoRefResolver,
@@ -57,6 +62,7 @@ export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningCha
         const invocation: UserJoiningChannelListenerInvocation = {
             addressChannels,
             preferences,
+            configuration: this.configuration,
             context,
             credentials,
             joinEvent,

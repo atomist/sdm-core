@@ -62,4 +62,5 @@ fragment SdmGoalFields on SdmGoal {
     ...PushFields
   }
   version
+  signature
 }

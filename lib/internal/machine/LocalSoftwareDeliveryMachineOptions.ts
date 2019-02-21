@@ -15,10 +15,7 @@
  */
 
 import { AnyOptions } from "@atomist/automation-client";
-import {
-    PushTest,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
 
 /**
  * Configuration determining how to run in local mode

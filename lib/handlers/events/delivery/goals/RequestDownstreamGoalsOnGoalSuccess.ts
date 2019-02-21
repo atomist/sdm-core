@@ -15,12 +15,14 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -50,6 +52,9 @@ import {
 @EventHandler("Move downstream goals from 'planned' to 'requested' when preconditions are met",
     GraphQL.subscription("OnAnySuccessfulSdmGoal"))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     constructor(private readonly name: string,
                 private readonly implementationMapper: GoalImplementationMapper,
@@ -94,7 +99,15 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                 let g = sdmG;
                 const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmG);
                 for (const cb of cbs) {
-                    g = await cb.callback(g, { id, addressChannels: undefined, preferences, credentials, context });
+                    g = await cb.callback(g,
+                        {
+                            id,
+                            addressChannels: undefined,
+                            preferences,
+                            configuration: this.configuration,
+                            credentials,
+                            context,
+                        });
                 }
                 return updateGoal(context, g, {
                     state: SdmGoalState.requested,

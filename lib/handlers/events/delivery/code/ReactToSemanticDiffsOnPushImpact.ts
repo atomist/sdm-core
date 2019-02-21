@@ -15,11 +15,13 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -42,6 +44,9 @@ import * as schema from "../../../../typings/types";
 @EventHandler("Find semantic diffs from a PushImpact", GraphQL.subscription("OnPushImpact"))
 export class ReactToSemanticDiffsOnPushImpact
     implements HandleEvent<schema.OnPushImpact.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     constructor(private readonly differenceListeners: FingerprintDifferenceListener[],
                 private readonly repoRefResolver: RepoRefResolver,
@@ -82,6 +87,7 @@ export class ReactToSemanticDiffsOnPushImpact
             context,
             credentials,
             addressChannels: addressChannelsFor(after.repo, context),
+            configuration: this.configuration,
             preferences,
             diffs,
         };

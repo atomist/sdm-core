@@ -15,12 +15,14 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GitCommandGitProject,
     GraphQL,
     HandlerContext,
     HandlerResult,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -40,6 +42,9 @@ import * as schema from "../../../typings/types";
  */
 @EventHandler("On repo onboarding", GraphQL.subscription("OnRepoOnboarded"))
 export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     constructor(private readonly actions: ProjectListener[],
                 private readonly repoRefResolver: RepoRefResolver,
@@ -61,6 +66,7 @@ export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subsc
             context,
             addressChannels,
             preferences,
+            configuration: this.configuration,
             credentials,
             project,
         };

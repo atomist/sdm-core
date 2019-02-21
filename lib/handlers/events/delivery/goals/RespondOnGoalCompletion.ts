@@ -15,12 +15,14 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -44,6 +46,9 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 @EventHandler("Run a listener on goal failure or success",
     GraphQL.subscription("OnAnyCompletedSdmGoal"))
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
@@ -69,6 +74,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             context,
             credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
+            configuration: this.configuration,
             preferences: this.preferenceStoreFactory(context),
             allGoals: goals,
             completedGoal: sdmGoal,

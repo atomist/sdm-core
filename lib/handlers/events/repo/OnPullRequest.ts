@@ -15,11 +15,13 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -39,6 +41,9 @@ import * as schema from "../../../typings/types";
  */
 @EventHandler("On pull request", GraphQL.subscription("OnPullRequest"))
 export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     constructor(
         private readonly projectLoader: ProjectLoader,
@@ -68,6 +73,7 @@ export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscript
                 context,
                 addressChannels,
                 preferences,
+                configuration: this.configuration,
                 credentials,
                 project,
                 pullRequest,

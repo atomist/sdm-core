@@ -125,4 +125,5 @@ fragment SdmGoalWithGoalsFields on SdmGoal {
     }
   }
   version
+  signature
 }

@@ -15,11 +15,13 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -39,6 +41,9 @@ import * as schema from "../../../typings/types";
 @EventHandler("On tag", GraphQL.subscription("OnTag"))
 export class OnTag implements HandleEvent<schema.OnTag.Subscription> {
 
+    @Value("")
+    public configuration: Configuration;
+
     constructor(private readonly listeners: TagListener[],
                 private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
@@ -57,6 +62,7 @@ export class OnTag implements HandleEvent<schema.OnTag.Subscription> {
         const invocation: TagListenerInvocation = {
             addressChannels,
             preferences,
+            configuration: this.configuration,
             id,
             context,
             tag,

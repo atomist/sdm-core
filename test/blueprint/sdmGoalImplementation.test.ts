@@ -105,6 +105,7 @@ describe("implementing goals in the SDM", () => {
                     return;
                 },
                 preferences: NoPreferenceStore,
+                configuration: {},
                 goalSetId: "hi",
             },
         );
@@ -148,6 +149,7 @@ describe("implementing goals in the SDM", () => {
                     return;
                 },
                 preferences: NoPreferenceStore,
+                configuration: {},
                 goalSetId: "hi",
             },
         );

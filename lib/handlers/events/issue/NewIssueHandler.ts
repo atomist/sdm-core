@@ -15,12 +15,14 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -39,6 +41,9 @@ import * as schema from "@atomist/sdm/lib/typings/types";
  */
 @EventHandler("On issue creation", GraphQL.subscription("OnIssueAction"))
 export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscription> {
+
+    @Value("")
+    public configuration: Configuration;
 
     private readonly newIssueListeners: NewIssueListener[];
 
@@ -66,6 +71,7 @@ export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscri
             id,
             addressChannels,
             preferences,
+            configuration: this.configuration,
             context,
             issue,
             credentials,

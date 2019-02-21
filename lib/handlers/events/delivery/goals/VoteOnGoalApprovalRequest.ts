@@ -15,12 +15,14 @@
  */
 
 import {
+    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -55,6 +57,9 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
     GraphQL.subscription("OnAnyApprovedSdmGoal"))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
+    @Value("")
+    public configuration: Configuration;
+
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly voters: GoalApprovalRequestVoter[],
@@ -87,6 +92,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
             context,
             credentials,
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
+            configuration: this.configuration,
             preferences,
             goal: sdmGoal,
         };
@@ -101,7 +107,14 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                     let g = sdmGoal;
                     const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmGoal);
                     for (const cb of cbs) {
-                        g = await cb.callback(g, { id, addressChannels: undefined, preferences, credentials, context });
+                        g = await cb.callback(g, {
+                            id,
+                            addressChannels: undefined,
+                            preferences,
+                            credentials,
+                            configuration: this.configuration,
+                            context,
+                        });
                     }
                     await updateGoal(context, sdmGoal, {
                         state: SdmGoalState.requested,
