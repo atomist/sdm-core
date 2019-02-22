@@ -42,6 +42,13 @@ export interface SignatureMixin {
     signature: string;
 }
 
+/**
+ * AutomationEventListener that verifies incoming SDM goals against a set of configurable
+ * verification public keys.
+ *
+ * Optionally a private key can be specified to sign outgoing goals. Setting this is strongly
+ * recommended to prevent executing untrusted and/or tampered SDM goals.
+ */
 export class GoalSigningAutomationEventListener extends AutomationEventListenerSupport {
 
     constructor(private readonly verificationKeys: GoalVerificationKey[] = [],
@@ -59,14 +66,15 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
 
         if (!!goal && isGoalRelevant(goal) && !isGoalRejected(goal)) {
             if (!!goal.signature) {
-                const verifier = crypto.createVerify("sha512");
+                const verifier = crypto.createVerify("RSA-SHA512");
                 verifier.update(normalizeGoal(goal));
                 verifier.end();
 
                 const message = Buffer.from(goal.signature, "base64");
-
-                if (this.verificationKeys.some(vk => verifier.verify(vk.publicKey, message))) {
-                    logger.info(`Verified signature of incoming goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
+                const verifiedWith = this.verificationKeys.find(vk => verifier.verify(vk.publicKey, message));
+                if (!!verifiedWith) {
+                    logger.info(
+                        `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${verifiedWith.name}'`);
                 } else {
                     await rejectGoal("signature invalid", goal, ctx);
                     throw new Error("SDM goal signature invalid. Rejecting goal!");
@@ -98,7 +106,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
     private initVerificationKeys(): void {
         // Load the Atomist public key
         const publicKey = fs.readFileSync(path.join(__dirname, "atomist-public.pem")).toString();
-        this.verificationKeys.push({ publicKey });
+        this.verificationKeys.push({ publicKey, name: "atomist.com" });
 
         // If signing key is set, also use it to verify
         if (!!this.signingKey) {
@@ -109,7 +117,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
 
 export function signGoal(goal: SdmGoalMessage & SignatureMixin,
                          signingKey: GoalSigningKey): SdmGoalMessage {
-    const signer = crypto.createSign("sha512");
+    const signer = crypto.createSign("RSA-SHA512");
     signer.update(normalizeGoal(goal));
     signer.end();
 

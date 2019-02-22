@@ -88,6 +88,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         // Configure the job forking ability
         configureJobLaunching(mergedConfig, sdm);
+        configureGoalSigning(mergedConfig);
 
         await registerMetadata(mergedConfig, sdm);
 
@@ -163,14 +164,25 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.cluster.workers = 1;
 }
 
+/**
+ * Configure SDM to sign and verify goals
+ * @param mergedConfig
+ */
 function configureGoalSigning(mergedConfig: SoftwareDeliveryMachineConfiguration): void {
-    if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled) {
-        const verificationKeys =
-            Array.isArray(mergedConfig.sdm.goalSigning.verificationKeys)
-                ? mergedConfig.sdm.goalSigning.verificationKeys
-                : [mergedConfig.sdm.goalSigning.verificationKeys];
+    if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled === true) {
+        const signingConfig = mergedConfig.sdm.goalSigning;
+
+        const verificationKeys = [];
+        if (!!signingConfig.verificationKeys) {
+            if (Array.isArray(signingConfig.verificationKeys)) {
+                verificationKeys.push(...signingConfig.verificationKeys);
+            } else {
+                verificationKeys.push(signingConfig.verificationKeys);
+            }
+        }
+
         mergedConfig.listeners.push(
-            new GoalSigningAutomationEventListener(verificationKeys, mergedConfig.sdm.goalSigning.signingKey));
+            new GoalSigningAutomationEventListener(verificationKeys, signingConfig.signingKey));
     }
 }
 
