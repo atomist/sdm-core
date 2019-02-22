@@ -18,24 +18,23 @@ import {
     AutomationEventListenerSupport,
     CustomEventDestination,
     Destination,
-    EventFired,
     HandlerContext,
     logger,
     MessageOptions,
 } from "@atomist/automation-client";
 import {
     GoalSigningKey,
-    GoalVerificationKey,
     SdmGoalEvent,
     SdmGoalMessage,
     SdmGoalState,
     SdmProvenance,
+    SoftwareDeliveryMachineConfiguration,
     updateGoal,
 } from "@atomist/sdm";
 import * as crypto from "crypto";
 import * as fs from "fs-extra";
-import * as _ from "lodash";
 import * as path from "path";
+import { DeepPartial } from "ts-essentials";
 import { isGoalRelevant } from "../delivery/goals/support/validateGoal";
 
 export interface SignatureMixin {
@@ -51,27 +50,66 @@ export interface SignatureMixin {
  */
 export class GoalSigningAutomationEventListener extends AutomationEventListenerSupport {
 
-    constructor(private readonly verificationKeys: GoalVerificationKey[] = [],
-                private readonly signingKey?: GoalSigningKey) {
+    constructor(private readonly configuration: SoftwareDeliveryMachineConfiguration) {
         super();
         this.initVerificationKeys();
     }
 
-    public async eventStarting(payload: EventFired<any>, ctx: HandlerContext): Promise<void> {
-        if (this.verificationKeys.length === 0) {
-            return;
+    public async messageSending(message: any,
+                                destinations: Destination | Destination[],
+                                options: MessageOptions,
+                                ctx: HandlerContext): Promise<any> {
+        const dests = Array.isArray(destinations) ? destinations : [destinations];
+
+        if (!!this.configuration.goalSigning.signingKey &&
+            dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
+
+            const goal = signGoal(message as SdmGoalMessage & SignatureMixin, this.configuration.goalSigning.signingKey);
+            logger.info(`Signed outgoing goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
+            return goal;
         }
 
-        const goal = _.get(payload, "data.SdmGoal[0]") as SdmGoalEvent & SignatureMixin;
+        return message;
+    }
 
+    private initVerificationKeys(): void {
+
+        if (!Array.isArray(this.configuration.goalSigning.verificationKeys)) {
+            if (!!this.configuration.goalSigning.verificationKeys) {
+                this.configuration.goalSigning.verificationKeys = [this.configuration.goalSigning.verificationKeys];
+            } else {
+                this.configuration.goalSigning.verificationKeys = [];
+            }
+        }
+
+        // If signing key is set, also use it to verify
+        if (!!this.configuration.goalSigning.signingKey) {
+            this.configuration.goalSigning.verificationKeys.push(this.configuration.goalSigning.signingKey);
+        }
+
+        // Load the Atomist public key
+        const publicKey = fs.readFileSync(path.join(__dirname, "atomist-public.pem")).toString();
+        this.configuration.goalSigning.verificationKeys.push({ publicKey, name: "atomist.com/sdm" });
+    }
+}
+
+export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin>,
+                                 configuration: SoftwareDeliveryMachineConfiguration,
+                                 ctx: HandlerContext): Promise<void> {
+    const signingConfiguration = configuration.goalSigning;
+    if (!!signingConfiguration && signingConfiguration.enabled === true) {
         if (!!goal && isGoalRelevant(goal) && !isGoalRejected(goal)) {
             if (!!goal.signature) {
-                const verifier = crypto.createVerify("RSA-SHA512");
-                verifier.update(normalizeGoal(goal));
-                verifier.end();
 
-                const message = Buffer.from(goal.signature, "base64");
-                const verifiedWith = this.verificationKeys.find(vk => verifier.verify(vk.publicKey, message));
+                const signature = Buffer.from(goal.signature, "base64");
+                const message = normalizeGoal(goal);
+                const verifiedWith = signingConfiguration.verificationKeys.find(vk => {
+                    const verifier = crypto.createVerify("RSA-SHA512");
+                    verifier.update(message);
+                    verifier.end();
+                    return verifier.verify(vk.publicKey, signature);
+                });
+
                 if (!!verifiedWith) {
                     logger.info(
                         `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${verifiedWith.name}'`);
@@ -83,34 +121,6 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
                 await rejectGoal("signature missing", goal, ctx);
                 throw new Error("SDM goal signature is missing. Rejecting goal!");
             }
-        }
-    }
-
-    public async messageSending(message: any,
-                                destinations: Destination | Destination[],
-                                options: MessageOptions,
-                                ctx: HandlerContext): Promise<any> {
-        const dests = Array.isArray(destinations) ? destinations : [destinations];
-
-        if (!!this.signingKey &&
-            dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
-
-            const goal = signGoal(message as SdmGoalMessage & SignatureMixin, this.signingKey);
-            logger.info(`Signed outgoing goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
-            return goal;
-        }
-
-        return message;
-    }
-
-    private initVerificationKeys(): void {
-        // Load the Atomist public key
-        const publicKey = fs.readFileSync(path.join(__dirname, "atomist-public.pem")).toString();
-        this.verificationKeys.push({ publicKey, name: "atomist.com" });
-
-        // If signing key is set, also use it to verify
-        if (!!this.signingKey) {
-            this.verificationKeys.push(this.signingKey);
         }
     }
 }

@@ -21,6 +21,7 @@ import {
     HandlerResult,
     logger,
     Success,
+    Value,
 } from "@atomist/automation-client";
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
@@ -30,9 +31,11 @@ import {
     SdmGoalEvent,
     SdmGoalKey,
     SdmGoalState,
+    SoftwareDeliveryMachineConfiguration,
     updateGoal,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
 /**
@@ -42,6 +45,9 @@ import { OnAnyFailedSdmGoal } from "../../../../typings/types";
     GraphQL.subscription("OnAnyFailedSdmGoal"))
 export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailedSdmGoal.Subscription> {
 
+    @Value("")
+    public configuration: SoftwareDeliveryMachineConfiguration;
+
     public async handle(event: EventFired<OnAnyFailedSdmGoal.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
         const failedGoal = event.data.SdmGoal[0] as SdmGoalEvent;
@@ -50,6 +56,8 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
             logger.debug(`Goal ${failedGoal.uniqueName} skipped because not relevant for this SDM`);
             return Success;
         }
+
+        await verifyGoal(failedGoal, this.configuration, context);
 
         const goals = fetchGoalsFromPush(failedGoal);
 

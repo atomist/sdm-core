@@ -170,19 +170,8 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
  */
 function configureGoalSigning(mergedConfig: SoftwareDeliveryMachineConfiguration): void {
     if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled === true) {
-        const signingConfig = mergedConfig.sdm.goalSigning;
-
-        const verificationKeys = [];
-        if (!!signingConfig.verificationKeys) {
-            if (Array.isArray(signingConfig.verificationKeys)) {
-                verificationKeys.push(...signingConfig.verificationKeys);
-            } else {
-                verificationKeys.push(signingConfig.verificationKeys);
-            }
-        }
-
         mergedConfig.listeners.push(
-            new GoalSigningAutomationEventListener(verificationKeys, signingConfig.signingKey));
+            new GoalSigningAutomationEventListener(mergedConfig));
     }
 }
 
