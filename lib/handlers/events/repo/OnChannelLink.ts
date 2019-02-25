@@ -34,6 +34,7 @@ import {
     PreferenceStoreFactory,
     ProjectLoader,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as schema from "../../../typings/types";
 
@@ -62,7 +63,7 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
             {
                 branch: repo.defaultBranch,
             });
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
 
         const addressChannels: AddressChannels = addressChannelsFor(repo, context);
         const preferences = this.preferenceStoreFactory(context);

@@ -34,10 +34,13 @@ import {
     GoalCompletionListenerInvocation,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     SdmGoalEvent,
+    SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import * as stringify from "json-stringify-safe";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
 /**
@@ -48,7 +51,7 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     @Value("")
-    public configuration: Configuration;
+    public configuration: SoftwareDeliveryMachineConfiguration;
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
@@ -65,6 +68,8 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
             return Success;
         }
 
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
+
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
         const goals = fetchGoalsFromPush(sdmGoal);
@@ -72,7 +77,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
         const gsi: GoalCompletionListenerInvocation = {
             id,
             context,
-            credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
+            credentials: await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id)),
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
             configuration: this.configuration,
             preferences: this.preferenceStoreFactory(context),

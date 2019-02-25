@@ -34,6 +34,7 @@ import {
     ProjectListener,
     ProjectListenerInvocation,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as schema from "../../../typings/types";
 
@@ -56,7 +57,7 @@ export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subsc
                         context: HandlerContext): Promise<HandlerResult> {
         const repoOnboarded = event.data.RepoOnboarded[0];
         const id = this.repoRefResolver.toRemoteRepoRef(repoOnboarded.repo, {branch: repoOnboarded.repo.defaultBranch});
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const addressChannels: AddressChannels = addressChannelsFor(repoOnboarded.repo, context);
         const preferences = this.preferenceStoreFactory(context);
 

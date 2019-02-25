@@ -36,12 +36,15 @@ import {
     GoalImplementationMapper,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SdmGoalState,
+    SoftwareDeliveryMachineConfiguration,
     UnanimousGoalApprovalRequestVoteDecisionManager,
     updateGoal,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 
 /**
@@ -58,7 +61,7 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
     @Value("")
-    public configuration: Configuration;
+    public configuration: SoftwareDeliveryMachineConfiguration;
 
     constructor(private readonly repoRefResolver: RepoRefResolver,
                 private readonly credentialsFactory: CredentialsResolver,
@@ -83,8 +86,10 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
             return Success;
         }
 
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
+
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const garvi: GoalApprovalRequestVoterInvocation = {

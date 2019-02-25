@@ -35,12 +35,15 @@ import {
     preconditionsAreMet,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalKey,
+    SoftwareDeliveryMachineConfiguration,
     updateGoal,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import {
     OnAnySuccessfulSdmGoal,
     SdmGoalState,
@@ -54,7 +57,7 @@ import {
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 
     @Value("")
-    public configuration: Configuration;
+    public configuration: SoftwareDeliveryMachineConfiguration;
 
     constructor(private readonly name: string,
                 private readonly implementationMapper: GoalImplementationMapper,
@@ -72,8 +75,10 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             return Success;
         }
 
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
+
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const credentials = this.credentialsResolver.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsResolver.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const goals = fetchGoalsFromPush(sdmGoal);

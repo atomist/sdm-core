@@ -31,15 +31,14 @@ import { CancelGoalOnCanceled } from "../../handlers/events/delivery/goals/Cance
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
+import { GoalSigningAutomationEventListener } from "../signing/goalSigning";
 import { SdmGoalMetricReportingAutomationEventListener } from "../util/SdmGoalMetricReportingAutomationEventListener";
 import {
     sdmExtensionPackStartupMessage,
     sdmStartupMessage,
 } from "../util/startupMessage";
 import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
-import {
-    LocalSoftwareDeliveryMachineConfiguration,
-} from "./LocalSoftwareDeliveryMachineOptions";
+import { LocalSoftwareDeliveryMachineConfiguration } from "./LocalSoftwareDeliveryMachineOptions";
 import {
     isGitHubAction,
     isInLocalMode,
@@ -89,6 +88,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         // Configure the job forking ability
         configureJobLaunching(mergedConfig, sdm);
+        configureGoalSigning(mergedConfig);
 
         await registerMetadata(mergedConfig, sdm);
 
@@ -162,6 +162,17 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
 
     // Set workers to one but leave enablement unset so that it can be defined elsewhere.
     mergedConfig.cluster.workers = 1;
+}
+
+/**
+ * Configure SDM to sign and verify goals
+ * @param mergedConfig
+ */
+function configureGoalSigning(mergedConfig: SoftwareDeliveryMachineConfiguration): void {
+    if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled === true) {
+        mergedConfig.listeners.push(
+            new GoalSigningAutomationEventListener(mergedConfig.sdm.goalSigning));
+    }
 }
 
 async function registerMetadata(config: Configuration,

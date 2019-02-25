@@ -37,6 +37,7 @@ import {
     isGoalCanceled,
     LoggingProgressLog,
     ProgressLog,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalState,
@@ -46,6 +47,7 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
 import { formatDuration } from "../../../../util/misc/time";
 
@@ -72,6 +74,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             return Success;
         }
 
+        await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, ctx);
+
         if ((await cancelableGoal(sdmGoal, this.configuration)) && (await isGoalCanceled(sdmGoal, ctx))) {
             logger.info(`Goal ${sdmGoal.uniqueName} has been canceled. Not fulfilling`);
             return Success;
@@ -94,7 +98,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         }
 
         const id = this.configuration.sdm.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
-        const credentials = this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id);
+        const credentials = await resolveCredentialsPromise(this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id));
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const preferences = this.configuration.sdm.preferenceStoreFactory(ctx);
 

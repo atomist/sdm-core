@@ -33,6 +33,7 @@ import {
     PullRequestListener,
     PullRequestListenerInvocation,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as schema from "../../../typings/types";
 
@@ -63,7 +64,7 @@ export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscript
                 sha: pullRequest.head.sha,
                 branch: pullRequest.branch.name,
             });
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const addressChannels = addressChannelsFor(repo, context);
         const preferences = this.preferenceStoreFactory(context);
 

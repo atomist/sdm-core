@@ -32,6 +32,7 @@ import {
     RepoCreationListener,
     RepoCreationListenerInvocation,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as schema from "../../../typings/types";
 
@@ -57,7 +58,7 @@ export class OnRepoCreation implements HandleEvent<schema.OnRepoCreation.Subscri
                         context: HandlerContext): Promise<HandlerResult> {
         const repo = event.data.Repo[0];
         const id = this.repoRefResolver.toRemoteRepoRef(repo, {});
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const invocation: RepoCreationListenerInvocation = {
