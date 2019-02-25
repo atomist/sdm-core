@@ -94,8 +94,6 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         }
 
         await Promise.all(goalsToRequest.map(async sdmG => {
-            delete sdmG.data;
-
             const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
             if (sdmG.preApprovalRequired) {
                 return updateGoal(context, sdmG, {
