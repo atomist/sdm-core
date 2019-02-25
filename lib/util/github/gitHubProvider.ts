@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ export const GitHubDotComProviderId = "zjlmxjzwhurspem";
 
 export async function fetchProvider(context: HandlerContext, providerId: string): Promise<ScmProvider.ScmProvider> {
     const results = await context.graphClient.query<ScmProvider.Query, ScmProvider.Variables>(
-        {name: "SCMProvider", variables: {providerId}});
+        { name: "ScmProvider", variables: { providerId } });
 
     if (!results || !results.SCMProvider || results.SCMProvider.length === 0) {
         throw new Error("Provider not found: " + providerId);

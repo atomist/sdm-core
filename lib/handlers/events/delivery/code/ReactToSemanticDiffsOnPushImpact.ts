@@ -34,6 +34,7 @@ import {
     FingerprintValue,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import * as schema from "../../../../typings/types";
@@ -80,7 +81,7 @@ export class ReactToSemanticDiffsOnPushImpact
                 }))
                 .filter(fv => _.get(fv, "oldValue.sha") !== _.get(fv, "newValue.sha"));
 
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferencesStoreFactory(context);
         const inv: FingerprintDifferenceListenerInvocation = {
             id,

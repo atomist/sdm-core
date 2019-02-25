@@ -33,6 +33,7 @@ import {
     NewIssueListenerInvocation,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as schema from "@atomist/sdm/lib/typings/types";
 
@@ -64,7 +65,7 @@ export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscri
             logger.debug("Issue updated, not created: %s on %j", issue.number, id);
             return Success;
         }
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const inv: NewIssueListenerInvocation = {

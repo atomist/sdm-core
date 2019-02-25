@@ -31,6 +31,7 @@ import {
     CredentialsResolver,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     UpdatedIssueListener,
     UpdatedIssueListenerInvocation,
 } from "@atomist/sdm";
@@ -59,7 +60,7 @@ export class UpdatedIssueHandler implements HandleEvent<schema.OnIssueAction.Sub
         const issue = event.data.Issue[0];
         const addressChannels = addressChannelsFor(issue.repo, context);
         const id = this.repoRefResolver.toRemoteRepoRef(issue.repo, {});
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         if (issue.updatedAt === issue.createdAt) {

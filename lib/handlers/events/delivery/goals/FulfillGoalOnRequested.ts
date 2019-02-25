@@ -37,6 +37,7 @@ import {
     isGoalCanceled,
     LoggingProgressLog,
     ProgressLog,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalState,
@@ -97,7 +98,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         }
 
         const id = this.configuration.sdm.repoRefResolver.repoRefFromSdmGoal(sdmGoal);
-        const credentials = this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id);
+        const credentials = await resolveCredentialsPromise(this.configuration.sdm.credentialsResolver.eventHandlerCredentials(ctx, id));
         const addressChannels = addressChannelsFor(sdmGoal.push.repo, ctx);
         const preferences = this.configuration.sdm.preferenceStoreFactory(ctx);
 

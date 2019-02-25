@@ -34,6 +34,7 @@ import {
     GoalCompletionListenerInvocation,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
@@ -76,7 +77,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
         const gsi: GoalCompletionListenerInvocation = {
             id,
             context,
-            credentials: this.credentialsFactory.eventHandlerCredentials(context, id),
+            credentials: await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id)),
             addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
             configuration: this.configuration,
             preferences: this.preferenceStoreFactory(context),

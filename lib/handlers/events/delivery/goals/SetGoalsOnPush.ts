@@ -34,6 +34,7 @@ import {
     PreferenceStoreFactory,
     ProjectLoader,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import { OnPushToAnyBranch } from "../../../../typings/types";
 
@@ -67,7 +68,7 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
                         context: HandlerContext): Promise<HandlerResult> {
         const push: OnPushToAnyBranch.Push = event.data.Push[0];
         const id: RemoteRepoRef = this.repoRefResolver.toRemoteRepoRef(push.repo, {});
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
 
         await chooseAndSetGoals({
             projectLoader: this.projectLoader,

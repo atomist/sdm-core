@@ -35,6 +35,7 @@ import {
     preconditionsAreMet,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalKey,
@@ -77,7 +78,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const credentials = this.credentialsResolver.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsResolver.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const goals = fetchGoalsFromPush(sdmGoal);
