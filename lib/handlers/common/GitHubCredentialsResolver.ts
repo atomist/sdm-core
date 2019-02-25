@@ -76,7 +76,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
 
         // Check the graph to see if we have a token on the provider
         if (!!id && (id.providerType === RepoProviderType.github_com)) {
-            const token = await fetchTokenByProviderType(ProviderType.ghe, context);
+            const token = await fetchTokenByProviderType(ProviderType.github_com, context);
             if (hasToken(token)) {
                 return { token };
             }
