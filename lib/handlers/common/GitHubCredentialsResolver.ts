@@ -68,9 +68,9 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
             return { token: this.orgToken };
         } else if (hasToken(this.clientToken)) {
             return { token: this.clientToken };
-        } else if (hasToken(configurationValue("token"))) {
+        } else if (hasToken(configurationValue("token", "null"))) {
             return { token: configurationValue<string>("token")};
-        } else if (hasToken(configurationValue("sdm.github.token"))) {
+        } else if (hasToken(configurationValue("sdm.github.token", "null"))) {
             return { token: configurationValue<string>("sdm.github.token")};
         }
 
