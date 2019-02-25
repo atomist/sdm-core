@@ -36,6 +36,7 @@ import {
     GoalImplementationMapper,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     SdmGoalEvent,
     SdmGoalState,
     SoftwareDeliveryMachineConfiguration,
@@ -88,7 +89,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
 
         const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const garvi: GoalApprovalRequestVoterInvocation = {

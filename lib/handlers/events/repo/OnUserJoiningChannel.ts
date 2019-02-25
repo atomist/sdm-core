@@ -29,6 +29,7 @@ import {
     CredentialsResolver,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
 } from "@atomist/sdm";
@@ -55,7 +56,7 @@ export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningCha
         const repos = joinEvent.channel.repos.map(
             repo => this.repoRefResolver.toRemoteRepoRef(repo, {}));
 
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, repos[0]);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, repos[0]));
         const addressChannels = (msg, opts) => context.messageClient.addressChannels(msg, joinEvent.channel.name, opts);
         const preferences = this.preferenceStoreFactory(context);
 

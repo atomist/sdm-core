@@ -35,6 +35,7 @@ import {
     PushListener,
     PushListenerInvocation,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import * as schema from "../../../typings/types";
@@ -71,7 +72,7 @@ export class OnFirstPushToRepo
 
         const screenName = _.get(push, "after.committer.person.chatId.screenName");
         const id = this.repoRefResolver.toRemoteRepoRef(push.repo, { sha: push.after.sha });
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         let addressChannels: AddressChannels;

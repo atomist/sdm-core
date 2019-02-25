@@ -32,6 +32,7 @@ import {
     CredentialsResolver,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
 } from "@atomist/sdm";
 import * as schema from "@atomist/sdm/lib/typings/types";
 
@@ -57,7 +58,7 @@ export class ClosedIssueHandler implements HandleEvent<schema.OnClosedIssue.Subs
                         context: HandlerContext): Promise<HandlerResult> {
         const issue = event.data.Issue[0];
         const id = this.repoRefResolver.toRemoteRepoRef(issue.repo, {});
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 
         const addressChannels = addressChannelsFor(issue.repo, context);

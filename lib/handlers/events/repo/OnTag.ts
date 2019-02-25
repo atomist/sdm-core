@@ -30,6 +30,7 @@ import {
     CredentialsResolver,
     PreferenceStoreFactory,
     RepoRefResolver,
+    resolveCredentialsPromise,
     TagListener,
     TagListenerInvocation,
 } from "@atomist/sdm";
@@ -55,7 +56,7 @@ export class OnTag implements HandleEvent<schema.OnTag.Subscription> {
         const repo = tag.commit.repo;
 
         const id = this.repoRefResolver.toRemoteRepoRef(repo, {});
-        const credentials = this.credentialsFactory.eventHandlerCredentials(context, id);
+        const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const addressChannels = addressChannelsFor(repo, context);
         const preferences = this.preferenceStoreFactory(context);
 
