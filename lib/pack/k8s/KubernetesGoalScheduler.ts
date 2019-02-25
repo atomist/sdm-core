@@ -350,10 +350,10 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.
     delete podSpec.spec.nodeName;
 
     const labels = {
-        "atomist.com/goalSetId": goalEvent.goalSetId,
-        "atomist.com/goalId": (goalEvent as any).id,
+        "atomist.com/goal-set-id": goalEvent.goalSetId,
+        "atomist.com/goal-id": (goalEvent as any).id,
         "atomist.com/creator": sanitizeName(configuration.name),
-        "atomist.com/workspaceId": context.workspaceId,
+        "atomist.com/workspace-id": context.workspaceId,
     };
 
     const detail = {

@@ -59,7 +59,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                 return;
             }
 
-            const selector = `atomist.com/goalSetId=${goalEvent.goalSetId},atomist.com/creator=${sanitizeName(this.sdm.configuration.name)}`;
+            const selector = `atomist.com/goal-set-id=${goalEvent.goalSetId},atomist.com/creator=${sanitizeName(this.sdm.configuration.name)}`;
             let jobs;
 
             try {
