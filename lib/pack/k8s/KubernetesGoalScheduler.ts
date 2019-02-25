@@ -427,7 +427,7 @@ function rewriteCachePath(jobSpec: k8s.V1Job, workspaceId: string): void {
  */
 export function isConfiguredInEnv(...values: string[]): boolean {
     const value = process.env.ATOMIST_GOAL_SCHEDULER || process.env.ATOMIST_GOAL_LAUNCHER;
-    return values.includes(value);
+    return values.some(v => value.includes(v));
 }
 
 /**
