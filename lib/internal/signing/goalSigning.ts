@@ -132,7 +132,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
  * @param gsc
  */
 export function signGoal(goal: SdmGoalMessage,
-                         gsc: GoalSigningConfiguration): SdmGoalMessage  & SignatureMixin {
+                         gsc: GoalSigningConfiguration): SdmGoalMessage & SignatureMixin {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
         const signer = crypto.createSign("RSA-SHA512");
         signer.update(normalizeGoal(goal));
@@ -176,7 +176,8 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
         sha:${goal.sha}
         branch:${goal.branch}
         fulfillment:${goal.fulfillment.name}-${goal.fulfillment.method}
-        preConditions:${(goal.preConditions || []).map(p => `${p.environment}/${p.uniqueName}`)}
+        preConditions:${(goal.preConditions || []).map(p => `${
+            p.environment}/${normalizeValue(p.name)}/${normalizeValue(p.uniqueName)}`)}
         data:${normalizeValue(goal.data)}
         url:${normalizeValue(goal.url)}
         externalUrls:${(goal.externalUrls || []).map(u => u.url).join(",")}
