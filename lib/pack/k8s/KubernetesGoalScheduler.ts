@@ -330,7 +330,7 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.
                         labelSelector: {
                             matchExpressions: [
                                 {
-                                    key: "atomist.com/goalSetId",
+                                    key: "atomist.com/goal-set-id",
                                     operator: "In",
                                     values: [
                                         goalEvent.goalSetId,
