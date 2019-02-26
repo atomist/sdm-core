@@ -19,7 +19,10 @@ import {
     AutomationEventListenerSupport,
     logger,
 } from "@atomist/automation-client";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import {
+    SoftwareDeliveryMachine,
+    SdmCacheConfiguration
+} from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
 import * as glob from "glob";
@@ -36,8 +39,9 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
     }
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
-        if (cluster.isMaster && _.get(this.sdm, "configuration.sdm.cache.enabled")) {
-            const cachePath = _.get(this.sdm, "configuration.sdm.cache.path", "/opt/data");
+        const possibleCacheConfiguration = this.sdm.configuration.sdm.cache as any as (SdmCacheConfiguration["cache"] | undefined);
+        if (cluster.isMaster && possibleCacheConfiguration && possibleCacheConfiguration.enabled) {
+            const cachePath = possibleCacheConfiguration.path || "/opt/data";
 
             setTimeout(() => {
                 const ts = Date.now() - (1000 * 60 * 60 * 2); // 2 hour threshold
