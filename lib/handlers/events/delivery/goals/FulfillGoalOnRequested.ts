@@ -137,11 +137,11 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 await reportEndAndClose(result, start, progressLog);
             } else {
                 await updateGoal(ctx, sdmGoal, {
-                    state: !!result.state ? result.state : SdmGoalState.in_process,
-                    phase: !!result.phase ? result.phase : "scheduled",
-                    description: !!result.description ? result.description : descriptionFromState(goal, SdmGoalState.in_process),
+                    state: !!result && !!result.state ? result.state : SdmGoalState.in_process,
+                    phase: !!result && !!result.phase ? result.phase : "scheduled",
+                    description: !!result && !!result.description ? result.description : descriptionFromState(goal, SdmGoalState.in_process),
                     url: progressLog.url,
-                    externalUrls: result.externalUrls,
+                    externalUrls: !!result ? result.externalUrls : undefined,
                 });
             }
             return {
