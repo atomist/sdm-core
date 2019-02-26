@@ -17,6 +17,7 @@
 import { MessageClient } from "@atomist/automation-client";
 import {
     GoalSigningConfiguration,
+    GoalSigningScope,
     SdmGoalEvent,
     SdmGoalFulfillmentMethod,
     SdmGoalMessage,
@@ -31,6 +32,7 @@ import {
     signGoal,
     verifyGoal,
 } from "../../../lib/internal/signing/goalSigning";
+import { RsaGoalSigningAlgorithm } from "../../../lib/internal/signing/rsaGoalSigning";
 
 describe("goalSigning", () => {
 
@@ -132,10 +134,12 @@ describe("goalSigning", () => {
     it("should correctly sign and verify goal", async () => {
         const gsc: GoalSigningConfiguration = {
             enabled: true,
+            scope: GoalSigningScope.All,
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
+            algorithm: RsaGoalSigningAlgorithm,
         };
-        const signedGoal = signGoal(_.cloneDeep(goalMessage) as any, gsc);
+        const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc);
         assert(!!signedGoal.signature);
         await verifyGoal(signedGoal as any, gsc, {} as any);
     });
@@ -143,10 +147,12 @@ describe("goalSigning", () => {
     it("should reject tampered goal", async () => {
         const gsc: GoalSigningConfiguration = {
             enabled: true,
+            scope: GoalSigningScope.All,
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
+            algorithm: RsaGoalSigningAlgorithm,
         };
-        const signedGoal = signGoal(_.cloneDeep(goalMessage) as any, gsc) as SdmGoalEvent & SignatureMixin;
+        const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc) as SdmGoalEvent & SignatureMixin;
         assert(!!signedGoal.signature);
 
         signedGoal.externalUrls = [{ url: "https://google.com", label: "Google" }];

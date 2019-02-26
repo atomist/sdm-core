@@ -15,6 +15,7 @@
  */
 
 import {
+    AutomationContextAware,
     AutomationEventListenerSupport,
     CustomEventDestination,
     Destination,
@@ -24,21 +25,24 @@ import {
 } from "@atomist/automation-client";
 import {
     GoalSigningConfiguration,
-    GoalVerificationKey,
+    GoalSigningScope,
     SdmGoalEvent,
     SdmGoalMessage,
     SdmGoalState,
     SdmProvenance,
     updateGoal,
 } from "@atomist/sdm";
-import * as crypto from "crypto";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { DeepPartial } from "ts-essentials";
+import { toArray } from "../../util/misc/array";
+import { RsaGoalSigningAlgorithm } from "./rsaGoalSigning";
 
 export interface SignatureMixin {
     signature: string;
 }
+
+export const DefaultGoalSigningAlgorithm = RsaGoalSigningAlgorithm;
 
 /**
  * AutomationEventListener that verifies incoming SDM goals against a set of configurable
@@ -62,7 +66,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
 
         if (dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
 
-            const goal = signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc);
+            const goal = await signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc);
             logger.info(`Signed outgoing goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
             return goal;
         }
@@ -71,13 +75,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
     }
 
     private initVerificationKeys(): void {
-        if (!Array.isArray(this.gsc.verificationKeys)) {
-            if (!!this.gsc.verificationKeys) {
-                this.gsc.verificationKeys = [this.gsc.verificationKeys];
-            } else {
-                this.gsc.verificationKeys = [];
-            }
-        }
+        this.gsc.verificationKeys = toArray(this.gsc.verificationKeys);
 
         // If signing key is set, also use it to verify
         if (!!this.gsc.signingKey) {
@@ -87,6 +85,10 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
         // Load the Atomist public key
         const publicKey = fs.readFileSync(path.join(__dirname, "atomist-public.pem")).toString();
         this.gsc.verificationKeys.push({ publicKey, name: "atomist.com/sdm" });
+
+        if (!!this.gsc.algorithm) {
+            this.gsc.algorithm = DefaultGoalSigningAlgorithm;
+        }
     }
 }
 
@@ -100,18 +102,11 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
 export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin>,
                                  gsc: GoalSigningConfiguration,
                                  ctx: HandlerContext): Promise<void> {
-    if (!!gsc && gsc.enabled === true && !!goal && !isGoalRejected(goal)) {
+    if (!!gsc && gsc.enabled === true && !!goal && isInScope(gsc.scope, ctx) && !isGoalRejected(goal)) {
         if (!!goal.signature) {
 
-            const signature = Buffer.from(goal.signature, "base64");
             const message = normalizeGoal(goal);
-            const verifiedWith = (gsc.verificationKeys as GoalVerificationKey[]).find(vk => {
-                const verifier = crypto.createVerify("RSA-SHA512");
-                verifier.update(message);
-                verifier.end();
-                return verifier.verify(vk.publicKey, signature);
-            });
-
+            const verifiedWith = await gsc.algorithm.verify(message, goal.signature, toArray(gsc.verificationKeys));
             if (!!verifiedWith) {
                 logger.info(
                     `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${verifiedWith.name}'`);
@@ -131,20 +126,10 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
  * @param goal
  * @param gsc
  */
-export function signGoal(goal: SdmGoalMessage,
-                         gsc: GoalSigningConfiguration): SdmGoalMessage & SignatureMixin {
+export async function signGoal(goal: SdmGoalMessage,
+                               gsc: GoalSigningConfiguration): Promise<SdmGoalMessage & SignatureMixin> {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
-        const signer = crypto.createSign("RSA-SHA512");
-        signer.update(normalizeGoal(goal));
-        signer.end();
-
-        const signature = signer.sign({
-            key: gsc.signingKey.privateKey,
-            passphrase: gsc.signingKey.passphrase,
-        });
-
-        (goal as any).signature = signature.toString("base64");
-
+        (goal as any).signature = await gsc.algorithm.sign(normalizeGoal(goal), gsc.signingKey);
         return goal as any;
     }
 }
@@ -159,6 +144,17 @@ async function rejectGoal(reason: string,
             state: SdmGoalState.failure,
             description: `Rejected ${sdmGoal.name} because ${reason}`,
         });
+}
+
+function isInScope(scope: GoalSigningScope, ctx: HandlerContext): boolean {
+    if (scope === GoalSigningScope.All) {
+        return true;
+    } else if (scope === GoalSigningScope.Fulfillment &&
+        (ctx as any as AutomationContextAware).context.operation === "FulfillGoalOnRequested") {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function isGoalRejected(sdmGoal: SdmGoalEvent): boolean {
@@ -177,7 +173,7 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
         branch:${goal.branch}
         fulfillment:${goal.fulfillment.name}-${goal.fulfillment.method}
         preConditions:${(goal.preConditions || []).map(p => `${
-            p.environment}/${normalizeValue(p.name)}/${normalizeValue(p.uniqueName)}`)}
+        p.environment}/${normalizeValue(p.name)}/${normalizeValue(p.uniqueName)}`)}
         data:${normalizeValue(goal.data)}
         url:${normalizeValue(goal.url)}
         externalUrls:${(goal.externalUrls || []).map(u => u.url).join(",")}
