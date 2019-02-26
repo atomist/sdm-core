@@ -29,6 +29,7 @@ import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
     addressChannelsFor,
     cancelableGoal,
+    descriptionFromState,
     executeGoal,
     GoalExecutionListener,
     GoalImplementationMapper,
@@ -127,13 +128,21 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         if (!!goalScheduler) {
             const start = Date.now();
             const result = await goalScheduler.schedule(goalInvocation);
-            if (!!result && result.code !== 0) {
+            if (!!result && result.code !== undefined && result.code !== 0) {
                 await updateGoal(ctx, sdmGoal, {
                     state: SdmGoalState.failure,
                     description: `Failed to schedule goal`,
                     url: progressLog.url,
                 });
                 await reportEndAndClose(result, start, progressLog);
+            } else {
+                await updateGoal(ctx, sdmGoal, {
+                    state: !!result.state ? result.state : SdmGoalState.in_process,
+                    phase: !!result.phase ? result.phase : "scheduled",
+                    description: !!result.description ? result.description : descriptionFromState(goal, SdmGoalState.in_process),
+                    url: progressLog.url,
+                    externalUrls: result.externalUrls,
+                });
             }
             return {
                 code: 0,
