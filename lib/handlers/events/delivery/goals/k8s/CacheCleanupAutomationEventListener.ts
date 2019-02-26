@@ -20,8 +20,8 @@ import {
     logger,
 } from "@atomist/automation-client";
 import {
+    SdmCacheConfiguration,
     SoftwareDeliveryMachine,
-    SdmCacheConfiguration
 } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
@@ -39,7 +39,7 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
     }
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
-        const possibleCacheConfiguration = this.sdm.configuration.sdm.cache as any as (SdmCacheConfiguration["cache"] | undefined);
+        const possibleCacheConfiguration = this.sdm.configuration.sdm.cache as (SdmCacheConfiguration["cache"] | undefined);
         if (cluster.isMaster && possibleCacheConfiguration && possibleCacheConfiguration.enabled) {
             const cachePath = possibleCacheConfiguration.path || "/opt/data";
 
