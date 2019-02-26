@@ -86,7 +86,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
         const publicKey = fs.readFileSync(path.join(__dirname, "atomist-public.pem")).toString();
         this.gsc.verificationKeys.push({ publicKey, name: "atomist.com/sdm" });
 
-        if (!!this.gsc.algorithm) {
+        if (!this.gsc.algorithm) {
             this.gsc.algorithm = DefaultGoalSigningAlgorithm;
         }
     }
