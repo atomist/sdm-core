@@ -21,16 +21,21 @@ describe("KubernetesGoalScheduler", () => {
 
     describe("isConfiguredInEnv", () => {
 
-        let envVar: string;
+        let gEnvVar: string;
+        let lEnvVar: string;
 
         beforeEach(() => {
-            envVar = process.env.ATOMIST_GOAL_SCHEDULER;
+            gEnvVar = process.env.ATOMIST_GOAL_SCHEDULER;
             delete process.env.ATOMIST_GOAL_SCHEDULER;
+            lEnvVar = process.env.ATOMIST_GOAL_LAUNCHER;
+            delete process.env.ATOMIST_GOAL_LAUNCHER;
         });
 
         afterEach(() => {
-            process.env.ATOMIST_GOAL_SCHEDULER = envVar;
-            envVar = undefined;
+            process.env.ATOMIST_GOAL_SCHEDULER = gEnvVar;
+            gEnvVar = undefined;
+            process.env.ATOMIST_GOAL_LAUNCHER = lEnvVar;
+            lEnvVar = undefined;
         });
 
         it("should detect missing value", () => {
@@ -43,7 +48,7 @@ describe("KubernetesGoalScheduler", () => {
         });
 
         it("should detect multiple string value", () => {
-            process.env.ATOMIST_GOAL_SCHEDULER = "kubernetes";
+            process.env.ATOMIST_GOAL_LAUNCHER = "kubernetes";
             assert(isConfiguredInEnv("kubernetes-all", "kubernetes"));
         });
 
@@ -53,7 +58,7 @@ describe("KubernetesGoalScheduler", () => {
         });
 
         it("should detect single json array string value", () => {
-            process.env.ATOMIST_GOAL_SCHEDULER = "[\"kubernetes\"]";
+            process.env.ATOMIST_GOAL_LAUNCHER = "[\"kubernetes\"]";
             assert(isConfiguredInEnv("kubernetes-all", "kubernetes"));
         });
 
