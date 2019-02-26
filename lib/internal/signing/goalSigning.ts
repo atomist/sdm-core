@@ -65,10 +65,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
         const dests = Array.isArray(destinations) ? destinations : [destinations];
 
         if (dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
-
-            const goal = await signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc);
-            logger.info(`Signed outgoing goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
-            return goal;
+            return await signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc);
         }
 
         return message;
@@ -130,6 +127,9 @@ export async function signGoal(goal: SdmGoalMessage,
                                gsc: GoalSigningConfiguration): Promise<SdmGoalMessage & SignatureMixin> {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
         (goal as any).signature = await gsc.algorithm.sign(normalizeGoal(goal), gsc.signingKey);
+        logger.info(`Signed goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
+        return goal as any;
+    } else {
         return goal as any;
     }
 }
