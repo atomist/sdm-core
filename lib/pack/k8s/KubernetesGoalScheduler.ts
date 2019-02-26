@@ -427,7 +427,22 @@ function rewriteCachePath(jobSpec: k8s.V1Job, workspaceId: string): void {
  */
 export function isConfiguredInEnv(...values: string[]): boolean {
     const value = process.env.ATOMIST_GOAL_SCHEDULER || process.env.ATOMIST_GOAL_LAUNCHER;
-    return values.some(v => value.includes(v));
+    if (!!value) {
+        try {
+            const json = JSON.parse(value);
+            if (Array.isArray(json)) {
+                return json.some(v => values.includes(v));
+            } else {
+                return values.includes(json);
+            }
+        } catch (e) {
+            if (typeof value === "string") {
+                return values.includes(value);
+            }
+        }
+    } else {
+        return false;
+    }
 }
 
 /**
