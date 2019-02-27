@@ -65,6 +65,7 @@ export function resetGoalsCommand(sdm: SoftwareDeliveryMachine,
                                   repoTargets: Maker<RepoTargets> = GitHubRepoTargets): CommandHandlerRegistration {
     return {
         name: "ResetGoalsOnCommit",
+        description: "Plan goals on a commit",
         paramsMaker: toRepoTargetingParametersMaker(ResetGoalsParameters, repoTargets),
         listener: resetGoalsOnCommit(sdm),
         intent: [
