@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Add PreferenceStore implementations. [#93](https://github.com/atomist/sdm-core/issues/93)
 -   Support parameter prompting from command listeners. [#95](https://github.com/atomist/sdm-core/issues/95)
 -   Introduce goal signing and verification. [#100](https://github.com/atomist/sdm-core/issues/100)
+-   Use a declared type for the configuration. [#101](https://github.com/atomist/sdm-core/issues/101)
 
 ### Changed
 
