@@ -26,6 +26,8 @@ import * as crypto from "crypto";
  */
 export const RsaGoalSigningAlgorithm: GoalSigningAlgorithm<string> = {
 
+    name: "rsa-sha512",
+
     sign: async (goal: string, key: GoalSigningKey<string>) => {
         const signer = crypto.createSign("RSA-SHA512");
         signer.update(goal);
@@ -39,13 +41,11 @@ export const RsaGoalSigningAlgorithm: GoalSigningAlgorithm<string> = {
         return signature.toString("base64");
     },
 
-    verify: async (goal: string, signatureString: string, keys: Array<GoalVerificationKey<string>>) => {
+    verify: async (goal: string, signatureString: string, key: GoalVerificationKey<string>) => {
         const signature = Buffer.from(signatureString, "base64");
-        return keys.find(vk => {
-            const verifier = crypto.createVerify("RSA-SHA512");
-            verifier.update(goal);
-            verifier.end();
-            return verifier.verify(vk.publicKey, signature);
-        });
+        const verifier = crypto.createVerify("RSA-SHA512");
+        verifier.update(goal);
+        verifier.end();
+        return verifier.verify(key.publicKey, signature);
     },
 };

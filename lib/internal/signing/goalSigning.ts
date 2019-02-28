@@ -24,8 +24,11 @@ import {
     MessageOptions,
 } from "@atomist/automation-client";
 import {
+    GoalSigningAlgorithm,
     GoalSigningConfiguration,
+    GoalSigningKey,
     GoalSigningScope,
+    GoalVerificationKey,
     SdmGoalEvent,
     SdmGoalMessage,
     SdmGoalState,
@@ -82,10 +85,6 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
         // Load the Atomist public key
         const publicKey = fs.readFileSync(path.join(__dirname, "atomist-public.pem")).toString();
         this.gsc.verificationKeys.push({ publicKey, name: "atomist.com/sdm" });
-
-        if (!this.gsc.algorithm) {
-            this.gsc.algorithm = DefaultGoalSigningAlgorithm;
-        }
     }
 }
 
@@ -103,14 +102,24 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
         if (!!goal.signature) {
 
             const message = normalizeGoal(goal);
-            const verifiedWith = await gsc.algorithm.verify(message, goal.signature, toArray(gsc.verificationKeys));
+
+            let verifiedWith: GoalVerificationKey<any>;
+            for (const key of toArray(gsc.verificationKeys)) {
+                if (await findAlgorithm(key, gsc).verify(message, goal.signature, key)) {
+                    verifiedWith = key;
+                    break;
+                }
+            }
+
             if (!!verifiedWith) {
                 logger.info(
-                    `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${verifiedWith.name}'`);
+                    `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${
+                        verifiedWith.name}' and algorithm '${verifiedWith.algorithm}'`);
             } else {
                 await rejectGoal("signature was invalid", goal, ctx);
                 throw new Error("SDM goal signature invalid. Rejecting goal!");
             }
+
         } else {
             await rejectGoal("signature was missing", goal, ctx);
             throw new Error("SDM goal signature is missing. Rejecting goal!");
@@ -126,7 +135,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
 export async function signGoal(goal: SdmGoalMessage,
                                gsc: GoalSigningConfiguration): Promise<SdmGoalMessage & SignatureMixin> {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
-        (goal as any).signature = await gsc.algorithm.sign(normalizeGoal(goal), gsc.signingKey);
+        (goal as any).signature = await findAlgorithm(gsc.signingKey, gsc).sign(normalizeGoal(goal), gsc.signingKey);
         logger.info(`Signed goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
         return goal as any;
     } else {
@@ -144,6 +153,17 @@ async function rejectGoal(reason: string,
             state: SdmGoalState.failure,
             description: `Rejected ${sdmGoal.name} because ${reason}`,
         });
+}
+
+function findAlgorithm(key: GoalVerificationKey<any> | GoalSigningKey<any>,                                             
+                       gsc: GoalSigningConfiguration): GoalSigningAlgorithm<any> {
+    const algorithm = [...toArray(gsc.algorithms), DefaultGoalSigningAlgorithm]
+        .find(a => a.name.toLowerCase() === (key.algorithm || DefaultGoalSigningAlgorithm.name).toLowerCase());
+    if (!algorithm) {
+        throw new Error(
+            `Goal signing or verification key '${key.name}' requested algorithm '${key.algorithm}' which isn't configured`);
+    }
+    return algorithm;
 }
 
 function isInScope(scope: GoalSigningScope, ctx: HandlerContext): boolean {

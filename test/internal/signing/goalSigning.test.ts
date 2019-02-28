@@ -32,7 +32,6 @@ import {
     signGoal,
     verifyGoal,
 } from "../../../lib/internal/signing/goalSigning";
-import { RsaGoalSigningAlgorithm } from "../../../lib/internal/signing/rsaGoalSigning";
 
 describe("goalSigning", () => {
 
@@ -137,7 +136,7 @@ describe("goalSigning", () => {
             scope: GoalSigningScope.All,
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
-            algorithm: RsaGoalSigningAlgorithm,
+            algorithms: [],
         };
         const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc);
         assert(!!signedGoal.signature);
@@ -150,7 +149,7 @@ describe("goalSigning", () => {
             scope: GoalSigningScope.All,
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
-            algorithm: RsaGoalSigningAlgorithm,
+            algorithms: [],
         };
         const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc) as SdmGoalEvent & SignatureMixin;
         assert(!!signedGoal.signature);
