@@ -157,7 +157,7 @@ async function rejectGoal(reason: string,
 
 function findAlgorithm(key: GoalVerificationKey<any> | GoalSigningKey<any>,
                        gsc: GoalSigningConfiguration): GoalSigningAlgorithm<any> {
-    const algorithm = [...toArray(gsc.algorithms), DefaultGoalSigningAlgorithm]
+    const algorithm = [...toArray(gsc.algorithms || []), DefaultGoalSigningAlgorithm]
         .find(a => a.name.toLowerCase() === (key.algorithm || DefaultGoalSigningAlgorithm.name).toLowerCase());
     if (!algorithm) {
         throw new Error(
