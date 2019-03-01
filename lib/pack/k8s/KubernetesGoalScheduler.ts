@@ -160,8 +160,10 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
         try {
-            const kc = loadKubeConfig();
+            const kc = new k8s.KubeConfig();
+            kc.loadFromCluster();
             const core = kc.makeApiClient(k8s.Core_v1Api);
+
             this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;
         } catch (e) {
             logger.error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
