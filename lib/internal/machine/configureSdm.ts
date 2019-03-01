@@ -123,7 +123,7 @@ async function configureJobLaunching(mergedConfig: SoftwareDeliveryMachineConfig
     } else {
         // initialize the GoalSchedulers
         for (const goalScheduler of toArray(mergedConfig.sdm.goalScheduler || [])) {
-            if (goalScheduler.initialize) {
+            if (!!goalScheduler.initialize) {
                 await goalScheduler.initialize(mergedConfig);
             }
         }
