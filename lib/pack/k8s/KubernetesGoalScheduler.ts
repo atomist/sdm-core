@@ -17,6 +17,7 @@
 import {
     automationClientInstance,
     AutomationContextAware,
+    Configuration,
     configurationValue,
     doWithRetry,
     logger,
@@ -53,8 +54,9 @@ export interface KubernetesGoalSchedulerOptions {
  */
 export class KubernetesGoalScheduler implements GoalScheduler {
 
+    private podSpec: k8s.V1Pod;
+
     constructor(private readonly options: KubernetesGoalSchedulerOptions = { isolateAll: false }) {
-        this.init();
     }
 
     public async supports(gi: GoalInvocation): Promise<boolean> {
@@ -74,24 +76,12 @@ export class KubernetesGoalScheduler implements GoalScheduler {
     public async schedule(gi: GoalInvocation): Promise<ExecuteGoalResult> {
         const { goalEvent } = gi;
 
-        // Using new ATOMIST_POD_NAME to overwrite the host name default
-        // This is to prevent breakage when users still have old ATOMIST_DEPLOYMENT_NAME env var defined
-        const podName = process.env.ATOMIST_POD_NAME || os.hostname();
         const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
 
         const kc = loadKubeConfig();
-        const core = kc.makeApiClient(k8s.Core_v1Api);
         const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
-        let podSpec: k8s.V1Pod;
-        try {
-            podSpec = (await core.readNamespacedPod(podName, podNs)).body;
-        } catch (e) {
-            logger.error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
-            return { code: 1, message: `Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}` };
-        }
-
-        const jobSpec = createJobSpec(podSpec, podNs, gi);
+        const jobSpec = createJobSpec(_.cloneDeep(this.podSpec), podNs, gi);
         await this.beforeCreation(gi, jobSpec);
 
         gi.progressLog.write(`/--`);
@@ -165,8 +155,20 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         // Intentionally left empty
     }
 
-    private init(): void {
-        if (cluster.isMaster) {
+    public async initialize(configuration: Configuration): Promise<void> {
+        const podName = process.env.ATOMIST_POD_NAME || os.hostname();
+        const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+
+        try {
+            const kc = loadKubeConfig();
+            const core = kc.makeApiClient(k8s.Core_v1Api);
+            this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;
+        } catch (e) {
+            logger.error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+            throw new Error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+        }
+
+        if (configuration.cluster.enabled === false || cluster.isMaster) {
             setInterval(() => {
                 return this.cleanUp()
                     .then(() => {

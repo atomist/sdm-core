@@ -31,6 +31,7 @@ import { CancelGoalOnCanceled } from "../../handlers/events/delivery/goals/Cance
 import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
+import { toArray } from "../../util/misc/array";
 import { GoalSigningAutomationEventListener } from "../signing/goalSigning";
 import { SdmGoalMetricReportingAutomationEventListener } from "../util/SdmGoalMetricReportingAutomationEventListener";
 import {
@@ -87,7 +88,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
         );
 
         // Configure the job forking ability
-        configureJobLaunching(mergedConfig, sdm);
+        await configureJobLaunching(mergedConfig, sdm);
         configureGoalSigning(mergedConfig);
 
         await registerMetadata(mergedConfig, sdm);
@@ -114,12 +115,19 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
  * @param mergedConfig
  * @param machine
  */
-function configureJobLaunching(mergedConfig: SoftwareDeliveryMachineConfiguration,
-                               machine: SoftwareDeliveryMachine): void {
+async function configureJobLaunching(mergedConfig: SoftwareDeliveryMachineConfiguration,
+                               machine: SoftwareDeliveryMachine): Promise<void> {
     const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);
     } else {
+        // initialize the GoalSchedulers
+        for (const goalScheduler of toArray(mergedConfig.sdm.goalScheduler || [])) {
+            if (goalScheduler.initialize) {
+                await goalScheduler.initialize(mergedConfig);
+            }
+        }
+
         _.update(mergedConfig, "commands",
             old => !!old ? old : []);
         mergedConfig.commands.push(...machine.commandHandlers);

@@ -36,15 +36,9 @@ import {
 export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
     private readonly cache: Map<string, { ttl: number, name: string, namespace: string }> = new Map();
-    private readonly batch: k8s.Batch_v1Api;
-    private readonly core: k8s.Core_v1Api;
 
     constructor(private readonly sdm: SoftwareDeliveryMachine) {
-        const kc = loadKubeConfig();
-        this.batch = kc.makeApiClient(k8s.Batch_v1Api);
-        this.core = kc.makeApiClient(k8s.Core_v1Api);
-
-        this.init();
+        this.initialize();
     }
 
     public create(): GoalCompletionListener {
@@ -100,7 +94,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
         };
     }
 
-    private init(): void {
+    private initialize(): void {
         setInterval(async () => {
                 const now = Date.now();
                 for (const uid of this.cache.keys()) {
@@ -123,9 +117,12 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
     private async deleteJob(job: { name: string, namespace: string }): Promise<void> {
         try {
-            await this.batch.readNamespacedJob(job.name, job.namespace);
+            const kc = loadKubeConfig();
+            const batch = kc.makeApiClient(k8s.Batch_v1Api);
+
+            await batch.readNamespacedJob(job.name, job.namespace);
             try {
-                await this.batch.deleteNamespacedJob(
+                await batch.deleteNamespacedJob(
                     job.name,
                     job.namespace,
                     { propagationPolicy: "Foreground" } as any);
@@ -140,8 +137,11 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
     private async deletePods(job: { name: string, namespace: string }): Promise<void> {
         try {
+            const kc = loadKubeConfig();
+            const core = kc.makeApiClient(k8s.Core_v1Api);
+
             const selector = `job-name=${job.name}`;
-            const pods = await this.core.listNamespacedPod(
+            const pods = await core.listNamespacedPod(
                 job.namespace,
                 undefined,
                 undefined,
@@ -151,7 +151,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
             if (pods.body && pods.body.items) {
                 for (const pod of pods.body.items) {
                     try {
-                        await this.core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
+                        await core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
                     } catch (e) {
                         // Probably ok because pod might be gone already
                         logger.debug(
