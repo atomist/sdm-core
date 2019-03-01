@@ -116,7 +116,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
  * @param machine
  */
 async function configureJobLaunching(mergedConfig: SoftwareDeliveryMachineConfiguration,
-                               machine: SoftwareDeliveryMachine): Promise<void> {
+                                     machine: SoftwareDeliveryMachine): Promise<void> {
     const forked = process.env.ATOMIST_ISOLATED_GOAL === "true";
     if (forked) {
         configureSdmToRunExactlyOneGoal(mergedConfig, machine);
