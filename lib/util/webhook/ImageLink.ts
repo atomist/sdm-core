@@ -15,11 +15,12 @@
  */
 
 import {
+    configurationValue,
+    DefaultHttpClientFactory,
+    HttpMethod,
     logger,
     RetryOptions,
 } from "@atomist/automation-client";
-import axios from "axios";
-import promiseRetry = require("promise-retry");
 
 export interface AtomistBuildRepository {
     owner_name: string;
@@ -151,7 +152,7 @@ export function postLinkImageWebhook(
  * @param retryOptions change default retry options
  * @return true if successful, false on failure after retries
  */
-export function postWebhook(
+export async function postWebhook(
     webhook: AtomistWebhookType,
     payload: any,
     teamId: string,
@@ -161,18 +162,21 @@ export function postWebhook(
 
     const baseUrl = process.env.ATOMIST_WEBHOOK_BASEURL || "https://webhook.atomist.com";
     const url = `${baseUrl}/atomist/${webhook}/teams/${teamId}`;
-    return promiseRetry(retryOptions, (retry, retryCount) => {
-        logger.debug("posting '%j' to '%s' attempt %d", payload, url, retryCount);
-        return axios.post(url, payload)
-            .then(() => true)
-            .catch(err => {
-                logger.debug("error posting '%j' to '%s': %j", payload, url, err);
-                retry(err);
-                return false;
+
+    const httpClient = configurationValue("http.client.factory", DefaultHttpClientFactory).create(url);
+
+    try {
+        await httpClient.exchange(
+            url,
+            {
+                method: HttpMethod.Post,
+                body: payload,
+                options: {
+                    retry: retryOptions,
+                },
             });
-    })
-        .catch(err => {
-            logger.error("failed to post '%j' to '%s': %j", payload, url, err);
-            return false;
-        });
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
