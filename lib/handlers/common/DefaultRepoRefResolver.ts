@@ -146,7 +146,6 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
         const apiUrl = _.get(repo, "org.provider.apiUrl");
         const url = _.get(repo, "org.provider.url");
 
-        logger.info("toRemoteRepoRef with GraphQL-sourced repo: %j", repo);
         switch (providerType) {
             case undefined:
             // tslint:disable-next-line:no-null-keyword
@@ -181,5 +180,4 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
                 throw new Error(`Provider ${repo.org.provider.providerType} not currently supported in SDM`);
         }
     }
-
 }
