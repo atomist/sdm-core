@@ -37,14 +37,22 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
     }
 
     public eventIncoming(payload: EventIncoming): void {
-        if (cluster.isMaster && this.statsd && process.env.ATOMIST_ISOLATED_GOAL !== "forked") {
+        if (cluster.isMaster && !!this.statsd && process.env.ATOMIST_ISOLATED_GOAL !== "forked") {
             const ts = _.get(payload.data, "SdmGoal[0].ts");
+            const name = _.get(payload.data, "SdmGoal[0].name");
+            if (!!name) {
+                this.statsd.increment(
+                    `counter.goal`,
+                    1,
+                    { goal: name },
+                    () => { /* intentionally left empty */});
+            }
             if (ts) {
                 this.statsd.timing(
-                    "goal.round_trip",
+                    "timer.goal.round_trip",
                     Date.now() - ts,
                     1,
-                    [],
+                    {},
                     () => { /* intentionally left empty */});
             }
         }
