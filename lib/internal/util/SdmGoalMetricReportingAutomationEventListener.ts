@@ -44,8 +44,9 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
                 this.statsd.increment(
                     `counter.goal`,
                     1,
-                    { goal: name },
-                    () => { /* intentionally left empty */});
+                    [`atomist_goal:${name}`],
+                    () => { /* intentionally left empty */
+                    });
             }
             if (ts) {
                 this.statsd.timing(
@@ -53,7 +54,8 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
                     Date.now() - ts,
                     1,
                     {},
-                    () => { /* intentionally left empty */});
+                    () => { /* intentionally left empty */
+                    });
             }
         }
     }
