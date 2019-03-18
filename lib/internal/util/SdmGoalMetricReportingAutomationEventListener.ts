@@ -19,9 +19,11 @@ import {
     AutomationEventListenerSupport,
     EventIncoming,
 } from "@atomist/automation-client";
+import { SdmGoalEvent } from "@atomist/sdm";
 import * as cluster from "cluster";
 import { StatsD } from "hot-shots";
 import * as _ from "lodash";
+import { isGoalRelevant } from "../delivery/goals/support/validateGoal";
 
 /**
  * Automation listener that reports goal round trip metrics to StatsD.
@@ -38,25 +40,23 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
 
     public eventIncoming(payload: EventIncoming): void {
         if (cluster.isMaster && !!this.statsd && process.env.ATOMIST_ISOLATED_GOAL !== "forked") {
-            const ts = _.get(payload.data, "SdmGoal[0].ts");
-            const name = _.get(payload.data, "SdmGoal[0].name");
-            if (!!name) {
+            const goal = _.get(payload.data, "SdmGoal[0]") as SdmGoalEvent;
+
+            if (!!goal && isGoalRelevant(goal)) {
                 this.statsd.increment(
                     `counter.goal`,
                     1,
-                    [`atomist_goal:${name}`],
+                    [`atomist_goal:${goal.name}`],
                     () => { /* intentionally left empty */
                     });
             }
-            if (ts) {
-                this.statsd.timing(
-                    "timer.goal.round_trip",
-                    Date.now() - ts,
-                    1,
-                    {},
-                    () => { /* intentionally left empty */
-                    });
-            }
+            this.statsd.timing(
+                "timer.goal.round_trip",
+                Date.now() - goal.ts,
+                1,
+                {},
+                () => { /* intentionally left empty */
+                });
         }
     }
 }
