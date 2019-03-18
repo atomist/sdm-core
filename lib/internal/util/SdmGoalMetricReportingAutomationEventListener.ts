@@ -49,14 +49,14 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
                     [`atomist_goal:${goal.name}`],
                     () => { /* intentionally left empty */
                     });
+                this.statsd.timing(
+                    "timer.goal.round_trip",
+                    Date.now() - goal.ts,
+                    1,
+                    {},
+                    () => { /* intentionally left empty */
+                    });
             }
-            this.statsd.timing(
-                "timer.goal.round_trip",
-                Date.now() - goal.ts,
-                1,
-                {},
-                () => { /* intentionally left empty */
-                });
         }
     }
 }
