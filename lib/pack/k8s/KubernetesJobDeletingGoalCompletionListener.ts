@@ -49,7 +49,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
                 return;
             }
 
-            if (goalEvent.state === SdmGoalState.canceled && !(cancelableGoal(goalEvent, gi.configuration))) {
+            if (goalEvent.state === SdmGoalState.canceled && !(await cancelableGoal(goalEvent, gi.configuration))) {
                 return;
             }
 
