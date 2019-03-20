@@ -54,7 +54,7 @@ export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGo
 
         const sdmGoal = e.data.SdmGoal[0] as SdmGoalEvent;
 
-        if (!(await cancelableGoal(sdmGoal, ctx))) {
+        if (!(await cancelableGoal(sdmGoal, this.configuration))) {
             logger.info("Not exciting this process because goal can't be canceled");
             return Success;
         }
