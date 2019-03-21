@@ -24,7 +24,7 @@
     "url": "https://github.com/atomist/sdm-core/issues"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.8.1",
+    "@kubernetes/client-node": "^0.8.2",
     "@octokit/rest": "^16.3.0",
     "@types/proper-lockfile": "^3.0.0",
     "@types/request": "^2.48.1",
