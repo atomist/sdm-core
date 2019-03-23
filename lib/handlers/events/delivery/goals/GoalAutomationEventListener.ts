@@ -15,18 +15,17 @@
  */
 
 import {
+    AutomationClient,
     automationClientInstance,
     AutomationEventListenerSupport,
     EventIncoming,
     guid,
     logger,
     QueryNoCacheOptions,
-    RequestProcessor,
     Secrets,
 } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
-import { RegistrationConfirmation } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketRequestProcessor";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
@@ -49,9 +48,8 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         }
     }
 
-    public async registrationSuccessful(eventHandler: RequestProcessor): Promise<void> {
+    public async startupSuccessful(client: AutomationClient): Promise<void> {
         if (cluster.isMaster) {
-            const registration = (eventHandler as any).registration as RegistrationConfirmation;
             const teamId = process.env.ATOMIST_GOAL_TEAM;
             const teamName = process.env.ATOMIST_GOAL_TEAM_NAME || teamId;
             const goalId = process.env.ATOMIST_GOAL_ID;
@@ -60,7 +58,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
             // Obtain goal via graphql query
             const graphClient = new ApolloGraphClient(
                 `${this.sdm.configuration.endpoints.graphql}/${teamId}`,
-                { Authorization: `Bearer ${registration.jwt}` });
+                { Authorization: `Bearer ${client.configuration.apiKey}` });
 
             const goal = await graphClient.query<SdmGoalById.Query, SdmGoalById.Variables>({
                 name: "SdmGoalById",
@@ -74,7 +72,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
             const maker = () => new FulfillGoalOnRequested(
                 this.sdm.goalFulfillmentMapper,
                 [...this.sdm.goalExecutionListeners]);
-            automationClientInstance().withEventHandler(maker);
+            client.withEventHandler(maker);
 
             // Create event and run event handler
             const event: EventIncoming = {
@@ -90,7 +88,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     value: "null",
                 }],
             };
-            await eventHandler.processEvent(event, async results => {
+            await client.processEvent(event, async results => {
                 const resolved = await results;
                 logger.info("Processing goal completed with results %j", resolved);
                 setTimeout(() => process.exit(0), 10000);
