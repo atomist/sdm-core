@@ -20,7 +20,11 @@ import {
     RepoRef,
 } from "@atomist/automation-client";
 import { LocalProject } from "@atomist/automation-client/lib/project/local/LocalProject";
-import { ProgressLog, spawnLog, StringCapturingProgressLog } from "@atomist/sdm";
+import {
+    ProgressLog,
+    spawnLog,
+    StringCapturingProgressLog,
+} from "@atomist/sdm";
 import * as fs from "fs";
 import * as path from "path";
 import { GoalArtifactCache } from "./goalCaching";
