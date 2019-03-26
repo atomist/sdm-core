@@ -15,13 +15,15 @@
  */
 
 import {
-    GitProject, LocalProject,
+    GitProject,
+    LocalProject,
     NodeFsLocalProject,
 } from "@atomist/automation-client";
 import {
     fakeGoalInvocation,
     fakePush,
-    GoalProjectListenerEvent, LoggingProgressLog,
+    GoalProjectListenerEvent,
+    LoggingProgressLog,
     pushTest,
     PushTest,
 } from "@atomist/sdm";
@@ -32,7 +34,8 @@ import * as assert from "power-assert";
 import { tempdir } from "shelljs";
 import uuid = require("uuid");
 import {
-    cacheGoalArtifacts, FileSystemGoalArtifactCache,
+    cacheGoalArtifacts,
+    FileSystemGoalArtifactCache,
     removeGoalArtifacts,
     restoreGoalArtifacts,
 } from "../../../index";
