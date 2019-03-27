@@ -25,103 +25,105 @@ import {
     fakeGoalInvocation,
     fakePush,
     GoalProjectListenerEvent,
+    LoggingProgressLog,
     ProgressLog,
-    pushTest,
-    PushTest,
 } from "@atomist/sdm";
 import { GoalProjectListener } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import * as assert from "power-assert";
 import {
     cacheGoalArtifacts,
-    GoalArtifactCache,
+    GoalCache,
+    GoalCacheOptions,
     removeGoalArtifacts,
     restoreGoalArtifacts,
 } from "../../../index";
 
 describe("CacheArtifacts", () => {
+        let project;
+        const testCache = new TestGoalArtifactCache();
+        let fakePushId;
+        let fakeGoal;
 
-        class TestGoalArtifactCache implements GoalArtifactCache {
-            private id: RepoRef;
-            private cacheFiles: ProjectFile[];
-
-            public async putInCache(id: RepoRef, project: Project, files: string[], log: ProgressLog): Promise<void> {
-                this.id = id;
-                this.cacheFiles = await Promise.all(files.map(async f => project.getFile(f)));
-                return undefined;
-            }
-
-            public async empty(): Promise<void> {
-                this.id = undefined;
-                this.cacheFiles = undefined;
-            }
-
-            public async removeFromCache(id: RepoRef): Promise<void> {
-                if (this.id === id) {
-                    this.id = undefined;
-                    this.cacheFiles = undefined;
-                } else {
-                    throw Error("Wrong id!");
-                }
-            }
-
-            public async retrieveFromCache(id: RepoRef, project: Project, log: ProgressLog): Promise<void> {
-                if (this.id === id) {
-                    if (this.cacheFiles === undefined) {
-                        throw Error("No cache");
-                    }
-                    this.cacheFiles.forEach(f => project.add(f));
-                } else {
-                    throw Error("Wrong id!");
-                }
-            }
-        }
+        beforeEach(() => {
+            project = InMemoryProject.of({path: "test.txt", content: "Test"});
+            fakePushId = fakePush().id;
+            fakeGoal = fakeGoalInvocation(fakePushId);
+            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+            fakeGoal.configuration.sdm.goalCache = testCache;
+            fakeGoal.configuration.sdm.cache.enabled = true;
+        });
 
         it("should cache and retrieve", async () => {
-            // when cache something
-            const project = InMemoryProject.of({path: "test.txt", content: "Test"});
-            const testCache = new TestGoalArtifactCache();
-            const fakePushId = fakePush().id;
-            await cacheGoalArtifacts(testCache, {globPattern: "**/*.txt"})
-                .listener(project as any as GitProject, fakeGoalInvocation(fakePushId) ,  GoalProjectListenerEvent.after);
+            const options: GoalCacheOptions = {
+                globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
+            };
+            await cacheGoalArtifacts(options)
+                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
             // it should find it in the cache
             const emptyProject = InMemoryProject.of();
-            await restoreGoalArtifacts(testCache, {})
-                .listener(emptyProject as any as GitProject, fakeGoalInvocation(fakePushId), GoalProjectListenerEvent.before);
+            await restoreGoalArtifacts(options)
+                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
             assert(await emptyProject.hasFile("test.txt"));
         });
 
         it("should call fallback on cache miss", async () => {
             // when cache something
-            const project = InMemoryProject.of({path: "test.txt", content: "Test"});
-            const testCache = new TestGoalArtifactCache();
-            const fakePushId = fakePush().id;
-            await cacheGoalArtifacts(testCache, {globPattern: "**/*.txt"})
-                .listener(project as any as GitProject, fakeGoalInvocation(fakePushId),  GoalProjectListenerEvent.after);
-            // and clearing the cache
-            await removeGoalArtifacts(testCache, {globPattern: "**/*.txt"})
-                .listener(project as any as GitProject, fakeGoalInvocation(fakePushId),  GoalProjectListenerEvent.after);
-            // it should not find it in the cache and call fallback
-            const emptyProject = InMemoryProject.of();
             const fallback: GoalProjectListener = async p => {
                 await p.addFile("test2.txt", "test");
             };
-            await restoreGoalArtifacts(testCache, {fallbackListenerOnCacheMiss: fallback})
-                .listener(emptyProject as any as GitProject, fakeGoalInvocation(fakePushId), GoalProjectListenerEvent.before);
-            assert(await emptyProject.hasFile("test2.txt"));
-        });
-
-        it("should check push test", async () => {
-            // when cache something with a specific pushtest that negates caching
-            const neverCache: PushTest = pushTest("test", async p => false);
-            const project = InMemoryProject.of({path: "test.txt", content: "Test"});
-            const testCache = new TestGoalArtifactCache();
-            const fakePushId = fakePush().id;
-            await cacheGoalArtifacts(testCache, {globPattern: "**/*.txt", pushTest: neverCache})
-                .listener(project as any as GitProject, fakeGoalInvocation(fakePushId),  GoalProjectListenerEvent.after);
+            const options: GoalCacheOptions = {
+                globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
+                fallbackListenerOnCacheMiss: fallback,
+            };
+            await cacheGoalArtifacts(options)
+                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
+            // and clearing the cache
+            await removeGoalArtifacts(options)
+                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
             // it should not find it in the cache and call fallback
             const emptyProject = InMemoryProject.of();
-            await restoreGoalArtifacts(testCache, {pushTest: neverCache})
-                .listener(emptyProject as any as GitProject, fakeGoalInvocation(fakePushId), GoalProjectListenerEvent.before);
-            assert(!(await emptyProject.hasFile("test.txt")));
+            await restoreGoalArtifacts(options)
+                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+            assert(await emptyProject.hasFile("test2.txt"));
         });
 });
+
+class TestGoalArtifactCache implements GoalCache {
+    private id: RepoRef;
+    private cacheFiles: ProjectFile[];
+    private classifier: string;
+
+    public async put(id: RepoRef, project: Project, files: string[], classifier: string = "default", log: ProgressLog): Promise<void> {
+        this.id = id;
+        this.cacheFiles = await Promise.all(files.map(async f => project.getFile(f)));
+        this.classifier = classifier;
+        return undefined;
+    }
+
+    public async empty(): Promise<void> {
+        this.id = undefined;
+        this.cacheFiles = undefined;
+        this.classifier = undefined;
+    }
+
+    public async remove(id: RepoRef): Promise<void> {
+        if (this.id === id) {
+            this.id = undefined;
+            this.cacheFiles = undefined;
+            this.classifier = undefined;
+        } else {
+            throw Error("Wrong id!");
+        }
+    }
+
+    public async retrieve(id: RepoRef, project: Project, log: ProgressLog, classifier: string = "default"): Promise<void> {
+        if (this.id === id && this.classifier === classifier) {
+            if (this.cacheFiles === undefined) {
+                throw Error("No cache");
+            }
+            this.cacheFiles.forEach(f => project.add(f));
+        } else {
+            throw Error("Wrong id!");
+        }
+    }
+}

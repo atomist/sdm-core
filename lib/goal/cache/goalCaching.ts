@@ -15,13 +15,13 @@
  */
 
 import {
+    configurationValue,
     GitProject,
     Project,
+    projectUtils,
     RepoRef,
 } from "@atomist/automation-client";
-import { gatherFromFiles } from "@atomist/automation-client/lib/project/util/projectUtils";
 import {
-    AnyPush,
     ExecuteGoalResult,
     GoalInvocation,
     GoalProjectListener,
@@ -32,96 +32,87 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 
-export interface GoalArtifactCache {
-    putInCache(id: RepoRef, project: Project, file: string[], log: ProgressLog): Promise<void>;
-    retrieveFromCache(id: RepoRef, project: Project, log: ProgressLog): Promise<void>;
-    removeFromCache(id: RepoRef): Promise<void>;
+/**
+ * Goal cache interface for storing and retrieving arbitrary files produced by the execution of a goal.
+ * @see ./FileS
+ */
+export interface GoalCache {
+    put(id: RepoRef, project: Project, file: string[], classifier: string, log: ProgressLog): Promise<void>;
+    retrieve(id: RepoRef, project: Project, log: ProgressLog, classifier?: string): Promise<void>;
+    remove(id: RepoRef, classifier?: string): Promise<void>;
 }
 
-const defaultGoalArtifactCacheOptions: GoalArtifactCacheOptions = {
-    pushTest: AnyPush,
-    globPattern: "**/*.jar",
-    fallbackListenerOnCacheMiss: () => { throw Error("No entry found in cache"); },
-};
-
-export interface GoalArtifactCacheOptions {
-    pushTest: PushTest;
-    globPattern: string;
-    fallbackListenerOnCacheMiss: GoalProjectListener;
+export interface GoalCacheOptions {
+    pushTest?: PushTest;
+    globPatterns: Array<{classifier: string, pattern: string}>;
+    fallbackListenerOnCacheMiss?: GoalProjectListener;
 }
 
-export function cacheGoalArtifacts(artifactArchiveCacher: GoalArtifactCache,
-                                   options: Partial<GoalArtifactCacheOptions> = {}): GoalProjectListenerRegistration {
-    const optionsToUse = {
-        ...defaultGoalArtifactCacheOptions,
-        ...options,
-    };
-
+export function cacheGoalArtifacts(options: GoalCacheOptions,
+                                   classifier?: string): GoalProjectListenerRegistration {
     return {
         name: "cache-artifacts",
         listener: archiveAndCacheArtifacts,
-        pushTest: optionsToUse.pushTest,
+        pushTest: options.pushTest,
+        events: [GoalProjectListenerEvent.after],
     };
 
     async function archiveAndCacheArtifacts(p: GitProject,
-                                            gi: GoalInvocation,
-                                            event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> {
-        if (optionsToUse.pushTest !== undefined && await optionsToUse.pushTest.mapping({project: p, push: gi.goalEvent.push, ...gi})) {
-            if (event === GoalProjectListenerEvent.after) {
-                const jars = await getFilePathsThroughPattern(p, optionsToUse.globPattern);
-                if (!_.isEmpty(jars)) {
-                    return artifactArchiveCacher.putInCache(gi.id, p, jars, gi.progressLog);
+                                            gi: GoalInvocation): Promise<void | ExecuteGoalResult> {
+        const cacheEnabled = gi.configuration.sdm.cache.enabled as boolean;
+        if (cacheEnabled) {
+            const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+            const patterns = classifier ? options.globPatterns.filter(pattern => pattern.classifier === classifier) : options.globPatterns;
+            await Promise.all(patterns.map(async globPattern => {
+                const files = await getFilePathsThroughPattern(p, globPattern.pattern);
+                if (!_.isEmpty(files)) {
+                    await goalCache.put(gi.id, p, files, globPattern.classifier, gi.progressLog);
                 }
-            }
+            }));
         }
     }
 }
 
 export function getFilePathsThroughPattern(project: Project, globPattern: string): Promise<string[]> {
-    return gatherFromFiles(project, globPattern, async f => f.path);
+    return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
 }
 
-export function restoreGoalArtifacts(artifactArchiveCache: GoalArtifactCache,
-                                     options: Partial<GoalArtifactCacheOptions> = {}): GoalProjectListenerRegistration {
-    const optionsToUse = {
-        ...defaultGoalArtifactCacheOptions,
-        ...options,
-    };
-
+export function restoreGoalArtifacts(options: GoalCacheOptions,
+                                     classifier?: string): GoalProjectListenerRegistration {
     return {
         name: "restore-artifacts",
         listener: retrieveAndRestoreArtifacts,
-        pushTest: optionsToUse.pushTest,
+        pushTest: options.pushTest,
+        events: [GoalProjectListenerEvent.before],
     };
 
     async function retrieveAndRestoreArtifacts(p: GitProject,
                                                gi: GoalInvocation,
                                                event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> {
-        if (optionsToUse.pushTest !== undefined && await optionsToUse.pushTest.mapping({project: p, push: gi.goalEvent.push, ...gi})) {
-            if (event === GoalProjectListenerEvent.before) {
-                return artifactArchiveCache.retrieveFromCache(gi.id, p, gi.progressLog)
-                    .catch(async () => { await optionsToUse.fallbackListenerOnCacheMiss(p, gi, event); });
+        const cacheEnabled = gi.configuration.sdm.cache.enabled as boolean;
+        if (cacheEnabled) {
+            const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+            try {
+                await goalCache.retrieve(gi.id, p, gi.progressLog, classifier);
+            } catch (e) {
+                await options.fallbackListenerOnCacheMiss(p, gi, event);
             }
         }
     }
 }
 
-export function removeGoalArtifacts(artifactArchiveCache: GoalArtifactCache,
-                                    options: Partial<GoalArtifactCacheOptions> = {}): GoalProjectListenerRegistration {
-    const optionsToUse = {
-        ...defaultGoalArtifactCacheOptions,
-        ...options,
-    };
-
+export function removeGoalArtifacts(options: GoalCacheOptions,
+                                    classifier?: string): GoalProjectListenerRegistration {
     return {
         name: "remove-archived-artifacts",
-        listener: async (p, gi, event) => {
-            if (optionsToUse.pushTest !== undefined && await optionsToUse.pushTest.mapping({project: p, push: gi.goalEvent.push, ...gi})) {
-                if (event === GoalProjectListenerEvent.after) {
-                    return artifactArchiveCache.removeFromCache(gi.id);
-                }
+        listener: async (p, gi) =>  {
+            const cacheEnabled = gi.configuration.sdm.cache.enabled as boolean;
+            if (cacheEnabled) {
+                const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+                return goalCache.remove(gi.id, classifier);
             }
         },
-        pushTest: optionsToUse.pushTest,
+        pushTest: options.pushTest,
+        events: [GoalProjectListenerEvent.after],
     };
 }

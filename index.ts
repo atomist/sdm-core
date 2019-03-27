@@ -152,12 +152,12 @@ export {
     K8sServiceRegistration,
 } from "./lib/pack/k8s/service";
 export {
-    FileSystemGoalArtifactCache,
-} from "./lib/goal/cache/FileSystemGoalArtifactCache";
+    FileSystemGoalCache,
+} from "./lib/goal/cache/FileSystemGoalCache";
 export {
     cacheGoalArtifacts,
-    GoalArtifactCache,
-    GoalArtifactCacheOptions,
+    GoalCache,
+    GoalCacheOptions,
     removeGoalArtifacts,
     restoreGoalArtifacts,
 } from "./lib/goal/cache/goalCaching";
