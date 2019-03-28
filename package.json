@@ -29,6 +29,7 @@
     "@types/proper-lockfile": "^3.0.0",
     "@types/request": "^2.48.1",
     "@types/retry": "^0.10.2",
+    "@types/uuid": "^3.4.4",
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
@@ -46,6 +47,7 @@
     "retry": "^0.12.0",
     "sprintf-js": "^1.1.2",
     "tempfile": "^2.0.0",
+    "uuid": "^3.3.2",
     "tmp-promise": "^1.0.4",
     "ts-essentials": "^1.0.2"
   },
@@ -62,6 +64,7 @@
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.0",
     "@types/power-assert": "^1.5.0",
+    "@types/shelljs": "^0.8.3",
     "axios-mock-adapter": "^1.16.0",
     "espower-typescript": "^9.0.2",
     "istanbul": "^0.4.5",

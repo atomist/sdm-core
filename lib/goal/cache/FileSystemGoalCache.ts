@@ -27,9 +27,13 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import { promisify } from "util";
+import * as uuid from "uuid";
 import { GoalCache } from "./goalCaching";
-import uuid = require("uuid");
 
+/**
+ * Cache implementation that caches files produced by goals to a local filesystem,
+ * using tar to create the archives per goal invocation (and classifier if present).
+ */
 export class FileSystemGoalCache implements GoalCache {
     private readonly cacheDirectory: string;
 
@@ -40,7 +44,7 @@ export class FileSystemGoalCache implements GoalCache {
     public async put(id: RepoRef, project: Project, files: string[], classifier: string = "default", log: ProgressLog): Promise<void> {
         const goalCacheDirectory = path.join(this.cacheDirectory, id.sha);
         fs.mkdirSync(goalCacheDirectory, {recursive: true});
-        const tempArchive = `atomist-${uuid()}-cache.tar.gz`
+        const tempArchive = `atomist-${uuid()}-cache.tar.gz`;
         const archiveFileName = path.join(goalCacheDirectory,  classifier + ".tar.gz");
         await spawnLog("tar", ["-czf", tempArchive, ...files], {log, cwd: (project as LocalProject).baseDir});
         await spawnLog("mv", [tempArchive, archiveFileName], {log, cwd: (project as LocalProject).baseDir});
