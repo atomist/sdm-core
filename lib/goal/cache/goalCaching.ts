@@ -15,7 +15,6 @@
  */
 
 import {
-    configurationValue,
     GitProject,
     Project,
     projectUtils,
@@ -34,7 +33,7 @@ import * as _ from "lodash";
 
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced by the execution of a goal.
- * @see ./FileS
+ * @see FileSystemGoalCache`
  */
 export interface GoalCache {
     put(id: RepoRef, project: Project, file: string[], classifier: string, log: ProgressLog): Promise<void>;
@@ -42,12 +41,31 @@ export interface GoalCache {
     remove(id: RepoRef, classifier?: string): Promise<void>;
 }
 
+/**
+ * Options for goal caching
+ */
 export interface GoalCacheOptions {
+    /**
+     * Push test on when to trigger caching
+     */
     pushTest?: PushTest;
+    /**
+     * Required. Collection of glob patterns with classifiers to determine which files need to be cached between
+     * goal invocations.
+     */
     globPatterns: Array<{classifier: string, pattern: string}>;
-    fallbackListenerOnCacheMiss?: GoalProjectListener;
+    /**
+     * Required. Listener function that should be called when no cache entry is found.
+     */
+    fallbackListenerOnCacheMiss: GoalProjectListener;
 }
 
+/**
+ * Goal listener that performs caching after a goal has been run.
+ * @param options The options for caching
+ * @param classifier Whether only a specific classifier, as defined in the options, needs to be cached. If omitted,
+ *                   all classifiers are cached.
+ */
 export function cacheGoalArtifacts(options: GoalCacheOptions,
                                    classifier?: string): GoalProjectListenerRegistration {
     return {
@@ -73,10 +91,16 @@ export function cacheGoalArtifacts(options: GoalCacheOptions,
     }
 }
 
-export function getFilePathsThroughPattern(project: Project, globPattern: string): Promise<string[]> {
+function getFilePathsThroughPattern(project: Project, globPattern: string): Promise<string[]> {
     return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
 }
 
+/**
+ * Goal listener that performs cache restores before a goal has been run.
+ * @param options The options for caching
+ * @param classifier Whether only a specific classifier, as defined in the options, needs to be restored. If omitted,
+ *                   all classifiers are restored.
+ */
 export function restoreGoalArtifacts(options: GoalCacheOptions,
                                      classifier?: string): GoalProjectListenerRegistration {
     return {
@@ -101,6 +125,12 @@ export function restoreGoalArtifacts(options: GoalCacheOptions,
     }
 }
 
+/**
+ * Goal listener that cleans up the cache restores after a goal has been run.
+ * @param options The options for caching
+ * @param classifier Whether only a specific classifier, as defined in the options, needs to be removed. If omitted,
+ *                   all classifiers are removed.
+ */
 export function removeGoalArtifacts(options: GoalCacheOptions,
                                     classifier?: string): GoalProjectListenerRegistration {
     return {

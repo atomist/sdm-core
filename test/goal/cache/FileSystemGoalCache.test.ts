@@ -15,8 +15,6 @@
  */
 
 import {
-    automationClientInstance,
-    configurationValue,
     GitProject,
     LocalProject,
     NodeFsLocalProject,
@@ -33,7 +31,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as assert from "power-assert";
 import { tempdir } from "shelljs";
-import uuid = require("uuid");
+import * as uuid from "uuid";
 import {
     cacheGoalArtifacts,
     FileSystemGoalCache,
@@ -60,6 +58,7 @@ describe("FileSystemGoalCache", () => {
 
             const options: GoalCacheOptions = {
                 globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
+                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
             };
             // when cache something
             const project = await createTempProject(fakePushId);
@@ -115,6 +114,7 @@ describe("FileSystemGoalCache", () => {
 
             const options: GoalCacheOptions = {
                 globPatterns: [{classifier: "default", pattern: "**/*.txt"}, {classifier: "batches", pattern: "**/*.bat"}],
+                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
             };
             // when cache something
             const project = await createTempProject(fakePushId);
@@ -140,6 +140,7 @@ describe("FileSystemGoalCache", () => {
 
             const options: GoalCacheOptions = {
                 globPatterns: [{classifier: "default", pattern: "**/*.txt"}, {classifier: "batches", pattern: "**/*.bat"}],
+                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
             };
             // when cache something
             const project = await createTempProject(fakePushId);

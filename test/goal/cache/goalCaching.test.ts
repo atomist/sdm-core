@@ -56,6 +56,7 @@ describe("CacheArtifacts", () => {
         it("should cache and retrieve", async () => {
             const options: GoalCacheOptions = {
                 globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
+                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
             };
             await cacheGoalArtifacts(options)
                 .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
