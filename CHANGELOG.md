@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.3.0...HEAD)
 
+### Fixed
+
+-   Goals that shouldn't be canceled get canceled. [#111](https://github.com/atomist/sdm-core/issues/111)
+
 ## [1.3.0](https://github.com/atomist/sdm-core/compare/1.2.0...1.3.0) - 2019-03-14
 
 ### Added
