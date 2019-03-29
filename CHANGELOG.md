@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.3.0...HEAD)
 
+### Changed
+
+-   Update k8s client. [#116](https://github.com/atomist/sdm-core/issues/116)
+
 ### Fixed
 
 -   Goals that shouldn't be canceled get canceled. [#111](https://github.com/atomist/sdm-core/issues/111)
