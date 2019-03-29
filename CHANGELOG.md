@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   Update k8s client. [#116](https://github.com/atomist/sdm-core/issues/116)
+-   Use apiKey to query for isolated SDM goal. [#117](https://github.com/atomist/sdm-core/issues/117)
 
 ### Fixed
 
