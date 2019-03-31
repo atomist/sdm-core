@@ -75,7 +75,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
     }
 
     private initVerificationKeys(): void {
-        this.gsc.verificationKeys = toArray(this.gsc.verificationKeys);
+        this.gsc.verificationKeys = toArray(this.gsc.verificationKeys) || [];
 
         // If signing key is set, also use it to verify
         if (!!this.gsc.signingKey) {
