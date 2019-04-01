@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.3.1...HEAD)
 
+### Changed
+
+-   Update deps and version. [97c8365](https://github.com/atomist/sdm-core/commit/97c8365a288f8f984ad11487d72d5910c5e71812)
+
 ### Fixed
 
 -   Fix issue when no verification keys are configured. [ed6628c](https://github.com/atomist/sdm-core/commit/ed6628c489cfac9e03f83a38d4290b6875ed8e25)
