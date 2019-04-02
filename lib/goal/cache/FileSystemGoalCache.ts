@@ -16,6 +16,7 @@
 
 import {
     GitProject,
+    guid,
     LocalProject,
     Project,
 } from "@atomist/automation-client";
@@ -25,7 +26,6 @@ import {
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as uuid from "uuid";
 import { GoalCache } from "./goalCaching";
 
 /**
@@ -40,7 +40,7 @@ export class FileSystemGoalCache implements GoalCache {
     public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
         const cacheDir = await this.getCacheDirectory(classifier);
         const archiveName = this.getArchiveName(gi);
-        const teamArchiveFileName = path.join(cacheDir, `${archiveName}.${uuid().slice(0, 7)}`);
+        const teamArchiveFileName = path.join(cacheDir, `${archiveName}.${guid().slice(0, 7)}`);
         const archiveFileName = path.join(cacheDir, archiveName);
 
         await spawnLog("tar", ["-czf", teamArchiveFileName, ...files], {
