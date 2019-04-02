@@ -22,6 +22,7 @@ import {
     commandRequestParameterPromptFactory,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import * as os from "os";
 import { FileSystemGoalCache } from "../goal/cache/FileSystemGoalCache";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
@@ -50,7 +51,8 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             goalScheduler: [],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
             parameterPromptFactory: commandRequestParameterPromptFactory,
-            goalCache: new FileSystemGoalCache(path.join(_.get(configuration, "sdm.cache.path"), "goalcache")),
+            goalCache: new FileSystemGoalCache(
+                path.join(_.get(configuration, "sdm.cache.path", os.tmpdir()), "cache")),
         },
         local: {
             preferLocalSeeds: true,
