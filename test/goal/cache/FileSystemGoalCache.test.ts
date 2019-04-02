@@ -28,160 +28,173 @@ import {
     LoggingProgressLog,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
-import { tempdir } from "shelljs";
 import * as uuid from "uuid";
 import {
-    cacheGoalArtifacts,
+    cachePut,
+    cacheRemove,
+    cacheRestore,
     FileSystemGoalCache,
     GoalCacheOptions,
-    removeGoalArtifacts,
-    restoreGoalArtifacts,
 } from "../../../index";
 
 async function createTempProject(fakePushId: RepoRef): Promise<LocalProject> {
-    const projectDir = (path.join(tempdir(), uuid()));
+    const projectDir = (path.join(os.tmpdir(), uuid()));
     fs.mkdirSync(projectDir);
     return NodeFsLocalProject.fromExistingDirectory(fakePushId, projectDir);
 }
 
 describe("FileSystemGoalCache", () => {
-        it("should cache and retrieve", async () => {
-            const fakePushId = fakePush().id;
-            fakePushId.sha = "testing";
-            const fakeGoal = fakeGoalInvocation(fakePushId);
-            const testCache = new FileSystemGoalCache(path.join(tempdir(), uuid()));
-            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache = { enabled: true };
 
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
-                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
-            };
-            // when cache something
-            const project = await createTempProject(fakePushId);
-            await project.addFile("test.txt", "test");
-            await cacheGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            // it should find it in the cache
-            const emptyProject = await createTempProject(fakePushId);
-            await restoreGoalArtifacts(options)
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(await emptyProject.hasFile("test.txt"));
-        });
+    it("should cache and retrieve", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
 
-        it("should call fallback on cache miss", async () => {
-            const fakePushId = fakePush().id;
-            fakePushId.sha = "testing";
-            const fakeGoal = fakeGoalInvocation(fakePushId);
-            const testCache = new FileSystemGoalCache(path.join(tempdir(), uuid()));
-            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache = { enabled: true };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: () => {
+                throw Error("should not happen");
+            },
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        // it should find it in the cache
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+    });
 
-            const fallback: GoalProjectListener = async p => {
-                await p.addFile("test2.txt", "test");
-            };
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
-                fallbackListenerOnCacheMiss: fallback,
-            };
-            // when cache something
-            const project = await createTempProject(fakePushId);
-            await project.addFile("test.txt", "test");
-            await cacheGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            // and clearing the cache
-            await removeGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            // it should not find it in the cache and call fallback
-            const emptyProject = await createTempProject(fakePushId);
-            await restoreGoalArtifacts(options)
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(await emptyProject.hasFile("test2.txt"));
-        });
+    it("should call fallback on cache miss", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
 
-        it("should call create different archives", async () => {
-            const fakePushId = fakePush().id;
-            fakePushId.sha = "testing";
-            const fakeGoal = fakeGoalInvocation(fakePushId);
-            const testCache = new FileSystemGoalCache(path.join(tempdir(), uuid()));
-            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache = { enabled: true };
+        const fallback: GoalProjectListener = async p => {
+            await p.addFile("test2.txt", "test");
+        };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: fallback,
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        // and clearing the cache
+        await cacheRemove(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        // it should not find it in the cache and call fallback
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test2.txt"));
+    });
 
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}, {classifier: "batches", pattern: "**/*.bat"}],
-                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
-            };
-            // when cache something
-            const project = await createTempProject(fakePushId);
-            await project.addFile("test.txt", "test");
-            await project.addFile("test.bat", "test");
-            await cacheGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            const emptyProject = await createTempProject(fakePushId);
-            await restoreGoalArtifacts(options)
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(await emptyProject.hasFile("test.txt"));
-            assert(await emptyProject.hasFile("test.bat"));
-        });
+    it("should call create different archives", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
 
-        it("should call create different archives and be able to select one", async () => {
-            const fakePushId = fakePush().id;
-            fakePushId.sha = "testing";
-            const fakeGoal = fakeGoalInvocation(fakePushId);
-            const testCache = new FileSystemGoalCache(path.join(tempdir(), uuid()));
-            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache = { enabled: true };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }, { classifier: "batches", pattern: "**/*.bat" }],
+            onCacheMiss: () => {
+                throw Error("should not happen");
+            },
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await project.addFile("test.bat", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options, "default", "batches")
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+        assert(await emptyProject.hasFile("test.bat"));
+    });
 
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}, {classifier: "batches", pattern: "**/*.bat"}],
-                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
-            };
-            // when cache something
-            const project = await createTempProject(fakePushId);
-            await project.addFile("test.txt", "test");
-            await project.addFile("test.bat", "test");
-            await cacheGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            const emptyProject = await createTempProject(fakePushId);
-            await restoreGoalArtifacts(options, "batches")
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(!await emptyProject.hasFile("test.txt"));
-            assert(await emptyProject.hasFile("test.bat"));
-        });
+    it("should call create different archives and be able to select one", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
 
-        it("should call create specific archives and fallback", async () => {
-            const fakePushId = fakePush().id;
-            fakePushId.sha = "testing";
-            const fakeGoal = fakeGoalInvocation(fakePushId);
-            const testCache = new FileSystemGoalCache(path.join(tempdir(), uuid()));
-            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache = { enabled: true };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }, {
+                classifier: "batches",
+                pattern: "**/*.bat",
+            }],
+            onCacheMiss: () => {
+                throw Error("should not happen");
+            },
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await project.addFile("test.bat", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options, "batches")
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(!await emptyProject.hasFile("test.txt"));
+        assert(await emptyProject.hasFile("test.bat"));
+    });
 
-            const fallback: GoalProjectListener = async p => {
-                await p.addFile("fallback.text", "test");
-            };
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}, {classifier: "batches", pattern: "**/*.bat"}],
-                fallbackListenerOnCacheMiss: fallback,
-            };
-            // when cache something
-            const project = await createTempProject(fakePushId);
-            await project.addFile("test.txt", "test");
-            await project.addFile("test.bat", "test");
-            await cacheGoalArtifacts(options, "batches")
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            const emptyProject = await createTempProject(fakePushId);
-            await restoreGoalArtifacts(options, "default")
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(!await emptyProject.hasFile("test.txt"));
-            assert(!await emptyProject.hasFile("test.bat"));
-            assert(await emptyProject.hasFile("fallback.text"));
-        });
+    it("should call create specific archives and fallback", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
+
+        const fallback: GoalProjectListener = async p => {
+            await p.addFile("fallback.text", "test");
+        };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }, {
+                classifier: "batches",
+                pattern: "**/*.bat",
+            }],
+            onCacheMiss: fallback,
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await project.addFile("test.bat", "test");
+        await cachePut(options, "batches")
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options, "default")
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(!await emptyProject.hasFile("test.txt"));
+        assert(!await emptyProject.hasFile("test.bat"));
+        assert(await emptyProject.hasFile("fallback.text"));
+    });
 });

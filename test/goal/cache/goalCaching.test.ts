@@ -24,78 +24,27 @@ import {
 import {
     fakeGoalInvocation,
     fakePush,
+    GoalInvocation,
+    GoalProjectListener,
     GoalProjectListenerEvent,
     LoggingProgressLog,
-    ProgressLog,
 } from "@atomist/sdm";
-import { GoalProjectListener } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import * as assert from "power-assert";
 import {
-    cacheGoalArtifacts,
+    cachePut,
+    cacheRemove,
+    cacheRestore,
     GoalCache,
     GoalCacheOptions,
-    removeGoalArtifacts,
-    restoreGoalArtifacts,
 } from "../../../index";
-
-describe("CacheArtifacts", () => {
-        let project;
-        const testCache = new TestGoalArtifactCache();
-        let fakePushId;
-        let fakeGoal;
-
-        beforeEach(() => {
-            project = InMemoryProject.of({path: "test.txt", content: "Test"});
-            fakePushId = fakePush().id;
-            fakeGoal = fakeGoalInvocation(fakePushId);
-            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache.enabled = true;
-        });
-
-        it("should cache and retrieve", async () => {
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
-                fallbackListenerOnCacheMiss: () => { throw Error("should not happen"); },
-            };
-            await cacheGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            // it should find it in the cache
-            const emptyProject = InMemoryProject.of();
-            await restoreGoalArtifacts(options)
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(await emptyProject.hasFile("test.txt"));
-        });
-
-        it("should call fallback on cache miss", async () => {
-            // when cache something
-            const fallback: GoalProjectListener = async p => {
-                await p.addFile("test2.txt", "test");
-            };
-            const options: GoalCacheOptions = {
-                globPatterns: [{classifier: "default", pattern: "**/*.txt"}],
-                fallbackListenerOnCacheMiss: fallback,
-            };
-            await cacheGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            // and clearing the cache
-            await removeGoalArtifacts(options)
-                .listener(project as any as GitProject, fakeGoal,  GoalProjectListenerEvent.after);
-            // it should not find it in the cache and call fallback
-            const emptyProject = InMemoryProject.of();
-            await restoreGoalArtifacts(options)
-                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
-            assert(await emptyProject.hasFile("test2.txt"));
-        });
-});
 
 class TestGoalArtifactCache implements GoalCache {
     private id: RepoRef;
     private cacheFiles: ProjectFile[];
     private classifier: string;
 
-    public async put(id: RepoRef, project: Project, files: string[], classifier: string = "default", log: ProgressLog): Promise<void> {
-        this.id = id;
+    public async put(gi: GoalInvocation, project: Project, files: string[], classifier: string = "default"): Promise<void> {
+        this.id = gi.id;
         this.cacheFiles = await Promise.all(files.map(async f => project.getFile(f)));
         this.classifier = classifier;
         return undefined;
@@ -107,8 +56,8 @@ class TestGoalArtifactCache implements GoalCache {
         this.classifier = undefined;
     }
 
-    public async remove(id: RepoRef): Promise<void> {
-        if (this.id === id) {
+    public async remove(gi: GoalInvocation): Promise<void> {
+        if (this.id === gi.id) {
             this.id = undefined;
             this.cacheFiles = undefined;
             this.classifier = undefined;
@@ -117,8 +66,8 @@ class TestGoalArtifactCache implements GoalCache {
         }
     }
 
-    public async retrieve(id: RepoRef, project: Project, log: ProgressLog, classifier: string = "default"): Promise<void> {
-        if (this.id === id && this.classifier === classifier) {
+    public async retrieve(gi: GoalInvocation, project: Project, classifier: string = "default"): Promise<void> {
+        if (this.id === gi.id && this.classifier === classifier) {
             if (this.cacheFiles === undefined) {
                 throw Error("No cache");
             }
@@ -128,3 +77,59 @@ class TestGoalArtifactCache implements GoalCache {
         }
     }
 }
+
+describe("goalCaching", () => {
+    let project;
+    const testCache = new TestGoalArtifactCache();
+    let fakePushId;
+    let fakeGoal;
+
+    beforeEach(() => {
+        project = InMemoryProject.of({ path: "test.txt", content: "Test" });
+        fakePushId = fakePush().id;
+        fakeGoal = fakeGoalInvocation(fakePushId);
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = {
+            enabled: true,
+        };
+    });
+
+    it("should cache and retrieve", async () => {
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: () => {
+                throw Error("should not happen");
+            },
+        };
+        await cachePut(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // it should find it in the cache
+        const emptyProject = InMemoryProject.of();
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+    });
+
+    it("should call fallback on cache miss", async () => {
+        // when cache something
+        const fallback: GoalProjectListener = async p => {
+            await p.addFile("test2.txt", "test");
+        };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: fallback,
+        };
+        await cachePut(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // and clearing the cache
+        await cacheRemove(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // it should not find it in the cache and call fallback
+        const emptyProject = InMemoryProject.of();
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test2.txt"));
+    });
+});
+

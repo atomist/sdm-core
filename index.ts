@@ -155,9 +155,9 @@ export {
     FileSystemGoalCache,
 } from "./lib/goal/cache/FileSystemGoalCache";
 export {
-    cacheGoalArtifacts,
+    cachePut,
+    cacheRemove,
+    cacheRestore,
     GoalCache,
     GoalCacheOptions,
-    removeGoalArtifacts,
-    restoreGoalArtifacts,
 } from "./lib/goal/cache/goalCaching";

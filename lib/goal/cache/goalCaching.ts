@@ -18,7 +18,6 @@ import {
     GitProject,
     Project,
     projectUtils,
-    RepoRef,
 } from "@atomist/automation-client";
 import {
     ExecuteGoalResult,
@@ -26,19 +25,22 @@ import {
     GoalProjectListener,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
-    ProgressLog,
     PushTest,
 } from "@atomist/sdm";
 import * as _ from "lodash";
 
 /**
- * Goal cache interface for storing and retrieving arbitrary files produced by the execution of a goal.
+ * Goal cache interface for storing and retrieving arbitrary files produced
+ * by the execution of a goal.
  * @see FileSystemGoalCache`
  */
 export interface GoalCache {
-    put(id: RepoRef, project: Project, file: string[], classifier: string, log: ProgressLog): Promise<void>;
-    retrieve(id: RepoRef, project: Project, log: ProgressLog, classifier?: string): Promise<void>;
-    remove(id: RepoRef, classifier?: string): Promise<void>;
+
+    put(gi: GoalInvocation, p: GitProject, file: string[], classifier?: string): Promise<void>;
+
+    retrieve(gi: GoalInvocation, p: GitProject, classifier?: string): Promise<void>;
+
+    remove(gi: GoalInvocation, classifier?: string): Promise<void>;
 }
 
 /**
@@ -46,103 +48,109 @@ export interface GoalCache {
  */
 export interface GoalCacheOptions {
     /**
-     * Push test on when to trigger caching
+     * Optional push test on when to trigger caching
      */
     pushTest?: PushTest;
     /**
-     * Required. Collection of glob patterns with classifiers to determine which files need to be cached between
+     * Collection of glob patterns with classifiers to determine which files need to be cached between
      * goal invocations.
      */
-    globPatterns: Array<{classifier: string, pattern: string}>;
+    entries: Array<{ classifier: string, pattern: string | string[] }>;
     /**
-     * Required. Listener function that should be called when no cache entry is found.
+     * Optional listener function that should be called when no cache entry is found.
      */
-    fallbackListenerOnCacheMiss: GoalProjectListener;
+    onCacheMiss?: GoalProjectListener;
 }
 
 /**
  * Goal listener that performs caching after a goal has been run.
  * @param options The options for caching
- * @param classifier Whether only a specific classifier, as defined in the options, needs to be cached. If omitted,
- *                   all classifiers are cached.
+ * @param classifier Whether only a specific classifier, as defined in the options,
+ * needs to be cached. If omitted, all classifiers are cached.
  */
-export function cacheGoalArtifacts(options: GoalCacheOptions,
-                                   classifier?: string): GoalProjectListenerRegistration {
+export function cachePut(options: GoalCacheOptions,
+                         classifier?: string): GoalProjectListenerRegistration {
     return {
-        name: "cache-artifacts",
-        listener: archiveAndCacheArtifacts,
-        pushTest: options.pushTest,
-        events: [GoalProjectListenerEvent.after],
-    };
-
-    async function archiveAndCacheArtifacts(p: GitProject,
-                                            gi: GoalInvocation): Promise<void | ExecuteGoalResult> {
-        const cacheEnabled = gi.configuration.sdm.cache.enabled as boolean;
-        if (cacheEnabled) {
-            const goalCache = gi.configuration.sdm.goalCache as GoalCache;
-            const patterns = classifier ? options.globPatterns.filter(pattern => pattern.classifier === classifier) : options.globPatterns;
-            await Promise.all(patterns.map(async globPattern => {
-                const files = await getFilePathsThroughPattern(p, globPattern.pattern);
-                if (!_.isEmpty(files)) {
-                    await goalCache.put(gi.id, p, files, globPattern.classifier, gi.progressLog);
-                }
-            }));
-        }
-    }
-}
-
-function getFilePathsThroughPattern(project: Project, globPattern: string): Promise<string[]> {
-    return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
-}
-
-/**
- * Goal listener that performs cache restores before a goal has been run.
- * @param options The options for caching
- * @param classifier Whether only a specific classifier, as defined in the options, needs to be restored. If omitted,
- *                   all classifiers are restored.
- */
-export function restoreGoalArtifacts(options: GoalCacheOptions,
-                                     classifier?: string): GoalProjectListenerRegistration {
-    return {
-        name: "restore-artifacts",
-        listener: retrieveAndRestoreArtifacts,
-        pushTest: options.pushTest,
-        events: [GoalProjectListenerEvent.before],
-    };
-
-    async function retrieveAndRestoreArtifacts(p: GitProject,
-                                               gi: GoalInvocation,
-                                               event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> {
-        const cacheEnabled = gi.configuration.sdm.cache.enabled as boolean;
-        if (cacheEnabled) {
-            const goalCache = gi.configuration.sdm.goalCache as GoalCache;
-            try {
-                await goalCache.retrieve(gi.id, p, gi.progressLog, classifier);
-            } catch (e) {
-                await options.fallbackListenerOnCacheMiss(p, gi, event);
-            }
-        }
-    }
-}
-
-/**
- * Goal listener that cleans up the cache restores after a goal has been run.
- * @param options The options for caching
- * @param classifier Whether only a specific classifier, as defined in the options, needs to be removed. If omitted,
- *                   all classifiers are removed.
- */
-export function removeGoalArtifacts(options: GoalCacheOptions,
-                                    classifier?: string): GoalProjectListenerRegistration {
-    return {
-        name: "remove-archived-artifacts",
-        listener: async (p, gi) =>  {
-            const cacheEnabled = gi.configuration.sdm.cache.enabled as boolean;
-            if (cacheEnabled) {
+        name: "cache put",
+        listener: async (p: GitProject,
+                         gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
+            if (!!isCacheEnabled(gi)) {
                 const goalCache = gi.configuration.sdm.goalCache as GoalCache;
-                return goalCache.remove(gi.id, classifier);
+                const entries = !!classifier ?
+                    options.entries.filter(pattern => pattern.classifier === classifier) :
+                    options.entries;
+                for (const entry of entries) {
+                    const files = await getFilePathsThroughPattern(p, entry.pattern);
+                    if (!_.isEmpty(files)) {
+                        await goalCache.put(gi, p, files, entry.classifier);
+                    }
+                }
             }
         },
         pushTest: options.pushTest,
         events: [GoalProjectListenerEvent.after],
     };
+}
+
+/**
+ * Goal listener that performs cache restores before a goal has been run.
+ * @param options The options for caching
+ * @param classifier Whether only a specific classifier, as defined in the options,
+ * needs to be restored. If omitted, all classifiers are restored.
+ */
+export function cacheRestore(options: GoalCacheOptions,
+                             classifier: string = "default",
+                             ...classifiers: string[]): GoalProjectListenerRegistration {
+    const optsToUse: GoalCacheOptions = {
+        onCacheMiss: async () => {},
+        ...options,
+    }
+    return {
+        name: "cache restore",
+        listener: async (p: GitProject,
+                         gi: GoalInvocation,
+                         event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
+            if (!!isCacheEnabled(gi)) {
+                const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+                for (const c of [classifier, ...classifiers]) {
+                    try {
+                        await goalCache.retrieve(gi, p, c);
+                    } catch (e) {
+                        await optsToUse.onCacheMiss(p, gi, event);
+                    }
+                }
+            }
+        },
+        pushTest: optsToUse.pushTest,
+        events: [GoalProjectListenerEvent.before],
+    };
+}
+
+/**
+ * Goal listener that cleans up the cache restores after a goal has been run.
+ * @param options The options for caching
+ * @param classifier Whether only a specific classifier, as defined in the options,
+ * needs to be removed. If omitted, all classifiers are removed.
+ */
+export function cacheRemove(options: GoalCacheOptions,
+                            classifier?: string): GoalProjectListenerRegistration {
+    return {
+        name: "cache remove",
+        listener: async (p, gi) => {
+            if (!!isCacheEnabled(gi)) {
+                const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+                return goalCache.remove(gi, classifier);
+            }
+        },
+        pushTest: options.pushTest,
+        events: [GoalProjectListenerEvent.after],
+    };
+}
+
+function getFilePathsThroughPattern(project: Project, globPattern: string | string[]): Promise<string[]> {
+    return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
+}
+
+function isCacheEnabled(gi: GoalInvocation): boolean {
+    return _.get(gi.configuration, "sdm.cache.enabled") || false;
 }
