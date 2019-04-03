@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.4.0...HEAD)
 
+### Added
+
+-   Artifact caching. [#110](https://github.com/atomist/sdm-core/issues/110)
+
 ## [1.4.0](https://github.com/atomist/sdm-core/compare/1.3.1...1.4.0) - 2019-04-01
 
 ### Changed
