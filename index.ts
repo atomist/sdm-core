@@ -151,3 +151,13 @@ export {
     K8sServiceSpec,
     K8sServiceRegistration,
 } from "./lib/pack/k8s/service";
+export {
+    FileSystemGoalCache,
+} from "./lib/goal/cache/FileSystemGoalCache";
+export {
+    cachePut,
+    cacheRemove,
+    cacheRestore,
+    GoalCache,
+    GoalCacheOptions,
+} from "./lib/goal/cache/goalCaching";

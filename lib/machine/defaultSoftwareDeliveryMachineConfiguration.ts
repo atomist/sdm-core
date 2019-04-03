@@ -22,12 +22,15 @@ import {
     commandRequestParameterPromptFactory,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import * as os from "os";
+import { FileSystemGoalCache } from "../goal/cache/FileSystemGoalCache";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { GraphQLPreferenceStoreFactory } from "../internal/preferences/GraphQLPreferenceStore";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
+import * as path from "path";
 
 export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
     const repoRefResolver = new DefaultRepoRefResolver();
@@ -48,6 +51,8 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             goalScheduler: [],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
             parameterPromptFactory: commandRequestParameterPromptFactory,
+            goalCache: new FileSystemGoalCache(
+                path.join(_.get(configuration, "sdm.cache.path", os.tmpdir()), "cache")),
         },
         local: {
             preferLocalSeeds: true,
