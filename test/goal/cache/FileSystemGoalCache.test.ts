@@ -59,9 +59,9 @@ describe("FileSystemGoalCache", () => {
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
-            onCacheMiss: () => {
+            onCacheMiss: [() => {
                 throw Error("should not happen");
-            },
+            }],
         };
         // when cache something
         const project = await createTempProject(fakePushId);
@@ -89,7 +89,7 @@ describe("FileSystemGoalCache", () => {
         };
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
-            onCacheMiss: fallback,
+            onCacheMiss: [fallback],
         };
         // when cache something
         const project = await createTempProject(fakePushId);
@@ -117,9 +117,9 @@ describe("FileSystemGoalCache", () => {
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }, { classifier: "batches", pattern: "**/*.bat" }],
-            onCacheMiss: () => {
+            onCacheMiss: [() => {
                 throw Error("should not happen");
-            },
+            }],
         };
         // when cache something
         const project = await createTempProject(fakePushId);
@@ -148,9 +148,9 @@ describe("FileSystemGoalCache", () => {
                 classifier: "batches",
                 pattern: "**/*.bat",
             }],
-            onCacheMiss: () => {
+            onCacheMiss: [() => {
                 throw Error("should not happen");
-            },
+            }],
         };
         // when cache something
         const project = await createTempProject(fakePushId);
@@ -182,7 +182,7 @@ describe("FileSystemGoalCache", () => {
                 classifier: "batches",
                 pattern: "**/*.bat",
             }],
-            onCacheMiss: fallback,
+            onCacheMiss: [fallback],
         };
         // when cache something
         const project = await createTempProject(fakePushId);
