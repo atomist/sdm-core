@@ -126,11 +126,11 @@ export function cacheRestore(options: GoalCacheOptions,
                     try {
                         await goalCache.retrieve(gi, p, c);
                     } catch (e) {
-                        invokeCacheMissListeners(optsToUse, p, gi, event);
+                        await invokeCacheMissListeners(optsToUse, p, gi, event);
                     }
                 }
             } else {
-                invokeCacheMissListeners(optsToUse, p, gi, event);
+                await invokeCacheMissListeners(optsToUse, p, gi, event);
             }
         },
         pushTest: optsToUse.pushTest,

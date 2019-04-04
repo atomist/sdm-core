@@ -138,7 +138,9 @@ describe("goalCaching", () => {
             await p.addFile("test2.txt", "test");
         };
         const fallback2: GoalProjectListener = async p => {
-            await p.addFile("test3.txt", "test");
+            if (await p.hasFile("test2.txt")) {
+                await p.addFile("test3.txt", "test");
+            }
         };
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
