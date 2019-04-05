@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Artifact caching. [#110](https://github.com/atomist/sdm-core/issues/110)
+-   Enable multiple cache miss listeners and add a no-op cache. [#122](https://github.com/atomist/sdm-core/issues/122)
 
 ## [1.4.0](https://github.com/atomist/sdm-core/compare/1.3.1...1.4.0) - 2019-04-01
 
