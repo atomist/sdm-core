@@ -24,7 +24,6 @@ import {
     AnyPush,
     fakeGoalInvocation,
     fakePush,
-    GoalProjectListener,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
     LoggingProgressLog,
@@ -50,7 +49,7 @@ async function createTempProject(fakePushId: RepoRef): Promise<LocalProject> {
 
 const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "Error",
-    listener: async () => { throw Error("") },
+    listener: async () => { throw Error(""); },
     pushTest: AnyPush,
 };
 
@@ -66,7 +65,7 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true };
 
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
         // when cache something
@@ -79,6 +78,33 @@ describe("FileSystemGoalCache", () => {
         await cacheRestore(options)
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test.txt"));
+    });
+
+    it("should cache and retrieve complete directories", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
+
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: { directory: "test" }}],
+            onCacheMiss: ErrorProjectListenerRegistration,
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test/test.txt", "test");
+        await project.addFile("test/test2.txt", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        // it should find it in the cache
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test/test.txt"));
+        assert(await emptyProject.hasFile("test/test2.txt"));
     });
 
     it("should call fallback on cache miss", async () => {
@@ -94,7 +120,7 @@ describe("FileSystemGoalCache", () => {
             await p.addFile("test2.txt", "test");
         }};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback],
         };
         // when cache something
@@ -122,7 +148,8 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true };
 
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }, { classifier: "batches", pattern: "**/*.bat" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } },
+                { classifier: "batches", pattern: { globPattern: "**/*.bat" }}],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
         // when cache something
@@ -148,10 +175,8 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true };
 
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }, {
-                classifier: "batches",
-                pattern: "**/*.bat",
-            }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }},
+                {classifier: "batches", pattern: { globPattern: "**/*.bat"}}],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
         // when cache something
@@ -180,9 +205,9 @@ describe("FileSystemGoalCache", () => {
                 await p.addFile("fallback.text", "test");
             }};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }, {
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }, {
                 classifier: "batches",
-                pattern: "**/*.bat",
+                pattern: { globPattern: "**/*.bat"},
             }],
             onCacheMiss: [fallback],
         };

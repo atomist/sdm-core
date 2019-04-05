@@ -26,7 +26,6 @@ import {
     fakeGoalInvocation,
     fakePush,
     GoalInvocation,
-    GoalProjectListener,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
     LoggingProgressLog,
@@ -83,7 +82,7 @@ class TestGoalArtifactCache implements GoalCache {
 
 const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "Error",
-    listener: async () => { throw Error("") },
+    listener: async () => { throw Error(""); },
     pushTest: AnyPush,
 };
 
@@ -94,7 +93,7 @@ describe("goalCaching", () => {
     let fakeGoal;
 
     beforeEach(() => {
-        project = InMemoryProject.of({ path: "test.txt", content: "Test" });
+        project = InMemoryProject.of({ path: "test.txt", content: "Test"}, { path: "dirtest/test.txt", content: "" });
         fakePushId = fakePush().id;
         fakeGoal = fakeGoalInvocation(fakePushId);
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
@@ -106,7 +105,7 @@ describe("goalCaching", () => {
 
     it("should cache and retrieve", async () => {
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
         await cachePut(options)
@@ -124,7 +123,7 @@ describe("goalCaching", () => {
             await p.addFile("test2.txt", "test");
         }};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: fallback,
         };
         await cachePut(options)
@@ -150,7 +149,7 @@ describe("goalCaching", () => {
                 }
             }};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback, fallback2],
         };
         await cachePut(options)
@@ -179,7 +178,7 @@ describe("goalCaching", () => {
                 await p.addFile("test3.txt", "test");
             }};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback, fallback2, fallback3],
         };
         await cachePut(options)
@@ -209,7 +208,7 @@ describe("goalCaching", () => {
                 await p.addFile("test3.txt", "test");
             }, events: [GoalProjectListenerEvent.after]};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback, fallback2, fallback3],
         };
         await cachePut(options)
@@ -232,7 +231,7 @@ describe("goalCaching", () => {
                 await p.addFile("fallback.txt", "test");
             }};
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: fallback,
         };
         await cachePut(options)
