@@ -27,8 +27,10 @@ import {
     fakePush,
     GoalInvocation,
     GoalProjectListener,
-    GoalProjectListenerEvent, GoalProjectListenerRegistration,
-    LoggingProgressLog, pushTest,
+    GoalProjectListenerEvent,
+    GoalProjectListenerRegistration,
+    LoggingProgressLog,
+    pushTest,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
 import {

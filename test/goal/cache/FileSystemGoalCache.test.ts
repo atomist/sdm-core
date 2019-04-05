@@ -25,7 +25,8 @@ import {
     fakeGoalInvocation,
     fakePush,
     GoalProjectListener,
-    GoalProjectListenerEvent, GoalProjectListenerRegistration,
+    GoalProjectListenerEvent,
+    GoalProjectListenerRegistration,
     LoggingProgressLog,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";

@@ -25,7 +25,9 @@ import {
     GoalInvocation,
     GoalProjectListener,
     GoalProjectListenerEvent,
-    GoalProjectListenerRegistration, predicatePushTest, pushTest,
+    GoalProjectListenerRegistration,
+    predicatePushTest,
+    pushTest,
     PushTest,
 } from "@atomist/sdm";
 import * as _ from "lodash";
