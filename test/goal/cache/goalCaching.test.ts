@@ -225,4 +225,21 @@ describe("goalCaching", () => {
         assert(!await emptyProject.hasFile("test2.txt"));
         assert(!await emptyProject.hasFile("test3.txt"));
     });
+
+    it("should default to NoOpGoalCache", async () => {
+        fakeGoal.configuration.sdm.goalCache = undefined;
+        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("fallback.txt", "test");
+            }};
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: fallback,
+        };
+        await cachePut(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        const emptyProject = InMemoryProject.of();
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("fallback.txt"));
+    });
 });

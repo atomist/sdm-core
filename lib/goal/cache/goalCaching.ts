@@ -32,6 +32,7 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
+import { NoOpGoalCache } from "./NoOpGoalCache";
 
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced
@@ -66,6 +67,8 @@ export interface GoalCacheOptions {
     onCacheMiss?: GoalProjectListenerRegistration | GoalProjectListenerRegistration[];
 }
 
+const DefaultGoalCache = new NoOpGoalCache();
+
 /**
  * Goal listener that performs caching after a goal has been run.
  * @param options The options for caching
@@ -79,7 +82,7 @@ export function cachePut(options: GoalCacheOptions,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
                 const entries = !!classifier ?
                     options.entries.filter(pattern => pattern.classifier === classifier) :
                     options.entries;
@@ -143,7 +146,7 @@ export function cacheRestore(options: GoalCacheOptions,
                          gi: GoalInvocation,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
                 for (const c of [classifier, ...classifiers]) {
                     try {
                         await goalCache.retrieve(gi, p, c);
@@ -172,7 +175,7 @@ export function cacheRemove(options: GoalCacheOptions,
         name: "cache remove",
         listener: async (p, gi) => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = gi.configuration.sdm.goalCache as GoalCache;
+                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
                 return goalCache.remove(gi, classifier);
             }
         },
