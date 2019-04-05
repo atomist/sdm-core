@@ -20,11 +20,12 @@ import {
     projectUtils,
 } from "@atomist/automation-client";
 import {
+    AnyPush,
     ExecuteGoalResult,
     GoalInvocation,
     GoalProjectListener,
     GoalProjectListenerEvent,
-    GoalProjectListenerRegistration,
+    GoalProjectListenerRegistration, predicatePushTest, pushTest,
     PushTest,
 } from "@atomist/sdm";
 import * as _ from "lodash";
@@ -60,7 +61,7 @@ export interface GoalCacheOptions {
     /**
      * Optional listener functions that should be called when no cache entry is found.
      */
-    onCacheMiss?: GoalProjectListener | GoalProjectListener[];
+    onCacheMiss?: GoalProjectListenerRegistration | GoalProjectListenerRegistration[];
 }
 
 /**
@@ -98,8 +99,26 @@ async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
                                         gi: GoalInvocation,
                                         event: GoalProjectListenerEvent): Promise<void> {
     for (const cacheMissFallback of toArray(optsToUse.onCacheMiss)) {
-        await cacheMissFallback(p, gi, event);
+        const allEvents = [GoalProjectListenerEvent.before, GoalProjectListenerEvent.after];
+        if((cacheMissFallback.events || allEvents).filter(e => e === event).length > 0 && await (cacheMissFallback.pushTest || AnyPush).mapping({
+            push: gi.goalEvent.push,
+            project: p,
+            id: gi.id,
+            configuration: gi.configuration,
+            addressChannels: gi.addressChannels,
+            context: gi.context,
+            preferences: gi.preferences,
+            credentials: gi.credentials,
+        })) {
+            await cacheMissFallback.listener(p, gi, event);
+        }
     }
+}
+
+export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistration = {
+    name: "NoOpListener",
+    listener: async () => {},
+    pushTest: AnyPush,
 }
 
 /**
@@ -113,7 +132,7 @@ export function cacheRestore(options: GoalCacheOptions,
                              classifier: string = "default",
                              ...classifiers: string[]): GoalProjectListenerRegistration {
     const optsToUse: GoalCacheOptions = {
-        onCacheMiss: [async () => {}],
+        onCacheMiss: NoOpGoalProjectListenerRegistration,
         ...options,
     };
     return {

@@ -22,12 +22,13 @@ import {
     RepoRef,
 } from "@atomist/automation-client";
 import {
+    AnyPush,
     fakeGoalInvocation,
     fakePush,
     GoalInvocation,
     GoalProjectListener,
-    GoalProjectListenerEvent,
-    LoggingProgressLog,
+    GoalProjectListenerEvent, GoalProjectListenerRegistration,
+    LoggingProgressLog, pushTest,
 } from "@atomist/sdm";
 import * as assert from "power-assert";
 import {
@@ -78,6 +79,12 @@ class TestGoalArtifactCache implements GoalCache {
     }
 }
 
+const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
+    name: "Error",
+    listener: async () => { throw Error("") },
+    pushTest: AnyPush,
+};
+
 describe("goalCaching", () => {
     let project;
     const testCache = new TestGoalArtifactCache();
@@ -98,9 +105,7 @@ describe("goalCaching", () => {
     it("should cache and retrieve", async () => {
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
-            onCacheMiss: [() => {
-                throw Error("should not happen");
-            }],
+            onCacheMiss: ErrorProjectListenerRegistration,
         };
         await cachePut(options)
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
@@ -113,12 +118,12 @@ describe("goalCaching", () => {
 
     it("should call fallback on cache miss", async () => {
         // when cache something
-        const fallback: GoalProjectListener = async p => {
+        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
             await p.addFile("test2.txt", "test");
-        };
+        }};
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
-            onCacheMiss: [fallback],
+            onCacheMiss: fallback,
         };
         await cachePut(options)
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
@@ -134,14 +139,14 @@ describe("goalCaching", () => {
 
     it("should call multiple fallbacks on cache miss", async () => {
         // when cache something
-        const fallback: GoalProjectListener = async p => {
-            await p.addFile("test2.txt", "test");
-        };
-        const fallback2: GoalProjectListener = async p => {
-            if (await p.hasFile("test2.txt")) {
-                await p.addFile("test3.txt", "test");
-            }
-        };
+        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test2.txt", "test");
+            }};
+        const fallback2: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                if (await p.hasFile("test2.txt")) {
+                    await p.addFile("test3.txt", "test");
+                }
+            }};
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
             onCacheMiss: [fallback, fallback2],
@@ -157,5 +162,65 @@ describe("goalCaching", () => {
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test2.txt"));
         assert(await emptyProject.hasFile("test3.txt"));
+    });
+
+    it("shouldn't call fallback with failing pushtest on cache miss", async () => {
+        // when cache something
+        const NoPushMatches = pushTest("never", async () => false);
+        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test.txt", "test");
+            }};
+        const fallback2: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test2.txt", "test");
+            }, pushTest: NoPushMatches};
+        const fallback3: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test3.txt", "test");
+            }};
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: [fallback, fallback2, fallback3],
+        };
+        await cachePut(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // and clearing the cache
+        await cacheRemove(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // it should not find it in the cache and call fallback
+        const emptyProject = InMemoryProject.of();
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+        assert(!await emptyProject.hasFile("test2.txt"));
+        assert(await emptyProject.hasFile("test3.txt"));
+    });
+
+    it("shouldn't call fallback with wrong event on cache miss", async () => {
+        // when cache something
+        const NoPushMatches = pushTest("never", async () => false);
+        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test.txt", "test");
+            }};
+        const fallback2: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test2.txt", "test");
+            }, pushTest: NoPushMatches};
+        const fallback3: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+                await p.addFile("test3.txt", "test");
+            }, events: [GoalProjectListenerEvent.after]};
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: [fallback, fallback2, fallback3],
+        };
+        await cachePut(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // and clearing the cache
+        await cacheRemove(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // it should not find it in the cache and call fallback
+        const emptyProject = InMemoryProject.of();
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+        assert(!await emptyProject.hasFile("test2.txt"));
+        assert(!await emptyProject.hasFile("test3.txt"));
     });
 });
