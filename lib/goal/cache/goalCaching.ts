@@ -28,6 +28,7 @@ import {
     PushTest,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { toArray } from "../../util/misc/array";
 
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced
@@ -59,7 +60,7 @@ export interface GoalCacheOptions {
     /**
      * Optional listener functions that should be called when no cache entry is found.
      */
-    onCacheMiss?: GoalProjectListener[];
+    onCacheMiss?: GoalProjectListener | GoalProjectListener[];
 }
 
 /**
@@ -96,7 +97,7 @@ async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
                                         p: GitProject,
                                         gi: GoalInvocation,
                                         event: GoalProjectListenerEvent): Promise<void> {
-    for (const cacheMissFallback of optsToUse.onCacheMiss) {
+    for (const cacheMissFallback of toArray(optsToUse.onCacheMiss)) {
         await cacheMissFallback(p, gi, event);
     }
 }
