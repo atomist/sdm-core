@@ -155,6 +155,9 @@ export {
     FileSystemGoalCache,
 } from "./lib/goal/cache/FileSystemGoalCache";
 export {
+    NoOpGoalCache,
+} from "./lib/goal/cache/NoOpGoalCache";
+export {
     cachePut,
     cacheRemove,
     cacheRestore,

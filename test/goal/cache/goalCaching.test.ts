@@ -98,9 +98,9 @@ describe("goalCaching", () => {
     it("should cache and retrieve", async () => {
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
-            onCacheMiss: () => {
+            onCacheMiss: [() => {
                 throw Error("should not happen");
-            },
+            }],
         };
         await cachePut(options)
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
@@ -118,7 +118,7 @@ describe("goalCaching", () => {
         };
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: "**/*.txt" }],
-            onCacheMiss: fallback,
+            onCacheMiss: [fallback],
         };
         await cachePut(options)
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
@@ -131,5 +131,31 @@ describe("goalCaching", () => {
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test2.txt"));
     });
-});
 
+    it("should call multiple fallbacks on cache miss", async () => {
+        // when cache something
+        const fallback: GoalProjectListener = async p => {
+            await p.addFile("test2.txt", "test");
+        };
+        const fallback2: GoalProjectListener = async p => {
+            if (await p.hasFile("test2.txt")) {
+                await p.addFile("test3.txt", "test");
+            }
+        };
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: "**/*.txt" }],
+            onCacheMiss: [fallback, fallback2],
+        };
+        await cachePut(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // and clearing the cache
+        await cacheRemove(options)
+            .listener(project, fakeGoal, GoalProjectListenerEvent.after);
+        // it should not find it in the cache and call fallback
+        const emptyProject = InMemoryProject.of();
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test2.txt"));
+        assert(await emptyProject.hasFile("test3.txt"));
+    });
+});

@@ -28,6 +28,7 @@ import {
     PushTest,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { toArray } from "../../util/misc/array";
 
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced
@@ -57,9 +58,9 @@ export interface GoalCacheOptions {
      */
     entries: Array<{ classifier: string, pattern: string | string[] }>;
     /**
-     * Optional listener function that should be called when no cache entry is found.
+     * Optional listener functions that should be called when no cache entry is found.
      */
-    onCacheMiss?: GoalProjectListener;
+    onCacheMiss?: GoalProjectListener | GoalProjectListener[];
 }
 
 /**
@@ -92,19 +93,29 @@ export function cachePut(options: GoalCacheOptions,
     };
 }
 
+async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
+                                        p: GitProject,
+                                        gi: GoalInvocation,
+                                        event: GoalProjectListenerEvent): Promise<void> {
+    for (const cacheMissFallback of toArray(optsToUse.onCacheMiss)) {
+        await cacheMissFallback(p, gi, event);
+    }
+}
+
 /**
  * Goal listener that performs cache restores before a goal has been run.
  * @param options The options for caching
  * @param classifier Whether only a specific classifier, as defined in the options,
  * needs to be restored. If omitted, all classifiers are restored.
+ * @param classifiers Additional classifiers that need to be restored.
  */
 export function cacheRestore(options: GoalCacheOptions,
                              classifier: string = "default",
                              ...classifiers: string[]): GoalProjectListenerRegistration {
     const optsToUse: GoalCacheOptions = {
-        onCacheMiss: async () => {},
+        onCacheMiss: [async () => {}],
         ...options,
-    }
+    };
     return {
         name: "cache restore",
         listener: async (p: GitProject,
@@ -116,9 +127,11 @@ export function cacheRestore(options: GoalCacheOptions,
                     try {
                         await goalCache.retrieve(gi, p, c);
                     } catch (e) {
-                        await optsToUse.onCacheMiss(p, gi, event);
+                        await invokeCacheMissListeners(optsToUse, p, gi, event);
                     }
                 }
+            } else {
+                await invokeCacheMissListeners(optsToUse, p, gi, event);
             }
         },
         pushTest: optsToUse.pushTest,
