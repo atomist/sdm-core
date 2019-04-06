@@ -23,11 +23,8 @@ import {
     AnyPush,
     ExecuteGoalResult,
     GoalInvocation,
-    GoalProjectListener,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
-    predicatePushTest,
-    pushTest,
     PushTest,
 } from "@atomist/sdm";
 import * as _ from "lodash";
@@ -41,11 +38,45 @@ import { NoOpGoalCache } from "./NoOpGoalCache";
  */
 export interface GoalCache {
 
-    put(gi: GoalInvocation, p: GitProject, file: string[], classifier?: string): Promise<void>;
+    /**
+     * Add a set of files (or directories) to the cache.
+     * @param gi The goal invocation for which the cache needs to be stored.
+     * @param p The project where the files (or directories) reside.
+     * @param files The files (or directories) to be cached.
+     * @param classifier An optional classifier to identify the set of files (or directories to be cached).
+     */
+    put(gi: GoalInvocation, p: GitProject, files: string | string[], classifier?: string): Promise<void>;
 
+    /**
+     * Retrieve files from the cache.
+     * @param gi The goal invocation for which the cache needs to be restored.
+     * @param p he project where the files (or directories) need to be restored in.
+     * @param classifier Optionally the classifier of the cache for the files to be restored. If not defined,
+     *                   all caches for the GoalInvocation are restored.
+     */
     retrieve(gi: GoalInvocation, p: GitProject, classifier?: string): Promise<void>;
 
+    /**
+     * Remove files from the cache.
+     * @param gi The goal invocation for which the cache needs to be removed.
+     * @param classifier Optionally the classifier of the cache for the files to be removed. If not defined,
+     *                   all classifiers are removed.
+     */
     remove(gi: GoalInvocation, classifier?: string): Promise<void>;
+}
+
+/**
+ * Suitable for a limited set of files adhering to a pattern.
+ */
+export interface GlobFilePattern {
+    globPattern: string | string[];
+}
+
+/**
+ * Suitable for caching complete directories, possibly containing a lot of files.
+ */
+export interface DirectoryPattern {
+    directory: string;
 }
 
 /**
@@ -58,9 +89,9 @@ export interface GoalCacheOptions {
     pushTest?: PushTest;
     /**
      * Collection of glob patterns with classifiers to determine which files need to be cached between
-     * goal invocations.
+     * goal invocations, possibly excluding paths using regular expressions.
      */
-    entries: Array<{ classifier: string, pattern: string | string[] }>;
+    entries: Array<{ classifier: string, pattern: GlobFilePattern | DirectoryPattern }>;
     /**
      * Optional listener functions that should be called when no cache entry is found.
      */
@@ -87,7 +118,12 @@ export function cachePut(options: GoalCacheOptions,
                     options.entries.filter(pattern => pattern.classifier === classifier) :
                     options.entries;
                 for (const entry of entries) {
-                    const files = await getFilePathsThroughPattern(p, entry.pattern);
+                    const files = [];
+                    if (isGlobFilePattern(entry.pattern)) {
+                        files.push(...(await getFilePathsThroughPattern(p, entry.pattern.globPattern)));
+                    } else if (isDirectoryPattern(entry.pattern)) {
+                        files.push(entry.pattern.directory);
+                    }
                     if (!_.isEmpty(files)) {
                         await goalCache.put(gi, p, files, entry.classifier);
                     }
@@ -99,22 +135,30 @@ export function cachePut(options: GoalCacheOptions,
     };
 }
 
+function isGlobFilePattern(toBeDetermined: any): toBeDetermined is GlobFilePattern { return toBeDetermined.globPattern !== undefined; }
+function isDirectoryPattern(toBeDetermined: any): toBeDetermined is DirectoryPattern { return toBeDetermined.directory !== undefined; }
+
+async function pushTestSucceeds(pushTest: PushTest, gi: GoalInvocation, p: GitProject): Promise<boolean> {
+    return (pushTest || AnyPush).mapping({
+        push: gi.goalEvent.push,
+        project: p,
+        id: gi.id,
+        configuration: gi.configuration,
+        addressChannels: gi.addressChannels,
+        context: gi.context,
+        preferences: gi.preferences,
+        credentials: gi.credentials,
+    });
+}
+
 async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
                                         p: GitProject,
                                         gi: GoalInvocation,
                                         event: GoalProjectListenerEvent): Promise<void> {
     for (const cacheMissFallback of toArray(optsToUse.onCacheMiss)) {
         const allEvents = [GoalProjectListenerEvent.before, GoalProjectListenerEvent.after];
-        if((cacheMissFallback.events || allEvents).filter(e => e === event).length > 0 && await (cacheMissFallback.pushTest || AnyPush).mapping({
-            push: gi.goalEvent.push,
-            project: p,
-            id: gi.id,
-            configuration: gi.configuration,
-            addressChannels: gi.addressChannels,
-            context: gi.context,
-            preferences: gi.preferences,
-            credentials: gi.credentials,
-        })) {
+        if ((cacheMissFallback.events || allEvents).filter(e => e === event).length > 0
+            && await pushTestSucceeds(cacheMissFallback.pushTest, gi, p)) {
             await cacheMissFallback.listener(p, gi, event);
         }
     }
@@ -124,17 +168,17 @@ export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistratio
     name: "NoOpListener",
     listener: async () => {},
     pushTest: AnyPush,
-}
+};
 
 /**
  * Goal listener that performs cache restores before a goal has been run.
  * @param options The options for caching
  * @param classifier Whether only a specific classifier, as defined in the options,
- * needs to be restored. If omitted, all classifiers are restored.
+ * needs to be restored. If omitted, all classifiers defined in the options are restored.
  * @param classifiers Additional classifiers that need to be restored.
  */
 export function cacheRestore(options: GoalCacheOptions,
-                             classifier: string = "default",
+                             classifier?: string,
                              ...classifiers: string[]): GoalProjectListenerRegistration {
     const optsToUse: GoalCacheOptions = {
         onCacheMiss: NoOpGoalProjectListenerRegistration,
@@ -147,7 +191,13 @@ export function cacheRestore(options: GoalCacheOptions,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
-                for (const c of [classifier, ...classifiers]) {
+                const classifiersToBeRestored = [];
+                if (classifier) {
+                    classifiersToBeRestored.push(...[classifier, ...classifiers]);
+                } else {
+                    classifiersToBeRestored.push(...options.entries.map(entry => entry.classifier));
+                }
+                for (const c of classifiersToBeRestored) {
                     try {
                         await goalCache.retrieve(gi, p, c);
                     } catch (e) {
@@ -184,7 +234,7 @@ export function cacheRemove(options: GoalCacheOptions,
     };
 }
 
-function getFilePathsThroughPattern(project: Project, globPattern: string | string[]): Promise<string[]> {
+async function getFilePathsThroughPattern(project: Project, globPattern: string | string[]): Promise<string[]> {
     return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
 }
 

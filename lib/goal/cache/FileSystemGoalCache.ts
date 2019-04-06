@@ -43,11 +43,15 @@ export class FileSystemGoalCache implements GoalCache {
         const teamArchiveFileName = path.join(cacheDir, `${archiveName}.${guid().slice(0, 7)}`);
         const archiveFileName = path.join(cacheDir, archiveName);
 
-        await spawnLog("tar", ["-czf", teamArchiveFileName, ...files], {
+        await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
             log: gi.progressLog,
             cwd: (project as LocalProject).baseDir,
         });
-        await spawnLog("mv", [teamArchiveFileName, archiveFileName], {
+        await spawnLog("gzip", ["-3", teamArchiveFileName], {
+            log: gi.progressLog,
+            cwd: (project as LocalProject).baseDir,
+        });
+        await spawnLog("mv", [teamArchiveFileName + ".gz", archiveFileName], {
             log: gi.progressLog,
             cwd: (project as LocalProject).baseDir,
         });
