@@ -138,22 +138,27 @@ export function cachePut(options: GoalCacheOptions,
 function isGlobFilePattern(toBeDetermined: any): toBeDetermined is GlobFilePattern { return toBeDetermined.globPattern !== undefined; }
 function isDirectoryPattern(toBeDetermined: any): toBeDetermined is DirectoryPattern { return toBeDetermined.directory !== undefined; }
 
+async function pushTestSucceeds(pushTest: PushTest, gi: GoalInvocation, p: GitProject): Promise<boolean> {
+    return (pushTest || AnyPush).mapping({
+        push: gi.goalEvent.push,
+        project: p,
+        id: gi.id,
+        configuration: gi.configuration,
+        addressChannels: gi.addressChannels,
+        context: gi.context,
+        preferences: gi.preferences,
+        credentials: gi.credentials,
+    });
+}
+
 async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
                                         p: GitProject,
                                         gi: GoalInvocation,
                                         event: GoalProjectListenerEvent): Promise<void> {
     for (const cacheMissFallback of toArray(optsToUse.onCacheMiss)) {
         const allEvents = [GoalProjectListenerEvent.before, GoalProjectListenerEvent.after];
-        if ((cacheMissFallback.events || allEvents).filter(e => e === event).length > 0 && await (cacheMissFallback.pushTest || AnyPush).mapping({
-            push: gi.goalEvent.push,
-            project: p,
-            id: gi.id,
-            configuration: gi.configuration,
-            addressChannels: gi.addressChannels,
-            context: gi.context,
-            preferences: gi.preferences,
-            credentials: gi.credentials,
-        })) {
+        if ((cacheMissFallback.events || allEvents).filter(e => e === event).length > 0
+            && await pushTestSucceeds(cacheMissFallback.pushTest, gi, p)) {
             await cacheMissFallback.listener(p, gi, event);
         }
     }
@@ -169,11 +174,11 @@ export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistratio
  * Goal listener that performs cache restores before a goal has been run.
  * @param options The options for caching
  * @param classifier Whether only a specific classifier, as defined in the options,
- * needs to be restored. If omitted, all classifiers are restored.
+ * needs to be restored. If omitted, all classifiers defined in the options are restored.
  * @param classifiers Additional classifiers that need to be restored.
  */
 export function cacheRestore(options: GoalCacheOptions,
-                             classifier: string = "default",
+                             classifier?: string,
                              ...classifiers: string[]): GoalProjectListenerRegistration {
     const optsToUse: GoalCacheOptions = {
         onCacheMiss: NoOpGoalProjectListenerRegistration,
@@ -186,7 +191,13 @@ export function cacheRestore(options: GoalCacheOptions,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
-                for (const c of [classifier, ...classifiers]) {
+                const classifiersToBeRestored = [];
+                if (classifier) {
+                    classifiersToBeRestored.push(...[classifier, ...classifiers]);
+                } else {
+                    classifiersToBeRestored.push(...options.entries.map(entry => entry.classifier));
+                }
+                for (const c of classifiersToBeRestored) {
                     try {
                         await goalCache.retrieve(gi, p, c);
                     } catch (e) {

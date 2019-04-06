@@ -165,6 +165,33 @@ describe("FileSystemGoalCache", () => {
         assert(await emptyProject.hasFile("test.bat"));
     });
 
+    it("should call create different archives and restore all", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true };
+
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } },
+                { classifier: "batches", pattern: { globPattern: "**/*.bat" }}],
+            onCacheMiss: ErrorProjectListenerRegistration,
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await project.addFile("test.bat", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+        assert(await emptyProject.hasFile("test.bat"));
+    });
+
     it("should call create different archives and be able to select one", async () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
