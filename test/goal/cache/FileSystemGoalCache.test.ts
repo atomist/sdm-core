@@ -90,6 +90,7 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: ["**/*.txt", "!excludeme/**/*"] }}],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
@@ -117,6 +118,7 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { directory: "test" }}],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
@@ -147,6 +149,7 @@ describe("FileSystemGoalCache", () => {
             await p.addFile("test2.txt", "test");
         }};
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback],
         };
@@ -175,6 +178,7 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } },
                 { classifier: "batches", pattern: { globPattern: "**/*.bat" }}],
             onCacheMiss: ErrorProjectListenerRegistration,
@@ -202,6 +206,7 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } },
                 { classifier: "batches", pattern: { globPattern: "**/*.bat" }}],
             onCacheMiss: ErrorProjectListenerRegistration,
@@ -229,6 +234,7 @@ describe("FileSystemGoalCache", () => {
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }},
                 {classifier: "batches", pattern: { globPattern: "**/*.bat"}}],
             onCacheMiss: ErrorProjectListenerRegistration,
@@ -259,6 +265,7 @@ describe("FileSystemGoalCache", () => {
                 await p.addFile("fallback.text", "test");
             }};
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }, {
                 classifier: "batches",
                 pattern: { globPattern: "**/*.bat"},

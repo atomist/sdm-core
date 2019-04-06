@@ -84,6 +84,10 @@ export interface DirectoryPattern {
  */
 export interface GoalCacheOptions {
     /**
+     * Name of the goal cache. Used in the goal listener.
+     */
+    name: string;
+    /**
      * Optional push test on when to trigger caching
      */
     pushTest?: PushTest;
@@ -109,7 +113,7 @@ const DefaultGoalCache = new NoOpGoalCache();
 export function cachePut(options: GoalCacheOptions,
                          classifier?: string): GoalProjectListenerRegistration {
     return {
-        name: "cache put",
+        name: `create ${options.name} cache`,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
@@ -185,7 +189,7 @@ export function cacheRestore(options: GoalCacheOptions,
         ...options,
     };
     return {
-        name: "cache restore",
+        name: `restoring ${options.name} cache`,
         listener: async (p: GitProject,
                          gi: GoalInvocation,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
@@ -222,7 +226,7 @@ export function cacheRestore(options: GoalCacheOptions,
 export function cacheRemove(options: GoalCacheOptions,
                             classifier?: string): GoalProjectListenerRegistration {
     return {
-        name: "cache remove",
+        name: `removing ${options.name} cache`,
         listener: async (p, gi) => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
