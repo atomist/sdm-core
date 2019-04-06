@@ -16,6 +16,7 @@
 
 import {
     GitProject,
+    guid,
     LocalProject,
     NodeFsLocalProject,
     RepoRef,
@@ -32,7 +33,6 @@ import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
-import * as uuid from "uuid";
 import {
     cachePut,
     cacheRemove,
@@ -42,7 +42,7 @@ import {
 } from "../../../index";
 
 async function createTempProject(fakePushId: RepoRef): Promise<LocalProject> {
-    const projectDir = (path.join(os.tmpdir(), uuid()));
+    const projectDir = (path.join(os.tmpdir(), guid()));
     fs.mkdirSync(projectDir);
     return NodeFsLocalProject.fromExistingDirectory(fakePushId, projectDir);
 }
@@ -59,7 +59,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
@@ -84,7 +84,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
@@ -111,7 +111,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
@@ -142,7 +142,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
@@ -169,7 +169,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
@@ -196,7 +196,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
@@ -223,7 +223,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), uuid()));
+        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true };
