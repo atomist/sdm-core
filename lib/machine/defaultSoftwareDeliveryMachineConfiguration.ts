@@ -30,7 +30,6 @@ import { EphemeralLocalArtifactStore } from "../internal/artifact/local/Ephemera
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { GraphQLPreferenceStoreFactory } from "../internal/preferences/GraphQLPreferenceStore";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
-import * as path from "path";
 
 export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
     const repoRefResolver = new DefaultRepoRefResolver();
@@ -51,8 +50,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             goalScheduler: [],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
             parameterPromptFactory: commandRequestParameterPromptFactory,
-            goalCache: new FileSystemGoalCache(
-                path.join(_.get(configuration, "sdm.cache.path", os.tmpdir()), "cache")),
+            goalCache: new FileSystemGoalCache(),
         },
         local: {
             preferLocalSeeds: true,

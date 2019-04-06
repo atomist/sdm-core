@@ -21,6 +21,7 @@ import {
     Project,
 } from "@atomist/automation-client";
 import {
+    CacheConfiguration,
     GoalInvocation,
     spawnLog,
 } from "@atomist/sdm";
@@ -33,13 +34,9 @@ import { GoalCache } from "./goalCaching";
  * using tar to create the archives per goal invocation (and classifier if present).
  */
 export class FileSystemGoalCache implements GoalCache {
-
-    constructor(private readonly cacheDirectory: string) {
-    }
-
     public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
-        const cacheDir = await this.getCacheDirectory(classifier);
-        const archiveName = this.getArchiveName(gi);
+        const cacheDir = await getCacheDirectory(gi, classifier);
+        const archiveName = getArchiveName(gi);
         const teamArchiveFileName = path.join(cacheDir, `${archiveName}.${guid().slice(0, 7)}`);
         const archiveFileName = path.join(cacheDir, archiveName);
 
@@ -58,14 +55,14 @@ export class FileSystemGoalCache implements GoalCache {
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
-        const archiveFileName = await this.getArchiveFileName(gi, classifier);
+        const archiveFileName = await getArchiveFileName(gi, classifier);
         await spawnLog("rm", ["-f", archiveFileName], {
             log: gi.progressLog,
         });
     }
 
     public async retrieve(gi: GoalInvocation, project: Project, classifier?: string): Promise<void> {
-        const archiveFileName = await this.getArchiveFileName(gi, classifier);
+        const archiveFileName = await getArchiveFileName(gi, classifier);
         if (fs.existsSync(archiveFileName)) {
             await spawnLog("tar", ["-xzf", archiveFileName], {
                 log: gi.progressLog,
@@ -75,21 +72,22 @@ export class FileSystemGoalCache implements GoalCache {
             throw Error("No cache entry");
         }
     }
+}
 
-    private async getCacheDirectory(classifier: string = "default"): Promise<string> {
-        const cacheDir = path.join(this.cacheDirectory, classifier);
-        await fs.mkdirs(cacheDir);
-        return cacheDir;
-    }
+async function getCacheDirectory(gi: GoalInvocation, classifier: string = "default"): Promise<string> {
+    const possibleCacheConfiguration = gi.configuration.sdm.cache as (CacheConfiguration["cache"] | undefined);
+    const sdmCacheDir = possibleCacheConfiguration ? (possibleCacheConfiguration.path || "/opt/data") : "/opt/data";
+    const cacheDir = path.join(sdmCacheDir, classifier);
+    await fs.mkdirs(cacheDir);
+    return cacheDir;
+}
 
-    private getArchiveName(gi: GoalInvocation): string {
-       return `${gi.goalEvent.sha}-cache.tar.gz`;
-    }
+function getArchiveName(gi: GoalInvocation): string {
+    return `${gi.goalEvent.sha}-cache.tar.gz`;
+}
 
-    private async getArchiveFileName(gi: GoalInvocation, classifier: string): Promise<string> {
-        const cacheDir = await this.getCacheDirectory(classifier);
-        const archiveName = this.getArchiveName(gi);
-        return path.join(cacheDir, archiveName);
-    }
-
+async function  getArchiveFileName(gi: GoalInvocation, classifier: string): Promise<string> {
+    const cacheDir = await getCacheDirectory(gi, classifier);
+    const archiveName = getArchiveName(gi);
+    return path.join(cacheDir, archiveName);
 }
