@@ -105,7 +105,6 @@ describe("goalCaching", () => {
 
     it("should cache and retrieve", async () => {
         const options: GoalCacheOptions = {
-            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
@@ -124,7 +123,6 @@ describe("goalCaching", () => {
             await p.addFile("test2.txt", "test");
         }};
         const options: GoalCacheOptions = {
-            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: fallback,
         };
@@ -151,7 +149,6 @@ describe("goalCaching", () => {
                 }
             }};
         const options: GoalCacheOptions = {
-            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback, fallback2],
         };
@@ -181,7 +178,6 @@ describe("goalCaching", () => {
                 await p.addFile("test3.txt", "test");
             }};
         const options: GoalCacheOptions = {
-            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback, fallback2, fallback3],
         };
@@ -212,7 +208,6 @@ describe("goalCaching", () => {
                 await p.addFile("test3.txt", "test");
             }, events: [GoalProjectListenerEvent.after]};
         const options: GoalCacheOptions = {
-            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: [fallback, fallback2, fallback3],
         };
@@ -236,7 +231,6 @@ describe("goalCaching", () => {
                 await p.addFile("fallback.txt", "test");
             }};
         const options: GoalCacheOptions = {
-            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: fallback,
         };
