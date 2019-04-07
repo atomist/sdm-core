@@ -37,7 +37,7 @@ import {
     cachePut,
     cacheRemove,
     cacheRestore,
-    FileSystemGoalCache,
+    CompressingGoalCache,
     GoalCacheOptions,
 } from "../../../index";
 
@@ -53,18 +53,19 @@ const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
     pushTest: AnyPush,
 };
 
-describe("FileSystemGoalCache", () => {
+describe("CompressingGoalCache", () => {
 
     it("should cache and retrieve", async () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
+            name: "test",
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
@@ -84,7 +85,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
@@ -112,7 +113,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
@@ -140,7 +141,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
@@ -172,7 +173,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
@@ -200,7 +201,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
@@ -228,7 +229,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
@@ -256,7 +257,7 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache();
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };

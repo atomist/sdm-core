@@ -152,8 +152,12 @@ export {
     K8sServiceRegistration,
 } from "./lib/pack/k8s/service";
 export {
-    FileSystemGoalCache,
-} from "./lib/goal/cache/FileSystemGoalCache";
+    FileSystemGoalCacheArchiveStore,
+} from "./lib/goal/cache/FileSystemGoalCacheArchiveStore";
+export {
+    CompressingGoalCache,
+    GoalCacheArchiveStore,
+} from "./lib/goal/cache/CompressingGoalCache";
 export {
     NoOpGoalCache,
 } from "./lib/goal/cache/NoOpGoalCache";

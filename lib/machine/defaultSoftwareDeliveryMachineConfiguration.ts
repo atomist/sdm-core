@@ -22,8 +22,7 @@ import {
     commandRequestParameterPromptFactory,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import * as os from "os";
-import { FileSystemGoalCache } from "../goal/cache/FileSystemGoalCache";
+import { NoOpGoalCache } from "../goal/cache/NoOpGoalCache";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
@@ -50,7 +49,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             goalScheduler: [],
             preferenceStoreFactory: GraphQLPreferenceStoreFactory,
             parameterPromptFactory: commandRequestParameterPromptFactory,
-            goalCache: new FileSystemGoalCache(),
+            goalCache: new NoOpGoalCache(),
         },
         local: {
             preferLocalSeeds: true,
