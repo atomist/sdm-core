@@ -37,7 +37,7 @@ import {
     cachePut,
     cacheRemove,
     cacheRestore,
-    FileSystemGoalCache,
+    CompressingGoalCache,
     GoalCacheOptions,
 } from "../../../index";
 
@@ -53,16 +53,16 @@ const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
     pushTest: AnyPush,
 };
 
-describe("FileSystemGoalCache", () => {
+describe("CompressingGoalCache", () => {
 
     it("should cache and retrieve", async () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
@@ -80,14 +80,41 @@ describe("FileSystemGoalCache", () => {
         assert(await emptyProject.hasFile("test.txt"));
     });
 
+    it("should cache and retrieve, excluding specific directories", async () => {
+        const fakePushId = fakePush().id;
+        fakePushId.sha = "testing";
+        const fakeGoal = fakeGoalInvocation(fakePushId);
+        const testCache = new CompressingGoalCache();
+        fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+        fakeGoal.configuration.sdm.goalCache = testCache;
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
+
+        const options: GoalCacheOptions = {
+            entries: [{ classifier: "default", pattern: { globPattern: ["**/*.txt", "!excludeme/**/*"] }}],
+            onCacheMiss: ErrorProjectListenerRegistration,
+        };
+        // when cache something
+        const project = await createTempProject(fakePushId);
+        await project.addFile("test.txt", "test");
+        await project.addFile("excludeme/test.txt", "test");
+        await cachePut(options)
+            .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+        // it should find it in the cache
+        const emptyProject = await createTempProject(fakePushId);
+        await cacheRestore(options)
+            .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+        assert(await emptyProject.hasFile("test.txt"));
+        assert(!await emptyProject.hasFile("excludeme/test.txt"));
+    });
+
     it("should cache and retrieve complete directories", async () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { directory: "test" }}],
@@ -111,10 +138,10 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const fallback: GoalProjectListenerRegistration = { name: "fallback", listener: async p => {
             await p.addFile("test2.txt", "test");
@@ -142,10 +169,10 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } },
@@ -169,10 +196,10 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } },
@@ -196,10 +223,10 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }},
@@ -223,10 +250,10 @@ describe("FileSystemGoalCache", () => {
         const fakePushId = fakePush().id;
         fakePushId.sha = "testing";
         const fakeGoal = fakeGoalInvocation(fakePushId);
-        const testCache = new FileSystemGoalCache(path.join(os.tmpdir(), guid()));
+        const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
         fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: path.join(os.tmpdir(), guid()) };
 
         const fallback: GoalProjectListenerRegistration = { name: "fallback", listener: async p => {
                 await p.addFile("fallback.text", "test");

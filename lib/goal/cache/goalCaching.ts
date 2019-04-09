@@ -105,17 +105,24 @@ const DefaultGoalCache = new NoOpGoalCache();
  * @param options The options for caching
  * @param classifier Whether only a specific classifier, as defined in the options,
  * needs to be cached. If omitted, all classifiers are cached.
+ * @param classifiers Additional classifiers that need to be created.
  */
 export function cachePut(options: GoalCacheOptions,
-                         classifier?: string): GoalProjectListenerRegistration {
+                         classifier?: string,
+                         ...classifiers: string[]): GoalProjectListenerRegistration {
+    const allClassifiers = [];
+    if (classifier) {
+        allClassifiers.push(...[classifier, ...classifiers]);
+    }
+    const listenerName = `creating ${classifier ? classifier + " cache" : "caches"}`;
     return {
-        name: "cache put",
+        name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
                 const entries = !!classifier ?
-                    options.entries.filter(pattern => pattern.classifier === classifier) :
+                    options.entries.filter(pattern => allClassifiers.includes(pattern.classifier)) :
                     options.entries;
                 for (const entry of entries) {
                     const files = [];
@@ -180,20 +187,25 @@ export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistratio
 export function cacheRestore(options: GoalCacheOptions,
                              classifier?: string,
                              ...classifiers: string[]): GoalProjectListenerRegistration {
+    const allClassifiers = [];
+    if (classifier) {
+        allClassifiers.push(...[classifier, ...classifiers]);
+    }
+    const listenerName = `restoring ${classifier ? "caches: " + allClassifiers.join(",") : "caches"}`;
     const optsToUse: GoalCacheOptions = {
         onCacheMiss: NoOpGoalProjectListenerRegistration,
         ...options,
     };
     return {
-        name: "cache restore",
+        name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
                 const classifiersToBeRestored = [];
-                if (classifier) {
-                    classifiersToBeRestored.push(...[classifier, ...classifiers]);
+                if (allClassifiers.length > 0) {
+                    classifiersToBeRestored.push(...allClassifiers);
                 } else {
                     classifiersToBeRestored.push(...options.entries.map(entry => entry.classifier));
                 }
@@ -218,15 +230,30 @@ export function cacheRestore(options: GoalCacheOptions,
  * @param options The options for caching
  * @param classifier Whether only a specific classifier, as defined in the options,
  * needs to be removed. If omitted, all classifiers are removed.
+ * @param classifiers Additional classifiers that need to be removed.
  */
 export function cacheRemove(options: GoalCacheOptions,
-                            classifier?: string): GoalProjectListenerRegistration {
+                            classifier?: string,
+                            ...classifiers: string[]): GoalProjectListenerRegistration {
+    const allClassifiers = [];
+    if (classifier) {
+        allClassifiers.push(...[classifier, ...classifiers]);
+    }
+    const listenerName = `removing ${classifier ? "caches: " + allClassifiers.join(",") : "caches"}`;
     return {
-        name: "cache remove",
+        name: listenerName,
         listener: async (p, gi) => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
-                return goalCache.remove(gi, classifier);
+                const classifiersToBeRemoved = [];
+                if (allClassifiers.length > 0) {
+                    classifiersToBeRemoved.push(...allClassifiers);
+                } else {
+                    classifiersToBeRemoved.push(...options.entries.map(entry => entry.classifier));
+                }
+                for (const c of classifiersToBeRemoved) {
+                    await goalCache.remove(gi, c);
+                }
             }
         },
         pushTest: options.pushTest,
