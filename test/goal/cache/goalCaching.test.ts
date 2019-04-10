@@ -132,4 +132,3 @@ describe("goalCaching", () => {
         assert(await emptyProject.hasFile("test2.txt"));
     });
 });
-
