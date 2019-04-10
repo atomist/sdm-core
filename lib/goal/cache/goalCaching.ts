@@ -104,7 +104,7 @@ export function cacheRestore(options: GoalCacheOptions,
     const optsToUse: GoalCacheOptions = {
         onCacheMiss: async () => {},
         ...options,
-    }
+    };
     return {
         name: "cache restore",
         listener: async (p: GitProject,
