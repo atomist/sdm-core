@@ -105,12 +105,15 @@ import * as github from "./lib/util/github/ghub";
 
 export {
     gitHubGoalStatus,
+    gitHubGoalStatusSupport,
 } from "./lib/pack/github-goal-status/github";
 export {
     goalState,
+    goalStateSupport,
 } from "./lib/pack/goal-state/goalState";
 export {
     exposeInfo,
+    infoSupport,
 } from "./lib/pack/info/exposeInfo";
 export { github };
 export {
@@ -146,6 +149,7 @@ export {
 } from "./lib/pack/k8s/KubernetesJobDeletingGoalCompletionListener";
 export {
     goalScheduling,
+    k8sGoalSchedulingSupport,
 } from "./lib/pack/k8s/goalScheduling";
 export {
     K8sServiceSpec,
@@ -161,6 +165,9 @@ export {
 export {
     NoOpGoalCache,
 } from "./lib/goal/cache/NoOpGoalCache";
+export {
+    notificationSupport,
+} from "./lib/pack/notification/notification";
 export {
     cachePut,
     cacheRemove,
