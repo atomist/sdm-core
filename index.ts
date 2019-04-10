@@ -105,12 +105,15 @@ import * as github from "./lib/util/github/ghub";
 
 export {
     gitHubGoalStatus,
+    gitHubGoalStatusSupport,
 } from "./lib/pack/github-goal-status/github";
 export {
     goalState,
+    goalStateSupport,
 } from "./lib/pack/goal-state/goalState";
 export {
     exposeInfo,
+    infoSupport,
 } from "./lib/pack/info/exposeInfo";
 export { github };
 export {
@@ -146,14 +149,15 @@ export {
 } from "./lib/pack/k8s/KubernetesJobDeletingGoalCompletionListener";
 export {
     goalScheduling,
+    k8sGoalSchedulingSupport,
 } from "./lib/pack/k8s/goalScheduling";
 export {
     K8sServiceSpec,
     K8sServiceRegistration,
 } from "./lib/pack/k8s/service";
 export {
-    notify,
-} from "./lib/pack/notify/notify";
+    notificationSupport,
+} from "./lib/pack/notification/notification";
 export {
     FileSystemGoalCache,
 } from "./lib/goal/cache/FileSystemGoalCache";

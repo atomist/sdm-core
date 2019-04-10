@@ -23,11 +23,19 @@ import { selfDescribeCommand } from "./SelfDescribe";
 /**
  * Expose information about this machine
  */
-export function exposeInfo(): ExtensionPack {
+export function infoSupport(): ExtensionPack {
     return {
         ...metadata("info"),
         configure: sdm => {
             sdm.addCommand(selfDescribeCommand(sdm));
         },
     };
+}
+
+
+/**
+ * @deprecated use k8sGoalSchedulingSupport
+ */
+export function exposeInfo(): ExtensionPack {
+    return infoSupport();
 }

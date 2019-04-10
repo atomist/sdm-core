@@ -55,9 +55,9 @@ export interface NotifyOptions {
     destination: DestinationFactory | DestinationFactory[];
 }
 
-export function notify(options: NotifyOptions = { destination: defaultDestinationFactory }): ExtensionPack {
+export function notificationSupport(options: NotifyOptions = { destination: defaultDestinationFactory }): ExtensionPack {
     return {
-        ...metadata("notify"),
+        ...metadata("notification"),
         configure: sdm => {
 
             const updateGoalCommand = updateGoalStateCommand();

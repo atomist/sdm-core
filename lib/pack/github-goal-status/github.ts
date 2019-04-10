@@ -30,7 +30,7 @@ import {
 /**
  * Manage a GitHub status per SDM
  */
-export function gitHubGoalStatus(): ExtensionPack {
+export function gitHubGoalStatusSupport(): ExtensionPack {
     return {
         ...metadata("github-goal-status"),
         configure: sdm => {
@@ -40,4 +40,11 @@ export function gitHubGoalStatus(): ExtensionPack {
             }
         },
     };
+}
+
+/**
+ * @deprecated use gitHubGoalStatusSupport
+ */
+export function gitHubGoalStatus(): ExtensionPack {
+    return gitHubGoalStatusSupport();
 }
