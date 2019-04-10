@@ -17,6 +17,7 @@
 import {
     addressEvent,
     AutomationContextAware,
+    guid,
     MappedParameters,
     QueryNoCacheOptions,
     Success,
@@ -26,8 +27,13 @@ import {
     DeclarationType,
     SdmGoalState,
     slackErrorMessage,
-    SoftwareDeliveryMachine,
+    slackSuccessMessage,
 } from "@atomist/sdm";
+import {
+    bold,
+    codeLine,
+    italic,
+} from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {
     SdmGoalById,
@@ -37,6 +43,7 @@ import {
 export function updateGoalStateCommand(): CommandHandlerRegistration<{
     id: string,
     state: SdmGoalState,
+    msgId: string,
     slackRequester: string,
     githubRequester: string,
     teamId: string,
@@ -48,6 +55,7 @@ export function updateGoalStateCommand(): CommandHandlerRegistration<{
         parameters: {
             id: {},
             state: {},
+            msgId: {},
             slackRequester: {
                 uri: MappedParameters.SlackUserName,
                 required: false,
@@ -108,7 +116,13 @@ export function updateGoalStateCommand(): CommandHandlerRegistration<{
             goal.version = (goal.version || 0) + 1;
             delete (goal as any).id;
 
-            return ci.context.messageClient.send(goal, addressEvent("SdmGoal"));
+            await ci.context.messageClient.send(goal, addressEvent("SdmGoal"));
+            return ci.context.messageClient.respond(
+                slackSuccessMessage(
+                    "Set Goal State",
+                    `Successfully set state of ${italic(goal.name)} on ${codeLine(goal.sha.slice(0, 7))} of ${
+                        bold(`${goal.repo.owner}/${goal.repo.name}/${goal.branch}`)} to ${italic(ci.parameters.state)}`),
+                { id: ci.parameters.msgId || guid()});
         },
     };
 }

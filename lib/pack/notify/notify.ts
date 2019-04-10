@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import { addressSlackUsers } from "@atomist/automation-client";
+import {
+    addressSlackUsers,
+    guid,
+} from "@atomist/automation-client";
 import { Destination } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
     actionableButton,
     CommandHandlerRegistration,
     ExtensionPack,
+    fetchGoalsForCommit,
     GoalCompletionListener,
     metadata,
     SdmContext,
@@ -78,7 +82,7 @@ async function defaultDestinationFactory(goal: SdmGoalEvent): Promise<Destinatio
 function notifyGoalCompletionListener(options: NotifyOptions,
                                       updateGoalCommand: CommandHandlerRegistration): GoalCompletionListener {
     return async gi => {
-        const { completedGoal, context } = gi;
+        const { completedGoal, context, id } = gi;
 
         const destinations: Destination[] = [];
 
@@ -88,6 +92,10 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                 destinations.push(...toArray(newDestinations));
             }
         }
+
+        const goals = await fetchGoalsForCommit(context, id, completedGoal.repo.providerId, completedGoal.goalSetId);
+        const goalId = (goals.find(g => g.uniqueName === completedGoal.uniqueName) as any).id;
+        const msgId = guid();
 
         if (destinations.length > 0) {
             let state: string;
@@ -100,7 +108,8 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                     msg = slackErrorMessage("", "", context, {
                         actions: completedGoal.retryFeasible ? [
                             actionableButton({ text: "Restart" }, updateGoalCommand, {
-                                id: (completedGoal as any).id,
+                                id: goalId,
+                                msgId,
                                 state: SdmGoalState.requested,
                             })] : [],
                     });
@@ -110,7 +119,8 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                     suffix = "Awaiting Approval";
                     msg = slackInfoMessage("", "", {
                         actions: [actionableButton({ text: "Approve" }, updateGoalCommand, {
-                            id: (completedGoal as any).id,
+                            id: goalId,
+                            msgId,
                             state: SdmGoalState.approved,
                         })],
                     });
@@ -120,7 +130,8 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                     suffix = "Awaiting Start";
                     msg = slackInfoMessage("", "", {
                         actions: [actionableButton({ text: "Start" }, updateGoalCommand, {
-                            id: (completedGoal as any).id,
+                            id: goalId,
+                            msgId,
                             state: SdmGoalState.pre_approved,
                         })],
                     });
@@ -151,7 +162,7 @@ function notifyGoalCompletionListener(options: NotifyOptions,
             };
 
             for (const destination of destinations) {
-                await context.messageClient.send(msg, destination);
+                await context.messageClient.send(msg, destination, { id: msgId });
             }
         }
     };
