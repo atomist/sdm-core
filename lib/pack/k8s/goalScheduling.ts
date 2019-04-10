@@ -27,7 +27,7 @@ import { KubernetesJobDeletingGoalCompletionListenerFactory } from "./Kubernetes
 /**
  * Extension pack to schedule goals as k8s jobs when marked as isolated = true.
  */
-export function goalScheduling(): ExtensionPack {
+export function k8sGoalSchedulingSupport(): ExtensionPack {
     return {
         ...metadata("k8s-goal-scheduling"),
         configure: sdm => {
@@ -37,4 +37,11 @@ export function goalScheduling(): ExtensionPack {
             }
         },
     };
+}
+
+/**
+ * @deprecated use k8sGoalSchedulingSupport
+ */
+export function goalScheduling(): ExtensionPack {
+    return k8sGoalSchedulingSupport();
 }

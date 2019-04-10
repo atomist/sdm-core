@@ -241,4 +241,5 @@ describe("goalCaching", () => {
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("fallback.txt"));
     });
+
 });

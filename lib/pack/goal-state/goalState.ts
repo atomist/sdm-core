@@ -30,7 +30,7 @@ import { setGoalStateCommand } from "./setGoalState";
 /**
  * Allow goal setting
  */
-export function goalState(): ExtensionPack {
+export function goalStateSupport(): ExtensionPack {
     return {
         ...metadata("goal-state"),
         configure: sdm => {
@@ -45,4 +45,11 @@ export function goalState(): ExtensionPack {
             }
         },
     };
+}
+
+/**
+ * @deprecated use goalStateSupport
+ */
+export function goalState(): ExtensionPack {
+    return goalStateSupport();
 }

@@ -59,14 +59,14 @@ export interface GoalCacheArchiveStore {
  * using tar and gzip to create the archives per goal invocation (and classifier if present).
  */
 export class CompressingGoalCache implements GoalCache {
-    private store: GoalCacheArchiveStore;
+    private readonly store: GoalCacheArchiveStore;
 
     public constructor(store: GoalCacheArchiveStore = new FileSystemGoalCacheArchiveStore()) {
         this.store = store;
     }
 
     public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
-        const archiveName = "atomistgoalcache";
+        const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(project.baseDir, `${archiveName}.${guid().slice(0, 7)}`);
 
         await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
@@ -85,7 +85,7 @@ export class CompressingGoalCache implements GoalCache {
     }
 
     public async retrieve(gi: GoalInvocation, project: Project, classifier?: string): Promise<void> {
-        const archiveName = "atomistgoalcache";
+        const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join((project as LocalProject).baseDir, `${archiveName}.${guid().slice(0, 7)}`);
         await this.store.retrieve(gi, classifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
