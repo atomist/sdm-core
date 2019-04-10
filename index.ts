@@ -152,6 +152,9 @@ export {
     K8sServiceRegistration,
 } from "./lib/pack/k8s/service";
 export {
+    notify,
+} from "./lib/pack/notify/notify";
+export {
     FileSystemGoalCache,
 } from "./lib/goal/cache/FileSystemGoalCache";
 export {
