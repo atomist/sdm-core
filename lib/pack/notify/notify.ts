@@ -91,10 +91,12 @@ function notifyGoalCompletionListener(options: NotifyOptions,
 
         if (destinations.length > 0) {
             let state: string;
+            let suffix: string;
             let msg: SlackMessage;
             switch (completedGoal.state) {
                 case SdmGoalState.failure:
                     state = "has failed";
+                    suffix = "Failed";
                     msg = slackErrorMessage("", "", context, {
                         actions: completedGoal.retryFeasible ? [
                             actionableButton({ text: "Restart" }, updateGoalCommand, {
@@ -105,6 +107,7 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                     break;
                 case SdmGoalState.waiting_for_approval:
                     state = "is waiting for approval";
+                    suffix = "Awaiting Approval";
                     msg = slackInfoMessage("", "", {
                         actions: [actionableButton({ text: "Approve" }, updateGoalCommand, {
                             id: (completedGoal as any).id,
@@ -114,6 +117,7 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                     break;
                 case SdmGoalState.waiting_for_pre_approval:
                     state = "is waiting to start";
+                    suffix = "Awaiting Start";
                     msg = slackInfoMessage("", "", {
                         actions: [actionableButton({ text: "Start" }, updateGoalCommand, {
                             id: (completedGoal as any).id,
@@ -123,24 +127,27 @@ function notifyGoalCompletionListener(options: NotifyOptions,
                     break;
                 case SdmGoalState.stopped:
                     state = "has stopped";
+                    suffix = "Stopped";
                     msg = slackInfoMessage("", "");
                     break;
                 default:
                     return;
             }
 
-            const title = `Goal ${state}`;
+            const author = `Goal ${suffix}`;
             const text = `Goal ${italic(completedGoal.url ? url(completedGoal.url, completedGoal.name) : completedGoal.name)} on ${
                 codeLine(completedGoal.sha.slice(0, 7))} of ${bold(`${
                 completedGoal.repo.owner}/${completedGoal.repo.name}/${completedGoal.branch}`)} ${state}.`;
             const channels: CoreRepoFieldsAndChannels.Channels[] = _.get(completedGoal, "push.repo.channels") || [];
-            const channelLink = channels.filter(c => !!c.id).map(c => channel(c.id)).join(" | ");
+            const channelLink = channels.filter(c => !!c.channelId).map(c => channel(c.channelId)).join(" | ");
+            const link =
+                `https://app.atomist.com/workspace/${context.workspaceId}/goalset/${completedGoal.goalSetId}`;
 
             msg.attachments[0] = {
                 ...msg.attachments[0],
-                title,
+                author_name: author,
                 text,
-                footer: `${slackFooter()} | ${completedGoal.goalSetId.slice(0, 7)} | ${channelLink}`,
+                footer: `${slackFooter()} | ${url(link, completedGoal.goalSetId.slice(0, 7))} | ${channelLink}`,
             };
 
             for (const destination of destinations) {
