@@ -32,9 +32,8 @@ export function infoSupport(): ExtensionPack {
     };
 }
 
-
 /**
- * @deprecated use k8sGoalSchedulingSupport
+ * @deprecated use infoSupport
  */
 export function exposeInfo(): ExtensionPack {
     return infoSupport();

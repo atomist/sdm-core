@@ -47,7 +47,6 @@ export function goalStateSupport(): ExtensionPack {
     };
 }
 
-
 /**
  * @deprecated use goalStateSupport
  */

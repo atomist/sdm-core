@@ -21,7 +21,7 @@ import {
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import { HandlerBasedSoftwareDeliveryMachine } from "../internal/machine/HandlerBasedSoftwareDeliveryMachine";
-import { exposeInfo } from "../pack/info/exposeInfo";
+import { infoSupport } from "../pack/info/exposeInfo";
 
 /**
  * Create a **Software Delivery MachineConfiguration** with default predefined goals.
@@ -66,7 +66,7 @@ export function createSoftwareDeliveryMachine(config: MachineConfiguration<Softw
     : SoftwareDeliveryMachine<SoftwareDeliveryMachineConfiguration> {
     const machine = new HandlerBasedSoftwareDeliveryMachine(config.name, config.configuration,
         goalSetters);
-    machine.addExtensionPacks(exposeInfo());
+    machine.addExtensionPacks(infoSupport());
 
     return machine;
 }

@@ -149,7 +149,7 @@ describe("notification", () => {
                         options: {},
                     };
                 },
-                destination: async (g) => {
+                destination: async g => {
                     assert.deepStrictEqual(g, goal);
                     return addressSlackUsers("123456", "joe");
                 },
@@ -185,7 +185,7 @@ describe("notification", () => {
                         options: {},
                     };
                 },
-                destination: async (g) => {
+                destination: async g => {
                     assert.deepStrictEqual(g, goal);
                     return [
                         addressSlackUsers("123456", "joe"),
