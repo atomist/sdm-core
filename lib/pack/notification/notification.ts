@@ -166,8 +166,8 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
 
         const author = `Goal ${suffix}`;
         const text = `Goal ${italic(completedGoal.url ? url(completedGoal.url, completedGoal.name) : completedGoal.name)} on ${
-            codeLine(completedGoal.sha.slice(0, 7))} of ${bold(`${
-            completedGoal.repo.owner}/${completedGoal.repo.name}/${completedGoal.branch}`)} ${state}.`;
+            url( completedGoal.push.after.url, codeLine(completedGoal.sha.slice(0, 7)))} of ${bold(`${
+            url(completedGoal.push.repo.url, `${completedGoal.repo.owner}/${completedGoal.repo.name}/${completedGoal.branch}`)}`)} ${state}.`;
         const channels: CoreRepoFieldsAndChannels.Channels[] = _.get(completedGoal, "push.repo.channels") || [];
         const channelLink = channels.filter(c => !!c.channelId).map(c => channel(c.channelId)).join(" | ");
         const link =
