@@ -66,13 +66,14 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
 
     private scopeKey(key: string, options?: { scope?: PreferenceScope }): string {
         const k = key;
-        if (options) {
+        if (!!options && !!options.scope) {
             switch (options.scope) {
-                case "sdm":
+                case PreferenceScope.Sdm:
                     return `${(this.ctx as any as ConfigurationAware).configuration.name}.${key}`;
-                case "workspace":
-                default:
+                case PreferenceScope.Workspace:
                     return k;
+                default:
+                    return `${options.scope}.${key}`;
             }
         }
         return k;

@@ -33,6 +33,10 @@ export async function assertPreferences(prefs: PreferenceStore, scope?: Preferen
     await prefs.put("foo", "barbar", { scope });
     assert.strictEqual(await prefs.get("foo", { scope }), "barbar");
 
+    const tempScope = new Date().toISOString();
+    await prefs.put("foo", "barbar", { scope: tempScope });
+    assert.strictEqual(await prefs.get("foo", { scope: tempScope }), "barbar");
+
     await prefs.put("bar", "foo", { scope, ttl: 10 });
     await sleep(20);
     assert(!(await prefs.get("bar", { scope })));
