@@ -105,7 +105,7 @@ import * as github from "./lib/util/github/ghub";
 
 export {
     gitHubGoalStatus,
-    gitHubGoalStatusSupport,
+    githubGoalStatusSupport,
 } from "./lib/pack/github-goal-status/github";
 export {
     goalState,
