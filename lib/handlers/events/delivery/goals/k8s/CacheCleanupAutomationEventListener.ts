@@ -26,7 +26,6 @@ import {
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
 import * as glob from "glob";
-import * as _ from "lodash";
 import * as path from "path";
 
 /**

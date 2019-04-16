@@ -169,7 +169,7 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
             url( completedGoal.push.after.url, codeLine(completedGoal.sha.slice(0, 7)))} of ${bold(`${
             url(completedGoal.push.repo.url, `${completedGoal.repo.owner}/${completedGoal.repo.name}/${completedGoal.branch}`)}`)} ${state}.`;
         const channels: CoreRepoFieldsAndChannels.Channels[] = _.get(completedGoal, "push.repo.channels") || [];
-        const channelLink = channels.filter(c => !!c.channelId).map(c => channel(c.channelId)).join(" | ");
+        const channelLink = channels.filter(c => !!c.channelId).map(c => channel(c.channelId)).join(" \u00B7 ");
         const link =
             `https://app.atomist.com/workspace/${context.workspaceId}/goalset/${completedGoal.goalSetId}`;
 
@@ -177,7 +177,7 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
             ...msg.attachments[0],
             author_name: author,
             text,
-            footer: `${slackFooter()} | ${url(link, completedGoal.goalSetId.slice(0, 7))} | ${channelLink}`,
+            footer: `${slackFooter()} \u00B7 ${url(link, completedGoal.goalSetId.slice(0, 7))} \u00B7 ${channelLink}`,
         };
 
         return { message: msg, options: { id: msgId } };
