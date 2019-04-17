@@ -21,6 +21,7 @@ import {
     HttpClientOptions,
     HttpResponse,
 } from "@atomist/automation-client";
+// tslint:disable-next-line:import-blacklist
 import axios, { AxiosInstance } from "axios";
 import MockAdapter from "axios-mock-adapter";
 import * as assert from "power-assert";

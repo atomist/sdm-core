@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,12 @@ import {
     toToken,
 } from "@atomist/sdm";
 import * as GitHubApi from "@octokit/rest";
+// tslint:disable-next-line:import-blacklist
 import axios from "axios";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as p from "path";
 import * as tmp from "tmp-promise";
 import * as URL from "url";
-import { promisify } from "util";
 import {
     authHeaders,
     createRelease,
@@ -89,7 +89,7 @@ export class GitHubReleaseArtifactStore implements ArtifactStore {
         const outputPath = cwd + "/" + filename;
         logger.info("Attempting to download url %s to %s", url, outputPath);
         await downloadFileAs(creds, url, outputPath);
-        logger.info("Successfully download url %s to %s", url, outputPath);
+        logger.info("Successfully downloaded url %s to %s", url, outputPath);
         return {
             cwd,
             filename,
@@ -101,28 +101,24 @@ export class GitHubReleaseArtifactStore implements ArtifactStore {
 }
 
 /**
- * Download the file to local disk
- * @param creds credentials
- * @param {string} url
+ * Download the file to local disk. This only works on public repos, see
+ * https://stackoverflow.com/questions/20396329/how-to-download-github-release-from-private-repo-using-command-line
+ * @param creds ignored
+ * @param {string} url release asset URL from public repo
  * @param {string} outputFilename
  * @return {Promise<any>}
  */
 function downloadFileAs(creds: ProjectOperationCredentials, url: string, outputFilename: string): Promise<any> {
-    const token = toToken(creds);
     return doWithRetry(() => axios.get(url, {
-        ...authHeaders(token),
-        headers: {
-            "Accept": "application/octet-stream",
-            "Content-Type": "application/zip",
-        },
+        headers: { Accept: "application/octet-stream" },
         responseType: "arraybuffer",
     }), `Download ${url} to ${outputFilename}`, {
-        minTimeout: 10000,
-        maxTimeout: 10100,
-        retries: 10,
-    })
+            minTimeout: 1000,
+            maxTimeout: 10000,
+            retries: 10,
+        })
         .then(result => {
-            return fs.writeFileSync(outputFilename, result.data);
+            return fs.writeFile(outputFilename, result.data);
         });
 }
 
@@ -132,32 +128,26 @@ export interface Asset {
     name: string;
 }
 
-export function uploadAsset(token: string,
-                            owner: string,
-                            repo: string,
-                            tag: string,
-                            path: string,
-                            contentType: string = "application/zip"): Promise<Asset> {
+export async function uploadAsset(token: string,
+                                  owner: string,
+                                  repo: string,
+                                  tag: string,
+                                  path: string,
+                                  contentType: string = "application/zip"): Promise<Asset> {
     const github = githubApi(token);
-    return github.repos.getReleaseByTag({
-        owner,
-        repo,
-        tag,
-    })
-        .then(async result => {
-            const file = (await promisify(fs.readFile)(path)).buffer;
-            const contentLength = (await promisify(fs.stat)(path)).size;
-            return github.repos.uploadReleaseAsset({
-                url: result.data.upload_url,
-                file,
-                headers: {
-                    "content-length": contentLength,
-                    "content-type": contentType,
-                },
-                name: p.basename(path),
-            });
-        })
-        .then(r => r.data);
+    const result = await github.repos.getReleaseByTag({ owner, repo, tag });
+    const file = (await fs.readFile(path)).buffer;
+    const contentLength = (await fs.stat(path)).size;
+    const r = await github.repos.uploadReleaseAsset({
+        url: result.data.upload_url,
+        file,
+        headers: {
+            "content-length": contentLength,
+            "content-type": contentType,
+        },
+        name: p.basename(path),
+    });
+    return r.data;
 }
 
 export function githubApi(token: string, apiUrl: string = "https://api.github.com/"): GitHubApi {

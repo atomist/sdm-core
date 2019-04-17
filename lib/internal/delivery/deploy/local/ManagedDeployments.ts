@@ -15,6 +15,10 @@
  */
 
 import {
+    configurationValue,
+    DefaultHttpClientFactory,
+    HttpClientFactory,
+    HttpMethod,
     logger,
     RemoteRepoRef,
     RepoRef,
@@ -25,7 +29,6 @@ import {
     Targeter,
     TargetInfo,
 } from "@atomist/sdm";
-import axios from "axios";
 import { ChildProcess } from "child_process";
 import * as https from "https";
 
@@ -108,13 +111,13 @@ export class ManagedDeployments {
 
     public findDeployment(id: RemoteRepoRef, lookupStrategy: LookupStrategy): DeployedApp {
         switch (lookupStrategy) {
-            case  LookupStrategy.sha :
+            case LookupStrategy.sha:
                 if (!id.sha) {
                     throw new Error("Sha should have been set to use 'sha' LookupStrategy");
                 }
                 // Probability of a sha collision is tiny
                 return this.deployments.find(d => d.id.sha === id.sha);
-            case LookupStrategy.branch :
+            case LookupStrategy.branch:
                 if (!id.branch) {
                     throw new Error("Branch should have been set to use 'branch' LookupStrategy");
                 }
@@ -164,11 +167,15 @@ export class ManagedDeployments {
 }
 
 export async function portIsInUse(host: string, port: number): Promise<boolean> {
+    const httpClient = configurationValue<HttpClientFactory>("http.client.factory", DefaultHttpClientFactory).create();
     const agent = new https.Agent({
         rejectUnauthorized: false,
     });
     try {
-        await axios.head(`${host}:${port}`, { httpsAgent: agent });
+        await httpClient.exchange(`${host}:${port}`, {
+            method: HttpMethod.Head,
+            options: { httpsAgent: agent },
+        });
         return true;
     } catch {
         return false;
