@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,19 @@
  */
 
 import {
+    configurationValue,
+    DefaultHttpClientFactory,
     GitHubRepoRef,
+    HttpClientFactory,
+    HttpMethod,
     logger,
 } from "@atomist/automation-client";
 import { successOn } from "@atomist/automation-client/lib/action/ActionResult";
 import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { TagRouter } from "@atomist/automation-client/lib/operations/tagger/Tagger";
-
 import { toToken } from "@atomist/sdm";
-import axios, { AxiosRequestConfig } from "axios";
 import * as _ from "lodash";
+import { authHeaders } from "./ghub";
 
 /**
  * Persist tags to GitHub topics
@@ -33,27 +36,25 @@ import * as _ from "lodash";
  * @return {Promise<ActionResult<Tags>>}
  * @constructor
  */
-export const GitHubTagRouter: TagRouter = (tags, params) => {
+export const GitHubTagRouter: TagRouter = async (tags, params) => {
     const grr = isGitHubRepoRef(tags.repoId) ? tags.repoId : new GitHubRepoRef(tags.repoId.owner, tags.repoId.repo, tags.repoId.sha);
     const url = `${grr.scheme}${grr.apiBase}/repos/${grr.owner}/${grr.repo}/topics`;
-    logger.debug(`Request to '${url}' to raise tags: [${tags.tags.join()}]`);
-    return axios.put(url, { names: _.uniq(tags.tags) },
-        // Mix in custom media type for
-        {
+    const names = _.uniq(tags.tags);
+    const httpClient = configurationValue<HttpClientFactory>("http.client.factory", DefaultHttpClientFactory).create();
+    logger.debug(`Request to '${url}' to raise tags: [${names.join()}]`);
+    try {
+        await httpClient.exchange(url, {
+            body: { names },
             headers: {
                 ...authHeaders(toToken(params.targets.credentials)).headers,
                 Accept: "application/vnd.github.mercy-preview+json",
             },
-        },
-    )
-        .then(x => successOn(tags));
-};
-
-function authHeaders(token: string): AxiosRequestConfig {
-    return token ? {
-        headers: {
-            Authorization: `token ${token}`,
-        },
+            method: HttpMethod.Put,
+        });
+    } catch (e) {
+        e.message = `Failed to create GitHub topics '${names.join()}' on '${url}': ${e.message}`;
+        logger.error(e.message);
+        throw e;
     }
-        : {};
-}
+    return successOn(tags);
+};

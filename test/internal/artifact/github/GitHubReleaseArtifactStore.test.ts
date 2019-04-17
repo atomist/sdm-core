@@ -27,34 +27,34 @@ describe("GitHubReleaseArtifactStore", () => {
 
     describe("checkout", () => {
 
-        it("should checkout existing file", () => {
+        it("should checkout existing file", async () => {
             const ghras = new GitHubReleaseArtifactStore();
             const id = new GitHubRepoRef("spring-team", "fintan");
-            return ghras.checkout(asset,
-                id,
-                { token: process.env.GITHUB_TOKEN })
-                .then(da => {
-                    const path = `${da.cwd}/${da.filename}`;
-                    assert(fs.existsSync(path), `File [${path}] must exist`);
-                    const cwd = p.dirname(path);
-                    const filename = p.basename(path);
-                    return execPromise("unzip", [filename], { cwd });
-                });
-        }).timeout(60000);
+            try {
+                const da = await ghras.checkout(asset, id, {});
+                const path = `${da.cwd}/${da.filename}`;
+                assert(fs.existsSync(path), `File '${path}' should exist`);
+                const cwd = p.dirname(path);
+                const filename = p.basename(path);
+                await execPromise("unzip", [filename], { cwd });
+            } catch (e) {
+                assert.fail(e.message);
+            }
+        }).timeout(10000);
 
-        it("should checkout existing file and parse AppInfo", () => {
+        it("should checkout existing file and parse AppInfo", async () => {
             const ghras = new GitHubReleaseArtifactStore();
             const id = new GitHubRepoRef("spring-team", "fintan");
-            return ghras.checkout(asset,
-                id,
-                { token: process.env.GITHUB_TOKEN })
-                .then(da => {
-                    assert.equal(da.id.owner, id.owner);
-                    assert.equal(da.id.repo, id.repo);
-                    assert.equal(da.name, "fintan", "name should be 'fintan', not " + da.name);
-                    assert.equal(da.version, "0.1.0-SNAPSHOT", "version should be '0.1.0-SNAPSHOT', not " + da.version);
-                });
-        }).timeout(60000);
+            try {
+                const da = await ghras.checkout(asset, id, {});
+                assert.equal(da.id.owner, id.owner);
+                assert.equal(da.id.repo, id.repo);
+                assert.equal(da.name, "fintan", "name should be 'fintan', not " + da.name);
+                assert.equal(da.version, "0.1.0-SNAPSHOT", "version should be '0.1.0-SNAPSHOT', not " + da.version);
+            } catch (e) {
+                assert.fail(e.message);
+            }
+        }).timeout(10000);
     });
 
 });

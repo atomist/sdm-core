@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,12 @@ import {
 } from "@atomist/automation-client";
 import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { toToken } from "@atomist/sdm";
+/* tslint:disable:import-blacklist */
 import axios, {
     AxiosPromise,
     AxiosRequestConfig,
 } from "axios";
+/* tslint:enable:import-blacklist */
 
 export type State = "error" | "failure" | "pending" | "success";
 
@@ -115,7 +117,7 @@ export function createTagReference(creds: string | ProjectOperationCredentials, 
     const config = authHeaders(toToken(creds));
     const url = `${rr.scheme}${rr.apiBase}/repos/${rr.owner}/${rr.repo}/git/refs`;
     logger.info("Creating github reference: %s to %j", url, tag);
-    return doWithRetry(() => axios.post(url, {ref: `refs/tags/${tag.tag}`, sha: tag.object}, config)
+    return doWithRetry(() => axios.post(url, { ref: `refs/tags/${tag.tag}`, sha: tag.object }, config)
         .catch(err =>
             Promise.reject(new Error(`Error hitting ${url} to set tag ${JSON.stringify(tag)}: ${err.message}`)),
         ), `Updating github tag: ${url} to ${JSON.stringify(tag)}`, {});
@@ -127,10 +129,10 @@ export function deleteRepository(creds: string | ProjectOperationCredentials, rr
     logger.info("Deleting repository: %s", url);
     return axios.delete(url, config)
         .catch(err => {
-                logger.error(err.message);
-                logger.error(err.response.body);
-                return Promise.reject(new Error(`Error hitting ${url} to delete repo`));
-            },
+            logger.error(err.message);
+            logger.error(err.response.body);
+            return Promise.reject(new Error(`Error hitting ${url} to delete repo`));
+        },
         );
 }
 
@@ -181,10 +183,10 @@ export function listCommitsBetween(creds: string | ProjectOperationCredentials,
 
 export function authHeaders(token: string): AxiosRequestConfig {
     return token ? {
-            headers: {
-                Authorization: `token ${token}`,
-            },
-        }
+        headers: {
+            Authorization: `token ${token}`,
+        },
+    }
         : {};
 }
 
