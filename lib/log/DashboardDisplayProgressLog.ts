@@ -76,8 +76,8 @@ export function constructLogPath(context: HandlerContext, sdmGoal: SdmGoalEvent)
         sdmGoal.repo.name,
         sdmGoal.sha,
         sdmGoal.environment,
-        sdmGoal.name,
+        sdmGoal.uniqueName,
         sdmGoal.goalSetId,
         context.correlationId,
-    ];
+    ].map(encodeURIComponent);
 }

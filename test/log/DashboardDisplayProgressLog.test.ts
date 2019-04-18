@@ -16,6 +16,7 @@
 
 import {
     DefaultHttpClientFactory,
+    guid,
     HandlerContext,
 } from "@atomist/automation-client";
 import { SdmGoalEvent } from "@atomist/sdm";
@@ -39,10 +40,10 @@ describe("DashboardDisplayProgressLog", () => {
         },
         sha: "SHA1",
         environment: "ENV",
-        name: "GoalName",
-        goalSetId: "GoalSetId",
-        uniqueName: undefined,
+        uniqueName: "autofix#machine.ts:141",
+        goalSetId: "2362da01-121c-4637-970c-a5ae7dbf6067",
         branch: undefined,
+        name: undefined,
         fulfillment: undefined,
         description: undefined,
         goalSet: undefined,
@@ -56,7 +57,7 @@ describe("DashboardDisplayProgressLog", () => {
         const log = new DashboardDisplayProgressLog("http://rolarhost", "https://app.atomist.com", 1000, 0,
             DefaultHttpClientFactory, context, goal);
         assert.equal(log.url,
-            "https://app.atomist.com/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/GoalName/GoalSetId/CorrelationID");
+            "https://app.atomist.com/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/autofix%23machine.ts%3A141/2362da01-121c-4637-970c-a5ae7dbf6067/CorrelationID");
     });
 
 });
