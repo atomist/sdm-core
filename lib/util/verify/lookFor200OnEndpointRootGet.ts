@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,17 @@
  */
 
 import {
-    doWithRetry,
+    configurationValue,
+    DefaultHttpClientFactory,
+    HttpClientFactory,
+    HttpMethod,
+    HttpResponse,
     logger,
 } from "@atomist/automation-client";
 import {
     EndpointVerificationInvocation,
     EndpointVerificationListener,
 } from "@atomist/sdm";
-import axios from "axios";
 import * as https from "https";
 import { WrapOptions } from "retry";
 
@@ -30,24 +33,28 @@ import { WrapOptions } from "retry";
  * Make an HTTP request to the reported endpoint to check
  */
 export function lookFor200OnEndpointRootGet(retryOpts: Partial<WrapOptions> = {}): EndpointVerificationListener {
-    return (inv: EndpointVerificationInvocation) => {
+    return async (inv: EndpointVerificationInvocation) => {
+        const httpClient = configurationValue<HttpClientFactory>("http.client.factory", DefaultHttpClientFactory).create();
         const agent = new https.Agent({
             rejectUnauthorized: false,
         });
         if (!inv.url) {
-           throw new Error("Verify called with null URL");
+            throw new Error("Verify called with null URL");
         }
-        return doWithRetry(
-            () => axios.get(inv.url, {httpsAgent: agent})
-                .then(resp => {
-                    logger.debug(`lookFor200OnEndpointRootGet: Response for ${inv.url} was ${resp.status}`);
-                    if (resp.status !== 200) {
-                        return Promise.reject(`Unexpected response: ${resp.status}`);
-                    }
-                    return Promise.resolve();
-                }),
-            `Try to connect to ${inv.url}`,
-            retryOpts);
-        // Let a failure go through
+        try {
+            const resp = await httpClient.exchange(inv.url, {
+                method: HttpMethod.Get,
+                options: { httpsAgent: agent },
+                retry: retryOpts,
+            });
+            logger.debug(`lookFor200OnEndpointRootGet: Response for ${inv.url} was ${resp.status}`);
+            if (resp.status !== 200) {
+                throw new Error(`Unexpected response when getting ${inv.url}: ${resp.status}`);
+            }
+            return;
+        } catch (e) {
+            logger.warn(`Unexpected error when getting ${inv.url}: ${e.message}`);
+            // Let a failure go through
+        }
     };
 }

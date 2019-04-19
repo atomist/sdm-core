@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,27 @@ import { PushListenerInvocation } from "@atomist/sdm";
 import * as assert from "power-assert";
 import { ToPublicRepo } from "../../../lib/mapping/pushtest/toPublicRepo";
 
-const credentials = { token: process.env.GITHUB_TOKEN};
-
 describe("pushToPublicRepo", () => {
+
+    let credentials: any;
+    before(function(): void {
+        if (process.env.GITHUB_TOKEN) {
+            credentials = { token: process.env.GITHUB_TOKEN };
+        } else {
+            // tslint:disable-next-line:no-invalid-this
+            this.skip();
+        }
+    });
 
     it("should work against public repo", async () => {
         const id = new GitHubRepoRef("atomist", "sdm");
-        const r = await ToPublicRepo.mapping({id, credentials} as any as PushListenerInvocation);
+        const r = await ToPublicRepo.mapping({ id, credentials } as any as PushListenerInvocation);
         assert.equal(r, true);
     }).timeout(5000);
 
     it("should work against private repo", async () => {
         const id = new GitHubRepoRef("atomisthq", "internal-automation");
-        const r = await ToPublicRepo.mapping({id, credentials} as any as PushListenerInvocation);
+        const r = await ToPublicRepo.mapping({ id, credentials } as any as PushListenerInvocation);
         assert.equal(r, false);
     }).timeout(5000);
 
