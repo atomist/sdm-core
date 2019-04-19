@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Caching can now also handle complete directories. [#125](https://github.com/atomist/sdm-core/issues/125)
 -   Enforced sdm local cache path on FileSystemGoalCache. [#130](https://github.com/atomist/sdm-core/issues/130)
+-   Make tests safer, eliminate some axios use. [#134](https://github.com/atomist/sdm-core/issues/134)
 
 ## [1.4.0](https://github.com/atomist/sdm-core/compare/1.3.1...1.4.0) - 2019-04-01
 
