@@ -57,6 +57,7 @@ describe("DashboardDisplayProgressLog", () => {
         const log = new DashboardDisplayProgressLog("http://rolarhost", "https://app.atomist.com", 1000, 0,
             DefaultHttpClientFactory, context, goal);
         assert.equal(log.url,
+            // tslint:disable-next-line:max-line-length
             "https://app.atomist.com/workspace/TeamID/logs/RepoOwner/RepoName/SHA1/ENV/autofix%23machine.ts%3A141/2362da01-121c-4637-970c-a5ae7dbf6067/CorrelationID");
     });
 
