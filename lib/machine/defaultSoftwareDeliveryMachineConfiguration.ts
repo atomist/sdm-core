@@ -39,8 +39,8 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             logFactory: rolarAndDashboardLogFactory(
                 _.get(configuration, "sdm.rolar.url", "https://rolar.atomist.com"),
                 _.get(configuration, "sdm.dashboard.url", "https://app.atomist.com"),
-                _.get(configuration, "sdm.rolar.bufferSize", 1000),
-                _.get(configuration, "sdm.rolar.flushInterval", 1000),
+                _.get(configuration, "sdm.rolar.bufferSize", 10000),
+                _.get(configuration, "sdm.rolar.flushInterval", 2000),
                 configuration.http.client.factory),
             credentialsResolver: new GitHubCredentialsResolver(),
             repoRefResolver,

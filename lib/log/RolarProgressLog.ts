@@ -47,7 +47,7 @@ export class RolarProgressLog implements ProgressLog {
                 private readonly logLevel: string = "info",
                 private readonly timestamper: Iterator<Date> = timestampGenerator()) {
         if (this.timerInterval > 0) {
-            this.timer = setInterval(() => this.flush(), 2000);
+            this.timer = setInterval(() => this.flush(), this.timerInterval);
         }
         this.httpClient = httpClientFactory.create(rolarBaseUrl);
     }
