@@ -64,14 +64,22 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
     public async messageSending(message: any,
                                 destinations: Destination | Destination[],
                                 options: MessageOptions,
-                                ctx: HandlerContext): Promise<any> {
+                                ctx: HandlerContext): Promise<{
+        message: any;
+        destinations: Destination | Destination[];
+        options: MessageOptions;
+    }> {
         const dests = Array.isArray(destinations) ? destinations : [destinations];
 
         if (dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
-            return signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc);
+            return {
+                message: signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc),
+                destinations,
+                options,
+            };
         }
 
-        return message;
+        return super.messageSending(message, destinations, options, ctx);
     }
 
     private initVerificationKeys(): void {
