@@ -73,7 +73,7 @@ export class GoalSigningAutomationEventListener extends AutomationEventListenerS
 
         if (dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
             return {
-                message: signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc),
+                message: await signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc),
                 destinations,
                 options,
             };
