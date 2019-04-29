@@ -1,5 +1,5 @@
 query SdmGoalById($id: ID!) {
-  SdmGoal(id: $id) {
+  SdmGoal(id: $id, _showHistory: true) {
     ...SdmGoalFields
     ...SdmGoalRepo
   }
