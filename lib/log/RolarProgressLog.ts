@@ -51,7 +51,7 @@ export class RolarProgressLog implements ProgressLog {
         this.bufferSizeLimit = _.get(configuration, "sdm.rolar.bufferSize", 10240);
         this.timerInterval = _.get(configuration, "sdm.rolar.flushInterval", 2000);
         if (this.timerInterval > 0) {
-            this.timer = setInterval(() => this.flush(), this.timerInterval);
+            this.timer = setInterval(() => this.flush(), this.timerInterval).unref();
         }
         this.httpClient = _.get(configuration, "http.client.factory", DefaultHttpClientFactory).create(this.rolarBaseUrl);
     }
