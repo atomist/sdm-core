@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    DefaultHttpClientFactory,
-    HttpClientFactory,
-} from "@atomist/automation-client";
+import { Configuration } from "@atomist/automation-client";
 import {
     createEphemeralProgressLog,
     firstAvailableProgressLog,
@@ -31,27 +28,16 @@ import { DashboardDisplayProgressLog } from "./DashboardDisplayProgressLog";
  * Create a progress log that will use Rolar logging service if available,
  * otherwise falling back to logging.
  */
-export function rolarAndDashboardLogFactory(rolarBaseUrl: string,
-                                            dashboardBaseUrl: string,
-                                            bufferSize: number = 1000,
-                                            flushInterval: number = 2000,
-                                            httpClientFactory: HttpClientFactory = DefaultHttpClientFactory): ProgressLogFactory {
-    let persistentLogFactory = (context, sdmGoal, fallback) => firstAvailableProgressLog(fallback);
-    if (rolarBaseUrl) {
-        persistentLogFactory = (context, sdmGoal, fallback) => {
-            return firstAvailableProgressLog(
-                new DashboardDisplayProgressLog(
-                    rolarBaseUrl,
-                    dashboardBaseUrl,
-                    bufferSize,
-                    flushInterval,
-                    httpClientFactory,
-                    context,
-                    sdmGoal),
-                fallback,
-            );
-        };
-    }
+export function rolarAndDashboardLogFactory(configuration: Configuration): ProgressLogFactory {
+    const persistentLogFactory = (context, sdmGoal, fallback) => {
+        return firstAvailableProgressLog(
+            new DashboardDisplayProgressLog(
+                configuration,
+                context,
+                sdmGoal),
+            fallback,
+        );
+    };
     return async (context, sdmGoal) => {
         const name = sdmGoal.name;
         const persistentLog = await persistentLogFactory(context, sdmGoal, new LoggingProgressLog(name, "info"));

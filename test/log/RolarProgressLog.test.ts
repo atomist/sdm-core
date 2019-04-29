@@ -80,12 +80,23 @@ describe("RolarProgressLog", () => {
 
     it("should be available if returning http 200", async () => {
         const axiosInstance = axios.create();
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(axiosInstance),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(axiosInstance),
+            configuration,
             "info",
             fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
@@ -96,12 +107,23 @@ describe("RolarProgressLog", () => {
 
     it("should not be available if returning http 404", async () => {
         const axiosInstance = axios.create();
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(axiosInstance),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(axiosInstance),
+            configuration,
             "info",
             fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
@@ -111,12 +133,23 @@ describe("RolarProgressLog", () => {
     });
 
     it("should write logs to memory", async () => {
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(),
+            configuration,
             "info",
             fakeTimestampGenerator());
 
@@ -141,12 +174,24 @@ describe("RolarProgressLog", () => {
 
     it("should flush logs", async () => {
         const axiosInstance = axios.create();
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(axiosInstance),
+                },
+            },
+        };
+
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(axiosInstance),
+            configuration,
             "info",
             fakeTimestampGenerator());
 
@@ -181,12 +226,23 @@ describe("RolarProgressLog", () => {
 
     it("should not clear logs if flush fails", async () => {
         const axiosInstance = axios.create();
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(axiosInstance),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(axiosInstance),
+            configuration,
             "info",
             fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
@@ -215,12 +271,23 @@ describe("RolarProgressLog", () => {
 
     it("should close logs", async () => {
         const axiosInstance = axios.create();
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(axiosInstance),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(axiosInstance),
+            configuration,
             "info",
             fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
@@ -247,12 +314,23 @@ describe("RolarProgressLog", () => {
 
     it("should flush logs automatically", async () => {
         const axiosInstance = axios.create();
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 50,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(axiosInstance),
+                },
+            },
+        };
         const smallBufferLog = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            50,
-            0,
-            new MockHttpClientFactory(axiosInstance),
+            configuration,
             "info",
             fakeTimestampGenerator());
         const mockAxios = new MockAdapter(axiosInstance);
@@ -284,24 +362,47 @@ describe("RolarProgressLog", () => {
     });
 
     it("should provide a link to the log", async () => {
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test", "it"],
-            10000,
-            0,
-            new MockHttpClientFactory(),
-            "info", fakeTimestampGenerator());
+            configuration,
+            "info",
+            fakeTimestampGenerator());
 
         assert.equal(log.url, "http://fakehost/logs/test/it");
     });
 
     it("should log as debug", async () => {
+        const configuration = {
+            sdm: {
+                rolar: {
+                    url: "http://fakehost",
+                    bufferSize: 10000,
+                    flushInterval: 0,
+                },
+            },
+            http: {
+                client: {
+                    factory: new MockHttpClientFactory(),
+                },
+            },
+        };
         const log = new RolarProgressLog(
-            "http://fakehost",
             ["test"],
-            10000,
-            0,
-            new MockHttpClientFactory(),
+            configuration,
             "debug",
             fakeTimestampGenerator());
 

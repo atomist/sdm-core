@@ -15,13 +15,14 @@
  */
 
 import {
+    Configuration,
     HandlerContext,
-    HttpClientFactory,
 } from "@atomist/automation-client";
 import {
     ProgressLog,
     SdmGoalEvent,
 } from "@atomist/sdm";
+import * as _ from "lodash";
 import { RolarProgressLog } from "./RolarProgressLog";
 
 /**
@@ -30,16 +31,15 @@ import { RolarProgressLog } from "./RolarProgressLog";
 export class DashboardDisplayProgressLog implements ProgressLog {
 
     private readonly rolarProgressLog: RolarProgressLog;
+    private readonly dashboardBaseUrl: string;
 
-    constructor(rolarBaseUrl: string,
-                private readonly dashboardBaseUrl: string,
-                bufferSize: number,
-                flushInterval: number,
-                httpClientFactory: HttpClientFactory,
+    constructor(private readonly configuration: Configuration,
                 private readonly context: HandlerContext,
                 private readonly sdmGoal: SdmGoalEvent) {
+        this.dashboardBaseUrl = _.get(configuration, "sdm.rolar.webAppUrl",
+            _.get(configuration, "sdm.dashboard.url", "https://app.atomist.com"));
         this.rolarProgressLog =
-            new RolarProgressLog(rolarBaseUrl, constructLogPath(context, sdmGoal), bufferSize, flushInterval, httpClientFactory);
+            new RolarProgressLog(constructLogPath(context, sdmGoal), configuration);
     }
 
     get name(): string {

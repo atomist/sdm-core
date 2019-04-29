@@ -21,7 +21,6 @@ import {
     CachingProjectLoader,
     commandRequestParameterPromptFactory,
 } from "@atomist/sdm";
-import * as _ from "lodash";
 import { NoOpGoalCache } from "../goal/cache/NoOpGoalCache";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
@@ -36,12 +35,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
         sdm: {
             artifactStore: new EphemeralLocalArtifactStore(),
             projectLoader: new CachingProjectLoader(),
-            logFactory: rolarAndDashboardLogFactory(
-                _.get(configuration, "sdm.rolar.url", "https://rolar.atomist.com"),
-                _.get(configuration, "sdm.dashboard.url", "https://app.atomist.com"),
-                _.get(configuration, "sdm.rolar.bufferSize", 10240),
-                _.get(configuration, "sdm.rolar.flushInterval", 2000),
-                configuration.http.client.factory),
+            logFactory: rolarAndDashboardLogFactory(configuration),
             credentialsResolver: new GitHubCredentialsResolver(),
             repoRefResolver,
             repoFinder: allReposInTeam(repoRefResolver),

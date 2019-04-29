@@ -15,8 +15,9 @@
  */
 
 import {
+    Configuration,
+    DefaultHttpClientFactory,
     HttpClient,
-    HttpClientFactory,
     HttpMethod,
     logger,
 } from "@atomist/automation-client";
@@ -38,18 +39,21 @@ export class RolarProgressLog implements ProgressLog {
     private readonly httpClient: HttpClient;
     private localLogs: LogData[] = [];
     private readonly timer: any;
+    private readonly rolarBaseUrl: string;
+    private readonly bufferSizeLimit: number;
+    private readonly timerInterval: number;
 
-    constructor(private readonly rolarBaseUrl: string,
-                private readonly logPath: string[],
-                private readonly bufferSizeLimit: number = 1000,
-                private readonly timerInterval: number = 0,
-                private readonly httpClientFactory: HttpClientFactory,
+    constructor(private readonly logPath: string[],
+                private readonly configuration: Configuration,
                 private readonly logLevel: string = "info",
                 private readonly timestamper: Iterator<Date> = timestampGenerator()) {
+        this.rolarBaseUrl = _.get(configuration, "sdm.rolar.url", "https://rolar.atomist.com");
+        this.bufferSizeLimit = _.get(configuration, "sdm.rolar.bufferSize", 10240);
+        this.timerInterval = _.get(configuration, "sdm.rolar.flushInterval", 2000);
         if (this.timerInterval > 0) {
             this.timer = setInterval(() => this.flush(), this.timerInterval);
         }
-        this.httpClient = httpClientFactory.create(rolarBaseUrl);
+        this.httpClient = _.get(configuration, "http.client.factory", DefaultHttpClientFactory).create(this.rolarBaseUrl);
     }
 
     get name(): string {
