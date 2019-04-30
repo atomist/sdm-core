@@ -24,7 +24,6 @@ import {
 import { NoOpGoalCache } from "../goal/cache/NoOpGoalCache";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
-import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { GraphQLPreferenceStoreFactory } from "../internal/preferences/GraphQLPreferenceStore";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
@@ -33,7 +32,6 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
     const repoRefResolver = new DefaultRepoRefResolver();
     return {
         sdm: {
-            artifactStore: new EphemeralLocalArtifactStore(),
             projectLoader: new CachingProjectLoader(),
             logFactory: rolarAndDashboardLogFactory(configuration),
             credentialsResolver: new GitHubCredentialsResolver(),
