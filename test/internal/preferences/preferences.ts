@@ -37,8 +37,8 @@ export async function assertPreferences(prefs: PreferenceStore, scope?: Preferen
     await prefs.put("foo", "barbar", { scope: tempScope });
     assert.strictEqual(await prefs.get("foo", { scope: tempScope }), "barbar");
 
-    await prefs.put("bar", "foo", { scope, ttl: 10 });
-    await sleep(20);
+    await prefs.put("bar", "foo", { scope, ttl: 1000 });
+    await sleep(2000);
     assert(!(await prefs.get("bar", { scope })));
 
     const b = { foo: "bar" };
