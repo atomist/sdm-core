@@ -19,10 +19,7 @@ import {
     HandlerContext,
     QueryNoCacheOptions,
 } from "@atomist/automation-client";
-import {
-    PreferenceStoreFactory,
-} from "@atomist/sdm";
-import * as _ from "lodash";
+import { PreferenceStoreFactory } from "@atomist/sdm";
 import { SdmPreferenceByKey } from "../../typings/types";
 import {
     AbstractPreferenceStore,
@@ -31,13 +28,13 @@ import {
 
 /**
  * Factory to create a new GraphQLPreferenceStore instance
- * @param ctx
- * @constructor
+ * @deprecated use TeamConfigurationPreferenceStoreFactory
  */
 export const GraphQLPreferenceStoreFactory: PreferenceStoreFactory = ctx => new GraphQLPreferenceStore(ctx);
 
 /**
  * PreferenceStore implementation that stores preferences in the backend GraphQL store.
+ * @deprecated use TeamConfigurationPreferenceStore
  */
 export class GraphQLPreferenceStore extends AbstractPreferenceStore {
 
@@ -45,7 +42,8 @@ export class GraphQLPreferenceStore extends AbstractPreferenceStore {
         super(context);
     }
 
-    protected async doGet(key: string): Promise<Preference | undefined> {
+    protected async doGet(name: string, namespace: string): Promise<Preference | undefined> {
+        const key = this.scopeKey(name, namespace);
         const result = await this.context.graphClient.query<SdmPreferenceByKey.Query, SdmPreferenceByKey.Variables>({
             name: "SdmPreferenceByKey",
             variables: {
@@ -53,11 +51,24 @@ export class GraphQLPreferenceStore extends AbstractPreferenceStore {
             },
             options: QueryNoCacheOptions,
         });
-        return _.get(result, "SdmPreference[0]") as Preference;
+        if (!!result.SdmPreference && result.SdmPreference.length === 1) {
+            return {
+                name,
+                namespace,
+                value: result.SdmPreference[0].value,
+                ttl: result.SdmPreference[0].ttl,
+            };
+        }
+        return undefined;
     }
 
     protected doPut(pref: Preference): Promise<void> {
-        return this.context.messageClient.send(pref, addressEvent("SdmPreference"));
+        const key = this.scopeKey(pref.name, pref.namespace);
+        return this.context.messageClient.send({
+            key,
+            value: pref.value,
+            ttl: typeof pref.ttl === "number" ? Date.now() + pref.ttl : undefined,
+        }, addressEvent("SdmPreference"));
     }
 
 }
