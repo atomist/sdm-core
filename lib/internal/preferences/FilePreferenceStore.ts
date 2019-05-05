@@ -37,8 +37,6 @@ type WithPreferenceFile<V> = (p: PreferenceFile) => Promise<{ value?: V, save: b
 
 /**
  * Factory to create a new FilePreferenceStore instance
- * @param ctx
- * @constructor
  */
 export const FilePreferenceStoreFactory: PreferenceStoreFactory = ctx => new FilePreferenceStore(ctx);
 
@@ -56,13 +54,15 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
         this.init();
     }
 
-    protected async doGet(key: string): Promise<Preference | undefined> {
+    protected async doGet(name: string, namespace: string): Promise<Preference | undefined> {
+        const key = this.scopeKey(name, namespace);
         return this.doWithPreferenceFile<Preference | undefined>(async prefs => {
             if (!!prefs[key]) {
                 return {
                     save: false,
                     value: {
-                        key,
+                        name,
+                        namespace,
                         value: prefs[key].value,
                         ttl: prefs[key].ttl,
                     },
@@ -78,7 +78,11 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
 
     protected async doPut(pref: Preference): Promise<void> {
         return this.doWithPreferenceFile<void>(async prefs => {
-            prefs[pref.key] = { value: pref.value, ttl: pref.ttl };
+            const key = this.scopeKey(pref.name, pref.namespace);
+            prefs[key] = {
+                value: pref.value,
+                ttl: typeof pref.ttl === "number" ? Date.now() + pref.ttl : undefined,
+            };
             return {
                 save: true,
             };

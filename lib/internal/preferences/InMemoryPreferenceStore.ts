@@ -23,8 +23,6 @@ import {
 
 /**
  * Factory to create a new InMemoryPreferenceStore instance
- * @param ctx
- * @constructor
  */
 export const InMemoryPreferenceStoreFactory: PreferenceStoreFactory = ctx => new InMemoryPreferenceStore(ctx);
 
@@ -40,12 +38,16 @@ export class InMemoryPreferenceStore extends AbstractPreferenceStore {
         super(context);
     }
 
-    protected async doGet(key: string): Promise<Preference | undefined> {
+    protected async doGet(name: string, namespace: string): Promise<Preference | undefined> {
+        const key = this.scopeKey(name, namespace);
         return this.store[key];
     }
 
-    protected doPut(pref: Preference): Promise<void> {
-        this.store[pref.key] = pref;
-        return;
+    protected async doPut(pref: Preference): Promise<void> {
+        const key = this.scopeKey(pref.name, pref.namespace);
+        this.store[key] = {
+            ...pref,
+            ttl: typeof pref.ttl === "number" ? Date.now() + pref.ttl : undefined,
+        };
     }
 }

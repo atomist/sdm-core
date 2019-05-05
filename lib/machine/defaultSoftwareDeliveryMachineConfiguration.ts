@@ -26,7 +26,7 @@ import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolve
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
-import { GraphQLPreferenceStoreFactory } from "../internal/preferences/GraphQLPreferenceStore";
+import { TeamConfigurationPreferenceStoreFactory } from "../internal/preferences/TeamConfigurationPreferenceStore";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
 
 export function defaultSoftwareDeliveryMachineConfiguration(configuration: Configuration): LocalSoftwareDeliveryMachineConfiguration {
@@ -41,7 +41,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             repoFinder: allReposInTeam(repoRefResolver),
             projectPersister: RemoteGitProjectPersister,
             goalScheduler: [],
-            preferenceStoreFactory: GraphQLPreferenceStoreFactory,
+            preferenceStoreFactory: TeamConfigurationPreferenceStoreFactory,
             parameterPromptFactory: commandRequestParameterPromptFactory,
             goalCache: new NoOpGoalCache(),
         },

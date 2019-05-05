@@ -15,28 +15,38 @@
  */
 
 import { PreferenceScope } from "@atomist/sdm";
-import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
+import { TeamConfigurationPreferenceStore } from "../../../lib/internal/preferences/TeamConfigurationPreferenceStore";
 import { assertPreferences } from "./preferences";
 
-describe("GraphQLPreferenceStore", () => {
+describe("TeamConfigurationPreferenceStore", () => {
 
     const ctx = store => ({
-        messageClient: {
-            send: async msg => {
-                store[msg.key] = msg;
-            },
-        },
         graphClient: {
             query: async opts => {
-                if (!!store[opts.variables.key]) {
+                if (!!store[opts.variables.namespace]) {
+                    const prefs = store[opts.variables.namespace].filter(p => {
+                        if (!!p.ttl) {
+                            return p.ttl + p.createdAt.getTime() >= new Date().getTime();
+                        }
+                        return true;
+                    });
                     return {
-                        SdmPreference: [store[opts.variables.key]],
+                        TeamConfiguration: prefs,
                     };
                 } else {
                     return {
-                        SdmPreference: undefined,
+                        TeamConfiguration: undefined,
                     };
                 }
+            },
+            mutate: async opts => {
+                store[opts.variables.namespace] = [{
+                    name: opts.variables.name,
+                    namespace: opts.variables.namespace,
+                    value: opts.variables.value,
+                    ttl: opts.variables.ttl,
+                    createdAt: new Date(),
+                }];
             },
         },
         configuration: {
@@ -46,14 +56,15 @@ describe("GraphQLPreferenceStore", () => {
 
     it("should correctly handle preferences", async () => {
         const store = {};
-        const prefs = new GraphQLPreferenceStore(ctx(store) as any);
+        const prefs = new TeamConfigurationPreferenceStore(ctx(store) as any);
         await assertPreferences(prefs);
-    }).timeout(5000);;
+    }).timeout(5000);
 
     it("should correctly handle scoped preferences", async () => {
         const store = {};
-        const prefs = new GraphQLPreferenceStore(ctx(store) as any);
+        const prefs = new TeamConfigurationPreferenceStore(ctx(store) as any);
         await assertPreferences(prefs, PreferenceScope.Sdm);
-    }).timeout(5000);;
+    }).timeout(5000);
+    ;
 
 });
