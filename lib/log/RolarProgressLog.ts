@@ -21,6 +21,7 @@ import {
     HttpMethod,
     logger,
 } from "@atomist/automation-client";
+import { redact } from "@atomist/automation-client/lib/util/redact";
 import { ProgressLog } from "@atomist/sdm";
 import * as _ from "lodash";
 import os = require("os");
@@ -42,6 +43,7 @@ export class RolarProgressLog implements ProgressLog {
     private readonly rolarBaseUrl: string;
     private readonly bufferSizeLimit: number;
     private readonly timerInterval: number;
+    private readonly redact: boolean;
 
     constructor(private readonly logPath: string[],
                 private readonly configuration: Configuration,
@@ -50,6 +52,7 @@ export class RolarProgressLog implements ProgressLog {
         this.rolarBaseUrl = _.get(configuration, "sdm.rolar.url", "https://rolar.atomist.com");
         this.bufferSizeLimit = _.get(configuration, "sdm.rolar.bufferSize", 10240);
         this.timerInterval = _.get(configuration, "sdm.rolar.flushInterval", 2000);
+        this.redact = _.get(configuration, "redact.log", false);
         if (this.timerInterval > 0) {
             this.timer = setInterval(() => this.flush(), this.timerInterval).unref();
         }
@@ -70,13 +73,13 @@ export class RolarProgressLog implements ProgressLog {
             await this.httpClient.exchange(url, { method: HttpMethod.Head });
             return true;
         } catch (e) {
-            logger.warn(`Rolar logger is NOT available at ${url}: ${e}`);
+            logger.warn(`Rolar logger is not available at ${url}: ${e}`);
             return false;
         }
     }
 
-    public write(what: string): void {
-        const line = what || "";
+    public write(what: string = ""): void {
+        const line = this.redact ? redact(what) : what;
         const now: Date = this.timestamper.next().value;
         this.localLogs.push({
             level: this.logLevel,
