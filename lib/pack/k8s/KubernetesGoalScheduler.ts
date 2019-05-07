@@ -304,27 +304,27 @@ export function createJobSpec(podSpec: k8s.V1Pod,
                     if (v.type === K8sServiceRegistrationType.K8sService) {
                         const spec = v.spec as K8sServiceSpec;
                         if (!!spec.container) {
-                            const c = toArray(spec.container);
+                            const c = toArray<k8s.V1Container>(spec.container as any);
                             jobSpec.spec.template.spec.containers.push(...c);
                         }
 
                         if (!!spec.initContainer) {
-                            const ic = toArray(spec.initContainer);
+                            const ic = toArray<k8s.V1Container>(spec.initContainer as any);
                             jobSpec.spec.template.spec.initContainers.push(...ic);
                         }
 
                         if (!!spec.volume) {
-                            const vo = toArray(spec.volume);
+                            const vo = toArray<k8s.V1Volume>(spec.volume as any);
                             jobSpec.spec.template.spec.volumes.push(...vo);
                         }
 
                         if (!!spec.volumeMount) {
-                            const vm = toArray(spec.volumeMount);
+                            const vm = toArray<k8s.V1VolumeMount>(spec.volumeMount as any);
                             jobSpec.spec.template.spec.containers.forEach(c => c.volumeMounts.push(...vm));
                         }
 
                         if (!!spec.imagePullSecret) {
-                            const ips = toArray(spec.imagePullSecret);
+                            const ips = toArray<k8s.V1LocalObjectReference>(spec.imagePullSecret as any);
                             jobSpec.spec.template.spec.imagePullSecrets.push(...ips);
                         }
                     }

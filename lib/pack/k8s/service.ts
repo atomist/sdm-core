@@ -20,6 +20,7 @@ import {
     ServiceRegistration,
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
+import { DeepPartial } from "ts-essentials";
 
 /**
  * Key of k8s services inside the service structure of goal data
@@ -36,14 +37,14 @@ export enum K8sServiceRegistrationType {
  */
 export interface K8sServiceSpec {
     // Additional containers to be added into the goal job
-    container?: k8s.V1Container | k8s.V1Container[];
-    initContainer?: k8s.V1Container | k8s.V1Container[];
+    container?: DeepPartial<k8s.V1Container> | Array<DeepPartial<k8s.V1Container>>;
+    initContainer?: DeepPartial<k8s.V1Container> | Array<DeepPartial<k8s.V1Container>>;
 
     // Additional volumes and volumeMounts to be added into the goal job
-    volumeMount?: k8s.V1VolumeMount | k8s.V1VolumeMount[];
-    volume?: k8s.V1Volume | k8s.V1Volume[];
+    volumeMount?: DeepPartial<k8s.V1VolumeMount> | Array<DeepPartial<k8s.V1VolumeMount>>;
+    volume?: DeepPartial<k8s.V1Volume> | Array<DeepPartial<k8s.V1Volume>>;
 
-    imagePullSecret?: k8s.V1LocalObjectReference | k8s.V1LocalObjectReference[];
+    imagePullSecret?: DeepPartial<k8s.V1LocalObjectReference> | Array<DeepPartial<k8s.V1LocalObjectReference>>;
 }
 
 /**
