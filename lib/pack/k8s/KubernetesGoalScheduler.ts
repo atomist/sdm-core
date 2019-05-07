@@ -30,6 +30,7 @@ import {
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
+import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as os from "os";
 import { toArray } from "../../util/misc/array";
@@ -78,7 +79,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
     public async schedule(gi: GoalInvocation): Promise<ExecuteGoalResult> {
         const { goalEvent } = gi;
 
-        const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+        const podNs = await readNamespace();
 
         const kc = loadKubeConfig();
         const batch = kc.makeApiClient(k8s.Batch_v1Api);
@@ -159,7 +160,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
 
     public async initialize(configuration: Configuration): Promise<void> {
         const podName = process.env.ATOMIST_POD_NAME || os.hostname();
-        const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+        const podNs = await readNamespace();
 
         try {
             const kc = new k8s.KubeConfig();
@@ -483,7 +484,7 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
     const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
     if (configurationValue<boolean>("sdm.k8s.job.singleNamespace", true)) {
-        const podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE || "default";
+        const podNs = await readNamespace();
         return (await batch.listNamespacedJob(
             podNs,
             undefined,
@@ -500,6 +501,29 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
             labelSelector,
         )).body.items;
     }
+}
+
+const NamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
+
+/**
+ * Read the namespace of the deployment from environment and k8s service account files.
+ * Falls back to the default namespace and no other configuration can be found.
+ */
+export async function readNamespace(): Promise<string> {
+    let podNs = process.env.ATOMIST_POD_NAMESPACE || process.env.ATOMIST_DEPLOYMENT_NAMESPACE;
+    if (!!podNs) {
+        return podNs;
+    }
+
+    if (await fs.pathExists(NamespaceFile)) {
+        podNs = (await fs.readFile(NamespaceFile)).toString().trim();
+    }
+
+    if (!!podNs) {
+        return podNs;
+    }
+
+    return "default";
 }
 
 export function prettyPrintError(e: any): string {
