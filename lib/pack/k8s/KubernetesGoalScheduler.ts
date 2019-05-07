@@ -32,6 +32,7 @@ import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import * as os from "os";
+import { toArray } from "../../util/misc/array";
 import { loadKubeConfig } from "./config";
 import {
     K8sServiceRegistrationType,
@@ -43,6 +44,7 @@ import {
  */
 export interface KubernetesGoalSchedulerOptions {
     isolateAll?: boolean;
+    podSpec?: k8s.V1Pod;
 }
 
 /**
@@ -167,7 +169,12 @@ export class KubernetesGoalScheduler implements GoalScheduler {
             this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;
         } catch (e) {
             logger.error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
-            throw new Error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+
+            if (!!this.options.podSpec) {
+                this.podSpec = this.options.podSpec;
+            } else {
+                throw new Error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+            }
         }
 
         if (configuration.cluster.enabled === false || cluster.isMaster) {
@@ -296,18 +303,28 @@ export function createJobSpec(podSpec: k8s.V1Pod,
                     if (v.type === K8sServiceRegistrationType.K8sService) {
                         const spec = v.spec as K8sServiceSpec;
                         if (!!spec.container) {
-                            const c = Array.isArray(spec.container) ? spec.container : [spec.container];
+                            const c = toArray(spec.container)
                             jobSpec.spec.template.spec.containers.push(...c);
                         }
 
+                        if (!!spec.initContainer) {
+                            const ic = toArray(spec.initContainer);
+                            jobSpec.spec.template.spec.initContainers.push(...ic);
+                        }
+
                         if (!!spec.volume) {
-                            const vo = Array.isArray(spec.volume) ? spec.volume : [spec.volume];
+                            const vo = toArray(spec.volume)
                             jobSpec.spec.template.spec.volumes.push(...vo);
                         }
 
                         if (!!spec.volumeMount) {
-                            const vm = Array.isArray(spec.volumeMount) ? spec.volumeMount : [spec.volumeMount];
+                            const vm = toArray(spec.volumeMount);
                             jobSpec.spec.template.spec.containers.forEach(c => c.volumeMounts.push(...vm));
+                        }
+
+                        if (!!spec.imagePullSecret) {
+                            const ips = toArray(spec.imagePullSecret);
+                            jobSpec.spec.template.spec.imagePullSecrets.push(...ips);
                         }
                     }
                 });
