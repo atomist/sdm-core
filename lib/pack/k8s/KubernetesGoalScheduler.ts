@@ -303,7 +303,7 @@ export function createJobSpec(podSpec: k8s.V1Pod,
                     if (v.type === K8sServiceRegistrationType.K8sService) {
                         const spec = v.spec as K8sServiceSpec;
                         if (!!spec.container) {
-                            const c = toArray(spec.container)
+                            const c = toArray(spec.container);
                             jobSpec.spec.template.spec.containers.push(...c);
                         }
 
@@ -313,7 +313,7 @@ export function createJobSpec(podSpec: k8s.V1Pod,
                         }
 
                         if (!!spec.volume) {
-                            const vo = toArray(spec.volume)
+                            const vo = toArray(spec.volume);
                             jobSpec.spec.template.spec.volumes.push(...vo);
                         }
 
