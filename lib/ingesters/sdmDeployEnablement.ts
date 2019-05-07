@@ -22,5 +22,3 @@ export interface SdmDeployEnablement {
     repo: string;
     providerId: string;
 }
-
-
