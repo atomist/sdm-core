@@ -163,8 +163,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         const podNs = await readNamespace();
 
         try {
-            const kc = new k8s.KubeConfig();
-            kc.loadFromCluster();
+            const kc = loadKubeConfig();
             const core = kc.makeApiClient(k8s.Core_v1Api);
 
             this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;
@@ -310,22 +309,36 @@ export function createJobSpec(podSpec: k8s.V1Pod,
 
                         if (!!spec.initContainer) {
                             const ic = toArray<k8s.V1Container>(spec.initContainer as any);
-                            jobSpec.spec.template.spec.initContainers.push(...ic);
+                            jobSpec.spec.template.spec.initContainers = [
+                                ...(jobSpec.spec.template.spec.initContainers || []),
+                                ...ic,
+                            ];
                         }
 
                         if (!!spec.volume) {
                             const vo = toArray<k8s.V1Volume>(spec.volume as any);
-                            jobSpec.spec.template.spec.volumes.push(...vo);
+                            jobSpec.spec.template.spec.volumes = [
+                                ...(jobSpec.spec.template.spec.volumes || []),
+                                ...vo,
+                            ];
                         }
 
                         if (!!spec.volumeMount) {
                             const vm = toArray<k8s.V1VolumeMount>(spec.volumeMount as any);
-                            jobSpec.spec.template.spec.containers.forEach(c => c.volumeMounts.push(...vm));
+                            jobSpec.spec.template.spec.containers.forEach(c => {
+                                c.volumeMounts = [
+                                    ...(c.volumeMounts || []),
+                                    ...vm,
+                                ];
+                            });
                         }
 
                         if (!!spec.imagePullSecret) {
                             const ips = toArray<k8s.V1LocalObjectReference>(spec.imagePullSecret as any);
-                            jobSpec.spec.template.spec.imagePullSecrets.push(...ips);
+                            jobSpec.spec.template.spec.imagePullSecrets = [
+                                ...(jobSpec.spec.template.spec.imagePullSecrets || []),
+                                ...ips,
+                            ];
                         }
                     }
                 });
