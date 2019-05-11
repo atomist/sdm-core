@@ -34,7 +34,10 @@ import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as os from "os";
 import { toArray } from "../../util/misc/array";
-import { loadKubeConfig } from "./config";
+import {
+    loadKubeClusterConfig,
+    loadKubeConfig,
+} from "./config";
 import {
     K8sServiceRegistrationType,
     K8sServiceSpec,
@@ -163,7 +166,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         const podNs = await readNamespace();
 
         try {
-            const kc = loadKubeConfig();
+            const kc = loadKubeClusterConfig();
             const core = kc.makeApiClient(k8s.Core_v1Api);
 
             this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;

@@ -31,3 +31,18 @@ export function loadKubeConfig(): k8s.KubeConfig {
     }
     return kc;
 }
+
+export function loadKubeClusterConfig(): k8s.KubeConfig {
+    const kc = new k8s.KubeConfig();
+    try {
+        kc.loadFromCluster();
+    } catch (e) {
+        logger.debug("Failed to to load in-cluster config, attempting default");
+        try {
+            kc.loadFromDefault();
+        } catch (ex) {
+            logger.debug("Failed to to load default config");
+        }
+    }
+    return kc;
+}
