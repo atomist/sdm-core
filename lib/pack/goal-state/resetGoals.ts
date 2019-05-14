@@ -124,29 +124,32 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
 
         const push = await fetchPushForCommit(cli.context, id, cli.parameters.providerId);
 
-        const goals = await chooseAndSetGoals(rules, {
+        const goalss = await chooseAndSetGoals(rules, {
             context: cli.context,
             credentials: cli.credentials,
             push,
         });
 
-        if (goals) {
-            await cli.addressChannels(slackSuccessMessage(
-                "Plan Goals",
-                `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
-                    bold(`${id.owner}/${id.repo}/${push.branch}`)} to ${italic(goals.name)}`,
-                {
-                    footer: `${cli.parameters.name}:${cli.parameters.version}`,
-                }));
-        } else {
-            await cli.addressChannels(slackWarningMessage(
-                "Plan Goals",
-                `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
-                    bold(`${id.owner}/${id.repo}/${push.branch}`)}`,
-                cli.context,
-                {
-                    footer: `${cli.parameters.name}:${cli.parameters.version}`,
-                }));
+        for (const goals of goalss) {
+
+            if (goals) {
+                await cli.addressChannels(slackSuccessMessage(
+                    "Plan Goals",
+                    `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
+                        bold(`${id.owner}/${id.repo}/${push.branch}`)} to ${italic(goals.name)}`,
+                    {
+                        footer: `${cli.parameters.name}:${cli.parameters.version}`,
+                    }));
+            } else {
+                await cli.addressChannels(slackWarningMessage(
+                    "Plan Goals",
+                    `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
+                        bold(`${id.owner}/${id.repo}/${push.branch}`)}`,
+                    cli.context,
+                    {
+                        footer: `${cli.parameters.name}:${cli.parameters.version}`,
+                    }));
+            }
         }
 
         return Success;

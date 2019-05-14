@@ -70,25 +70,27 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
 
-        const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        const ids = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
         const goals = fetchGoalsFromPush(sdmGoal);
 
-        const gsi: GoalCompletionListenerInvocation = {
-            id,
-            context,
-            credentials: await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id)),
-            addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
-            configuration: this.configuration,
-            preferences: this.preferenceStoreFactory(context),
-            allGoals: goals,
-            completedGoal: sdmGoal,
-        };
+        for (const id of ids) {
+            const gsi: GoalCompletionListenerInvocation = {
+                id,
+                context,
+                credentials: await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id)),
+                addressChannels: addressChannelsFor(sdmGoal.push.repo, context),
+                configuration: this.configuration,
+                preferences: this.preferenceStoreFactory(context),
+                allGoals: goals,
+                completedGoal: sdmGoal,
+            };
 
-        try {
-            await Promise.all(this.goalCompletionListeners.map(l => l(gsi)));
-        } catch (e) {
-            logger.warn(`Error occurred while running goal completion listener: ${stringify(e)}`);
+            try {
+                await Promise.all(this.goalCompletionListeners.map(l => l(gsi)));
+            } catch (e) {
+                logger.warn(`Error occurred while running goal completion listener: ${stringify(e)}`);
+            }
         }
         return Success;
     }

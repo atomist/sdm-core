@@ -38,36 +38,36 @@ export class DefaultRepoRefResolver implements RepoRefResolver {
      * @param {OnPushToAnyBranch.Push} push
      * @return {any}
      */
-    public repoRefFromPush(push: OnPushToAnyBranch.Push): RemoteRepoRef {
+    public repoRefFromPush(push: OnPushToAnyBranch.Push): RemoteRepoRef[] {
         const providerType = push.repo.org.provider.providerType;
         switch (providerType) {
             case ProviderType.github_com:
             case ProviderType.ghe:
-                return GitHubRepoRef.from({
+                return [GitHubRepoRef.from({
                     owner: push.repo.owner,
                     repo: push.repo.name,
                     sha: push.after.sha,
                     rawApiBase: push.repo.org.provider.apiUrl,
                     branch: push.branch,
-                });
+                })];
             case ProviderType.bitbucket:
                 const providerUrl = push.repo.org.provider.url;
-                return this.toBitBucketServerRepoRef({
+                return [this.toBitBucketServerRepoRef({
                     providerUrl,
                     owner: push.repo.owner,
                     name: push.repo.name,
                     sha: push.after.sha,
                     branch: push.branch,
-                });
+                })];
             case ProviderType.gitlab:
-                return GitlabRepoRef.from({
+                return [GitlabRepoRef.from({
                     owner: push.repo.owner,
                     repo: push.repo.name,
                     sha: push.after.sha,
                     rawApiBase: push.repo.org.provider.apiUrl,
                     gitlabRemoteUrl: push.repo.org.provider.url,
                     branch: push.branch,
-                });
+                })];
             case ProviderType.bitbucket_cloud:
                 throw new Error("BitBucket Cloud not yet supported");
             default:

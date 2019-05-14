@@ -88,7 +88,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
 
-        const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
+        // TODO this is ugly and probably wrong (monorepo)
+        const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push)[0];
         const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const preferences = this.preferenceStoreFactory(context);
 

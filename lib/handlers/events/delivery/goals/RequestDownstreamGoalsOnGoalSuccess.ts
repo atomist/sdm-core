@@ -77,50 +77,53 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
 
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, context);
 
-        const id = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
-        const credentials = await resolveCredentialsPromise(this.credentialsResolver.eventHandlerCredentials(context, id));
-        const preferences = this.preferenceStoreFactory(context);
+        const ids = this.repoRefResolver.repoRefFromPush(sdmGoal.push);
 
-        const goals = fetchGoalsFromPush(sdmGoal);
+        for (const id of ids) {
+            const credentials = await resolveCredentialsPromise(this.credentialsResolver.eventHandlerCredentials(context, id));
+            const preferences = this.preferenceStoreFactory(context);
 
-        const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
-            .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
-            .filter(shouldBePlannedOrSkipped)
-            .filter(g => preconditionsAreMet(g, { goalsForCommit: goals }));
+            const goals = fetchGoalsFromPush(sdmGoal);
 
-        if (goalsToRequest.length > 0) {
-            logger.info("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
-                goalsToRequest.map(goalKeyString).join(", "));
-        }
+            const goalsToRequest = goals.filter(g => isDirectlyDependentOn(sdmGoal, g))
+                .filter(g => expectToBeFulfilledAfterRequest(g, this.name))
+                .filter(shouldBePlannedOrSkipped)
+                .filter(g => preconditionsAreMet(g, { goalsForCommit: goals }));
 
-        await Promise.all(goalsToRequest.map(async sdmG => {
-            const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
-            if (sdmG.preApprovalRequired) {
-                return updateGoal(context, sdmG, {
-                    state: SdmGoalState.waiting_for_pre_approval,
-                    description: goal ? goal.waitingForPreApprovalDescription : `Start required: ${sdmG.name}`,
-                });
-            } else {
-                let g = sdmG;
-                const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmG);
-                for (const cb of cbs) {
-                    g = await cb.callback(g,
-                        {
-                            id,
-                            addressChannels: undefined,
-                            preferences,
-                            configuration: this.configuration,
-                            credentials,
-                            context,
-                        });
-                }
-                return updateGoal(context, g, {
-                    state: SdmGoalState.requested,
-                    description: goal ? goal.requestedDescription : `Ready: ${g.name}`,
-                    data: g.data,
-                });
+            if (goalsToRequest.length > 0) {
+                logger.info("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
+                    goalsToRequest.map(goalKeyString).join(", "));
             }
-        }));
+
+            await Promise.all(goalsToRequest.map(async sdmG => {
+                const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
+                if (sdmG.preApprovalRequired) {
+                    return updateGoal(context, sdmG, {
+                        state: SdmGoalState.waiting_for_pre_approval,
+                        description: goal ? goal.waitingForPreApprovalDescription : `Start required: ${sdmG.name}`,
+                    });
+                } else {
+                    let g = sdmG;
+                    const cbs = this.implementationMapper.findFulfillmentCallbackForGoal(sdmG);
+                    for (const cb of cbs) {
+                        g = await cb.callback(g,
+                            {
+                                id,
+                                addressChannels: undefined,
+                                preferences,
+                                configuration: this.configuration,
+                                credentials,
+                                context,
+                            });
+                    }
+                    return updateGoal(context, g, {
+                        state: SdmGoalState.requested,
+                        description: goal ? goal.requestedDescription : `Ready: ${g.name}`,
+                        data: g.data,
+                    });
+                }
+            }));
+        }
         return Success;
     }
 }
