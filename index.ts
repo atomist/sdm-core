@@ -175,3 +175,9 @@ export {
     GoalCache,
     GoalCacheOptions,
 } from "./lib/goal/cache/goalCaching";
+export {
+    configure,
+    Configurer,
+    GoalData,
+    GoalStructure,
+} from "./lib/machine/configure";
