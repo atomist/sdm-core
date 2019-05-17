@@ -102,7 +102,7 @@ export type Configurer<F extends SdmContext = PushListenerInvocation> = (sdm: So
 export function configure<T extends SdmContext = PushListenerInvocation>(configurer: Configurer<T>,
                                                                          options: {
                                                                              name?: string,
-                                                                             postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[]
+                                                                             postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
                                                                          } & ConfigureOptions = {}): Configuration {
     return {
         postProcessors: [
