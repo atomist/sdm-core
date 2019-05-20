@@ -27,7 +27,8 @@ import {
  * **This is purely for demo and test use. It is NOT a production
  * quality implementation. It uses fake artifact links in
  * GitHub statuses that may not be honored after the present automation
- * client is shut down.**
+ * client is shut down.
+ * @deprecated Artifact storage should be done using project listeners.
  */
 export class EphemeralLocalArtifactStore implements ArtifactStore {
 

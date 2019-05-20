@@ -20,6 +20,7 @@ import { LookupStrategy } from "./ManagedDeployments";
 
 /**
  * @ModuleExport
+ * @deprecated
  */
 export interface StartupInfo {
 
@@ -32,6 +33,7 @@ export interface StartupInfo {
 
 /**
  * @ModuleExport
+ * @deprecated
  */
 export interface SpawnedDeployment extends Deployment {
 
@@ -40,6 +42,7 @@ export interface SpawnedDeployment extends Deployment {
 
 /**
  * @ModuleExport
+ * @deprecated
  */
 export interface LocalDeployerOptions {
 
@@ -77,6 +80,7 @@ export interface LocalDeployerOptions {
 
 /**
  * @ModuleExport
+ * @deprecated
  */
 export const DefaultLocalDeployerOptions: Partial<LocalDeployerOptions> = {
     lowerPort: 8080,
