@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Make tests safer, eliminate some axios use. [#134](https://github.com/atomist/sdm-core/issues/134)
 -   Change rolar default buffer and flush settings. [904a94f](https://github.com/atomist/sdm-core/commit/904a94f088acedbc850552277d1bc46d633c576b)
 -   Use configuration for rolar setup. [08436e8](https://github.com/atomist/sdm-core/commit/08436e84cdc554dcd95cf4568b5e6d6df9c0ea6c)
+-   Deprecates deployer and artifact usage. [#147](https://github.com/atomist/sdm-core/issues/147)
+
+### Deprecated
+
+-   Deprecates deployer and artifact usage. [#147](https://github.com/atomist/sdm-core/issues/147)
 
 ## [1.4.0](https://github.com/atomist/sdm-core/compare/1.3.1...1.4.0) - 2019-04-01
 
