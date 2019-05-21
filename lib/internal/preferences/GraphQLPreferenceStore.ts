@@ -30,6 +30,7 @@ import {
  * Factory to create a new GraphQLPreferenceStore instance
  * @deprecated use TeamConfigurationPreferenceStoreFactory
  */
+// tslint:disable-next-line:deprecation
 export const GraphQLPreferenceStoreFactory: PreferenceStoreFactory = ctx => new GraphQLPreferenceStore(ctx);
 
 /**

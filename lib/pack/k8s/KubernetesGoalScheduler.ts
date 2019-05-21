@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// tslint:disable:max-file-line-count
+
 import {
     automationClientInstance,
     AutomationContextAware,

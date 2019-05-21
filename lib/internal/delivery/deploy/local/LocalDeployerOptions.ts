@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// tslint:disable:deprecation
+
 import { Deployment } from "@atomist/sdm";
 import { ChildProcess } from "child_process";
 import { LookupStrategy } from "./ManagedDeployments";

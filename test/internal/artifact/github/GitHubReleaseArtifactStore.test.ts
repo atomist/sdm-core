@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// tslint:disable:deprecation
+
 import { GitHubRepoRef } from "@atomist/automation-client";
 import { execPromise } from "@atomist/sdm";
 import * as fs from "fs";

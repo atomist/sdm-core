@@ -99,11 +99,12 @@ export type Configurer<F extends SdmContext = PushListenerInvocation> = (sdm: So
 /**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
  */
-export function configure<T extends SdmContext = PushListenerInvocation>(configurer: Configurer<T>,
-                                                                         options: {
-                                                                             name?: string,
-                                                                             postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
-                                                                         } & ConfigureOptions = {}): Configuration {
+export function configure<T extends SdmContext = PushListenerInvocation>(
+    configurer: Configurer<T>,
+    options: {
+        name?: string,
+        postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
+    } & ConfigureOptions = {}): Configuration {
     return {
         postProcessors: [
             ...(toArray(options.postProcessors || [])),

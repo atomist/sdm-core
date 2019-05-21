@@ -24,6 +24,7 @@ import {
 import { NoOpGoalCache } from "../goal/cache/NoOpGoalCache";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
+// tslint:disable-next-line:deprecation
 import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { TeamConfigurationPreferenceStoreFactory } from "../internal/preferences/TeamConfigurationPreferenceStore";
@@ -33,6 +34,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
     const repoRefResolver = new DefaultRepoRefResolver();
     return {
         sdm: {
+            // tslint:disable-next-line:deprecation
             artifactStore: new EphemeralLocalArtifactStore(),
             projectLoader: new CachingProjectLoader(),
             logFactory: rolarAndDashboardLogFactory(configuration),

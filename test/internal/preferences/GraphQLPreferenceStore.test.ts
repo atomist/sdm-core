@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// tslint:disable:deprecation
+
 import { PreferenceScope } from "@atomist/sdm";
 import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
 import { assertPreferences } from "./preferences";
@@ -48,12 +50,12 @@ describe("GraphQLPreferenceStore", () => {
         const store = {};
         const prefs = new GraphQLPreferenceStore(ctx(store) as any);
         await assertPreferences(prefs);
-    }).timeout(5000);;
+    }).timeout(5000);
 
     it("should correctly handle scoped preferences", async () => {
         const store = {};
         const prefs = new GraphQLPreferenceStore(ctx(store) as any);
         await assertPreferences(prefs, PreferenceScope.Sdm);
-    }).timeout(5000);;
+    }).timeout(5000);
 
 });
