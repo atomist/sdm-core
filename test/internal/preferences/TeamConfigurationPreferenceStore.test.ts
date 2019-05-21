@@ -65,6 +65,6 @@ describe("TeamConfigurationPreferenceStore", () => {
         const prefs = new TeamConfigurationPreferenceStore(ctx(store) as any);
         await assertPreferences(prefs, PreferenceScope.Sdm);
     }).timeout(5000);
-    ;
+    
 
 });
