@@ -44,6 +44,7 @@ import {
 
 /**
  * Implement ArtifactStore interface to store artifacts as GitHub releases
+ * @deprecated Artifact storage should be done using project listeners
  */
 export class GitHubReleaseArtifactStore implements ArtifactStore {
 

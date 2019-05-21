@@ -34,6 +34,7 @@ import * as https from "https";
 
 /**
  * @ModuleExport
+ * @deprecated
  */
 export interface ManagedDeploymentTargetInfo extends TargetInfo {
     managedDeploymentKey: RemoteRepoRef;
@@ -41,6 +42,7 @@ export interface ManagedDeploymentTargetInfo extends TargetInfo {
 
 /**f
  * @ModuleExport
+ * @deprecated
  */
 export const ManagedDeploymentTargeter: Targeter<ManagedDeploymentTargetInfo> = (id: RemoteRepoRef, branch: string) => {
     const branchId = { ...id, branch };
@@ -54,6 +56,7 @@ export const ManagedDeploymentTargeter: Targeter<ManagedDeploymentTargetInfo> = 
 /**
  * Strategy for looking up a service
  * @ModuleExport
+ * @deprecated
  */
 export enum LookupStrategy {
     service = "service",
@@ -64,6 +67,7 @@ export enum LookupStrategy {
 /**
  * Ports will be reused for the same app
  * @ModuleExport
+ * @deprecated
  */
 export interface DeployedApp {
 
@@ -84,6 +88,7 @@ export interface DeployedApp {
  * This is not intended for production use
  * @type {Array}
  * @ModuleExport
+ * @deprecated
  */
 export class ManagedDeployments {
 
