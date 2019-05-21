@@ -139,6 +139,7 @@ export {
 } from "./lib/internal/preferences/AbstractPreferenceStore";
 export { FilePreferenceStoreFactory } from "./lib/internal/preferences/FilePreferenceStore";
 export { GraphQLPreferenceStoreFactory } from "./lib/internal/preferences/GraphQLPreferenceStore";
+export { TeamConfigurationPreferenceStoreFactory } from "./lib/internal/preferences/TeamConfigurationPreferenceStore";
 export {
     KubernetesGoalScheduler,
     sanitizeName,
