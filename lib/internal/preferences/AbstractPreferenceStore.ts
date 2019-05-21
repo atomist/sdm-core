@@ -24,7 +24,8 @@ import {
 } from "@atomist/sdm";
 
 export interface Preference {
-    key: string;
+    name: string;
+    namespace: string;
     value: string;
     ttl: number;
 }
@@ -38,7 +39,7 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
     }
 
     public async get<V>(key: string, options?: { scope?: PreferenceScope, defaultValue?: V }): Promise<V | undefined> {
-        const pref = await this.doGet(this.scopeKey(key, options));
+        const pref = await this.doGet(key, this.scope(options));
         const defaultValue = !!options ? options.defaultValue : undefined;
         if (!pref) {
             return defaultValue;
@@ -52,30 +53,36 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
 
     public async put<V>(key: string, value: V, options: { ttl?: number; scope?: PreferenceScope } = {}): Promise<V> {
         const pref: Preference = {
-            key: this.scopeKey(key, options),
+            name: key,
+            namespace: this.scope(options),
             value: JSON.stringify(value),
-            ttl: typeof options.ttl === "number" ? Date.now() + options.ttl : undefined,
+            ttl: options.ttl,
         };
         await this.doPut(pref);
         return value;
     }
 
-    protected abstract doGet(key: string): Promise<Preference | undefined>;
+    protected abstract doGet(key: string, namespace: string): Promise<Preference | undefined>;
 
     protected abstract doPut(pref: Preference): Promise<void>;
 
-    private scopeKey(key: string, options?: { scope?: PreferenceScope }): string {
-        const k = key;
+    protected scopeKey(key: string, scope?: string): string {
+        if (!!scope && scope.length > 0) {
+            return `${scope}.${key}`;
+        }
+        return key;
+    }
+
+    protected scope(options?: { scope?: PreferenceScope }): string {
         if (!!options && !!options.scope) {
             switch (options.scope) {
                 case PreferenceScope.Sdm:
-                    return `${(this.ctx as any as ConfigurationAware).configuration.name}.${key}`;
+                    return (this.ctx as any as ConfigurationAware).configuration.name;
                 case PreferenceScope.Workspace:
-                    return k;
+                    return "";
                 default:
-                    return `${options.scope}.${key}`;
+                    return options.scope;
             }
         }
-        return k;
     }
 }
