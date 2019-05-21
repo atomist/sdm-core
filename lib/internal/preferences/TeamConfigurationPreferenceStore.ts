@@ -48,7 +48,7 @@ export class TeamConfigurationPreferenceStore extends AbstractPreferenceStore {
         const result = await this.context.graphClient.query<TeamConfigurationByNamespace.Query, TeamConfigurationByNamespace.Variables>({
             name: "TeamConfigurationByNamespace",
             variables: {
-                namespace: namespace,
+                namespace: normalizeNamespace(namespace),
             },
             options: QueryNoCacheOptions,
         });
@@ -69,11 +69,18 @@ export class TeamConfigurationPreferenceStore extends AbstractPreferenceStore {
             name: "SetTeamConfiguration",
             variables: {
                 name: pref.name,
-                namespace: pref.namespace,
+                namespace: normalizeNamespace(pref.namespace),
                 value: pref.value,
                 ttl: typeof pref.ttl === "number" ? Math.floor(pref.ttl / 1000) : undefined,
             },
             options: MutationNoCacheOptions,
         });
     }
+}
+
+function normalizeNamespace(namespace: string): string {
+    if (!namespace || namespace.length === 0) {
+        return "@atomist/global";
+    }
+    return namespace;
 }
