@@ -80,7 +80,8 @@ export class TeamConfigurationPreferenceStore extends AbstractPreferenceStore {
 
 function normalizeNamespace(namespace: string): string {
     if (!namespace || namespace.length === 0) {
-        return "@atomist/global";
+        return "@atomist.global";
     }
-    return namespace;
+    // Backend doesn't allow / inside a namespace
+    return namespace.replace(/\//g, ".");
 }
