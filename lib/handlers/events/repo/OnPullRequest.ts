@@ -58,11 +58,13 @@ export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscript
                         context: HandlerContext): Promise<HandlerResult> {
         const pullRequest = event.data.PullRequest[0];
         const repo = pullRequest.repo;
+
+        const branch = _.get(pullRequest, "branch.name") || _.get(pullRequest, "head.pushes[0].branch");
         const id = this.repoRefResolver.toRemoteRepoRef(
             repo,
             {
                 sha: pullRequest.head.sha,
-                branch: pullRequest.branch.name,
+                branch,
             });
         const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
         const addressChannels = addressChannelsFor(repo, context);
