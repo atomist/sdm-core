@@ -35,6 +35,7 @@ import {
     RepoRefResolver,
     resolveCredentialsPromise,
 } from "@atomist/sdm";
+import * as _ from "lodash";
 import * as schema from "../../../typings/types";
 
 /**
