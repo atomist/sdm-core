@@ -19,9 +19,12 @@ import {
     AutomationEventListenerSupport,
     EventIncoming,
 } from "@atomist/automation-client";
+import {
+    defaultStatsDClientOptions,
+    StatsDClient,
+} from "@atomist/automation-client/lib/spi/statsd/statsdClient";
 import { SdmGoalEvent } from "@atomist/sdm";
 import * as cluster from "cluster";
-import { StatsD } from "hot-shots";
 import * as _ from "lodash";
 import { isGoalRelevant } from "../delivery/goals/support/validateGoal";
 
@@ -30,11 +33,12 @@ import { isGoalRelevant } from "../delivery/goals/support/validateGoal";
  */
 export class SdmGoalMetricReportingAutomationEventListener extends AutomationEventListenerSupport {
 
-    private statsd: StatsD;
+    private statsd: StatsDClient;
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
         if (cluster.isMaster && client.configuration.statsd.enabled) {
-            this.statsd = (client.configuration.statsd as any).__instance;
+            this.statsd = client.configuration.statsd.client.factory.create(
+                defaultStatsDClientOptions(client.configuration));
         }
     }
 
@@ -46,15 +50,18 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
                 this.statsd.increment(
                     `counter.goal`,
                     1,
+                    1,
                     [`atomist_goal:${goal.name}`],
-                    () => { /* intentionally left empty */
+                    () => {
+                        /* intentionally left empty */
                     });
                 this.statsd.timing(
                     "timer.goal.round_trip",
                     Date.now() - goal.ts,
                     1,
                     {},
-                    () => { /* intentionally left empty */
+                    () => {
+                        /* intentionally left empty */
                     });
             }
         }
