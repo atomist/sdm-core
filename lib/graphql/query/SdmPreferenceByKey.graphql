@@ -1,4 +1,4 @@
-query SdmPreferenceByKey($key: [String!]!) {
+query SdmPreferenceByKey($key: [String!]) {
   SdmPreference(key: $key) {
     key
     value

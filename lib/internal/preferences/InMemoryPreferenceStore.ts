@@ -16,6 +16,7 @@
 
 import { HandlerContext } from "@atomist/automation-client";
 import { PreferenceStoreFactory } from "@atomist/sdm";
+import * as _ from "lodash";
 import {
     AbstractPreferenceStore,
     Preference,
@@ -49,5 +50,20 @@ export class InMemoryPreferenceStore extends AbstractPreferenceStore {
             ...pref,
             ttl: typeof pref.ttl === "number" ? Date.now() + pref.ttl : undefined,
         };
+    }
+
+    protected async doList(namespace: string): Promise<Preference[]> {
+        const values: Preference[] = [];
+        _.forEach(this.store, (v, k) => {
+            if (!namespace || k.startsWith(`${namespace}_$_`)) {
+                values.push(v as Preference);
+            }
+        });
+        return values;
+    }
+
+    protected async doDelete(name: string, namespace: string): Promise<void> {
+        const key = this.scopeKey(name, namespace);
+        delete this.store[key];
     }
 }

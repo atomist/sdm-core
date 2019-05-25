@@ -21,6 +21,7 @@ import {
 } from "@atomist/automation-client";
 import { PreferenceStoreFactory } from "@atomist/sdm";
 import {
+    DeleteTeamConfiguration,
     SetTeamConfiguration,
     TeamConfigurationByNamespace,
 } from "../../typings/types";
@@ -72,6 +73,36 @@ export class TeamConfigurationPreferenceStore extends AbstractPreferenceStore {
                 namespace: normalizeNamespace(pref.namespace),
                 value: pref.value,
                 ttl: typeof pref.ttl === "number" ? Math.floor(pref.ttl / 1000) : undefined,
+            },
+            options: MutationNoCacheOptions,
+        });
+    }
+
+    protected async doList(namespace: string): Promise<Preference[]> {
+        const result = await this.context.graphClient.query<TeamConfigurationByNamespace.Query, TeamConfigurationByNamespace.Variables>({
+            name: "TeamConfigurationByNamespace",
+            variables: {
+                namespace: normalizeNamespace(namespace),
+            },
+            options: QueryNoCacheOptions,
+        });
+        if (!!result.TeamConfiguration) {
+            return result.TeamConfiguration.map(t => ({
+                name: t.name,
+                namespace: t.namespace,
+                value: t.value,
+                ttl: undefined,
+            }))
+        }
+        return [];
+    }
+
+    protected async doDelete(name: string, namespace: string): Promise<void> {
+        await this.context.graphClient.mutate<DeleteTeamConfiguration.Mutation, DeleteTeamConfiguration.Variables>({
+            name: "DeleteTeamConfiguration",
+            variables: {
+                name: name,
+                namespace: normalizeNamespace(namespace),
             },
             options: MutationNoCacheOptions,
         });

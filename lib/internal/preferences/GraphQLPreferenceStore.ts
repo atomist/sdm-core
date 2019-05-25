@@ -72,4 +72,24 @@ export class GraphQLPreferenceStore extends AbstractPreferenceStore {
         }, addressEvent("SdmPreference"));
     }
 
+    protected async doList(namespace: string): Promise<Preference[]> {
+        const result = await this.context.graphClient.query<SdmPreferenceByKey.Query, SdmPreferenceByKey.Variables>({
+            name: "SdmPreferenceByKey",
+            options: QueryNoCacheOptions,
+        });
+        if (!!result.SdmPreference) {
+            return result.SdmPreference.filter(p => !namespace || p.key.startsWith(`${namespace}_$_`)).map(p => ({
+                name: p.key.includes("_$_") ? p.key.split("_$_")[1] : p.key,
+                namespace: p.key.includes("_$_") ? p.key.split("_$_")[0] : undefined,
+                value: p.value,
+                ttl: p.ttl,
+            }))
+        }
+        return [];
+    }
+
+    protected async doDelete(name: string, namespace: string): Promise<void> {
+        return this.doPut({ name, namespace, value: undefined, ttl: -100 });
+    }
+
 }

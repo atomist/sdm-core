@@ -20,6 +20,7 @@ import {
 } from "@atomist/automation-client";
 import { PreferenceStoreFactory } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as _ from "lodash";
 import * as os from "os";
 import * as path from "path";
 import {
@@ -31,7 +32,7 @@ import {
     Preference,
 } from "./AbstractPreferenceStore";
 
-type PreferenceFile = Record<string, { value: string, ttl?: number }>;
+type PreferenceFile = Record<string, { name: string, value: string, ttl?: number }>;
 
 type WithPreferenceFile<V> = (p: PreferenceFile) => Promise<{ value?: V, save: boolean }>;
 
@@ -80,9 +81,35 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
         return this.doWithPreferenceFile<void>(async prefs => {
             const key = this.scopeKey(pref.name, pref.namespace);
             prefs[key] = {
+                name: pref.name,
                 value: pref.value,
                 ttl: typeof pref.ttl === "number" ? Date.now() + pref.ttl : undefined,
             };
+            return {
+                save: true,
+            };
+        });
+    }
+
+    protected doList(namespace: string): Promise<Preference[]> {
+        return this.doWithPreferenceFile<Array<Preference>>(async prefs => {
+            const values: Preference[] = [];
+            _.forEach(prefs, (v, k) => {
+                if (!namespace || k.startsWith(`${namespace}_$_`)) {
+                    values.push(v as Preference);
+                }
+            });
+            return {
+                save: false,
+                value: values,
+            };
+        });
+    }
+
+    protected doDelete(pref: string, namespace: string): Promise<void> {
+        return this.doWithPreferenceFile<void>(async prefs => {
+            const key = this.scopeKey(pref, namespace);
+            delete prefs[key];
             return {
                 save: true,
             };
@@ -117,4 +144,5 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
             fs.writeJsonSync(this.filePath, {});
         }
     }
+
 }

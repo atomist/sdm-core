@@ -25,25 +25,30 @@ function sleep(ms: number): Promise<void> {
 }
 
 export async function assertPreferences(prefs: PreferenceStore, scope?: PreferenceScope): Promise<void> {
-    assert(!(await prefs.get("foo", { scope })));
-    assert(await prefs.get<boolean>("foo", { scope, defaultValue: true }));
-    await prefs.put("foo", "bar", { scope });
-    assert.strictEqual(await prefs.get("foo", { scope }), "bar");
+    assert(!(await prefs.get("foo", scope)));
+    assert(await prefs.get<boolean>("foo", scope, { defaultValue: true }));
+    await prefs.put("foo", "bar", scope);
+    assert.strictEqual(await prefs.get("foo", scope), "bar");
+    assert.deepStrictEqual(await prefs.list(scope), [ { key: "foo", value: "bar"} ]);
+    await prefs.delete("foo", scope);
+    assert(!(await prefs.get("foo", scope)));
 
-    await prefs.put("foo", "barbar", { scope });
-    assert.strictEqual(await prefs.get("foo", { scope }), "barbar");
+    await prefs.put("foo", "barbar", scope);
+    assert.strictEqual(await prefs.get("foo", scope), "barbar");
 
     const tempScope = new Date().toISOString();
-    await prefs.put("foo", "barbar", { scope: tempScope });
-    assert.strictEqual(await prefs.get("foo", { scope: tempScope }), "barbar");
+    await prefs.put("foo", "barbar", tempScope);
+    assert.strictEqual(await prefs.get("foo", tempScope), "barbar");
 
-    await prefs.put("bar", "foo", { scope, ttl: 1000 });
+    await prefs.put("bar", "foo", scope, { ttl: 1000 });
     await sleep(2000);
-    assert(!(await prefs.get("bar", { scope })));
+    assert(!(await prefs.get("bar", scope)));
 
     const b = { foo: "bar" };
-    await prefs.put("bar", b, { scope });
-    assert.deepStrictEqual((await prefs.get("bar", { scope })), b);
-    assert(!(await prefs.get("bar",
-        { scope: scope === PreferenceScope.Sdm ? PreferenceScope.Workspace : PreferenceScope.Sdm })));
+    await prefs.put("bar", b, scope);
+    assert.deepStrictEqual((await prefs.get("bar", scope)), b);
+    assert(!(await prefs.get(
+        "bar",
+        scope === PreferenceScope.Sdm ? PreferenceScope.Workspace : PreferenceScope.Sdm)),
+    );
 }

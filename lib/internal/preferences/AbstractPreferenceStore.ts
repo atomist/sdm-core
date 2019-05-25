@@ -38,8 +38,10 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
     protected constructor(private readonly ctx: HandlerContext) {
     }
 
-    public async get<V>(key: string, options?: { scope?: PreferenceScope, defaultValue?: V }): Promise<V | undefined> {
-        const pref = await this.doGet(key, this.scope(options));
+    public async get<V>(key: string,
+                        scope: PreferenceScope | string = PreferenceScope.Workspace,
+                        options?: { defaultValue?: V }): Promise<V | undefined> {
+        const pref = await this.doGet(key, this.scope(scope));
         const defaultValue = !!options ? options.defaultValue : undefined;
         if (!pref) {
             return defaultValue;
@@ -51,10 +53,13 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
         }
     }
 
-    public async put<V>(key: string, value: V, options: { ttl?: number; scope?: PreferenceScope } = {}): Promise<V> {
+    public async put<V>(key: string,
+                        value: V,
+                        scope?: PreferenceScope | string,
+                        options: { ttl?: number } = {}): Promise<V> {
         const pref: Preference = {
             name: key,
-            namespace: this.scope(options),
+            namespace: this.scope(scope),
             value: JSON.stringify(value),
             ttl: options.ttl,
         };
@@ -62,26 +67,50 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
         return value;
     }
 
+    public async list<V>(scope: PreferenceScope | string): Promise<Array<{ key: string; value: V }>> {
+        const prefs = await this.doList(this.scope(scope));
+        if (!prefs) {
+            return [];
+        } else {
+            const values: Array<{ key: string, value: V }> = prefs.map(pref => {
+                if (!!pref.ttl && pref.ttl < Date.now()) {
+                    return undefined;
+                } else {
+                    return { key: pref.name, value: JSON.parse(pref.value) as V };
+                }
+            })
+            return values.filter(v => !!v);
+        }
+    }
+
+    public async delete(key: string, scope?: PreferenceScope | string): Promise<void> {
+        return this.doDelete(key, this.scope(scope));
+    }
+
     protected abstract doGet(key: string, namespace: string): Promise<Preference | undefined>;
 
     protected abstract doPut(pref: Preference): Promise<void>;
 
+    protected abstract doList(namespace: string): Promise<Preference[]>;
+
+    protected abstract doDelete(key: string, namespace: string): Promise<void>;
+
     protected scopeKey(key: string, scope?: string): string {
         if (!!scope && scope.length > 0) {
-            return `${scope}.${key}`;
+            return `${scope}_$_${key}`;
         }
         return key;
     }
 
-    protected scope(options?: { scope?: PreferenceScope }): string {
-        if (!!options && !!options.scope) {
-            switch (options.scope) {
+    protected scope(scope: PreferenceScope | string): string {
+        if (!!scope) {
+            switch (scope) {
                 case PreferenceScope.Sdm:
                     return (this.ctx as any as ConfigurationAware).configuration.name;
                 case PreferenceScope.Workspace:
                     return "";
                 default:
-                    return options.scope;
+                    return scope;
             }
         }
     }

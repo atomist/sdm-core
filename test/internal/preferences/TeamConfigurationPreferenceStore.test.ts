@@ -40,13 +40,18 @@ describe("TeamConfigurationPreferenceStore", () => {
                 }
             },
             mutate: async opts => {
-                store[opts.variables.namespace] = [{
-                    name: opts.variables.name,
-                    namespace: opts.variables.namespace,
-                    value: opts.variables.value,
-                    ttl: opts.variables.ttl,
-                    createdAt: new Date(),
-                }];
+                if (opts.name === "SetTeamConfiguration") {
+                    store[opts.variables.namespace] = [{
+                        name: opts.variables.name,
+                        namespace: opts.variables.namespace,
+                        value: opts.variables.value,
+                        ttl: opts.variables.ttl,
+                        createdAt: new Date(),
+                    }];
+                } else if (opts.name === "DeleteTeamConfiguration") {
+                    store[opts.variables.namespace] =
+                        store[opts.variables.namespace].filter(p => p.name !== opts.variables.name);
+                }
             },
         },
         configuration: {

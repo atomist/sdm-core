@@ -19,6 +19,7 @@
 import { PreferenceScope } from "@atomist/sdm";
 import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
 import { assertPreferences } from "./preferences";
+import * as _ from "lodash";
 
 describe("GraphQLPreferenceStore", () => {
 
@@ -30,14 +31,22 @@ describe("GraphQLPreferenceStore", () => {
         },
         graphClient: {
             query: async opts => {
-                if (!!store[opts.variables.key]) {
-                    return {
-                        SdmPreference: [store[opts.variables.key]],
-                    };
+                if (!!opts.variables && !!opts.variables.key) {
+                    if (!!store[opts.variables.key]) {
+                        return {
+                            SdmPreference: [store[opts.variables.key]],
+                        };
+                    } else {
+                        return {
+                            SdmPreference: undefined,
+                        };
+                    }
                 } else {
+                    const prefs = [];
+                    _.forEach(store, v => prefs.push(v));
                     return {
-                        SdmPreference: undefined,
-                    };
+                        SdmPreference: prefs,
+                    }
                 }
             },
         },
