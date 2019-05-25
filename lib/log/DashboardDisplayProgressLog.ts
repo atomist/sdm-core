@@ -55,8 +55,8 @@ export class DashboardDisplayProgressLog implements ProgressLog {
         return this.rolarProgressLog.isAvailable();
     }
 
-    public write(what: string): void {
-        this.rolarProgressLog.write(what);
+    public write(msg: string, ...args: string[]): void {
+        this.rolarProgressLog.write(msg, ...args);
     }
 
     public flush(): Promise<any> {

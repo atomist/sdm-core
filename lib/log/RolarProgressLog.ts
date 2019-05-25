@@ -22,7 +22,8 @@ import {
     logger,
 } from "@atomist/automation-client";
 import { redact } from "@atomist/automation-client/lib/util/redact";
-import { ProgressLog } from "@atomist/sdm";
+import { ProgressLog,
+    format } from "@atomist/sdm";
 import * as _ from "lodash";
 import os = require("os");
 
@@ -78,8 +79,9 @@ export class RolarProgressLog implements ProgressLog {
         }
     }
 
-    public write(what: string = ""): void {
-        const line = this.redact ? redact(what) : what;
+    public write(msg: string = "", ...args: string[]): void {
+        const fmsg = format(msg, ...args);
+        const line = this.redact ? redact(fmsg) : fmsg;
         const now: Date = this.timestamper.next().value;
         this.localLogs.push({
             level: this.logLevel,
