@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Enable multiple cache miss listeners and add a no-op cache. [#122](https://github.com/atomist/sdm-core/issues/122)
 -   Add support for sending notifications on certain goal states. [#133](https://github.com/atomist/sdm-core/issues/133)
 -   Support for goal contributions as data. [#146](https://github.com/atomist/sdm-core/issues/146)
+-   Add delete and list to PreferenceStore api. [50c8c96](https://github.com/atomist/sdm-core/commit/50c8c9662cc8403b31cdd782a500ebbff7040511)
 
 ### Changed
 
