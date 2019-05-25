@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@atomist/automation-client": "1.5.0-master.20190523141559",
-    "@atomist/sdm": "1.5.0-master.20190525161944Today",
+    "@atomist/sdm": "1.5.0-master.20190525161944",
     "@atomist/slack-messages": "^1.1.0",
     "@types/lodash": "^4.14.123",
     "@types/mocha": "^5.2.6",
