@@ -92,7 +92,7 @@ export class FilePreferenceStore extends AbstractPreferenceStore {
     }
 
     protected doList(namespace: string): Promise<Preference[]> {
-        return this.doWithPreferenceFile<Array<Preference>>(async prefs => {
+        return this.doWithPreferenceFile<Preference[]>(async prefs => {
             const values: Preference[] = [];
             _.forEach(prefs, (v, k) => {
                 if (!namespace || k.startsWith(`${namespace}_$_`)) {

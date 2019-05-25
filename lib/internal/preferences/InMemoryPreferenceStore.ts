@@ -56,7 +56,7 @@ export class InMemoryPreferenceStore extends AbstractPreferenceStore {
         const values: Preference[] = [];
         _.forEach(this.store, (v, k) => {
             if (!namespace || k.startsWith(`${namespace}_$_`)) {
-                values.push(v as Preference);
+                values.push(v);
             }
         });
         return values;

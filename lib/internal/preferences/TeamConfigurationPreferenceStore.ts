@@ -92,7 +92,7 @@ export class TeamConfigurationPreferenceStore extends AbstractPreferenceStore {
                 namespace: t.namespace,
                 value: t.value,
                 ttl: undefined,
-            }))
+            }));
         }
         return [];
     }
@@ -101,7 +101,7 @@ export class TeamConfigurationPreferenceStore extends AbstractPreferenceStore {
         await this.context.graphClient.mutate<DeleteTeamConfiguration.Mutation, DeleteTeamConfiguration.Variables>({
             name: "DeleteTeamConfiguration",
             variables: {
-                name: name,
+                name,
                 namespace: normalizeNamespace(namespace),
             },
             options: MutationNoCacheOptions,

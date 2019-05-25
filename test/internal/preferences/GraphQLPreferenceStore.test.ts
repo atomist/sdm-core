@@ -17,9 +17,9 @@
 // tslint:disable:deprecation
 
 import { PreferenceScope } from "@atomist/sdm";
+import * as _ from "lodash";
 import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
 import { assertPreferences } from "./preferences";
-import * as _ from "lodash";
 
 describe("GraphQLPreferenceStore", () => {
 
@@ -46,7 +46,7 @@ describe("GraphQLPreferenceStore", () => {
                     _.forEach(store, v => prefs.push(v));
                     return {
                         SdmPreference: prefs,
-                    }
+                    };
                 }
             },
         },

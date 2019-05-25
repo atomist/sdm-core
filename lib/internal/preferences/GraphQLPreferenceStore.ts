@@ -83,7 +83,7 @@ export class GraphQLPreferenceStore extends AbstractPreferenceStore {
                 namespace: p.key.includes("_$_") ? p.key.split("_$_")[0] : undefined,
                 value: p.value,
                 ttl: p.ttl,
-            }))
+            }));
         }
         return [];
     }

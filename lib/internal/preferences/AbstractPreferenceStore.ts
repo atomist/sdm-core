@@ -78,7 +78,7 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
                 } else {
                     return { key: pref.name, value: JSON.parse(pref.value) as V };
                 }
-            })
+            });
             return values.filter(v => !!v);
         }
     }
