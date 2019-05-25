@@ -22,8 +22,10 @@ import {
     logger,
 } from "@atomist/automation-client";
 import { redact } from "@atomist/automation-client/lib/util/redact";
-import { format,
-    ProgressLog } from "@atomist/sdm";
+import {
+    format,
+    ProgressLog,
+} from "@atomist/sdm";
 import * as _ from "lodash";
 import os = require("os");
 
