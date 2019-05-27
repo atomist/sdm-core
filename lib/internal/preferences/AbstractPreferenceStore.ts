@@ -39,9 +39,8 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
     }
 
     public async get<V>(key: string,
-                        scope: PreferenceScope | string = PreferenceScope.Workspace,
-                        options?: { defaultValue?: V }): Promise<V | undefined> {
-        const pref = await this.doGet(key, this.scope(scope));
+                        options: { scope?: PreferenceScope | string, defaultValue?: V } = {}): Promise<V | undefined> {
+        const pref = await this.doGet(key, this.scope(options.scope));
         const defaultValue = !!options ? options.defaultValue : undefined;
         if (!pref) {
             return defaultValue;
@@ -55,11 +54,10 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
 
     public async put<V>(key: string,
                         value: V,
-                        scope?: PreferenceScope | string,
-                        options: { ttl?: number } = {}): Promise<V> {
+                        options: { scope?: PreferenceScope | string, ttl?: number } = {}): Promise<V> {
         const pref: Preference = {
             name: key,
-            namespace: this.scope(scope),
+            namespace: this.scope(options.scope),
             value: JSON.stringify(value),
             ttl: options.ttl,
         };
@@ -83,8 +81,8 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
         }
     }
 
-    public async delete(key: string, scope?: PreferenceScope | string): Promise<void> {
-        return this.doDelete(key, this.scope(scope));
+    public async delete(key: string, options: { scope?: PreferenceScope | string } = {}): Promise<void> {
+        return this.doDelete(key, this.scope(options.scope));
     }
 
     protected abstract doGet(key: string, namespace: string): Promise<Preference | undefined>;
