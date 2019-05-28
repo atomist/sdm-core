@@ -26,6 +26,10 @@ import {
     format,
     ProgressLog,
 } from "@atomist/sdm";
+import {
+    AllHtmlEntities,
+    Entities,
+} from "html-entities";
 import * as _ from "lodash";
 import os = require("os");
 
@@ -47,6 +51,7 @@ export class RolarProgressLog implements ProgressLog {
     private readonly bufferSizeLimit: number;
     private readonly timerInterval: number;
     private readonly redact: boolean;
+    private readonly entities: Entities;
 
     constructor(private readonly logPath: string[],
                 private readonly configuration: Configuration,
@@ -60,6 +65,7 @@ export class RolarProgressLog implements ProgressLog {
             this.timer = setInterval(() => this.flush(), this.timerInterval).unref();
         }
         this.httpClient = _.get(configuration, "http.client.factory", DefaultHttpClientFactory).create(this.rolarBaseUrl);
+        this.entities = new AllHtmlEntities();
     }
 
     get name(): string {
@@ -82,7 +88,7 @@ export class RolarProgressLog implements ProgressLog {
     }
 
     public write(msg: string = "", ...args: string[]): void {
-        const fmsg = format(msg, ...args);
+        const fmsg = this.entities.encode(format(msg, ...args));
         const line = this.redact ? redact(fmsg) : fmsg;
         const now: Date = this.timestamper.next().value;
         this.localLogs.push({

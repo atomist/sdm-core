@@ -159,7 +159,7 @@ describe("RolarProgressLog", () => {
         assert.deepEqual((log as any).localLogs, [
             {
                 level: "info",
-                message: "I'm a lumberjack and I'm OK",
+                message: "I&apos;m a lumberjack and I&apos;m OK",
                 timestamp: "01/01/1970 00:00:00.000",
                 timestampMillis: 0,
             },
@@ -201,7 +201,7 @@ describe("RolarProgressLog", () => {
                 const expectedRequest = [
                     {
                         level: "info",
-                        message: "He's a lumberjack and he's OK",
+                        message: "He&apos;s a lumberjack and he&apos;s OK",
                         timestamp: "01/01/1970 00:00:00.000",
                         timestampMillis: 0,
                     },
@@ -412,7 +412,7 @@ describe("RolarProgressLog", () => {
         assert.deepEqual((log as any).localLogs, [
             {
                 level: "debug",
-                message: "I'm a lumberjack and I'm OK",
+                message: "I&apos;m a lumberjack and I&apos;m OK",
                 timestamp: "01/01/1970 00:00:00.000",
                 timestampMillis: 0,
             },
