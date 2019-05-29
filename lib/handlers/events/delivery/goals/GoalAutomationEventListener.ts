@@ -16,18 +16,29 @@
 
 import {
     AutomationClient,
-    automationClientInstance,
     AutomationEventListenerSupport,
     EventIncoming,
     guid,
     logger,
+    Maker,
     QueryNoCacheOptions,
     safeExit,
     Secrets,
 } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
+import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
+import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+import {
+    isCommandHandlerMetadata,
+    isEventHandlerMetadata,
+} from "@atomist/automation-client/lib/internal/metadata/metadata";
 import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import { AutomationMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
+import { AutomationMetadataProcessor } from "@atomist/automation-client/lib/spi/env/MetadataProcessor";
+import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
+import {
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
@@ -37,16 +48,6 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
 
     constructor(private readonly sdm: SoftwareDeliveryMachine) {
         super();
-    }
-
-    public eventIncoming(payload: EventIncoming): void {
-        if (cluster.isWorker) {
-            // Register event handler locally only
-            const maker = () => new FulfillGoalOnRequested(
-                this.sdm.goalFulfillmentMapper,
-                [...this.sdm.goalExecutionListeners]);
-            automationClientInstance().withEventHandler(maker);
-        }
     }
 
     public async startupSuccessful(client: AutomationClient): Promise<void> {
@@ -69,12 +70,6 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 options: QueryNoCacheOptions,
             });
 
-            // Register event handler locally only
-            const maker = () => new FulfillGoalOnRequested(
-                this.sdm.goalFulfillmentMapper,
-                [...this.sdm.goalExecutionListeners]);
-            client.withEventHandler(maker);
-
             // Create event and run event handler
             const event: EventIncoming = {
                 data: _.cloneDeep(goal),
@@ -82,7 +77,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     correlation_id: correlationId,
                     team_id: teamId,
                     team_name: teamName,
-                    operationName: metadataFromInstance(maker()).name,
+                    operationName: FulfillGoalOnRequested.constructor.name,
                 },
                 secrets: [{
                     uri: Secrets.OrgToken,
@@ -104,5 +99,26 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 safeExit(1);
             }
         }
+    }
+}
+
+export class FilteringMetadataProcessor implements AutomationMetadataProcessor {
+
+    private readonly allowedCommands: string[];
+    private readonly allowedEvents: string[];
+
+    constructor(allowedCommandHandlers: Array<Maker<HandleCommand<any>>>,
+                allowedEventHandlers: Array<Maker<HandleEvent<any>>>) {
+        this.allowedCommands = allowedCommandHandlers.map(h => metadataFromInstance(toFactory(h)()).name);
+        this.allowedEvents = allowedEventHandlers.map(h => metadataFromInstance(toFactory(h)()).name);
+    }
+
+    public process<T extends AutomationMetadata>(metadata: T): T {
+        if (isEventHandlerMetadata(metadata) && !this.allowedEvents.includes(metadata.name)) {
+            metadata.expose = false;
+        } else if (isCommandHandlerMetadata(metadata) && !this.allowedCommands.includes(metadata.name)) {
+            metadata.expose = false;
+        }
+        return metadata;
     }
 }

@@ -28,7 +28,11 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { CancelGoalOnCanceled } from "../../handlers/events/delivery/goals/CancelGoalOnCanceled";
-import { GoalAutomationEventListener } from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
+import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
+import {
+    FilteringMetadataProcessor,
+    GoalAutomationEventListener,
+} from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import { toArray } from "../../util/misc/array";
@@ -145,10 +149,10 @@ async function configureJobLaunching(mergedConfig: SoftwareDeliveryMachineConfig
 /**
  * Configure SDM to run only one goal
  * @param mergedConfig
- * @param machine
+ * @param sdm
  */
 function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineConfiguration,
-                                         machine: SoftwareDeliveryMachine): void {
+                                         sdm: SoftwareDeliveryMachine): void {
     if (process.env.ATOMIST_JOB_NAME) {
         mergedConfig.name = process.env.ATOMIST_REGISTRATION_NAME;
     } else {
@@ -158,12 +162,19 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     // Force ephemeral policy and no handlers or ingesters
     mergedConfig.policy = "ephemeral";
     mergedConfig.commands = [];
-    mergedConfig.events = [() => new CancelGoalOnCanceled()];
+    mergedConfig.events = [
+        () => new CancelGoalOnCanceled(),
+        () => new FulfillGoalOnRequested(
+            sdm.goalFulfillmentMapper,
+            [...sdm.goalExecutionListeners])];
     mergedConfig.ingesters = [];
+    mergedConfig.metadataProcessor = new FilteringMetadataProcessor(
+        [],
+        [() => new CancelGoalOnCanceled()]);
 
     mergedConfig.listeners.push(
-        new GoalAutomationEventListener(machine),
-        new CacheCleanupAutomationEventListener(machine));
+        new GoalAutomationEventListener(sdm),
+        new CacheCleanupAutomationEventListener(sdm));
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
