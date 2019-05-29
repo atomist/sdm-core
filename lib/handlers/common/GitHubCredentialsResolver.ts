@@ -23,7 +23,6 @@ import {
     RemoteRepoRef,
     Secret,
     Secrets,
-    Value,
 } from "@atomist/automation-client";
 import { ProviderType as RepoProviderType } from "@atomist/automation-client/lib/operations/common/RepoId";
 import { CredentialsResolver } from "@atomist/sdm";
@@ -33,58 +32,104 @@ import {
     ScmProviderByType,
 } from "../../typings/types";
 
+/**
+ * Type to implement different strategies to obtain a GitHub token
+ */
+type ObtainToken = (context: HandlerContext, id?: RemoteRepoRef) => Promise<string | undefined>;
+
 @Parameters()
 export class GitHubCredentialsResolver implements CredentialsResolver {
 
     @Secret(Secrets.OrgToken)
-    private readonly orgToken: string;
-
-    @Value({ path: "token", required: false, type: "string" })
-    private readonly clientToken: string;
+    public readonly orgToken: string;
 
     public async eventHandlerCredentials(context: HandlerContext,
                                          id?: RemoteRepoRef): Promise<ProjectOperationCredentials> {
-        return this.credentials(context, id);
+        return this.credentials(
+            [
+                obtainTokenFromConfiguration(this),
+                ObtainTokenFromIncomingMessage,
+                ObtainTokenFromProvider,
+            ],
+            context,
+            id);
     }
 
     public async commandHandlerCredentials(context: HandlerContext,
                                            id?: RemoteRepoRef): Promise<ProjectOperationCredentials> {
-        return this.credentials(context, id);
+        return this.credentials(
+            [
+                ObtainTokenFromIncomingMessage,
+                obtainTokenFromConfiguration(this),
+                ObtainTokenFromProvider,
+            ],
+            context,
+            id);
     }
 
-    private async credentials(context: HandlerContext,
+    private async credentials(obtainTokens: ObtainToken[],
+                              context: HandlerContext,
                               id?: RemoteRepoRef): Promise<ProjectOperationCredentials> {
 
-        // First try to obtain the token from the incoming event or command request
-        const actx: AutomationContextAware = context as any;
-        if (actx.trigger && actx.trigger.secrets) {
-            const secret = actx.trigger.secrets.find(s => s.uri === Secrets.OrgToken);
-            if (secret && hasToken(secret.value)) {
-                return { token: secret.value };
-            }
-        }
-
-        if (hasToken(this.orgToken)) {
-            return { token: this.orgToken };
-        } else if (hasToken(this.clientToken)) {
-            return { token: this.clientToken };
-        } else if (hasToken(configurationValue("token", "null"))) {
-            return { token: configurationValue<string>("token")};
-        } else if (hasToken(configurationValue("sdm.github.token", "null"))) {
-            return { token: configurationValue<string>("sdm.github.token")};
-        }
-
-        // Check the graph to see if we have a token on the provider
-        if (!!id && (id.providerType === RepoProviderType.github_com)) {
-            const token = await fetchTokenByProviderType(ProviderType.github_com, context);
+        for (const obtainToken of obtainTokens) {
+            const token = await obtainToken(context, id);
             if (hasToken(token)) {
                 return { token };
             }
         }
 
-        throw new Error("Neither 'orgToken' nor 'clientToken' has been injected. " +
-            "Please add a repo-scoped GitHub token to your configuration at 'token' or 'sdm.github.token'.");
+        throw new Error("No GitHub token available! Please add a token to the SDM configuration at 'sdm.github.token' "
+            + "or authenticate the GitHub SCM provider from the web app or CLI.");
     }
+}
+
+/**
+ * Obtain a org or user token from the incoming event or command invocation
+ */
+const ObtainTokenFromIncomingMessage: ObtainToken = async ctx => {
+    // Try to obtain the token from the incoming event or command
+    const actx: AutomationContextAware = ctx as any;
+    if (!!actx.trigger && !!actx.trigger.secrets) {
+        let secret = actx.trigger.secrets.find(s => s.uri === Secrets.OrgToken);
+        if (secret && hasToken(secret.value)) {
+            return secret.value;
+        }
+        secret = actx.trigger.secrets.find(s => s.uri.startsWith(Secrets.UserToken));
+        if (secret && hasToken(secret.value)) {
+            return secret.value;
+        }
+    }
+    return undefined;
+};
+
+/**
+ * Obtain a token from an SCMProvider
+ */
+const ObtainTokenFromProvider: ObtainToken = async (ctx, id) => {
+    // Check the graph to see if we have a token on the provider
+    if (!!id && (id.providerType === RepoProviderType.github_com)) {
+        const token = await fetchTokenByProviderType(ProviderType.github_com, ctx);
+        if (hasToken(token)) {
+            return token;
+        }
+    }
+    return undefined;
+};
+
+/**
+ * Obtain a token from the SDM configuration
+ */
+function obtainTokenFromConfiguration(resolver: GitHubCredentialsResolver): ObtainToken {
+    return async () => {
+        if (hasToken(resolver.orgToken)) {
+            return resolver.orgToken;
+        } else if (hasToken(configurationValue("token", "null"))) {
+            return configurationValue<string>("token");
+        } else if (hasToken(configurationValue("sdm.github.token", "null"))) {
+            return configurationValue<string>("sdm.github.token");
+        }
+        return undefined;
+    };
 }
 
 function hasToken(token: string): boolean {
