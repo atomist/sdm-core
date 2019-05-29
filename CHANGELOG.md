@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.5.0...HEAD)
 
+### Changed
+
+-   Reorder token resolution. [#149](https://github.com/atomist/sdm-core/issues/149)
+
 ## [1.5.0](https://github.com/atomist/sdm-core/compare/1.4.0...1.5.0) - 2019-05-27
 
 ### Added
