@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Reorder token resolution. [#149](https://github.com/atomist/sdm-core/issues/149)
 
+### Fixed
+
+-   Replace process.exit with safeExit. [#155](https://github.com/atomist/sdm-core/issues/155)
+
 ## [1.5.0](https://github.com/atomist/sdm-core/compare/1.4.0...1.5.0) - 2019-05-27
 
 ### Added
