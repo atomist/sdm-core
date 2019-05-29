@@ -22,6 +22,7 @@ import {
     guid,
     logger,
     QueryNoCacheOptions,
+    safeExit,
     Secrets,
 } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
@@ -88,11 +89,20 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     value: "null",
                 }],
             };
-            await client.processEvent(event, async results => {
-                const resolved = await results;
-                logger.info("Processing goal completed with results %j", resolved);
-                setTimeout(() => process.exit(0), 10000);
-            });
+            try {
+                await new Promise<void>((resolve, reject) => {
+                    client.processEvent(event, pResults => {
+                        pResults.then(results => {
+                            logger.info("Processing goal completed with results %j", results);
+                            resolve();
+                        }, reject);
+                    });
+                });
+                safeExit(0);
+            } catch (e) {
+                logger.error(`Processing goal failed: ${e.message}`);
+                safeExit(1);
+            }
         }
     }
 }

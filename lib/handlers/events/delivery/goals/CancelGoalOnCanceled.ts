@@ -21,6 +21,7 @@ import {
     HandlerContext,
     HandlerResult,
     logger,
+    safeExit,
     Success,
     Value,
 } from "@atomist/automation-client";
@@ -49,8 +50,7 @@ export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGo
     @Value("") // empty path returns the entire configuration
     public configuration: SoftwareDeliveryMachineConfiguration;
 
-    public async handle(e: EventFired<OnSpecificCanceledSdmGoal.Subscription>,
-                        ctx: HandlerContext): Promise<HandlerResult> {
+    public async handle(e: EventFired<OnSpecificCanceledSdmGoal.Subscription>, ctx: HandlerContext): Promise<HandlerResult> {
 
         const sdmGoal = e.data.SdmGoal[0] as SdmGoalEvent;
 
@@ -61,15 +61,14 @@ export class CancelGoalOnCanceled implements HandleEvent<OnSpecificCanceledSdmGo
 
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, ctx);
 
-        logger.info("Exciting this process because goal was canceled");
+        logger.info("Exiting this process because goal was canceled");
 
-        // Exit with 0 to make sure k8s doesn't re-schedule this pod
+        // exit immediately with 0 to make sure k8s doesn't re-schedule this pod
+        automationClientInstance().configuration.ws.termination.graceful = false;
         if (cluster.isWorker) {
-            (automationClientInstance().webSocketHandler as ClusterWorkerRequestProcessor).sendShutdown(0, ctx as any);
-        } else {
-            automationClientInstance().configuration.ws.termination.graceful = false;
-            process.exit(0);
+            await (automationClientInstance().webSocketHandler as ClusterWorkerRequestProcessor).sendShutdown(0, ctx as any);
         }
+        safeExit(0);
 
         return Success;
     }
