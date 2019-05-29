@@ -22,6 +22,8 @@ import {
     StoredArtifact,
 } from "@atomist/sdm";
 
+/* tslint:disable:deprecation */
+
 /**
  * Store the artifact on local disk, relying on in memory cache.
  * **This is purely for demo and test use. It is NOT a production
