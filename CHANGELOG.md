@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   Reorder token resolution. [#149](https://github.com/atomist/sdm-core/issues/149)
+-   Differentiate between goal and handler results. [#159](https://github.com/atomist/sdm-core/issues/159)
 
 ### Fixed
 
