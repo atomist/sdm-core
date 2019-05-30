@@ -33,6 +33,7 @@ import {
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";
+import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
 import { toArray } from "../../util/misc/array";
@@ -106,8 +107,8 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                 await batch.deleteNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace, {} as any);
                 logger.debug(`k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
             } catch (e) {
-                logger.error(`Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
-                    JSON.stringify(e.body)}`);
+                logger.error(`Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal ` +
+                    `'${goalEvent.uniqueName}': ${stringify(e.body)}`);
                 return {
                     code: 1,
                     message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' ` +
@@ -126,13 +127,12 @@ export class KubernetesGoalScheduler implements GoalScheduler {
 
             await this.afterCreation(gi, jobResult);
 
-            logger.info(
-                `Scheduled k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' with result: ${
-                    JSON.stringify(jobResult.status)}`);
-            logger.log("silly", JSON.stringify(jobResult));
+            logger.info(`Scheduled k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' ` +
+                `with result: ${stringify(jobResult.status)}`);
+            logger.log("silly", stringify(jobResult));
         } catch (e) {
-            logger.error(`Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}': ${
-                JSON.stringify(e.body)}`);
+            logger.error(`Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal ` +
+                `'${goalEvent.uniqueName}': ${stringify(e.body)}`);
             return {
                 code: 1,
                 message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' ` +
@@ -239,9 +239,7 @@ export async function cleanCompletedJobs(): Promise<void> {
  * @param gi
  * @param context
  */
-export function createJobSpec(podSpec: k8s.V1Pod,
-                              podNs: string,
-                              gi: GoalInvocation): k8s.V1Job {
+export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocation): k8s.V1Job {
     const { goalEvent, context } = gi;
     const goalName = goalEvent.uniqueName.split("#")[0].toLowerCase();
 
@@ -255,9 +253,9 @@ export function createJobSpec(podSpec: k8s.V1Pod,
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
 
     jobSpec.spec.template.spec.containers[0].env.push({
-            name: "ATOMIST_JOB_NAME",
-            value: jobSpec.metadata.name,
-        } as any,
+        name: "ATOMIST_JOB_NAME",
+        value: jobSpec.metadata.name,
+    } as any,
         {
             name: "ATOMIST_REGISTRATION_NAME",
             value: `${automationClientInstance().configuration.name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`,
