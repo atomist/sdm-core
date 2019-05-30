@@ -36,9 +36,7 @@ import { metadataFromInstance } from "@atomist/automation-client/lib/internal/me
 import { AutomationMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
 import { AutomationMetadataProcessor } from "@atomist/automation-client/lib/spi/env/MetadataProcessor";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
-import {
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalById } from "../../../../typings/types";
@@ -77,7 +75,9 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                     correlation_id: correlationId,
                     team_id: teamId,
                     team_name: teamName,
-                    operationName: FulfillGoalOnRequested.constructor.name,
+                    operationName: metadataFromInstance(new FulfillGoalOnRequested(
+                        this.sdm.goalFulfillmentMapper,
+                        [...this.sdm.goalExecutionListeners])).name,
                 },
                 secrets: [{
                     uri: Secrets.OrgToken,
