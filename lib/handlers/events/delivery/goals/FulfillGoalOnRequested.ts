@@ -166,6 +166,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                     return res;
                 }, async err => {
                     await reportEndAndClose(err, start, progressLog);
+                    // TODO CD does it make sense to re-throw this error?
                     throw err;
                 });
             return {
