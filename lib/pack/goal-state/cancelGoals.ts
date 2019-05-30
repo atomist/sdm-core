@@ -25,7 +25,6 @@ import {
     CommandHandlerRegistration,
     fetchGoalsForCommit,
     GoalSetRootType,
-    InProcessSdmGoalSets,
     slackFooter,
     slackInfoMessage,
     slackSuccessMessage,
@@ -42,6 +41,7 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import {
+    InProcessSdmGoalSets,
     SdmGoalSetForId,
     SdmGoalState,
 } from "../../typings/types";
