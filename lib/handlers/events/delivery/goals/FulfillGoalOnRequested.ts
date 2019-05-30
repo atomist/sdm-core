@@ -145,8 +145,9 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 });
             }
             return {
-                code: 0,
                 ...result as any,
+                // successfully handled event even if goal failed
+                code: 0,
             };
         } else {
             delete (sdmGoal as any).id;
@@ -154,24 +155,24 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
-            const result = await executeGoal(
-                {
-                    projectLoader: this.configuration.sdm.projectLoader,
-                    goalExecutionListeners: this.goalExecutionListeners,
-                },
-                implementation,
-                goalInvocation)
-                .then(async res => {
-                    await reportEndAndClose(res, start, progressLog);
-                    return res;
-                }, async err => {
-                    await reportEndAndClose(err, start, progressLog);
-                    throw err;
-                });
-            return {
-                code: 0,
-                ...result,
-            };
+            try {
+                const result = await executeGoal(
+                    {
+                        projectLoader: this.configuration.sdm.projectLoader,
+                        goalExecutionListeners: this.goalExecutionListeners,
+                    },
+                    implementation,
+                    goalInvocation);
+                await reportEndAndClose(result, start, progressLog);
+                return {
+                    ...result,
+                    // successfully handled event even if goal failed
+                    code: 0,
+                };
+            } catch (e) {
+                await reportEndAndClose(e, start, progressLog);
+                throw e;
+            }
         }
     }
 }
