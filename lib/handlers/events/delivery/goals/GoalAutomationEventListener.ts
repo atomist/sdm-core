@@ -96,7 +96,10 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 safeExit(0);
             } catch (e) {
                 logger.error(`Processing goal failed: ${e.message}`);
-                safeExit(1);
+                // We always have to exit with 0 here as otherwise k8s will launch a new instance
+                // FulfillGoalOnRequested throws an error in case of a failing goal
+                // ^ TODO CD look at if that makes any sense or can be changed
+                safeExit(0);
             }
         }
     }
