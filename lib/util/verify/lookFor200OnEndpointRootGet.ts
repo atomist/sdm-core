@@ -19,7 +19,6 @@ import {
     DefaultHttpClientFactory,
     HttpClientFactory,
     HttpMethod,
-    HttpResponse,
     logger,
 } from "@atomist/automation-client";
 import {

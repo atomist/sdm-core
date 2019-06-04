@@ -52,7 +52,7 @@ export async function renderDiff(token: string, id: GitHubRepoRef, start: string
     }));
 
     logger.info("Rendering %d commits in diff", commits.length);
-    return render({owner: id.owner, name: id.repo}, commits, diffUrl(id, start, end), color);
+    return render({ owner: id.owner, name: id.repo }, commits, diffUrl(id, start, end), color);
 }
 
 // exported for testing
@@ -70,14 +70,14 @@ function render(repo: RepoInfo, commits: CommitForRendering[], fullDiffLink: str
 
     let author;
     let commitsByAuthor: any = {};
-    let unknownCommitter = false;
+    // let unknownCommitter = false;
     for (const commit of commits) {
         const ca = (commit.author !== undefined && commit.author.login && commit.author.login !== ""
             ? commit.author.login : "(unknown)");
 
-        if (ca === "(unknown)") {
-            unknownCommitter = true;
-        }
+        // if (ca === "(unknown)") {
+        //     unknownCommitter = true;
+        // }
 
         if (author === undefined || author !== ca) {
             commitsByAuthor = {

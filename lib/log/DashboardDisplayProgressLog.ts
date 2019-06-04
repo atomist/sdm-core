@@ -33,7 +33,7 @@ export class DashboardDisplayProgressLog implements ProgressLog {
     private readonly rolarProgressLog: RolarProgressLog;
     private readonly dashboardBaseUrl: string;
 
-    constructor(private readonly configuration: Configuration,
+    constructor(configuration: Configuration,
                 private readonly context: HandlerContext,
                 private readonly sdmGoal: SdmGoalEvent) {
         this.dashboardBaseUrl = _.get(configuration, "sdm.rolar.webAppUrl",

@@ -35,7 +35,6 @@ import * as p from "path";
 import * as tmp from "tmp-promise";
 import * as URL from "url";
 import {
-    authHeaders,
     createRelease,
     createTag,
     Release,

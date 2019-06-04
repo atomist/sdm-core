@@ -35,7 +35,7 @@ export class InMemoryPreferenceStore extends AbstractPreferenceStore {
 
     private readonly store: { [key: string]: Preference } = {};
 
-    constructor(private readonly context: HandlerContext) {
+    constructor(context: HandlerContext) {
         super(context);
     }
 

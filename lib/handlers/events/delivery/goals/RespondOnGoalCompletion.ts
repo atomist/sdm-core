@@ -15,7 +15,6 @@
  */
 
 import {
-    Configuration,
     EventFired,
     GraphQL,
     HandlerContext,

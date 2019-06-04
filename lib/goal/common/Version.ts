@@ -40,7 +40,7 @@ export interface ProjectVersionerRegistration extends Partial<ImplementationRegi
  */
 export class Version extends FulfillableGoalWithRegistrations<ProjectVersionerRegistration> {
 
-    constructor(private readonly goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("version"),
+    constructor(goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("version"),
                 ...dependsOn: Goal[]) {
 
         super({

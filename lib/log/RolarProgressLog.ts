@@ -49,7 +49,7 @@ export class RolarProgressLog implements ProgressLog {
     private readonly redact: boolean;
 
     constructor(private readonly logPath: string[],
-                private readonly configuration: Configuration,
+                configuration: Configuration,
                 private readonly logLevel: string = "info",
                 private readonly timestamper: Iterator<Date> = timestampGenerator()) {
         this.rolarBaseUrl = _.get(configuration, "sdm.rolar.url", "https://rolar.atomist.com");

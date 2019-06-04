@@ -16,16 +16,9 @@
 
 import {
     GitProject,
-    guid,
-    LocalProject,
     Project,
 } from "@atomist/automation-client";
-import {
-    GoalInvocation,
-    spawnLog,
-} from "@atomist/sdm";
-import * as fs from "fs-extra";
-import * as path from "path";
+import { GoalInvocation } from "@atomist/sdm";
 import { GoalCache } from "./goalCaching";
 
 /**

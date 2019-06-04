@@ -48,9 +48,8 @@ export const FilePreferenceStoreFactory: PreferenceStoreFactory = ctx => new Fil
  */
 export class FilePreferenceStore extends AbstractPreferenceStore {
 
-    constructor(private readonly context: HandlerContext,
-                private readonly filePath: string =
-                    path.join(os.homedir(), ".atomist", "prefs", "client.prefs.json")) {
+    constructor(context: HandlerContext,
+                private readonly filePath: string = path.join(os.homedir(), ".atomist", "prefs", "client.prefs.json")) {
         super(context);
         this.init();
     }

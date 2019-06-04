@@ -22,7 +22,6 @@ import {
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
-    goalKeyString,
     GoalsSetListener,
     GoalsSetListenerInvocation,
     SdmGoalEvent,
