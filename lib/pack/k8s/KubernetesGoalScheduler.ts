@@ -22,12 +22,14 @@ import {
     Configuration,
     configurationValue,
     doWithRetry,
+    HandlerContext,
     logger,
 } from "@atomist/automation-client";
 import {
     ExecuteGoalResult,
     GoalInvocation,
     GoalScheduler,
+    SdmGoalEvent,
     ServiceRegistrationGoalDataKey,
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
@@ -36,6 +38,7 @@ import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
+import { DeepPartial } from "ts-essentials";
 import { toArray } from "../../util/misc/array";
 import {
     loadKubeClusterConfig,
@@ -63,7 +66,7 @@ export interface KubernetesGoalSchedulerOptions {
  */
 export class KubernetesGoalScheduler implements GoalScheduler {
 
-    private podSpec: k8s.V1Pod;
+    public podSpec: k8s.V1Pod;
 
     constructor(private readonly options: KubernetesGoalSchedulerOptions = { isolateAll: false }) {
     }
@@ -231,62 +234,85 @@ export async function cleanCompletedJobs(): Promise<void> {
     }
 }
 
+/** Unique name for goal to use in k8s job spec. */
+function k8sJobGoalName(goalEvent: SdmGoalEvent): string {
+    return goalEvent.uniqueName.split("#")[0].toLowerCase();
+}
+
+/** Unique name for job to use in k8s job spec. */
+export function k8sJobName(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent): string {
+    const goalName = k8sJobGoalName(goalEvent);
+    return `${podSpec.spec.containers[0].name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`
+        .slice(0, 63).replace(/[^a-z0-9]*$/, "");
+}
+
+/**
+ * Kubernetes container spec environment variables that specify an SDM
+ * running in single-goal mode.
+ */
+export function k8sJobEnv(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent, context: HandlerContext): k8s.V1EnvVar[] {
+    const goalName = k8sJobGoalName(goalEvent);
+    const jobName = k8sJobName(podSpec, goalEvent);
+    const envVars: Array<DeepPartial<k8s.V1EnvVar>> = [
+        {
+            name: "ATOMIST_JOB_NAME",
+            value: jobName,
+        },
+        {
+            name: "ATOMIST_REGISTRATION_NAME",
+            value: `${automationClientInstance().configuration.name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`,
+        },
+        {
+            name: "ATOMIST_GOAL_TEAM",
+            value: context.workspaceId,
+        },
+        {
+            name: "ATOMIST_GOAL_TEAM_NAME",
+            value: (context as any as AutomationContextAware).context.workspaceName,
+        },
+        {
+            name: "ATOMIST_GOAL_ID",
+            value: (goalEvent as any).id,
+        },
+        {
+            name: "ATOMIST_GOAL_SET_ID",
+            value: goalEvent.goalSetId,
+        },
+        {
+            name: "ATOMIST_GOAL_UNIQUE_NAME",
+            value: goalEvent.uniqueName,
+        },
+        {
+            name: "ATOMIST_CORRELATION_ID",
+            value: context.correlationId,
+        },
+        {
+            name: "ATOMIST_ISOLATED_GOAL",
+            value: "true",
+        },
+    ];
+    return envVars as k8s.V1EnvVar[];
+}
+
 /**
  * Create a jobSpec by modifying the provided podSpec
  * @param podSpec
  * @param podNs
  * @param gi
- * @param context
  */
 export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocation): k8s.V1Job {
     const { goalEvent, context } = gi;
-    const goalName = goalEvent.uniqueName.split("#")[0].toLowerCase();
 
     const jobSpec = createJobSpecWithAffinity(podSpec, gi);
 
-    jobSpec.metadata.name = (`${podSpec.spec.containers[0].name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`).slice(0, 63);
+    jobSpec.metadata.name = k8sJobName(podSpec, goalEvent);
     jobSpec.metadata.namespace = podNs;
 
     jobSpec.spec.backoffLimit = 1;
     jobSpec.spec.template.spec.restartPolicy = "Never";
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
 
-    jobSpec.spec.template.spec.containers[0].env.push({
-        name: "ATOMIST_JOB_NAME",
-        value: jobSpec.metadata.name,
-    } as any,
-        {
-            name: "ATOMIST_REGISTRATION_NAME",
-            value: `${automationClientInstance().configuration.name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`,
-        } as any,
-        {
-            name: "ATOMIST_GOAL_TEAM",
-            value: context.workspaceId,
-        } as any,
-        {
-            name: "ATOMIST_GOAL_TEAM_NAME",
-            value: (context as any as AutomationContextAware).context.workspaceName,
-        } as any,
-        {
-            name: "ATOMIST_GOAL_ID",
-            value: (goalEvent as any).id,
-        } as any,
-        {
-            name: "ATOMIST_GOAL_SET_ID",
-            value: goalEvent.goalSetId,
-        } as any,
-        {
-            name: "ATOMIST_GOAL_UNIQUE_NAME",
-            value: goalEvent.uniqueName,
-        } as any,
-        {
-            name: "ATOMIST_CORRELATION_ID",
-            value: context.correlationId,
-        } as any,
-        {
-            name: "ATOMIST_ISOLATED_GOAL",
-            value: "true",
-        } as any);
+    jobSpec.spec.template.spec.containers[0].env.push(...k8sJobEnv(podSpec, goalEvent, context));
 
     rewriteCachePath(jobSpec, context.workspaceId);
 
@@ -518,7 +544,7 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
     }
 }
 
-const NamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
+export const K8sNamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
 
 /**
  * Read the namespace of the deployment from environment and k8s service account files.
@@ -530,8 +556,8 @@ export async function readNamespace(): Promise<string> {
         return podNs;
     }
 
-    if (await fs.pathExists(NamespaceFile)) {
-        podNs = (await fs.readFile(NamespaceFile)).toString().trim();
+    if (await fs.pathExists(K8sNamespaceFile)) {
+        podNs = (await fs.readFile(K8sNamespaceFile)).toString().trim();
     }
 
     if (!!podNs) {
