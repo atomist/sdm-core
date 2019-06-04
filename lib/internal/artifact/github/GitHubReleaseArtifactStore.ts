@@ -80,8 +80,8 @@ export class GitHubReleaseArtifactStore implements ArtifactStore {
     // Name is of format fintan-0.1.0-SNAPSHOT.jar
     public async checkout(url: string, id: RemoteRepoRef, creds: ProjectOperationCredentials): Promise<DeployableArtifact> {
         logger.info("Attempting to download artifact [%s] for %j", url, id);
-        const tmpDir = tmp.dirSync({ unsafeCleanup: true });
-        const cwd = tmpDir.name;
+        const tmpDir = await tmp.dir({ prefix: "GitHubReleaseArtifactStore-", unsafeCleanup: true });
+        const cwd = tmpDir.path;
         const lastSlash = url.lastIndexOf("/");
         const filename = url.substring(lastSlash + 1);
         const re = /([a-zA-Z0-9_]+)-(.*)/;
