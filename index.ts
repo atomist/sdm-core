@@ -28,6 +28,26 @@ export {
     ProjectVersionerRegistration,
 } from "./lib/goal/common/Version";
 export {
+    Container,
+    containerGoal,
+    ContainerPort,
+    ContainerProjectHome,
+    ContainerRegistration,
+    ContainerScheduler,
+    ContainerSpecCallback,
+    ContainerVolumeMount,
+    GoalContainer,
+    GoalContainerVolume,
+} from "./lib/goal/container/container";
+export {
+    DockerContainerRegistration,
+} from "./lib/goal/container/docker";
+export {
+    K8sContainerRegistration,
+    K8sContainerSpecCallback,
+    K8sGoalContainerSpec,
+} from "./lib/goal/container/k8s";
+export {
     DisplayDeployEnablement,
 } from "./lib/handlers/commands/DisplayDeployEnablement";
 export {
