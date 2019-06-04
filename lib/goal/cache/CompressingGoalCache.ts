@@ -15,10 +15,8 @@
  */
 
 import {
-    GitProject,
     guid,
     LocalProject,
-    Project,
 } from "@atomist/automation-client";
 import {
     GoalInvocation,
@@ -65,17 +63,17 @@ export class CompressingGoalCache implements GoalCache {
         this.store = store;
     }
 
-    public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
+    public async put(gi: GoalInvocation, project: LocalProject, files: string[], classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(project.baseDir, `${archiveName}.${guid().slice(0, 7)}`);
 
         await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
             log: gi.progressLog,
-            cwd: (project as LocalProject).baseDir,
+            cwd: project.baseDir,
         });
         await spawnLog("gzip", ["-3", teamArchiveFileName], {
             log: gi.progressLog,
-            cwd: (project as LocalProject).baseDir,
+            cwd: project.baseDir,
         });
         await this.store.store(gi, classifier, teamArchiveFileName + ".gz");
     }
@@ -84,14 +82,14 @@ export class CompressingGoalCache implements GoalCache {
         await this.store.delete(gi, classifier);
     }
 
-    public async retrieve(gi: GoalInvocation, project: Project, classifier?: string): Promise<void> {
+    public async retrieve(gi: GoalInvocation, project: LocalProject, classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
-        const teamArchiveFileName = path.join((project as LocalProject).baseDir, `${archiveName}.${guid().slice(0, 7)}`);
+        const teamArchiveFileName = path.join(project.baseDir, `${archiveName}.${guid().slice(0, 7)}`);
         await this.store.retrieve(gi, classifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
             await spawnLog("tar", ["-xzf", teamArchiveFileName], {
                 log: gi.progressLog,
-                cwd: (project as LocalProject).baseDir,
+                cwd: project.baseDir,
             });
         } else {
             throw Error("No cache entry");
