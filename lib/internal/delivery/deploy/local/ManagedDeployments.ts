@@ -131,8 +131,10 @@ export class ManagedDeployments {
                 return this.deployments
                     .find(d => d.id.owner === id.owner && d.id.repo === id.repo && d.id.branch === id.branch);
             case LookupStrategy.service:
-                this.deployments
+                return this.deployments
                     .find(d => d.id.owner === id.owner && d.id.repo === id.repo);
+            default:
+                return undefined;
         }
     }
 

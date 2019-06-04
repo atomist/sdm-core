@@ -49,7 +49,7 @@ export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine)
 }
 
 export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): GoalCompletionListener {
-    return async (inv: GoalCompletionListenerInvocation) => {
+    return async (inv: GoalCompletionListenerInvocation): Promise<any> => {
         const { id, completedGoal, allGoals, credentials } = inv;
 
         if (completedGoal.state === "failure") {
@@ -70,6 +70,7 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
                 state: "success",
             });
         }
+        return;
     };
 }
 

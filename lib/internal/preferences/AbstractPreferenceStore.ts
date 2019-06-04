@@ -111,5 +111,6 @@ export abstract class AbstractPreferenceStore implements PreferenceStore {
                     return scope;
             }
         }
+        return "";
     }
 }

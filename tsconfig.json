@@ -15,19 +15,16 @@
       "ScriptHost",
       "esnext.asynciterable"
     ],
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
     "strict": false,
     "strictNullChecks": false,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "exclude": [
-    "node_modules",
-    "docs",
-    "legal"
-  ],
+  "include": ["index.ts", "bin/*.ts", "lib/**/*.ts", "test/**/*.ts"],
+  "exclude": [".#*"],
   "compileOnSave": true,
   "buildOnSave": false,
   "atom": {

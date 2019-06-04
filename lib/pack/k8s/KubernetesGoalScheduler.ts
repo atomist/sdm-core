@@ -91,6 +91,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         const batch = kc.makeApiClient(k8s.Batch_v1Api);
 
         const jobSpec = createJobSpec(_.cloneDeep(this.podSpec), podNs, gi);
+        const jobDesc = `k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`;
         await this.beforeCreation(gi, jobSpec);
 
         gi.progressLog.write(`/--`);
@@ -101,18 +102,15 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         try {
             // Check if this job was previously launched
             await batch.readNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace);
-            logger.debug(
-                `k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' already exists. Deleting...`);
+            logger.debug(`${jobDesc} already exists. Deleting...`);
             try {
                 await batch.deleteNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace, {} as any);
-                logger.debug(`k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' deleted`);
+                logger.debug(`${jobDesc} deleted`);
             } catch (e) {
-                logger.error(`Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal ` +
-                    `'${goalEvent.uniqueName}': ${stringify(e.body)}`);
+                logger.error(`Failed to delete ${jobDesc}: ${stringify(e.body)}`);
                 return {
                     code: 1,
-                    message: `Failed to delete k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' ` +
-                        `for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
+                    message: `Failed to delete ${jobDesc}: ${prettyPrintError(e)}`,
                 };
             }
         } catch (e) {
@@ -123,23 +121,24 @@ export class KubernetesGoalScheduler implements GoalScheduler {
             // Previous deletion might not have completed; hence the retry here
             const jobResult = (await doWithRetry<{ body: k8s.V1Job }>(
                 () => batch.createNamespacedJob(jobSpec.metadata.namespace, jobSpec),
-                `Scheduling k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`)).body;
+                `Scheduling ${jobDesc}`)).body;
 
             await this.afterCreation(gi, jobResult);
 
-            logger.info(`Scheduled k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}' ` +
-                `with result: ${stringify(jobResult.status)}`);
+            logger.info(`Scheduled ${jobDesc} with result: ${stringify(jobResult.status)}`);
             logger.log("silly", stringify(jobResult));
         } catch (e) {
-            logger.error(`Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal ` +
-                `'${goalEvent.uniqueName}': ${stringify(e.body)}`);
+            logger.error(`Failed to schedule ${jobDesc}: ${stringify(e.body)}`);
             return {
                 code: 1,
-                message: `Failed to schedule k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' ` +
-                    `for goal '${goalEvent.uniqueName}': ${prettyPrintError(e)}`,
+                message: `Failed to schedule ${jobDesc}: ${prettyPrintError(e)}`,
             };
         }
         await gi.progressLog.flush();
+        return {
+            code: 0,
+            message: `Scheduled ${jobDesc}`,
+        };
     }
 
     /**
@@ -479,9 +478,8 @@ export function isConfiguredInEnv(...values: string[]): boolean {
                 return values.includes(value);
             }
         }
-    } else {
-        return false;
     }
+    return false;
 }
 
 /**

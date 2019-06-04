@@ -150,6 +150,8 @@ function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: stri
         case SdmGoalFulfillmentMethod.Other:
             // legacy behavior
             return true;
+        default:
+            return false;
     }
 }
 

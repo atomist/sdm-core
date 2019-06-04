@@ -162,7 +162,7 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
                 msg = slackInfoMessage("", "");
                 break;
             default:
-                return;
+                return undefined;
         }
 
         const author = `Goal ${suffix}`;

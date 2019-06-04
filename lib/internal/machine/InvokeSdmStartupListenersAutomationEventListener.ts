@@ -15,7 +15,10 @@
  */
 
 import { AutomationEventListenerSupport } from "@atomist/automation-client";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import {
+    AbstractSoftwareDeliveryMachine,
+    SoftwareDeliveryMachine,
+} from "@atomist/sdm";
 
 /**
  * AutomationEventListener that notifies the SDM StartupListeners that this SDM has been
@@ -27,9 +30,10 @@ export class InvokeSdmStartupListenersAutomationEventListener extends Automation
         super();
     }
 
-    public startupSuccessful(): Promise<any> {
-        if ((this.sdm as any).notifyStartupListeners) {
-            return (this.sdm as any).notifyStartupListeners();
+    public startupSuccessful(): Promise<void> {
+        if ((this.sdm as AbstractSoftwareDeliveryMachine).notifyStartupListeners) {
+            return (this.sdm as AbstractSoftwareDeliveryMachine).notifyStartupListeners();
         }
+        return Promise.resolve();
     }
 }

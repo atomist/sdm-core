@@ -224,7 +224,7 @@ async function registerMetadata(config: Configuration,
  * @param {(sdmLocal: any) => any} callback
  * @return {any}
  */
-async function doWithSdmLocal<R>(callback: (sdmLocal: any) => any): Promise<R | null> {
+async function doWithSdmLocal<R>(callback: (sdmLocal: any) => any): Promise<R | undefined> {
     if (isInLocalMode() || isGitHubAction()) {
         // tslint:disable-next-line:no-implicit-dependencies
         const local = attemptToRequire("@atomist/sdm-local", !process.env.ATOMIST_NPM_LOCAL_LINK);
@@ -236,6 +236,7 @@ async function doWithSdmLocal<R>(callback: (sdmLocal: any) => any): Promise<R | 
             return undefined;
         }
     }
+    return undefined;
 }
 
 /**
