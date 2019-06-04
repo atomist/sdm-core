@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.5.1...HEAD)
 
+### Fixed
+
+-   Pin moment-duration-format to 2.2.2 to fix logging.  [8d0dd38](https://github.com/atomist/sdm-core/commit/8d0dd38fd88bb4d6db3fdc0536f81a2248d3746d)
+
 ## [1.5.1](https://github.com/atomist/sdm-core/compare/1.5.0...1.5.1) - 2019-06-04
 
 ### Changed
