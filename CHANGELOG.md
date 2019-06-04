@@ -11,10 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Reorder token resolution. [#149](https://github.com/atomist/sdm-core/issues/149)
 -   Differentiate between goal and handler results. [#159](https://github.com/atomist/sdm-core/issues/159)
+-   Update dependencies.
 
 ### Fixed
 
 -   Replace process.exit with safeExit. [#155](https://github.com/atomist/sdm-core/issues/155)
+-   Correctly filter out undesired event handlers in single goal mode. [176986c](https://github.com/atomist/sdm-core/commit/176986c6e9d2955c2feb9c6ad69a226f9c1f2b98)
+-   Correctly assign operationName for single goal execution. [cb6f693](https://github.com/atomist/sdm-core/commit/cb6f693e25dcfdde9cd9268d2f69ea4b9f4fc75d)
+-   Always exit with 0. [e5dfdd2](https://github.com/atomist/sdm-core/commit/e5dfdd204e2e3f215d4de27556578a850ff8ea3f)
+-   Add in backoffLimit to k8s job spec. [4064863](https://github.com/atomist/sdm-core/commit/40648634c1a2e3d35e6c67262f44c02d35129ddf)
 
 ## [1.5.0](https://github.com/atomist/sdm-core/compare/1.4.0...1.5.0) - 2019-05-27
 
