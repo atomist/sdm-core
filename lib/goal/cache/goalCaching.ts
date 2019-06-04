@@ -79,6 +79,11 @@ export interface DirectoryPattern {
     directory: string;
 }
 
+export interface CacheEntry {
+    classifier: string;
+    pattern: GlobFilePattern | DirectoryPattern;
+}
+
 /**
  * Options for goal caching
  */
@@ -91,7 +96,7 @@ export interface GoalCacheOptions {
      * Collection of glob patterns with classifiers to determine which files need to be cached between
      * goal invocations, possibly excluding paths using regular expressions.
      */
-    entries: Array<{ classifier: string, pattern: GlobFilePattern | DirectoryPattern }>;
+    entries: CacheEntry[];
     /**
      * Optional listener functions that should be called when no cache entry is found.
      */
@@ -173,7 +178,7 @@ async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
 
 export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "NoOpListener",
-    listener: async () => {},
+    listener: async () => { },
     pushTest: AnyPush,
 };
 
@@ -266,5 +271,5 @@ async function getFilePathsThroughPattern(project: Project, globPattern: string 
 }
 
 function isCacheEnabled(gi: GoalInvocation): boolean {
-    return _.get(gi.configuration, "sdm.cache.enabled") || false;
+    return _.get(gi.configuration, "sdm.cache.enabled", false);
 }

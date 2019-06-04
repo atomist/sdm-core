@@ -53,13 +53,13 @@ describe("CompressingGoalCache", () => {
 
     async function createTempProject(fakePushId: RepoRef): Promise<LocalProject> {
         const projectDir = testDir();
-        fs.mkdirSync(projectDir);
+        await fs.ensureDir(projectDir);
         return NodeFsLocalProject.fromExistingDirectory(fakePushId, projectDir);
     }
 
     const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
         name: "Error",
-        listener: async () => { throw Error(""); },
+        listener: async () => { throw Error("Cache miss"); },
         pushTest: AnyPush,
     };
 
