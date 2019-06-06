@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.5.2...HEAD)
 
+### Fixed
+
+-   `ProgressLog` is not populated for code transforms. [#163](https://github.com/atomist/sdm-core/issues/163)
+
 ## [1.5.2](https://github.com/atomist/sdm-core/compare/1.5.1...1.5.2) - 2019-06-04
 
 ### Fixed
