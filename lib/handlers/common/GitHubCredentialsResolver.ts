@@ -121,9 +121,7 @@ const ObtainTokenFromProvider: ObtainToken = async (ctx, id) => {
  */
 function obtainTokenFromConfiguration(resolver: GitHubCredentialsResolver): ObtainToken {
     return async () => {
-        if (hasToken(resolver.orgToken)) {
-            return resolver.orgToken;
-        } else if (hasToken(configurationValue("token", "null"))) {
+        if (hasToken(configurationValue("token", "null"))) {
             return configurationValue<string>("token");
         } else if (hasToken(configurationValue("sdm.github.token", "null"))) {
             return configurationValue<string>("sdm.github.token");
