@@ -1,7 +1,7 @@
 query InProcessSdmGoalSets(
   $fetch: Int!
-  $offset: Int!
   $registration: [String!]
+  $offset: Int!
 ) {
   SdmGoalSet(
     _orderBy: "ts"
@@ -10,21 +10,33 @@ query InProcessSdmGoalSets(
     _offset: $offset
     state: [pre_approved, requested, approved, planned, in_process]
   ) {
-    goalSetId
-    goalSet
-    state
-    provenance(registration: $registration) @required {
-      registration
-    }
     sha
     branch
-    repo {
-      owner
-      name
-    }
+    goalSet
+    goalSetId
     goals {
-      uniqueName
       name
+      uniqueName
     }
+    provenance(registration: $registration) @required {
+      channelId
+      correlationId
+      name
+      registration
+      ts
+      userId
+      version
+    }
+    repo {
+      name
+      owner
+      providerId
+    }
+    state
+    tags {
+      name
+      value
+    }
+    ts
   }
 }
