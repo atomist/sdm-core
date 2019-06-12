@@ -35,6 +35,7 @@ import {
     ProjectLoader,
     RepoRefResolver,
     resolveCredentialsPromise,
+    TagGoalSet,
 } from "@atomist/sdm";
 import { OnPushToAnyBranch } from "../../../../typings/types";
 
@@ -61,7 +62,8 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
                 private readonly implementationMapping: GoalImplementationMapper,
                 private readonly credentialsFactory: CredentialsResolver,
                 private readonly preferenceStoreFactory: PreferenceStoreFactory,
-                private readonly enrichGoal: EnrichGoal) {
+                private readonly enrichGoal: EnrichGoal,
+                private readonly tagGoalSet: TagGoalSet) {
     }
 
     public async handle(event: EventFired<OnPushToAnyBranch.Subscription>,
@@ -78,6 +80,7 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
             implementationMapping: this.implementationMapping,
             preferencesFactory: this.preferenceStoreFactory,
             enrichGoal: this.enrichGoal,
+            tagGoalSet: this.tagGoalSet,
         }, {
                 context,
                 credentials,
