@@ -15,7 +15,10 @@
  */
 
 import { AnyOptions } from "@atomist/automation-client";
-import { SoftwareDeliveryMachine, SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
+import {
+    SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
 
 /**
  * Configuration determining how to run in local mode

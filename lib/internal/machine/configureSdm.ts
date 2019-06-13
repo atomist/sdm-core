@@ -43,7 +43,10 @@ import {
     sdmStartupMessage,
 } from "../util/startupMessage";
 import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
-import { LocalSoftwareDeliveryMachineConfiguration, SdmInstanceContainer } from "./LocalSoftwareDeliveryMachineOptions";
+import {
+    LocalSoftwareDeliveryMachineConfiguration,
+    SdmInstanceContainer,
+} from "./LocalSoftwareDeliveryMachineOptions";
 import {
     isGitHubAction,
     isInLocalMode,
