@@ -43,7 +43,7 @@ import {
     sdmStartupMessage,
 } from "../util/startupMessage";
 import { InvokeSdmStartupListenersAutomationEventListener } from "./InvokeSdmStartupListenersAutomationEventListener";
-import { LocalSoftwareDeliveryMachineConfiguration } from "./LocalSoftwareDeliveryMachineOptions";
+import { LocalSoftwareDeliveryMachineConfiguration, SdmInstanceContainer } from "./LocalSoftwareDeliveryMachineOptions";
 import {
     isGitHubAction,
     isInLocalMode,
@@ -71,10 +71,10 @@ export type SoftwareDeliveryMachineMaker =
  * @returns {ConfigurationPostProcessor}
  */
 export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
-                             options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
+                             options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration & SdmInstanceContainer> {
 
     return async (config: Configuration) => {
-        let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
+        let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration & SdmInstanceContainer;
 
         // Configure the local SDM
         mergedConfig = await doWithSdmLocal<LocalSoftwareDeliveryMachineConfiguration>(local => {
@@ -86,6 +86,7 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         validateConfigurationValues(mergedConfig, options);
         const sdm = await machineMaker(mergedConfig);
+        mergedConfig.sdmInstance = sdm;
 
         await doWithSdmLocal<void>(local =>
             sdm.addExtensionPacks(local.LocalLifecycle, local.LocalSdmConfig),

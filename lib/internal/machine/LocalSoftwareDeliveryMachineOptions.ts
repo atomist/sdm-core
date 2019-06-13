@@ -15,7 +15,7 @@
  */
 
 import { AnyOptions } from "@atomist/automation-client";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
+import { SoftwareDeliveryMachine, SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
 
 /**
  * Configuration determining how to run in local mode
@@ -60,4 +60,11 @@ export interface LocalSoftwareDeliveryMachineOptions {
  */
 export interface LocalSoftwareDeliveryMachineConfiguration extends SoftwareDeliveryMachineConfiguration {
     local: LocalSoftwareDeliveryMachineOptions & AnyOptions;
+}
+
+/**
+ * Configuration that takes SoftwareDeliveryMachineOptions inside the sdm key.
+ */
+export interface SdmInstanceContainer {
+    sdmInstance?: SoftwareDeliveryMachine;
 }
