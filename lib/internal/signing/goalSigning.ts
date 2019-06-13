@@ -122,7 +122,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
             if (!!verifiedWith) {
                 logger.info(
                     `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${
-                        verifiedWith.name}' and algorithm '${verifiedWith.algorithm}'`);
+                        verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
             } else {
                 await rejectGoal("signature was invalid", goal, ctx);
                 throw new Error("SDM goal signature invalid. Rejecting goal!");
