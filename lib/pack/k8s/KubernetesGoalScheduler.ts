@@ -244,7 +244,7 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
 
     const jobSpec = createJobSpecWithAffinity(podSpec, gi);
 
-    jobSpec.metadata.name = `${podSpec.spec.containers[0].name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`;
+    jobSpec.metadata.name = (`${podSpec.spec.containers[0].name}-job-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`).slice(0, 63);
     jobSpec.metadata.namespace = podNs;
 
     jobSpec.spec.backoffLimit = 1;
