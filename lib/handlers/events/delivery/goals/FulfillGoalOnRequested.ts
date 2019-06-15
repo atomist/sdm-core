@@ -31,6 +31,7 @@ import {
     cancelableGoal,
     descriptionFromState,
     executeGoal,
+    formatDate,
     GoalExecutionListener,
     GoalImplementationMapper,
     GoalInvocation,
@@ -197,6 +198,7 @@ async function findGoalScheduler(gi: GoalInvocation,
 
 async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog): Promise<void> {
     progressLog.write(`/--`);
+    progressLog.write(`Start: ${formatDate(new Date(), "yyyy-mm-dd HH:MM:ss.l")}`)
     progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}/${sdmGoal.branch}`);
     progressLog.write(`Sha: ${sdmGoal.sha}`);
     progressLog.write(`Goal: ${sdmGoal.name} (${sdmGoal.uniqueName})`);
@@ -212,6 +214,7 @@ async function reportEndAndClose(result: any, start: number, progressLog: Progre
     progressLog.write(`/--`);
     progressLog.write(`Result: ${serializeResult(result)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
+    progressLog.write(`Finish: ${formatDate(new Date(), "yyyy-mm-dd HH:MM:ss.l")}`)
     progressLog.write("\\--");
     await progressLog.close();
 }
