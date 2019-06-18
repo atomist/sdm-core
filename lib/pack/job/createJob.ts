@@ -49,5 +49,3 @@ export async function createJob(name: string,
 
     return { id: result.createAtmJob.id };
 }
-
-

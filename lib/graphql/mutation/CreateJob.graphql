@@ -1,5 +1,12 @@
-mutation CreateJob($data: String!, $name: String!, $owner: String!, $tasks: [AtmJobTaskInput!]!) {
-    createAtmJob(jobInput: {data: $data, name: $name, owner: $owner, jobTasks: $tasks}) {
-        id
-    }
+mutation CreateJob(
+  $data: String!
+  $name: String!
+  $owner: String!
+  $tasks: [AtmJobTaskInput!]!
+) {
+  createAtmJob(
+    jobInput: { data: $data, name: $name, owner: $owner, jobTasks: $tasks }
+  ) {
+    id
+  }
 }

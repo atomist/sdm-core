@@ -117,10 +117,10 @@ export {
 } from "./lib/pack/info/exposeInfo";
 export {
     jobSupport,
-} from "./lib/pack/job/job"
+} from "./lib/pack/job/job";
 export {
     createJob,
-} from "./lib/pack/job/createJob"
+} from "./lib/pack/job/createJob";
 export { github };
 export {
     tagRepo,
