@@ -17,7 +17,6 @@
 import {
     AutomationContextAware,
     AutomationEventListenerSupport,
-    CommandIncoming,
     HandlerContext,
     MessageOptions,
     SourceDestination,
