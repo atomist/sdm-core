@@ -33,8 +33,8 @@ export interface JobTask<T extends ParameterType> {
  * Create a AtmJob in the backend with the provided name and tasks
  */
 export async function createJob<T extends ParameterType>(name: string,
-                                tasks: JobTask<T>[],
-                                ctx: HandlerContext): Promise<{ id: string }> {
+                                                         tasks: Array<JobTask<T>>,
+                                                         ctx: HandlerContext): Promise<{ id: string }> {
     const context = ctx as any as AutomationContextAware;
     const owner = _.get(context, "context.name") || configurationValue<string>("name");
     const data = JSON.stringify(_.get(context, "trigger") || {});
