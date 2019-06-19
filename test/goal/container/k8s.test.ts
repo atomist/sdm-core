@@ -23,17 +23,20 @@ import {
 } from "@atomist/automation-client";
 import {
     execPromise,
-    // ExecuteGoalResult,
+    ExecuteGoalResult,
     fakePush,
     GoalInvocation,
     RepoContext,
     SdmGoalEvent,
     SdmGoalState,
 } from "@atomist/sdm";
+import * as k8s from "@kubernetes/client-node";
 import * as fs from "fs-extra";
+import * as _ from "lodash";
 import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
+import { DeepPartial } from "ts-essentials";
 import { Container } from "../../../lib/goal/container/container";
 import {
     executeK8sJob,
@@ -531,8 +534,7 @@ describe("goal/container/k8s", () => {
 
         const fakeId = fakePush().id;
         const goal = new Container();
-        const tmpDirPrefix = "atomist-sdm-core-k8s-test";
-        const projectDir = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
+        const tmpDirPrefix = path.join(os.tmpdir(), "atomist-sdm-core-k8s-test");
         let project: GitProject;
         const tmpDirs: string[] = [];
         let logData = "";
@@ -568,30 +570,28 @@ describe("goal/container/k8s", () => {
         } as any;
 
         let cwd: string;
-        before(async function minikubeCheckProjectSetup(): Promise<void> {
-            // tslint:disable-next-line:no-invalid-this
-            this.timeout(20000);
-            try {
-                // see if minikube is available and responding
-                await execPromise("kubectl", ["config", "use-context", "minikube"]);
-                await execPromise("kubectl", ["get", "--request-timeout=200ms", "pods"]);
-            } catch (e) {
-                // tslint:disable-next-line:no-invalid-this
-                this.skip();
-            }
+        before(async function getCwd(): Promise<void> {
             cwd = process.cwd();
+        });
+
+        beforeEach(async function resetFileSystem(): Promise<void> {
+            logData = "";
+            const projectDir = `${tmpDirPrefix}-${guid()}`;
             await fs.ensureDir(projectDir);
             tmpDirs.push(projectDir);
             project = await NodeFsLocalProject.fromExistingDirectory(fakeId, projectDir) as any;
-        });
-
-        beforeEach(() => {
-            process.chdir(cwd);
-            logData = "";
+            const workingDir = `${tmpDirPrefix}-${guid()}`;
+            await fs.ensureDir(workingDir);
+            tmpDirs.push(workingDir);
+            process.chdir(workingDir);
         });
 
         after(async function directoryCleanup(): Promise<void> {
             await Promise.all(tmpDirs.map(d => fs.remove(d)));
+        });
+
+        afterEach(() => {
+            process.chdir(cwd);
         });
 
         it("should run in init mode and copy project", async () => {
@@ -605,20 +605,13 @@ describe("goal/container/k8s", () => {
                 ],
             };
             const e = executeK8sJob(goal, r);
-            const d = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            await fs.ensureDir(d);
-            tmpDirs.push(d);
             const f = `JUNK-${guid()}.md`;
             const fp = path.join(project.baseDir, f);
             await fs.writeFile(fp, "Counting the days until they set you free again\n");
-            const dp = path.join(d, f);
-            assert(!fs.existsSync(dp));
-            process.chdir(d);
+            assert(!fs.existsSync(f));
             process.env.ATOMIST_ISOLATED_GOAL_INIT = "true";
             const egr = await e(goalInvocation);
             delete process.env.ATOMIST_ISOLATED_GOAL_INIT;
-            process.chdir(cwd);
-            await fs.unlink(fp);
             assert(egr, "ExecuteGoal did not return a value");
             const x = egr as SdmGoalEvent;
             const eg = {
@@ -634,278 +627,321 @@ describe("goal/container/k8s", () => {
                 uniqueName: goal.definition.uniqueName,
             };
             assert.deepStrictEqual(x, eg, logData);
-            const ec = await fs.readFile(path.join(d, f), "utf8");
+            const ec = await fs.readFile(f, "utf8");
             assert(ec === "Counting the days until they set you free again\n");
         }).timeout(10000);
 
-        /*
-        it("should report when the container fails", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["false"],
-                        image: containerTestImage,
-                        name: "alpine",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 1);
-            assert(x.message.startsWith("Docker container 'sdm-alpine-27c20de-container' failed"));
-        }).timeout(10000);
+        describe("minikube", () => {
 
-        it("should run multiple containers", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine1",
-                    },
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine2",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0);
-            assert(x.message === "Successfully completed container job");
-        }).timeout(10000);
-
-        it("should report when main container fails", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["false"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine1",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 1);
-            assert(x.message.startsWith("Docker container 'sdm-alpine0-27c20de-container' failed"));
-        }).timeout(10000);
-
-        it("should ignore when sidecar container fails", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                    {
-                        args: ["false"],
-                        image: containerTestImage,
-                        name: "alpine1",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0);
-            assert(x.message === "Successfully completed container job");
-        }).timeout(10000);
-
-        it("should allow containers to communicate", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["sleep", "2"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                    {
-                        args: ["ping", "-w", "1", "alpine0"],
-                        image: containerTestImage,
-                        name: "alpine1",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0);
-            assert(x.message === "Successfully completed container job");
-        }).timeout(15000);
-
-        it("should only wait on main container", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                    {
-                        args: ["sleep", "20"],
-                        image: containerTestImage,
-                        name: "alpine1",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0);
-            assert(x.message === "Successfully completed container job");
-        }).timeout(10000);
-
-        it("should persist changes to project", async () => {
-            const tmpDir = path.join(os.tmpdir(), "atomist-sdm-core-docker-test-" + guid());
-            await fs.ensureDir(tmpDir);
-            tmpDirs.push(tmpDir);
-            const existingFile = `README.${guid()}`;
-            const existingFilePath = path.join(tmpDir, existingFile);
-            await fs.writeFile(existingFilePath, "# After Hours\n");
-            const changeFile = `pigeonCamera.${guid()}`;
-            const changeFilePath = path.join(tmpDir, changeFile);
-            await fs.writeFile(changeFilePath, "Where's my pigeon camera?\n");
-            const deleteFile = `ifyouclosethedoor_${guid()}`;
-            const deleteFilePath = path.join(tmpDir, deleteFile);
-            await fs.writeFile(deleteFilePath, "you won't see me\nyou won't see me\n");
-            const lid = fakePush().id;
-            const lp: GitProject = await NodeFsLocalProject.fromExistingDirectory(lid, tmpDir) as any;
-            const lgi: GoalInvocation = {
-                context: {
-                    graphClient: {
-                        query: () => ({ SdmVersion: [{ version: "3.1.3-20200220200220" }] }),
-                    },
+            const partialPodSpec: DeepPartial<k8s.V1Pod> = {
+                apiVersion: "v1",
+                kind: "Pod",
+                metadata: {
+                    namespace: "default", // readNamespace is going to default to "default"
                 },
-                configuration: {
-                    sdm: {
-                        projectLoader: {
-                            doWithProject: (o, a) => a(lp),
+                spec: {},
+            };
+            const podNamePrefix = "sdm-core-container-k8s-test";
+
+            let originalOsHostname: any;
+            before(async function minikubeCheckProjectSetup(): Promise<void> {
+                // tslint:disable-next-line:no-invalid-this
+                this.timeout(20000);
+                try {
+                    // see if minikube is available and responding
+                    await execPromise("kubectl", ["config", "use-context", "minikube"]);
+                    await execPromise("kubectl", ["get", "--request-timeout=200ms", "pods"]);
+                } catch (e) {
+                    // tslint:disable-next-line:no-invalid-this
+                    this.skip();
+                }
+                originalOsHostname = Object.getOwnPropertyDescriptor(os, "hostname");
+            });
+
+            beforeEach(() => {
+                const podName = `${podNamePrefix}-${guid().split("-")[0]}`;
+                partialPodSpec.metadata.name = podName;
+                Object.defineProperty(os, "hostname", { value: () => podName });
+            });
+
+            after(() => {
+                if (originalOsHostname) {
+                    Object.defineProperty(os, "hostname", originalOsHostname);
+                }
+            });
+
+            it("should report when the container fails", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["false"],
+                            image: containerTestImage,
+                            name: "alpine",
+                        },
+                    ],
+                };
+                const p = JSON.stringify(_.merge({}, partialPodSpec, r));
+                const e = executeK8sJob(goal, r);
+                await execPromise("bash", ["-c", `echo '${p}' | kubectl apply -f -`]);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 1, logData);
+                assert(x.message.startsWith("Container 'alpine' failed:"));
+            }).timeout(10000);
+
+            /*
+            it("should run multiple containers", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine1",
+                        },
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine2",
+                        },
+                    ],
+                };
+                const e = executeK8sJob(goal, r);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0);
+                assert(x.message === "Successfully completed container job");
+            }).timeout(10000);
+
+            it("should report when main container fails", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["false"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine1",
+                        },
+                    ],
+                };
+                const e = executeK8sJob(goal, r);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 1);
+                assert(x.message.startsWith("Docker container 'sdm-alpine0-27c20de-container' failed"));
+            }).timeout(10000);
+
+            it("should ignore when sidecar container fails", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                        {
+                            args: ["false"],
+                            image: containerTestImage,
+                            name: "alpine1",
+                        },
+                    ],
+                };
+                const e = executeK8sJob(goal, r);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0);
+                assert(x.message === "Successfully completed container job");
+            }).timeout(10000);
+
+            it("should allow containers to communicate", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["sleep", "2"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                        {
+                            args: ["ping", "-w", "1", "alpine0"],
+                            image: containerTestImage,
+                            name: "alpine1",
+                        },
+                    ],
+                };
+                const e = executeK8sJob(goal, r);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0);
+                assert(x.message === "Successfully completed container job");
+            }).timeout(15000);
+
+            it("should only wait on main container", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                        {
+                            args: ["sleep", "20"],
+                            image: containerTestImage,
+                            name: "alpine1",
+                        },
+                    ],
+                };
+                const e = executeK8sJob(goal, r);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0);
+                assert(x.message === "Successfully completed container job");
+            }).timeout(10000);
+
+            it("should persist changes to project", async () => {
+                const tmpDir = path.join(os.tmpdir(), "atomist-sdm-core-docker-test-" + guid());
+                await fs.ensureDir(tmpDir);
+                tmpDirs.push(tmpDir);
+                const existingFile = `README.${guid()}`;
+                const existingFilePath = path.join(tmpDir, existingFile);
+                await fs.writeFile(existingFilePath, "# After Hours\n");
+                const changeFile = `pigeonCamera.${guid()}`;
+                const changeFilePath = path.join(tmpDir, changeFile);
+                await fs.writeFile(changeFilePath, "Where's my pigeon camera?\n");
+                const deleteFile = `ifyouclosethedoor_${guid()}`;
+                const deleteFilePath = path.join(tmpDir, deleteFile);
+                await fs.writeFile(deleteFilePath, "you won't see me\nyou won't see me\n");
+                const lid = fakePush().id;
+                const lp: GitProject = await NodeFsLocalProject.fromExistingDirectory(lid, tmpDir) as any;
+                const lgi: GoalInvocation = {
+                    context: {
+                        graphClient: {
+                            query: () => ({ SdmVersion: [{ version: "3.1.3-20200220200220" }] }),
                         },
                     },
-                },
-                credentials: {},
-                goalEvent: {
-                    branch: lid.branch,
-                    goalSetId: "27c20de4-2c88-480a-b4e7-f6c6d5a1d623",
-                    repo: {
-                        name: lid.repo,
-                        owner: lid.owner,
-                        providerId: "album",
-                    },
-                    sha: lid.sha,
-                    uniqueName: goal.definition.uniqueName,
-                },
-                id: lid,
-                progressLog: {
-                    write: () => { },
-                },
-            } as any;
-            const newFile = `project-test-0-${guid()}`;
-            const newFilePath = path.join(tmpDir, newFile);
-            const r = {
-                containers: [
-                    {
-                        args: [
-                            `echo 'This is only a local test' > ${newFile}` +
-                            `; echo 'By now it could be anywhere.' >> ${changeFile}` +
-                            `; rm ${deleteFile}`,
-                        ],
-                        command: ["sh", "-c"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                ],
-            };
-            const edj = executeK8sJob(goal, r);
-            const egr = await edj(lgi);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0);
-            assert(x.message === "Successfully completed container job");
-            const t = await lp.getFile(newFile);
-            assert(t, "file created in container does not exist");
-            const tc = await t.getContent();
-            assert(tc === "This is only a local test\n");
-            const tcf = await fs.readFile(newFilePath, "utf8");
-            assert(tcf === "This is only a local test\n");
-            const e = await lp.getFile(existingFile);
-            assert(e, "file existing in project disappeared");
-            const ec = await e.getContent();
-            assert(ec === "# After Hours\n");
-            const ecf = await fs.readFile(existingFilePath, "utf8");
-            assert(ecf === "# After Hours\n");
-            const c = await lp.getFile(changeFile);
-            assert(c, "file changed in project disappeared");
-            const cc = await c.getContent();
-            assert(cc === "Where's my pigeon camera?\nBy now it could be anywhere.\n");
-            const ccf = await fs.readFile(changeFilePath, "utf8");
-            assert(ccf === "Where's my pigeon camera?\nBy now it could be anywhere.\n");
-            assert(!await lp.getFile(deleteFile), "deleted file still exists in project");
-            assert(!fs.existsSync(deleteFilePath), "deleted file still exists on file system");
-        }).timeout(10000);
-
-        it("should use volumes", async () => {
-            const tmpDir = path.join(os.homedir(), ".atomist", "tmp", guid());
-            await fs.ensureDir(tmpDir);
-            tmpDirs.push(tmpDir);
-            const tmpFile = `volume-test-0-${guid()}`;
-            const r = {
-                containers: [
-                    {
-                        args: [`echo 'This is only a test' > /test/vol0/${tmpFile}`],
-                        command: ["sh", "-c"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                        volumeMounts: [
-                            {
-                                mountPath: "/test/vol0",
-                                name: "test-volume",
+                    configuration: {
+                        sdm: {
+                            projectLoader: {
+                                doWithProject: (o, a) => a(lp),
                             },
-                        ],
-                    },
-                ],
-                volumes: [
-                    {
-                        hostPath: {
-                            path: tmpDir,
                         },
-                        name: "test-volume",
                     },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0);
-            assert(x.message === "Successfully completed container job");
-            const tmpFilePath = path.join(tmpDir, tmpFile);
-            const tmpContent = await fs.readFile(tmpFilePath, "utf8");
-            assert(tmpContent === "This is only a test\n");
-        }).timeout(10000);
-        */
+                    credentials: {},
+                    goalEvent: {
+                        branch: lid.branch,
+                        goalSetId: "27c20de4-2c88-480a-b4e7-f6c6d5a1d623",
+                        repo: {
+                            name: lid.repo,
+                            owner: lid.owner,
+                            providerId: "album",
+                        },
+                        sha: lid.sha,
+                        uniqueName: goal.definition.uniqueName,
+                    },
+                    id: lid,
+                    progressLog: {
+                        write: () => { },
+                    },
+                } as any;
+                const newFile = `project-test-0-${guid()}`;
+                const newFilePath = path.join(tmpDir, newFile);
+                const r = {
+                    containers: [
+                        {
+                            args: [
+                                `echo 'This is only a local test' > ${newFile}` +
+                                `; echo 'By now it could be anywhere.' >> ${changeFile}` +
+                                `; rm ${deleteFile}`,
+                            ],
+                            command: ["sh", "-c"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                    ],
+                };
+                const edj = executeK8sJob(goal, r);
+                const egr = await edj(lgi);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0);
+                assert(x.message === "Successfully completed container job");
+                const t = await lp.getFile(newFile);
+                assert(t, "file created in container does not exist");
+                const tc = await t.getContent();
+                assert(tc === "This is only a local test\n");
+                const tcf = await fs.readFile(newFilePath, "utf8");
+                assert(tcf === "This is only a local test\n");
+                const e = await lp.getFile(existingFile);
+                assert(e, "file existing in project disappeared");
+                const ec = await e.getContent();
+                assert(ec === "# After Hours\n");
+                const ecf = await fs.readFile(existingFilePath, "utf8");
+                assert(ecf === "# After Hours\n");
+                const c = await lp.getFile(changeFile);
+                assert(c, "file changed in project disappeared");
+                const cc = await c.getContent();
+                assert(cc === "Where's my pigeon camera?\nBy now it could be anywhere.\n");
+                const ccf = await fs.readFile(changeFilePath, "utf8");
+                assert(ccf === "Where's my pigeon camera?\nBy now it could be anywhere.\n");
+                assert(!await lp.getFile(deleteFile), "deleted file still exists in project");
+                assert(!fs.existsSync(deleteFilePath), "deleted file still exists on file system");
+            }).timeout(10000);
+
+            it("should use volumes", async () => {
+                const tmpDir = path.join(os.homedir(), ".atomist", "tmp", guid());
+                await fs.ensureDir(tmpDir);
+                tmpDirs.push(tmpDir);
+                const tmpFile = `volume-test-0-${guid()}`;
+                const r = {
+                    containers: [
+                        {
+                            args: [`echo 'This is only a test' > /test/vol0/${tmpFile}`],
+                            command: ["sh", "-c"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                            volumeMounts: [
+                                {
+                                    mountPath: "/test/vol0",
+                                    name: "test-volume",
+                                },
+                            ],
+                        },
+                    ],
+                    volumes: [
+                        {
+                            hostPath: {
+                                path: tmpDir,
+                            },
+                            name: "test-volume",
+                        },
+                    ],
+                };
+                const e = executeK8sJob(goal, r);
+                const egr = await e(goalInvocation);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0);
+                assert(x.message === "Successfully completed container job");
+                const tmpFilePath = path.join(tmpDir, tmpFile);
+                const tmpContent = await fs.readFile(tmpFilePath, "utf8");
+                assert(tmpContent === "This is only a test\n");
+            }).timeout(10000);
+            */
+
+        });
 
     });
 
