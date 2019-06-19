@@ -35,6 +35,10 @@ import {
     OnAnyJobTask,
     SetJobTaskState,
 } from "../../typings/types";
+import {
+    JobTask,
+    JobTaskType,
+} from "./createJob";
 
 /**
  * Execute an incoming job task
@@ -54,45 +58,49 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
 
             if (task.state === AtmJobTaskState.created) {
 
-                const trigger = JSON.parse(task.data);
-                trigger.__context = (ctx as any as AutomationContextAware).context;
+                const data = JSON.parse(task.data) as JobTask;
 
-                const deferred = new Deferred<HandlerResult>();
-                if (isCommandIncoming(trigger)) {
-                    automationClientInstance().processCommand(trigger, async r => {
-                        const res = await r;
-                        await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
-                            name: "SetJobTaskState",
-                            variables: {
-                                id: task.id,
-                                state: {
-                                    state: res.code === 0 ? AtmJobTaskState.success : AtmJobTaskState.failed,
-                                    message: res.message,
+                if (data.type === JobTaskType.Command || data.type === JobTaskType.Command) {
+                    const trigger = data.payload;
+                    trigger.__context = (ctx as any as AutomationContextAware).context;
+
+                    const deferred = new Deferred<HandlerResult>();
+                    if (isCommandIncoming(trigger)) {
+                        automationClientInstance().processCommand(trigger, async r => {
+                            const res = await r;
+                            await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
+                                name: "SetJobTaskState",
+                                variables: {
+                                    id: task.id,
+                                    state: {
+                                        state: res.code === 0 ? AtmJobTaskState.success : AtmJobTaskState.failed,
+                                        message: res.message,
+                                    },
                                 },
-                            },
+                            });
+                            deferred.resolve(res);
                         });
-                        deferred.resolve(res);
-                    });
-                } else if (isEventIncoming(trigger)) {
-                    automationClientInstance().processEvent(trigger, async r => {
-                        const results = await r;
-                        const res = {
-                            code: results.some(sr => sr.code !== 0) ? 1 : 0,
-                            message: results.map(sr => sr.message).join(", "),
-                        };
-                        await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
-                            name: "SetJobTaskState",
-                            variables: {
-                                id: task.id,
-                                state: {
-                                    state: res.code === 0 ? AtmJobTaskState.success : AtmJobTaskState.failed,
-                                    message: res.message,
+                    } else if (isEventIncoming(trigger)) {
+                        automationClientInstance().processEvent(trigger, async r => {
+                            const results = await r;
+                            const res = {
+                                code: results.some(sr => sr.code !== 0) ? 1 : 0,
+                                message: results.map(sr => sr.message).join(", "),
+                            };
+                            await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
+                                name: "SetJobTaskState",
+                                variables: {
+                                    id: task.id,
+                                    state: {
+                                        state: res.code === 0 ? AtmJobTaskState.success : AtmJobTaskState.failed,
+                                        message: res.message,
+                                    },
                                 },
-                            },
+                            });
                         });
-                    });
+                    }
+                    return deferred.promise;
                 }
-                return deferred.promise;
             }
 
             return Success;

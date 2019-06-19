@@ -23,11 +23,24 @@ import {
 import { SdmContext } from "@atomist/sdm";
 import { CreateJob } from "../../typings/types";
 
+export enum JobTaskType {
+
+    Event = "event",
+
+    Command = "command",
+}
+
+export interface JobTask {
+    name: string,
+    payload: EventIncoming | CommandIncoming | any;
+    type: JobTaskType | string;
+}
+
 /**
  * Create a AtmJob in the backend with the provided name and tasks
  */
 export async function createJob(name: string,
-                                tasks: Array<{ name: string, payload: CommandIncoming | EventIncoming }>,
+                                tasks: JobTask[],
                                 ctx: SdmContext): Promise<{ id: string }> {
     const context = ctx.context as any as AutomationContextAware;
     const owner = context.context.name;
@@ -41,7 +54,10 @@ export async function createJob(name: string,
             data,
             tasks: tasks.map(t => ({
                 name: t.name,
-                data: JSON.stringify(t.payload),
+                data: JSON.stringify({
+                    type: t.type,
+                    payload: t.payload,
+                }),
             })),
         },
         options: MutationNoCacheOptions,
