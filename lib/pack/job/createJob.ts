@@ -16,33 +16,24 @@
 
 import {
     AutomationContextAware,
-    CommandIncoming,
     configurationValue,
-    EventIncoming,
     HandlerContext,
     MutationNoCacheOptions,
+    ParameterType,
 } from "@atomist/automation-client";
 import * as _ from "lodash";
 import { CreateJob } from "../../typings/types";
 
-export enum JobTaskType {
-
-    Event = "event",
-
-    Command = "command",
-}
-
-export interface JobTask {
+export interface JobTask<T extends ParameterType> {
     name: string;
-    payload: EventIncoming | CommandIncoming | any;
-    type: JobTaskType | string;
+    parameters: T;
 }
 
 /**
  * Create a AtmJob in the backend with the provided name and tasks
  */
-export async function createJob(name: string,
-                                tasks: JobTask[],
+export async function createJob<T extends ParameterType>(name: string,
+                                tasks: JobTask<T>[],
                                 ctx: HandlerContext): Promise<{ id: string }> {
     const context = ctx as any as AutomationContextAware;
     const owner = _.get(context, "context.name") || configurationValue<string>("name");
@@ -57,8 +48,7 @@ export async function createJob(name: string,
             tasks: tasks.map(t => ({
                 name: t.name,
                 data: JSON.stringify({
-                    type: t.type,
-                    payload: t.payload,
+                    parameters: t.parameters,
                 }),
             })),
         },

@@ -15,17 +15,16 @@
  */
 
 import {
-    automationClientInstance,
-    AutomationContextAware,
     GraphQL,
-    HandlerResult,
+    HandlerContext,
+    logger,
+    MessageOptions,
+    SourceDestination,
     Success,
 } from "@atomist/automation-client";
-import {
-    isCommandIncoming,
-    isEventIncoming,
-} from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
-import { Deferred } from "@atomist/automation-client/lib/internal/util/Deferred";
+import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
+import { isCommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     EventHandlerRegistration,
     SoftwareDeliveryMachine,
@@ -35,10 +34,7 @@ import {
     OnAnyJobTask,
     SetJobTaskState,
 } from "../../typings/types";
-import {
-    JobTask,
-    JobTaskType,
-} from "./createJob";
+import { JobTask } from "./createJob";
 
 /**
  * Execute an incoming job task
@@ -55,55 +51,87 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
         }),
         listener: async (e, ctx) => {
             const task = e.data.AtmJobTask[0];
-
             if (task.state === AtmJobTaskState.created) {
+                const jobData = JSON.parse(task.job.data);
+                const data = JSON.parse(task.data) as JobTask<any>;
 
-                const data = JSON.parse(task.data) as JobTask;
+                const maker = sdm.commandHandlers.find(ch => {
+                    const md = metadataFromInstance(toFactory(ch)());
+                    return md.name = data.name;
+                });
 
-                if (data.type === JobTaskType.Command || data.type === JobTaskType.Command) {
-                    const trigger = data.payload;
-                    trigger.__context = (ctx as any as AutomationContextAware).context;
+                if (!maker) {
+                    await updateJobTaskState(
+                        task.id,
+                        AtmJobTaskState.failed,
+                        `Task command '${data.name}' could not be found`,
+                        ctx);
+                } else {
+                    // Invoke the command
+                    try {
+                        const handle = toFactory(maker)();
+                        const result = await handle.handle(prepareForResponseMessages(ctx, jobData), data.parameters);
 
-                    const deferred = new Deferred<HandlerResult>();
-                    if (isCommandIncoming(trigger)) {
-                        automationClientInstance().processCommand(trigger, async r => {
-                            const res = await r;
-                            await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
-                                name: "SetJobTaskState",
-                                variables: {
-                                    id: task.id,
-                                    state: {
-                                        state: res.code === 0 ? AtmJobTaskState.success : AtmJobTaskState.failed,
-                                        message: res.message,
-                                    },
-                                },
-                            });
-                            deferred.resolve(res);
-                        });
-                    } else if (isEventIncoming(trigger)) {
-                        automationClientInstance().processEvent(trigger, async r => {
-                            const results = await r;
-                            const res = {
-                                code: results.some(sr => sr.code !== 0) ? 1 : 0,
-                                message: results.map(sr => sr.message).join(", "),
-                            };
-                            await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
-                                name: "SetJobTaskState",
-                                variables: {
-                                    id: task.id,
-                                    state: {
-                                        state: res.code === 0 ? AtmJobTaskState.success : AtmJobTaskState.failed,
-                                        message: res.message,
-                                    },
-                                },
-                            });
-                        });
+                        // Handle result
+                        if (!!result && result.code !== undefined) {
+                            if (result.code === 0) {
+                                await updateJobTaskState(
+                                    task.id,
+                                    AtmJobTaskState.success,
+                                    `Task command '${data.name}' successfully executed`,
+                                    ctx);
+                            } else {
+                                await updateJobTaskState(
+                                    task.id,
+                                    AtmJobTaskState.failed,
+                                    result.message || `Task command '${data.name}' failed`,
+                                    ctx);
+                            }
+                        } else {
+                            await updateJobTaskState(
+                                task.id,
+                                AtmJobTaskState.success,
+                                `Task command '${data.name}' successfully executed`,
+                                ctx);
+                        }
+                    } catch (e) {
+                        logger.warn("Command execution failed: %s", e.message);
+                        await updateJobTaskState(
+                            task.id,
+                            AtmJobTaskState.failed,
+                            `Task command '${data.name}' failed`,
+                            ctx);
                     }
-                    return deferred.promise;
                 }
             }
 
             return Success;
         },
     };
+}
+
+async function updateJobTaskState(id: string,
+                                  state: AtmJobTaskState,
+                                  message: string,
+                                  ctx: HandlerContext): Promise<void> {
+    await ctx.graphClient.mutate<SetJobTaskState.Mutation, SetJobTaskState.Variables>({
+        name: "SetJobTaskState",
+        variables: {
+            id,
+            state: {
+                state,
+                message,
+            },
+        },
+    });
+}
+
+function prepareForResponseMessages(ctx: HandlerContext, trigger: any): HandlerContext {
+    if (isCommandIncoming(trigger)) {
+        const source = trigger.source;
+        ctx.messageClient.respond = (msg: any, options?: MessageOptions) => {
+            return ctx.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
+        };
+    }
+    return ctx;
 }
