@@ -25,6 +25,7 @@ import {
     Success,
 } from "@atomist/automation-client";
 import { isCommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import { redact } from "@atomist/automation-client/lib/util/redact";
 import {
     EventHandlerRegistration,
     SoftwareDeliveryMachine,
@@ -100,7 +101,7 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
                                 await updateJobTaskState(
                                     task.id,
                                     AtmJobTaskState.failed,
-                                    result.message || `Task command '${task.name}' failed`,
+                                    redact(result.message || `Task command '${task.name}' failed`),
                                     ctx);
                             }
                         } else {
