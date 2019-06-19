@@ -31,7 +31,7 @@ export enum JobTaskType {
 }
 
 export interface JobTask {
-    name: string,
+    name: string;
     payload: EventIncoming | CommandIncoming | any;
     type: JobTaskType | string;
 }
