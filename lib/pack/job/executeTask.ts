@@ -15,6 +15,8 @@
  */
 
 import {
+    automationClientInstance,
+    CommandInvocation,
     GraphQL,
     HandlerContext,
     logger,
@@ -22,9 +24,7 @@ import {
     SourceDestination,
     Success,
 } from "@atomist/automation-client";
-import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
 import { isCommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
-import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import {
     EventHandlerRegistration,
     SoftwareDeliveryMachine,
@@ -54,23 +54,39 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
             if (task.state === AtmJobTaskState.created) {
                 const jobData = JSON.parse(task.job.data);
                 const data = JSON.parse(task.data) as JobTask<any>;
+                const parameters = data.parameters;
 
-                const maker = sdm.commandHandlers.find(ch => {
-                    const md = metadataFromInstance(toFactory(ch)());
-                    return md.name = data.name;
-                });
-
-                if (!maker) {
+                const md = automationClientInstance().automationServer.automations.commands.find(c => c.name === task.name);
+                if (!md) {
                     await updateJobTaskState(
                         task.id,
                         AtmJobTaskState.failed,
-                        `Task command '${data.name}' could not be found`,
+                        `Task command '${task.name}' could not be found`,
                         ctx);
                 } else {
+                    // Prepare the command
+                    const ci: CommandInvocation = {
+                        name: md.name,
+                        args: md.parameters.filter(p => !!parameters[p.name]).map(p => ({
+                            name: p.name,
+                            value: parameters[p.name],
+                        })),
+                        mappedParameters: md.mapped_parameters.filter(p => !!parameters[p.name]).map(p => ({
+                            name: p.name,
+                            value: parameters[p.name],
+                        })),
+                        secrets: md.secrets.filter(p => !!parameters[p.name]).map(p => ({
+                            uri: p.uri,
+                            value: parameters[p.name],
+                        })),
+                    };
+
                     // Invoke the command
                     try {
-                        const handle = toFactory(maker)();
-                        const result = await handle.handle(prepareForResponseMessages(ctx, jobData), data.parameters);
+                        const result = await automationClientInstance().automationServer.invokeCommand(
+                            ci,
+                            prepareForResponseMessages(ctx, jobData),
+                        );
 
                         // Handle result
                         if (!!result && result.code !== undefined) {
@@ -78,20 +94,20 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
                                 await updateJobTaskState(
                                     task.id,
                                     AtmJobTaskState.success,
-                                    `Task command '${data.name}' successfully executed`,
+                                    `Task command '${task.name}' successfully executed`,
                                     ctx);
                             } else {
                                 await updateJobTaskState(
                                     task.id,
                                     AtmJobTaskState.failed,
-                                    result.message || `Task command '${data.name}' failed`,
+                                    result.message || `Task command '${task.name}' failed`,
                                     ctx);
                             }
                         } else {
                             await updateJobTaskState(
                                 task.id,
                                 AtmJobTaskState.success,
-                                `Task command '${data.name}' successfully executed`,
+                                `Task command '${task.name}' successfully executed`,
                                 ctx);
                         }
                     } catch (e) {
@@ -99,7 +115,7 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
                         await updateJobTaskState(
                             task.id,
                             AtmJobTaskState.failed,
-                            `Task command '${data.name}' failed`,
+                            `Task command '${task.name}' failed`,
                             ctx);
                     }
                 }
