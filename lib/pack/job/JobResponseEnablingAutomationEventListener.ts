@@ -33,9 +33,11 @@ export class JobResponseEnablingAutomationEventListener extends AutomationEventL
         const atx = context as any as AutomationContextAware;
         if (atx.context.operation === "OnAnyJobTask" && isCommandIncoming(atx.trigger)) {
             const source = (atx.trigger).source;
-            context.messageClient.respond = (msg: any, options?: MessageOptions) => {
-                return context.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
-            };
+            if (!!source) {
+                context.messageClient.respond = (msg: any, options?: MessageOptions) => {
+                    return context.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
+                };
+            }
         }
     }
 

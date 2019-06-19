@@ -17,10 +17,11 @@
 import {
     AutomationContextAware,
     CommandIncoming,
+    configurationValue,
     EventIncoming,
+    HandlerContext,
     MutationNoCacheOptions,
 } from "@atomist/automation-client";
-import { SdmContext } from "@atomist/sdm";
 import { CreateJob } from "../../typings/types";
 
 export enum JobTaskType {
@@ -41,12 +42,12 @@ export interface JobTask {
  */
 export async function createJob(name: string,
                                 tasks: JobTask[],
-                                ctx: SdmContext): Promise<{ id: string }> {
-    const context = ctx.context as any as AutomationContextAware;
-    const owner = context.context.name;
-    const data = JSON.stringify(context.trigger);
+                                ctx: HandlerContext): Promise<{ id: string }> {
+    const context = ctx as any as AutomationContextAware;
+    const owner = _.get(context, "context.name") || configurationValue<string>("name");
+    const data = JSON.stringify(_.get(context, "trigger") || {});
 
-    const result = await ctx.context.graphClient.mutate<CreateJob.Mutation, CreateJob.Variables>({
+    const result = await ctx.graphClient.mutate<CreateJob.Mutation, CreateJob.Variables>({
         name: "CreateJob",
         variables: {
             name,
