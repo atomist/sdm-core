@@ -637,9 +637,11 @@ describe("goal/container/k8s", () => {
                 apiVersion: "v1",
                 kind: "Pod",
                 metadata: {
-                    namespace: "default", // readNamespace is going to default to "default"
+                    namespace: "default", // readNamespace() is going to default to "default"
                 },
-                spec: {},
+                spec: {
+                    restartPolicy: "Never",
+                },
             };
             const podNamePrefix = "sdm-core-container-k8s-test";
 
@@ -670,6 +672,35 @@ describe("goal/container/k8s", () => {
                 }
             });
 
+            afterEach(() => {
+                if (originalOsHostname) {
+                    Object.defineProperty(os, "hostname", originalOsHostname);
+                }
+            });
+
+            it("should report when the container succeeds", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["true"],
+                            image: containerTestImage,
+                            name: "alpine",
+                        },
+                    ],
+                };
+                const p = JSON.stringify(_.merge({}, partialPodSpec, { spec: r }));
+                const e = executeK8sJob(goal, r);
+                await execPromise("bash", ["-c", `echo '${p}' | kubectl apply -f -`]);
+                const egr = await e(goalInvocation);
+                try {
+                    await execPromise("kubectl", ["delete", "-n", partialPodSpec.metadata.namespace, "pod", partialPodSpec.metadata.name]);
+                } catch (e) { /* ignore */ }
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0, logData);
+                assert(x.message === "Container 'alpine' completed successfully");
+            }).timeout(10000);
+
             it("should report when the container fails", async () => {
                 const r = {
                     containers: [
@@ -680,10 +711,13 @@ describe("goal/container/k8s", () => {
                         },
                     ],
                 };
-                const p = JSON.stringify(_.merge({}, partialPodSpec, r));
+                const p = JSON.stringify(_.merge({}, partialPodSpec, { spec: r }));
                 const e = executeK8sJob(goal, r);
                 await execPromise("bash", ["-c", `echo '${p}' | kubectl apply -f -`]);
                 const egr = await e(goalInvocation);
+                try {
+                    await execPromise("kubectl", ["delete", "-n", partialPodSpec.metadata.namespace, "pod", partialPodSpec.metadata.name]);
+                } catch (e) { /* ignore */ }
                 assert(egr, "ExecuteGoal did not return a value");
                 const x = egr as ExecuteGoalResult;
                 assert(x.code === 1, logData);

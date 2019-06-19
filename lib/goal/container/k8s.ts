@@ -262,21 +262,35 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
         const ns = await readNamespace();
         const podName = os.hostname();
 
-        const podPromise = podWatch(containerName, podName, ns);
-        const log = await podLog(containerName, podName, ns, progressLog);
+        let kc: k8s.KubeConfig;
+        try {
+            kc = loadKubeConfig();
+        } catch (e) {
+            const message = `Failed to load Kubernetes configuration: ${e.message}`;
+            logger.error(message);
+            progressLog.write(message);
+            return { code: 1, message };
+        }
 
         const status = { code: 0, message: `Container '${containerName}' completed successfully` };
+        let log: request.Request;
         try {
-            await podPromise;
+            let podStatus: k8s.V1PodStatus;
+            [podStatus, log] = await Promise.all([
+                podWatch(kc, containerName, podName, ns),
+                podLog(containerName, podName, ns, progressLog),
+            ]);
+            logger.debug(`Container '${containerName}' exited: ${stringify(podStatus)}`);
         } catch (e) {
             const message = `Container '${containerName}' failed: ${e.message}`;
             logger.error(message);
             progressLog.write(message);
             status.code++;
             status.message = message;
-        }
-        if (log) {
-            log.abort();
+        } finally {
+            if (log) {
+                log.abort();
+            }
         }
 
         try {
@@ -302,33 +316,40 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
  * @param podName Name of pod to watch
  * @param ns Namespace of pod to watch
  */
-async function podWatch(containerName: string, podName: string, ns: string): Promise<k8s.V1PodStatus> {
+function podWatch(kc: k8s.KubeConfig, containerName: string, podName: string, ns: string): Promise<k8s.V1PodStatus> {
     return new Promise((resolve, reject) => {
         let watch: k8s.Watch;
         try {
-            const kc = loadKubeConfig();
             watch = new k8s.Watch(kc);
         } catch (e) {
             e.message = `Failed to create Kubernetes watch client: ${e.message}`;
             logger.error(e.message);
             reject(e);
         }
-        watch.watch(`/api/v1/watch/namespaces/${ns}/pods/${podName}`, {}, (phase, obj) => {
-            const podEvent = obj as k8s.V1Pod;
-            const container = podEvent.status.containerStatuses.find(c => c.name === containerName);
-            const exitCode: number = _.get(container, "state.terminated.exitCode");
-            if (exitCode === 0) {
-                logger.info(`Container '${containerName}' excited with 0`);
-                resolve(podEvent.status);
-            } else if (exitCode) {
-                const message = `Container '${containerName}' excited with ${exitCode}`;
-                logger.error(message);
-                const err = new Error(message);
-                (err as any).podStatus = podEvent.status;
-                reject(err);
-            } else {
-                logger.info(`Container '${containerName}' still running`);
+        let watcher: any;
+        watcher = watch.watch(`/api/v1/watch/namespaces/${ns}/pods/${podName}`, {}, (phase, obj) => {
+            const pod = obj as k8s.V1Pod;
+            if (pod && pod.status && pod.status.containerStatuses) {
+                const container = pod.status.containerStatuses.find(c => c.name === containerName);
+                if (container && container.state && container.state.terminated) {
+                    const exitCode: number = _.get(container, "state.terminated.exitCode");
+                    if (exitCode === 0) {
+                        logger.info(`Container '${containerName}' exited with status 0`);
+                        resolve(pod.status);
+                    } else {
+                        const message = `Container '${containerName}' exited with status ${exitCode}`;
+                        logger.error(message);
+                        const err = new Error(message);
+                        (err as any).podStatus = pod.status;
+                        reject(err);
+                    }
+                    if (watcher) {
+                        watcher.abort();
+                    }
+                    return;
+                }
             }
+            logger.debug(`Container '${containerName}' still running`);
         }, err => {
             logger.error(err);
             reject(err);
@@ -336,7 +357,10 @@ async function podWatch(containerName: string, podName: string, ns: string): Pro
     });
 }
 
-async function podLog(containerName: string, podName: string, ns: string, progressLog: ProgressLog): Promise<request.Request> {
+/**
+ * Wait for container to start and the stream logs
+ */
+export async function podLog(containerName: string, podName: string, ns: string, progressLog: ProgressLog): Promise<request.Request> {
     let kc: k8s.KubeConfig;
     let core: k8s.Core_v1Api;
     try {
@@ -348,13 +372,13 @@ async function podLog(containerName: string, podName: string, ns: string, progre
     }
 
     let pod: k8s.V1Pod;
-    let startedAt: string;
+    let started: boolean;
     do {
         await sleep(500);
         pod = (await core.readNamespacedPod(podName, ns)).body;
         const container = pod.status.containerStatuses.find(c => c.name === containerName);
-        startedAt = _.get(container, "state.running.startedAt");
-    } while (!startedAt);
+        started = !!_.get(container, "state.running.startedAt") || !!_.get(container, "state.terminated");
+    } while (!started);
 
     return followPodLog(kc, podName, ns,
         l => { progressLog.write(l); },
@@ -455,6 +479,7 @@ export function followPodLog(
         uri,
         useQuerystring: true,
         json: true,
+        timeout: 1000,
     };
     config.applyToRequest(requestOptions);
 
