@@ -17,6 +17,7 @@
 import {
     AutomationContextAware,
     AutomationEventListenerSupport,
+    CommandInvocation,
     HandlerContext,
     MessageOptions,
     SourceDestination,
@@ -31,8 +32,9 @@ export class JobResponseEnablingAutomationEventListener extends AutomationEventL
 
     public contextCreated(context: HandlerContext): void {
         const atx = context as any as AutomationContextAware;
-        if (atx.context.operation === "OnAnyJobTask" && isCommandIncoming(atx.trigger)) {
+        if (atx.context.operation === "ExecuteTask" && isCommandIncoming(atx.trigger)) {
             const source = (atx.trigger).source;
+            (context as any).__spawned = true;
             if (!!source) {
                 context.messageClient.respond = (msg: any, options?: MessageOptions) => {
                     return context.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
@@ -41,4 +43,9 @@ export class JobResponseEnablingAutomationEventListener extends AutomationEventL
         }
     }
 
+    public commandStarting(payload: CommandInvocation, ctx: HandlerContext): void {
+        if (!!(ctx as any).__spawned) {
+            (payload as any).__spawned = true;
+        }
+    }
 }
