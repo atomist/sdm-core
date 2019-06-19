@@ -22,6 +22,7 @@ import {
     HandlerContext,
     MutationNoCacheOptions,
 } from "@atomist/automation-client";
+import * as _ from "lodash";
 import { CreateJob } from "../../typings/types";
 
 export enum JobTaskType {
