@@ -20,6 +20,7 @@ import {
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
 import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
+import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
 
 /**
  * Simple test to see if SDM is running in Kubernetes.  It is called
@@ -28,8 +29,7 @@ import { readSdmVersion } from "../../internal/delivery/build/local/projectVersi
  * @return `true` if process is running in Kubernetes, `false` otherwise.
  */
 export function runningInK8s(): boolean {
-    const k8sFile = "/var/containerRun/secrets/kubernetes.io/serviceaccount/namespace";
-    return fs.pathExistsSync(k8sFile);
+    return fs.pathExistsSync(K8sNamespaceFile);
 }
 
 /**

@@ -544,7 +544,7 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
     }
 }
 
-const NamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
+export const K8sNamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
 
 /**
  * Read the namespace of the deployment from environment and k8s service account files.
@@ -556,8 +556,8 @@ export async function readNamespace(): Promise<string> {
         return podNs;
     }
 
-    if (await fs.pathExists(NamespaceFile)) {
-        podNs = (await fs.readFile(NamespaceFile)).toString().trim();
+    if (await fs.pathExists(K8sNamespaceFile)) {
+        podNs = (await fs.readFile(K8sNamespaceFile)).toString().trim();
     }
 
     if (!!podNs) {
