@@ -236,7 +236,7 @@ describe("goal/container/docker", () => {
         before(async function dockerCheckProjectSetup(): Promise<void> {
             // tslint:disable-next-line:no-invalid-this
             this.timeout(20000);
-            if ((!process.env.DOCKER_HOST && !fs.existsSync("/var/run/docker.sock")) || runningInK8s()) {
+            if (runningInK8s() || (!process.env.DOCKER_HOST && !fs.existsSync("/var/run/docker.sock"))) {
                 // tslint:disable-next-line:no-invalid-this
                 this.skip();
                 return;
