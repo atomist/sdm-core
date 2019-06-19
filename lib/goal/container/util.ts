@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { LeveledLogMethod } from "@atomist/automation-client";
 import {
+    ProgressLog,
     SdmContext,
     SdmGoalEvent,
 } from "@atomist/sdm";
@@ -103,4 +105,16 @@ export async function copyProject(src: string, dest: string): Promise<void> {
         }
         throw e;
     }
+}
+
+/**
+ * Write to client and progress logs.  Add newline to progress log.
+ *
+ * @param msg Message to write, should not have newline at end
+ * @param l Logger method, e.g., `logger.warn`
+ * @param p Progress log
+ */
+export function loglog(msg: string, l: LeveledLogMethod, p: ProgressLog): void {
+    l(msg);
+    p.write(msg + "\n");
 }

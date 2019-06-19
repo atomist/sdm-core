@@ -43,6 +43,7 @@ import {
 import {
     containerEnvVars,
     copyProject,
+    loglog,
 } from "./util";
 
 /**
@@ -92,8 +93,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             await copyProject(projectDir, containerDir);
         } catch (e) {
             const message = `Failed to duplicate project directory for goal ${goalName}: ${e.message}`;
-            logger.error(message);
-            progressLog.write(message);
+            loglog(message, logger.error, progressLog);
             return { code: 1, message };
         }
 
@@ -107,8 +107,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         if (networkCreateRes.code) {
             let message = `Failed to create Docker network '${network}'` +
                 ((networkCreateRes.error) ? `: ${networkCreateRes.error.message}` : "");
-            logger.error(message);
-            progressLog.write(message);
+            loglog(message, logger.error, progressLog);
             try {
                 await dockerCleanup({ containerDir, projectDir, spawnOpts });
             } catch (e) {
@@ -128,7 +127,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             try {
                 containerArgs = containerDockerOptions(container, registration);
             } catch (e) {
-                progressLog.write(e.message);
+                loglog(e.message, logger.error, progressLog);
                 failures.push(e.message);
                 break;
             }
@@ -169,14 +168,12 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             const result = await main.promise;
             if (result.code) {
                 const msg = `Docker container '${main.name}' failed` + ((result.error) ? `: ${result.error.message}` : "");
-                logger.error(msg);
-                progressLog.write(msg);
+                loglog(msg, logger.error, progressLog);
                 failures.push(msg);
             }
         } catch (e) {
             const message = `Failed to execute main Docker container '${main.name}': ${e.message}`;
-            logger.error(message);
-            progressLog.write(message);
+            loglog(message, logger.error, progressLog);
             failures.push(message);
         }
 
@@ -280,8 +277,7 @@ async function dockerCleanup(opts: CleanupOptions): Promise<void> {
         if (networkDeleteRes.code) {
             const msg = `Failed to delete Docker network '${opts.network}'` +
                 ((networkDeleteRes.error) ? `: ${networkDeleteRes.error.message}` : "");
-            logger.error(msg);
-            opts.spawnOpts.log.write(msg);
+            loglog(msg, logger.error, opts.spawnOpts.log);
         }
     }
     if (opts.containerDir) {
@@ -290,16 +286,14 @@ async function dockerCleanup(opts: CleanupOptions): Promise<void> {
         } catch (e) {
             e.message = `Failed to update project directory '${opts.projectDir}' with contents from container ` +
                 `directory '${opts.containerDir}': ${e.message}`;
-            logger.error(e.message);
-            opts.spawnOpts.log.write(e.message);
+            loglog(e.message, logger.error, opts.spawnOpts.log);
             throw e;
         }
         try {
             await fs.remove(opts.containerDir);
         } catch (e) {
             const message = `Failed to remove container directory '${opts.containerDir}': ${e.message}`;
-            logger.error(message);
-            opts.spawnOpts.log.write(message);
+            loglog(message, logger.error, opts.spawnOpts.log);
         }
     }
 }
@@ -320,7 +314,6 @@ async function dockerKill(containers: SpawnedContainer[], opts: SpawnLogOptions)
         await Promise.all(killPromises);
     } catch (e) {
         const message = `Failed to kill Docker containers: ${e.message}`;
-        logger.error(message);
-        opts.log.write(message);
+        loglog(message, logger.error, opts.log);
     }
 }
