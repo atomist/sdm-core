@@ -386,14 +386,14 @@ describe("goal/container/docker", () => {
             const r = {
                 containers: [
                     {
-                        args: ["sleep", "2"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                    {
                         args: ["ping", "-w", "1", "alpine0"],
                         image: containerTestImage,
                         name: "alpine1",
+                    },
+                    {
+                        args: ["sleep", "2"],
+                        image: containerTestImage,
+                        name: "alpine0",
                     },
                 ],
             };
