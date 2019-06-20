@@ -6,7 +6,13 @@ mutation CreateJob(
   $tasks: [AtmJobTaskInput!]!
 ) {
   createAtmJob(
-    jobInput: { data: $data, name: $name, description: $description, owner: $owner, jobTasks: $tasks }
+    jobInput: {
+      data: $data
+      name: $name
+      description: $description
+      owner: $owner
+      jobTasks: $tasks
+    }
   ) {
     id
   }
