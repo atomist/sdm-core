@@ -43,6 +43,7 @@ import {
     K8sContainerRegistration,
     k8sFulfillmentCallback,
 } from "../../../lib/goal/container/k8s";
+import { loadKubeConfig } from "../../../lib/pack/k8s/config";
 import { KubernetesGoalScheduler } from "../../../lib/pack/k8s/KubernetesGoalScheduler";
 import { containerTestImage } from "./util";
 
@@ -633,11 +634,12 @@ describe("goal/container/k8s", () => {
 
         describe("minikube", () => {
 
+            const ns = "default"; // readNamespace() is going to default to "default"
             const partialPodSpec: DeepPartial<k8s.V1Pod> = {
                 apiVersion: "v1",
                 kind: "Pod",
                 metadata: {
-                    namespace: "default", // readNamespace() is going to default to "default"
+                    namespace: ns,
                 },
                 spec: {
                     restartPolicy: "Never",
@@ -647,6 +649,7 @@ describe("goal/container/k8s", () => {
             const podNamePrefix = "sdm-core-container-k8s-test";
 
             let originalOsHostname: any;
+            let k8sCore: k8s.CoreV1Api;
             before(async function minikubeCheckProjectSetup(): Promise<void> {
                 // tslint:disable-next-line:no-invalid-this
                 this.timeout(20000);
@@ -654,6 +657,8 @@ describe("goal/container/k8s", () => {
                     // see if minikube is available and responding
                     await execPromise("kubectl", ["config", "use-context", "minikube"]);
                     await execPromise("kubectl", ["get", "--request-timeout=200ms", "pods"]);
+                    const kc = loadKubeConfig();
+                    k8sCore = kc.makeApiClient(k8s.CoreV1Api);
                 } catch (e) {
                     // tslint:disable-next-line:no-invalid-this
                     this.skip();
@@ -680,14 +685,13 @@ describe("goal/container/k8s", () => {
             });
 
             async function execK8sJobTest(r: K8sContainerRegistration): Promise<ExecuteGoalResult | void> {
-                const p = JSON.stringify(_.merge({}, partialPodSpec, { spec: r }));
-                await execPromise("bash", ["-c", `echo '${p}' | kubectl apply -f -`]);
+                const p: k8s.V1Pod = _.merge({}, partialPodSpec, { spec: r });
+                await k8sCore.createNamespacedPod(ns, p);
                 const e = executeK8sJob(goal, r);
                 const egr = await e(goalInvocation);
                 try {
-                    const args = ["delete", "--force", "--grace-period=0", "-n", partialPodSpec.metadata.namespace,
-                        "pod", partialPodSpec.metadata.name];
-                    await execPromise("kubectl", args);
+                    const body: k8s.V1DeleteOptions = { gracePeriodSeconds: 0, propagationPolicy: "Background" };
+                    await k8sCore.deleteNamespacedPod(p.metadata.name, ns, undefined, body);
                 } catch (e) { /* ignore */ }
                 return egr;
             }
@@ -698,7 +702,7 @@ describe("goal/container/k8s", () => {
                         {
                             args: ["true"],
                             image: containerTestImage,
-                            name: "alpine",
+                            name: "alpine0",
                         },
                     ],
                 };
@@ -706,7 +710,7 @@ describe("goal/container/k8s", () => {
                 assert(egr, "ExecuteGoal did not return a value");
                 const x = egr as ExecuteGoalResult;
                 assert(x.code === 0, logData);
-                assert(x.message === "Container 'alpine' completed successfully");
+                assert(x.message === "Container 'alpine0' completed successfully");
             }).timeout(10000);
 
             it("should report when the container fails", async () => {
@@ -715,7 +719,7 @@ describe("goal/container/k8s", () => {
                         {
                             args: ["false"],
                             image: containerTestImage,
-                            name: "alpine",
+                            name: "alpine0",
                         },
                     ],
                 };
@@ -723,7 +727,7 @@ describe("goal/container/k8s", () => {
                 assert(egr, "ExecuteGoal did not return a value");
                 const x = egr as ExecuteGoalResult;
                 assert(x.code === 1, logData);
-                assert(x.message.startsWith("Container 'alpine' failed:"));
+                assert(x.message.startsWith("Container 'alpine0' failed:"));
             }).timeout(10000);
 
             it("should run multiple containers", async () => {
@@ -817,6 +821,25 @@ describe("goal/container/k8s", () => {
                 const x = egr as ExecuteGoalResult;
                 assert(x.code === 0);
                 assert(x.message === "Container 'alpine0' completed successfully");
+            }).timeout(10000);
+
+            it("should capture the container output in the log", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: [`echo "Wouldn't it be nice"; echo 'If we were older?'`],
+                            command: ["sh", "-c"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                    ],
+                };
+                const egr = await execK8sJobTest(r);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 0, logData);
+                assert(x.message === "Container 'alpine0' completed successfully");
+                assert(logData.includes(`Wouldn't it be nice\nIf we were older?\n`));
             }).timeout(10000);
 
         });

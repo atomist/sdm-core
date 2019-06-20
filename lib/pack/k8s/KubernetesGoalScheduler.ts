@@ -91,7 +91,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         const podNs = await readNamespace();
 
         const kc = loadKubeConfig();
-        const batch = kc.makeApiClient(k8s.Batch_v1Api);
+        const batch = kc.makeApiClient(k8s.BatchV1Api);
 
         const jobSpec = createJobSpec(_.cloneDeep(this.podSpec), podNs, gi);
         const jobDesc = `k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`;
@@ -171,7 +171,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
 
         try {
             const kc = loadKubeClusterConfig();
-            const core = kc.makeApiClient(k8s.Core_v1Api);
+            const core = kc.makeApiClient(k8s.CoreV1Api);
 
             this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;
         } catch (e) {
@@ -218,7 +218,7 @@ export async function cleanCompletedJobs(): Promise<void> {
             completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
         const kc = loadKubeConfig();
-        const batch = kc.makeApiClient(k8s.Batch_v1Api);
+        const batch = kc.makeApiClient(k8s.BatchV1Api);
         for (const completedSdmJob of completedJobs) {
             try {
                 await batch.deleteNamespacedJob(
@@ -522,7 +522,7 @@ export function sanitizeName(name: string): string {
  */
 export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
     const kc = loadKubeConfig();
-    const batch = kc.makeApiClient(k8s.Batch_v1Api);
+    const batch = kc.makeApiClient(k8s.BatchV1Api);
 
     if (configurationValue<boolean>("sdm.k8s.job.singleNamespace", true)) {
         const podNs = await readNamespace();

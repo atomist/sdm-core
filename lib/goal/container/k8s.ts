@@ -37,6 +37,8 @@ import * as k8s from "@kubernetes/client-node";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
+import * as request from "request";
+import { Writable } from "stream";
 import {
     DeepPartial,
     Merge,
@@ -60,7 +62,6 @@ import {
     GoalContainer,
     GoalContainerVolume,
 } from "./container";
-import { followPodLog } from "./k8sLog";
 import {
     containerEnvVars,
     copyProject,
@@ -295,11 +296,7 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
             return { code: 1, message: e.message };
         }
 
-        const log = followPodLog(kc, podName, ns,
-            l => { progressLog.write(l); },
-            err => { if (err) { loglog(err.message, logger.error, progressLog); } },
-            { container: containerName },
-        );
+        const log = followK8sLog(container);
 
         const status = { code: 0, message: `Container '${containerName}' completed successfully` };
         try {
@@ -311,9 +308,9 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
             status.code++;
             status.message = message;
         } finally {
-            if (log) {
-                log.abort();
-            }
+            // Give the logs some time to be delivered
+            await sleep(1000);
+            log.abort();
         }
 
         try {
@@ -336,9 +333,9 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
  * @param ns Namespace of pod
  */
 async function containerStarted(container: K8sContainer, attempts: number = 120): Promise<void> {
-    let core: k8s.Core_v1Api;
+    let core: k8s.CoreV1Api;
     try {
-        core = container.config.makeApiClient(k8s.Core_v1Api);
+        core = container.config.makeApiClient(k8s.CoreV1Api);
     } catch (e) {
         e.message = `Failed to create Kubernetes core API client: ${e.message}`;
         loglog(e.message, logger.error, container.log);
@@ -414,4 +411,28 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
             reject(err);
         });
     });
+}
+
+/**
+ * Set up log follower for container.
+ */
+function followK8sLog(container: K8sContainer): request.Request {
+    const k8sLog = new k8s.Log(container.config);
+    const logStream = new Writable({
+        write: (chunk, encoding, callback) => {
+            container.log.write(chunk.toString());
+            callback();
+        },
+    });
+    const doneCallback = e => {
+        if (e) {
+            if (e.message) {
+                loglog(e.message, logger.error, container.log);
+            } else {
+                loglog(stringify(e), logger.error, container.log);
+            }
+        }
+    };
+    const logOptions: k8s.LogOptions = { follow: true };
+    return k8sLog.log(container.ns, container.pod, container.name, logStream, doneCallback, logOptions);
 }
