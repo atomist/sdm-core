@@ -35,7 +35,10 @@ import {
     OnAnyJobTask,
     SetJobTaskState,
 } from "../../typings/types";
-import { JobTask } from "./createJob";
+import {
+    JobTask,
+    JobTaskType,
+} from "./createJob";
 
 /**
  * Execute an incoming job task
@@ -52,72 +55,60 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
         }),
         listener: async (e, ctx) => {
             const task = e.data.AtmJobTask[0];
+
             if (task.state === AtmJobTaskState.created) {
+
                 const jobData = JSON.parse(task.job.data);
                 const data = JSON.parse(task.data) as JobTask<any>;
-                const parameters = data.parameters;
 
-                const md = automationClientInstance().automationServer.automations.commands.find(c => c.name === task.name);
-                if (!md) {
-                    await updateJobTaskState(
-                        task.id,
-                        AtmJobTaskState.failed,
-                        `Task command '${task.name}' could not be found`,
-                        ctx);
-                } else {
-                    // Prepare the command
-                    const ci: CommandInvocation = {
-                        name: md.name,
-                        args: md.parameters.filter(p => !!parameters[p.name]).map(p => ({
-                            name: p.name,
-                            value: parameters[p.name],
-                        })),
-                        mappedParameters: md.mapped_parameters.filter(p => !!parameters[p.name]).map(p => ({
-                            name: p.name,
-                            value: parameters[p.name],
-                        })),
-                        secrets: md.secrets.filter(p => !!parameters[p.name]).map(p => ({
-                            uri: p.uri,
-                            value: parameters[p.name],
-                        })),
-                    };
+                if (data.type === JobTaskType.Command) {
+                    const md = automationClientInstance().automationServer.automations.commands
+                        .find(c => c.name === task.name);
 
-                    // Invoke the command
-                    try {
-                        const result = await automationClientInstance().automationServer.invokeCommand(
-                            ci,
-                            prepareForResponseMessages(ctx, jobData),
-                        );
+                    if (!md) {
+                        await updateJobTaskState(
+                            task.id,
+                            AtmJobTaskState.failed,
+                            `Task command '${task.name}' could not be found`,
+                            ctx);
+                    } else {
+                        try {
+                            // Invoke the command
+                            const result = await automationClientInstance().automationServer.invokeCommand(
+                                prepareCommandInvocation(md, data.parameters),
+                                prepareHandlerContext(ctx, jobData),
+                            );
 
-                        // Handle result
-                        if (!!result && result.code !== undefined) {
-                            if (result.code === 0) {
+                            // Handle result
+                            if (!!result && result.code !== undefined) {
+                                if (result.code === 0) {
+                                    await updateJobTaskState(
+                                        task.id,
+                                        AtmJobTaskState.success,
+                                        `Task command '${task.name}' successfully executed`,
+                                        ctx);
+                                } else {
+                                    await updateJobTaskState(
+                                        task.id,
+                                        AtmJobTaskState.failed,
+                                        redact(result.message || `Task command '${task.name}' failed`),
+                                        ctx);
+                                }
+                            } else {
                                 await updateJobTaskState(
                                     task.id,
                                     AtmJobTaskState.success,
                                     `Task command '${task.name}' successfully executed`,
                                     ctx);
-                            } else {
-                                await updateJobTaskState(
-                                    task.id,
-                                    AtmJobTaskState.failed,
-                                    redact(result.message || `Task command '${task.name}' failed`),
-                                    ctx);
                             }
-                        } else {
+                        } catch (e) {
+                            logger.warn("Command execution failed: %s", e.message);
                             await updateJobTaskState(
                                 task.id,
-                                AtmJobTaskState.success,
-                                `Task command '${task.name}' successfully executed`,
+                                AtmJobTaskState.failed,
+                                `Task command '${task.name}' failed`,
                                 ctx);
                         }
-                    } catch (e) {
-                        logger.warn("Command execution failed: %s", e.message);
-                        await updateJobTaskState(
-                            task.id,
-                            AtmJobTaskState.failed,
-                            `Task command '${task.name}' failed`,
-                            ctx);
                     }
                 }
             }
@@ -143,12 +134,33 @@ async function updateJobTaskState(id: string,
     });
 }
 
-function prepareForResponseMessages(ctx: HandlerContext, trigger: any): HandlerContext {
+function prepareCommandInvocation(md, parameters) {
+    const ci: CommandInvocation = {
+        name: md.name,
+        args: md.parameters.filter(p => !!parameters[p.name]).map(p => ({
+            name: p.name,
+            value: parameters[p.name],
+        })),
+        mappedParameters: md.mapped_parameters.filter(p => !!parameters[p.name]).map(p => ({
+            name: p.name,
+            value: parameters[p.name],
+        })),
+        secrets: md.secrets.filter(p => !!parameters[p.name]).map(p => ({
+            uri: p.uri,
+            value: parameters[p.name],
+        })),
+    };
+    return ci;
+}
+
+function prepareHandlerContext(ctx: HandlerContext, trigger: any): HandlerContext {
     if (isCommandIncoming(trigger)) {
         const source = trigger.source;
-        ctx.messageClient.respond = (msg: any, options?: MessageOptions) => {
-            return ctx.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
-        };
+        if (!!source) {
+            ctx.messageClient.respond = (msg: any, options?: MessageOptions) => {
+                return ctx.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
+            };
+        }
     }
     return ctx;
 }
