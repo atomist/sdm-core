@@ -21,10 +21,12 @@ import {
     HandlerContext,
     logger,
     MessageOptions,
+    ParameterType,
     SourceDestination,
     Success,
 } from "@atomist/automation-client";
 import { isCommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
 import { redact } from "@atomist/automation-client/lib/util/redact";
 import {
     EventHandlerRegistration,
@@ -134,20 +136,20 @@ async function updateJobTaskState(id: string,
     });
 }
 
-function prepareCommandInvocation(md, parameters) {
+function prepareCommandInvocation(md: CommandHandlerMetadata, parameters: ParameterType): CommandInvocation {
     const ci: CommandInvocation = {
         name: md.name,
         args: md.parameters.filter(p => !!parameters[p.name]).map(p => ({
             name: p.name,
-            value: parameters[p.name],
+            value: parameters[p.name] as any,
         })),
         mappedParameters: md.mapped_parameters.filter(p => !!parameters[p.name]).map(p => ({
             name: p.name,
-            value: parameters[p.name],
+            value: parameters[p.name] as any,
         })),
         secrets: md.secrets.filter(p => !!parameters[p.name]).map(p => ({
             uri: p.uri,
-            value: parameters[p.name],
+            value: parameters[p.name] as any,
         })),
     };
     return ci;
