@@ -46,6 +46,18 @@ import { k8sContainerScheduler } from "./k8s";
 import { runningInK8s } from "./util";
 
 /**
+ * Create and return a container goal with the provided container
+ * specification.
+ *
+ * @param displayName Goal display name
+ * @param registration Goal containers, volumes, cache details, etc.
+ * @return SDM container goal
+ */
+export function containerGoal(displayName: string, registration: ContainerRegistration): Container {
+    return new Container({ displayName }).with(registration);
+}
+
+/**
  * Ports to expose from container.
  */
 export interface ContainerPort {

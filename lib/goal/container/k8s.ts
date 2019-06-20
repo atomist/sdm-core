@@ -214,6 +214,7 @@ export function k8sFulfillmentCallback(
     };
 }
 
+/** Container information useful the various functions. */
 interface K8sContainer {
     /** Kubernetes configuration to use when creating API clients */
     config: k8s.KubeConfig;
@@ -328,9 +329,8 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
 /**
  * Wait for container in pod to start, return when it does.
  *
- * @param containerName Name of container within pod to wait for
- * @param podName Name of pod
- * @param ns Namespace of pod
+ * @param container Information about container to check
+ * @param attempts Maximum number of attempts, waiting 500 ms between
  */
 async function containerStarted(container: K8sContainer, attempts: number = 120): Promise<void> {
     let core: k8s.CoreV1Api;
@@ -360,14 +360,13 @@ async function containerStarted(container: K8sContainer, attempts: number = 120)
 }
 
 /**
- * Watch pod until container `containerName` exits.  Resolve promise
- * with status if container `containerName` exits with status 0.
+ * Watch pod until container `container.name` exits.  Resolve promise
+ * with status if container `container.name` exits with status 0.
  * Reject promise otherwise, including pod status in the `podStatus`
  * property of the error.
  *
- * @param containerName Name of container to wait on
- * @param podName Name of pod to watch
- * @param ns Namespace of pod to watch
+ * @param container Information about container to watch
+ * @return Status of pod after container terminates
  */
 function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
     return new Promise((resolve, reject) => {
