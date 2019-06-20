@@ -641,7 +641,7 @@ describe("goal/container/k8s", () => {
                 },
                 spec: {
                     restartPolicy: "Never",
-                    terminationGracePeriodSeconds: 1,
+                    terminationGracePeriodSeconds: 0,
                 },
             };
             const podNamePrefix = "sdm-core-container-k8s-test";

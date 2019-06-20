@@ -382,29 +382,6 @@ describe("goal/container/docker", () => {
             assert(x.message === "Successfully completed container job");
         }).timeout(10000);
 
-        it("should allow containers to communicate", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["ping", "-w", "1", "alpine0"],
-                        image: containerTestImage,
-                        name: "alpine1",
-                    },
-                    {
-                        args: ["sleep", "2"],
-                        image: containerTestImage,
-                        name: "alpine0",
-                    },
-                ],
-            };
-            const e = executeDockerJob(goal, r);
-            const egr = await e(goalInvocation);
-            assert(egr, "ExecuteGoal did not return a value");
-            const x = egr as ExecuteGoalResult;
-            assert(x.code === 0, logData);
-            assert(x.message === "Successfully completed container job");
-        }).timeout(15000);
-
         it("should only wait on main container", async () => {
             const r = {
                 containers: [
@@ -427,6 +404,30 @@ describe("goal/container/docker", () => {
             assert(x.code === 0, logData);
             assert(x.message === "Successfully completed container job");
         }).timeout(10000);
+
+        it("should allow containers to communicate", async () => {
+            const r = {
+                containers: [
+                    {
+                        args: ["sleep 1; ping -w 1 alpine1"],
+                        command: ["sh", "-c"],
+                        image: containerTestImage,
+                        name: "alpine0",
+                    },
+                    {
+                        args: ["sleep", "20"],
+                        image: containerTestImage,
+                        name: "alpine1",
+                    },
+                ],
+            };
+            const e = executeDockerJob(goal, r);
+            const egr = await e(goalInvocation);
+            assert(egr, "ExecuteGoal did not return a value");
+            const x = egr as ExecuteGoalResult;
+            assert(x.code === 0, logData);
+            assert(x.message === "Successfully completed container job");
+        }).timeout(15000);
 
         it("should use the registration callback", async () => {
             const r = {
