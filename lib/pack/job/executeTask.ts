@@ -26,7 +26,10 @@ import {
     SourceDestination,
     Success,
 } from "@atomist/automation-client";
-import { isCommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import {
+    isCommandIncoming,
+    isEventIncoming,
+} from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
 import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
 import { redact } from "@atomist/automation-client/lib/util/redact";
 import {
@@ -192,6 +195,10 @@ function prepareHandlerContext(ctx: HandlerContext, trigger: any): HandlerContex
             ctx.messageClient.respond = (msg: any, options?: MessageOptions) => {
                 return ctx.messageClient.send(msg, new SourceDestination(source, source.user_agent), options);
             };
+        }
+    } else if (isEventIncoming(trigger)) {
+        ctx.messageClient.respond = async () => {
+            return;
         }
     }
     return ctx;
