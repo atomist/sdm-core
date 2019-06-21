@@ -170,9 +170,9 @@ function prepareCommandInvocation(md: CommandHandlerMetadata, parameters: Parame
             name: p.name,
             value: parameters[p.name] as any,
         })),
-        secrets: md.secrets.filter(p => !!parameters[p.name]).map(p => ({
+        secrets: md.secrets.map(p => ({
             uri: p.uri,
-            value: parameters[p.name] as any,
+            value: parameters[p.name] as any || "null",
         })),
     };
     return ci;
