@@ -65,7 +65,10 @@ export async function createJob<T extends ParameterType>(details: JobDetails<T>,
     const { command, parameters, name, description, registration } = details;
 
     const owner = registration || configurationValue<string>("name");
-    const data = JSON.stringify(_.get(ctx, "trigger") || {});
+
+    const data = _.cloneDeep(_.get(ctx, "trigger") || {});
+    delete data.secrets;
+
     const cmd = typeof command === "string" ? command : command.name;
 
     const result = await ctx.graphClient.mutate<CreateJob.Mutation, CreateJob.Variables>({
@@ -74,7 +77,7 @@ export async function createJob<T extends ParameterType>(details: JobDetails<T>,
             name: !!name ? name : cmd,
             description: !!description ? description : `Executing ${codeLine(cmd)}`,
             owner,
-            data,
+            data: JSON.stringify(data),
             tasks: toArray(parameters).map(p => ({
                 name: cmd,
                 data: JSON.stringify({
