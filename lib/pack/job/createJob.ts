@@ -41,11 +41,11 @@ export interface JobTask<T extends ParameterType> {
  * Details of the job to create
  */
 export interface JobDetails<T extends ParameterType> {
-    command: string | CommandRegistration<T>
-    registration?: string,
-    parameters: T | T[],
-    name?: string,
-    description?: string,
+    command: string | CommandRegistration<T>;
+    registration?: string;
+    parameters: T | T[];
+    name?: string;
+    description?: string;
 }
 
 /**
@@ -59,7 +59,7 @@ export interface JobDetails<T extends ParameterType> {
  * name: optional name of the job
  * description: optional description of the job used to display to the user in chat or web
  */
-export async function createJob<T extends ParameterType>(details:JobDetails<T>,
+export async function createJob<T extends ParameterType>(details: JobDetails<T>,
                                                          ctx: HandlerContext): Promise<{ id: string }> {
 
     const { command, parameters, name, description, registration } = details;
