@@ -102,7 +102,6 @@ export {
     SdmVersionForCommit,
 } from "./lib/typings/types";
 import * as github from "./lib/util/github/ghub";
-
 export {
     gitHubGoalStatus,
     githubGoalStatusSupport,
@@ -121,6 +120,9 @@ export {
 export {
     createJob,
 } from "./lib/pack/job/createJob";
+export {
+    invokeCommand,
+} from "./lib/pack/job/invokeCommand";
 export { github };
 export {
     tagRepo,
