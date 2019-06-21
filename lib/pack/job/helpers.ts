@@ -55,7 +55,7 @@ export function prepareHandlerContext(ctx: HandlerContext, trigger: any): Handle
     } else if (isEventIncoming(trigger)) {
         ctx.messageClient.respond = async () => {
             return;
-        }
+        };
     }
     return ctx;
 }

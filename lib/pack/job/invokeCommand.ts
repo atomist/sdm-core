@@ -50,7 +50,7 @@ export async function invokeCommand<T extends ParameterType>(command: string | C
         };
     } else {
         // Invoke the command
-        return await automationClientInstance().automationServer.invokeCommand(
+        return automationClientInstance().automationServer.invokeCommand(
             prepareCommandInvocation(md, parameters),
             prepareHandlerContext(ctx, trigger),
         );
