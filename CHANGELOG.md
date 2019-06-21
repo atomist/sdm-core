@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.5.2...HEAD)
 
+### Added
+
+-   Add support for scheduling commands as Jobs. [#172](https://github.com/atomist/sdm-core/issues/172)
+
 ### Fixed
 
 -   `ProgressLog` is not populated for code transforms. [#163](https://github.com/atomist/sdm-core/issues/163)
