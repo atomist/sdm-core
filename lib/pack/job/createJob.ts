@@ -67,7 +67,7 @@ export async function createJob<T extends ParameterType>(details: JobDetails<T>,
     const owner = registration || configurationValue<string>("name");
 
     const data = _.cloneDeep(_.get(ctx, "trigger") || {});
-    delete data.secrets;
+    data.secrets = [];
 
     const cmd = typeof command === "string" ? command : command.name;
 
