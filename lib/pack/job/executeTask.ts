@@ -199,7 +199,7 @@ function prepareHandlerContext(ctx: HandlerContext, trigger: any): HandlerContex
     } else if (isEventIncoming(trigger)) {
         ctx.messageClient.respond = async () => {
             return;
-        }
+        };
     }
     return ctx;
 }
