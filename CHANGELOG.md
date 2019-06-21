@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Add support for scheduling commands as Jobs. [#172](https://github.com/atomist/sdm-core/issues/172)
+-   Add invokeCommand method. [6581460](https://github.com/atomist/sdm-core/commit/6581460df84ba5b415071752ea0aa8078aba532d)
 
 ### Fixed
 
