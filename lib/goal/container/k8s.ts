@@ -77,9 +77,13 @@ export interface K8sGoalContainerSpec {
      * the exit status of the first element of the `containers` array.
      * The other containers are considered "sidecar" containers
      * provided functionality that the main container needs to
-     * function.  The working directory of the first container is set
-     * to [[ContainerProjectHome]], which contains the project upon
-     * which the goal should operate.
+     * function.  If not set, the working directory of the first
+     * container is set to [[ContainerProjectHome]], which contains
+     * the project upon which the goal should operate.  If
+     * `workingDir` is set, it is not changed.  If `workingDir` is set
+     * to the empty string, the `workingDir` property is deleted from
+     * the main container spec, meaning the container default working
+     * directory will be used.
      */
     containers: Array<Merge<DeepPartial<k8s.V1Container>, GoalContainer>>;
     /**
@@ -149,7 +153,11 @@ export function k8sFulfillmentCallback(
             throw new Error("No containers defined in K8sGoalContainerSpec");
         }
 
-        spec.containers[0].workingDir = ContainerProjectHome;
+        if (spec.containers[0].workingDir === "") {
+            delete spec.containers[0].workingDir;
+        } else if (!spec.containers[0].workingDir) {
+            spec.containers[0].workingDir = ContainerProjectHome;
+        }
         const containerEnvs = await containerEnvVars(goalEvent, repoContext);
         spec.containers.forEach(c => {
             c.env = [

@@ -272,6 +272,153 @@ describe("goal/container/k8s", () => {
             }
         });
 
+        it("should not set the working directory in the main container", async () => {
+            const r: K8sContainerRegistration = {
+                containers: [
+                    {
+                        args: ["true"],
+                        image: "colin/blunstone:1945.6.24",
+                        name: "colin-blunstone",
+                        workingDir: "",
+                    },
+                ],
+                name: "MaybeAfterHesGone",
+            };
+            const c = k8sFulfillmentCallback(g, r);
+            const ge = await c(sge, rc);
+            const p = JSON.parse(ge.data);
+            const d = {
+                "@atomist/sdm/service": {
+                    MaybeAfterHesGone: {
+                        type: "@atomist/sdm/service/k8s",
+                        spec: {
+                            initContainer: {
+                                name: "atm-init",
+                                image: "rod/argent:1945.6.14",
+                                workingDir: "/atm/home",
+                                volumeMounts: [
+                                    {
+                                        mountPath: "/atm/home",
+                                        name: "home",
+                                    },
+                                ],
+                                env: [
+                                    {
+                                        name: "ATOMIST_JOB_NAME",
+                                        value: "rod-argent-job-0abcdef-beechwoodpark.ts",
+                                    },
+                                    {
+                                        name: "ATOMIST_REGISTRATION_NAME",
+                                        value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
+                                    },
+                                    {
+                                        name: "ATOMIST_GOAL_TEAM",
+                                        value: "AR05343M1LY",
+                                    },
+                                    {
+                                        name: "ATOMIST_GOAL_TEAM_NAME",
+                                        value: "Odessey and Oracle",
+                                    },
+                                    {
+                                        name: "ATOMIST_GOAL_ID",
+                                        value: "CHANGES",
+                                    },
+                                    {
+                                        name: "ATOMIST_GOAL_SET_ID",
+                                        value: "0abcdef-123456789-abcdef",
+                                    },
+                                    {
+                                        name: "ATOMIST_GOAL_UNIQUE_NAME",
+                                        value: "BeechwoodPark.ts#L243",
+                                    },
+                                    {
+                                        name: "ATOMIST_CORRELATION_ID",
+                                        value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
+                                    },
+                                    {
+                                        name: "ATOMIST_ISOLATED_GOAL",
+                                        value: "true",
+                                    },
+                                    {
+                                        name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                        value: "true",
+                                    },
+                                ],
+                            },
+                            container: [
+                                {
+                                    args: ["true"],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_SLUG",
+                                            value: "TheZombies/odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_OWNER",
+                                            value: "TheZombies",
+                                        },
+                                        {
+                                            name: "ATOMIST_REPO",
+                                            value: "odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_SHA",
+                                            value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                                        },
+                                        {
+                                            name: "ATOMIST_BRANCH",
+                                            value: "psychedelic-rock",
+                                        },
+                                        {
+                                            name: "ATOMIST_VERSION",
+                                            value: "1968.4.19",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_SET_ID",
+                                            value: "0abcdef-123456789-abcdef",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL",
+                                            value: "BeechwoodPark.ts#L243",
+                                        },
+                                    ],
+                                    image: "colin/blunstone:1945.6.24",
+                                    name: "colin-blunstone",
+                                },
+                            ],
+                            volume: [
+                                {
+                                    name: "home",
+                                    emptyDir: {},
+                                },
+                            ],
+                            volumeMount: [
+                                {
+                                    mountPath: "/atm/home",
+                                    name: "home",
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+            assert.deepStrictEqual(p, d);
+            delete ge.data;
+            const e = {
+                branch: "psychedelic-rock",
+                goalSetId: "0abcdef-123456789-abcdef",
+                id: "CHANGES",
+                repo: {
+                    name: "odessey-and-oracle",
+                    owner: "TheZombies",
+                    providerId: "CBS",
+                },
+                sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                uniqueName: "BeechwoodPark.ts#L243",
+            };
+            assert.deepStrictEqual(ge, e);
+        });
+
         it("should merge k8s service into registration and use callback", async () => {
             const r: K8sContainerRegistration = {
                 callback: async () => {
@@ -444,7 +591,7 @@ describe("goal/container/k8s", () => {
                                             name: "tempest",
                                         },
                                     ],
-                                    workingDir: "/atm/home",
+                                    workingDir: "/abbey/road",
                                 },
                                 {
                                     args: ["second"],

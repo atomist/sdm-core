@@ -50,7 +50,13 @@ import {
  * Additional options for Docker CLI implementation of container goals.
  */
 export interface DockerContainerRegistration extends ContainerRegistration {
-    /** Additional Docker CLI command-line options. */
+    /**
+     * Additional Docker CLI command-line options.  Command-line
+     * options provided here will be appended to the default set of
+     * options used when executing `docker run`.  For example, if your
+     * main container must run in its default working directory, you
+     * can include `"--workdir="` in the `dockerOptions` array.
+     */
     dockerOptions?: string[];
 }
 
@@ -133,7 +139,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             }
             const dockerArgs = [
                 "run",
-                "-t",
+                "--tty",
                 "--rm",
                 `--name=${containerName}`,
                 `--volume=${containerDir}:${ContainerProjectHome}`,
@@ -146,7 +152,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 ...(container.args || []),
             ];
             if (spawnedContainers.length < 1) {
-                dockerArgs.splice(5, 0, `-w=${ContainerProjectHome}`);
+                dockerArgs.splice(5, 0, `--workdir=${ContainerProjectHome}`);
             }
             const promise = spawnLog("docker", dockerArgs, spawnOpts);
             spawnedContainers.push({ name: containerName, promise });

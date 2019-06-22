@@ -29,7 +29,7 @@ export {
 } from "./lib/goal/common/Version";
 export {
     Container,
-    containerGoal,
+    container,
     ContainerPort,
     ContainerProjectHome,
     ContainerRegistration,
