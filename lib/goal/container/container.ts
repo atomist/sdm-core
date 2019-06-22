@@ -53,7 +53,7 @@ import { runningInK8s } from "./util";
  * @param registration Goal containers, volumes, cache details, etc.
  * @return SDM container goal
  */
-export function containerGoal(displayName: string, registration: ContainerRegistration): Container {
+export function container(displayName: string, registration: ContainerRegistration): Container {
     return new Container({ displayName }).with(registration);
 }
 

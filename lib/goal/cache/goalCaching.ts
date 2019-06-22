@@ -139,7 +139,7 @@ export function cachePut(options: GoalCacheOptions,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
+                const goalCache = cacheStore(gi);
                 const entries = !!classifier ?
                     options.entries.filter(pattern => allClassifiers.includes(pattern.classifier)) :
                     options.entries;
@@ -221,7 +221,7 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
                          gi: GoalInvocation,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
+                const goalCache = cacheStore(gi);
                 const classifiersToBeRestored = [];
                 if (allClassifiers.length > 0) {
                     classifiersToBeRestored.push(...allClassifiers);
@@ -263,7 +263,7 @@ export function cacheRemove(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p, gi) => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
+                const goalCache = cacheStore(gi);
                 const classifiersToBeRemoved = [];
                 if (allClassifiers.length > 0) {
                     classifiersToBeRemoved.push(...allClassifiers);
@@ -286,4 +286,10 @@ async function getFilePathsThroughPattern(project: Project, globPattern: string 
 
 function isCacheEnabled(gi: GoalInvocation): boolean {
     return _.get(gi.configuration, "sdm.cache.enabled", false);
+}
+
+function cacheStore(gi: GoalInvocation): GoalCache {
+    const store: GoalCache = _.get(gi.configuration, "sdm.cache.store",
+        gi.configuration.sdm.goalCache || DefaultGoalCache);
+    return store;
 }
