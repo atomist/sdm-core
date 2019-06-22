@@ -20,6 +20,7 @@ import {
     HandlerResult,
     MappedParameter,
     Parameter,
+    Parameters,
     Secret,
     Secrets,
     Success,
@@ -105,6 +106,9 @@ describe("executeTask", () => {
                                 param: "bar",
                                 owner: "atomist",
                                 token: "123456",
+                                nested: {
+                                    foo: "bar",
+                                }
                             },
                         }),
                     }],
@@ -127,6 +131,13 @@ describe("executeTask", () => {
 
 });
 
+@Parameters()
+class NestedParameter {
+
+    @Parameter()
+    foo: string;
+}
+
 @CommandHandler("Some test command")
 class TestCommand implements HandleCommand {
 
@@ -139,10 +150,14 @@ class TestCommand implements HandleCommand {
     @MappedParameter(MappedParameters.GitHubOwner)
     public owner: string;
 
+    @Parameter()
+    public nested: NestedParameter = new NestedParameter();
+
     public async handle(ctx: HandlerContext): Promise<HandlerResult> {
         assert.strictEqual(this.param, "bar");
         assert.strictEqual(this.owner, "atomist");
         assert.strictEqual(this.token, "123456");
+        assert.strictEqual(this.nested.foo, "bar");
         return Success;
     }
 }

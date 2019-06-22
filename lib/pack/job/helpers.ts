@@ -17,6 +17,7 @@
 import {
     CommandInvocation,
     HandlerContext,
+    mergeParameters,
     MessageOptions,
     ParameterType,
     SourceDestination,
@@ -33,20 +34,23 @@ import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/
  * This pieces apart provided values form the parameters into the command's parameter, mapped parameter
  * and secret structures.
  */
-export function prepareCommandInvocation(md: CommandHandlerMetadata, parameters: ParameterType = {}): CommandInvocation {
+export function prepareCommandInvocation(md: CommandHandlerMetadata,
+                                         parameters: ParameterType = {}): CommandInvocation {
+    // Flatten the provided parameters before creating the CommandInvocation
+    const params = mergeParameters(parameters, {});
     const ci: CommandInvocation = {
         name: md.name,
-        args: md.parameters.filter(p => !!parameters[p.name]).map(p => ({
+        args: md.parameters.filter(p => !!params[p.name]).map(p => ({
             name: p.name,
-            value: parameters[p.name] as any,
+            value: params[p.name] as any,
         })),
-        mappedParameters: md.mapped_parameters.filter(p => !!parameters[p.name]).map(p => ({
+        mappedParameters: md.mapped_parameters.filter(p => !!params[p.name]).map(p => ({
             name: p.name,
-            value: parameters[p.name] as any,
+            value: params[p.name] as any,
         })),
         secrets: md.secrets.map(p => ({
             uri: p.uri,
-            value: parameters[p.name] as any || "null",
+            value: params[p.name] as any || "null",
         })),
     };
     return ci;
