@@ -42,15 +42,15 @@ export function prepareCommandInvocation(md: CommandHandlerMetadata,
         name: md.name,
         args: md.parameters.filter(p => !!params[p.name]).map(p => ({
             name: p.name,
-            value: params[p.name] as any,
+            value: params[p.name],
         })),
         mappedParameters: md.mapped_parameters.filter(p => !!params[p.name]).map(p => ({
             name: p.name,
-            value: params[p.name] as any,
+            value: params[p.name],
         })),
         secrets: md.secrets.map(p => ({
             uri: p.uri,
-            value: params[p.name] as any || "null",
+            value: params[p.name] || "null",
         })),
     };
     return ci;
