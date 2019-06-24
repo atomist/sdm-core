@@ -82,7 +82,7 @@ class TestGoalArtifactCache implements GoalCache {
 
 const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "Error",
-    listener: async () => { throw Error(""); },
+    listener: async () => { throw Error("Test cache miss"); },
     pushTest: AnyPush,
 };
 
@@ -93,7 +93,7 @@ describe("goalCaching", () => {
     let fakeGoal;
 
     beforeEach(() => {
-        project = InMemoryProject.of({ path: "test.txt", content: "Test"}, { path: "dirtest/test.txt", content: "" });
+        project = InMemoryProject.of({ path: "test.txt", content: "Test" }, { path: "dirtest/test.txt", content: "" });
         fakePushId = fakePush().id;
         fakeGoal = fakeGoalInvocation(fakePushId);
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
@@ -112,6 +112,7 @@ describe("goalCaching", () => {
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
         // it should find it in the cache
         const emptyProject = InMemoryProject.of();
+        assert(!await emptyProject.hasFile("test.txt"));
         await cacheRestore(options)
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test.txt"));
@@ -119,9 +120,12 @@ describe("goalCaching", () => {
 
     it("should call fallback on cache miss", async () => {
         // when cache something
-        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
-            await p.addFile("test2.txt", "test");
-        }};
+        const fallback: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
+                await p.addFile("test2.txt", "test");
+            },
+        };
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: fallback,
@@ -133,6 +137,7 @@ describe("goalCaching", () => {
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
         // it should not find it in the cache and call fallback
         const emptyProject = InMemoryProject.of();
+        assert(!await emptyProject.hasFile("test2.txt"));
         await cacheRestore(options)
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test2.txt"));
@@ -140,16 +145,22 @@ describe("goalCaching", () => {
 
     it("should call multiple fallbacks on cache miss", async () => {
         // when cache something
-        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+        const fallback: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test2.txt", "test");
-            }};
-        const fallback2: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+            },
+        };
+        const fallback2: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 if (await p.hasFile("test2.txt")) {
                     await p.addFile("test3.txt", "test");
                 }
-            }};
+            },
+        };
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: [fallback, fallback2],
         };
         await cachePut(options)
@@ -168,17 +179,27 @@ describe("goalCaching", () => {
     it("shouldn't call fallback with failing pushtest on cache miss", async () => {
         // when cache something
         const NoPushMatches = pushTest("never", async () => false);
-        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+        const fallback: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test.txt", "test");
-            }};
-        const fallback2: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+            },
+        };
+        const fallback2: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test2.txt", "test");
-            }, pushTest: NoPushMatches};
-        const fallback3: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+            },
+            pushTest: NoPushMatches,
+        };
+        const fallback3: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test3.txt", "test");
-            }};
+            },
+        };
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: [fallback, fallback2, fallback3],
         };
         await cachePut(options)
@@ -198,17 +219,28 @@ describe("goalCaching", () => {
     it("shouldn't call fallback with wrong event on cache miss", async () => {
         // when cache something
         const NoPushMatches = pushTest("never", async () => false);
-        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+        const fallback: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test.txt", "test");
-            }};
-        const fallback2: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+            },
+        };
+        const fallback2: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test2.txt", "test");
-            }, pushTest: NoPushMatches};
-        const fallback3: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+            },
+            pushTest: NoPushMatches,
+        };
+        const fallback3: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("test3.txt", "test");
-            }, events: [GoalProjectListenerEvent.after]};
+            },
+            events: [GoalProjectListenerEvent.after],
+        };
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: [fallback, fallback2, fallback3],
         };
         await cachePut(options)
@@ -227,11 +259,14 @@ describe("goalCaching", () => {
 
     it("should default to NoOpGoalCache", async () => {
         fakeGoal.configuration.sdm.goalCache = undefined;
-        const fallback: GoalProjectListenerRegistration = {name: "fallback", listener: async p => {
+        const fallback: GoalProjectListenerRegistration = {
+            name: "fallback",
+            listener: async p => {
                 await p.addFile("fallback.txt", "test");
-            }};
+            },
+        };
         const options: GoalCacheOptions = {
-            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" }}],
+            entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: fallback,
         };
         await cachePut(options)

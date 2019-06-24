@@ -36,12 +36,12 @@ describe("pushToPublicRepo", () => {
         const id = new GitHubRepoRef("atomist", "sdm");
         const r = await ToPublicRepo.mapping({ id, credentials } as any as PushListenerInvocation);
         assert.equal(r, true);
-    }).timeout(5000);
+    }).timeout(8000);
 
     it("should work against private repo", async () => {
         const id = new GitHubRepoRef("atomisthq", "internal-automation");
         const r = await ToPublicRepo.mapping({ id, credentials } as any as PushListenerInvocation);
         assert.equal(r, false);
-    }).timeout(5000);
+    }).timeout(8000);
 
 });

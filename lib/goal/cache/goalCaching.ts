@@ -79,23 +79,42 @@ export interface DirectoryPattern {
     directory: string;
 }
 
+export interface CacheEntry {
+    classifier: string;
+    pattern: GlobFilePattern | DirectoryPattern;
+}
+
 /**
- * Options for goal caching
+ * Core options for goal caching.
  */
-export interface GoalCacheOptions {
+export interface GoalCacheCoreOptions {
     /**
      * Optional push test on when to trigger caching
      */
     pushTest?: PushTest;
     /**
-     * Collection of glob patterns with classifiers to determine which files need to be cached between
-     * goal invocations, possibly excluding paths using regular expressions.
-     */
-    entries: Array<{ classifier: string, pattern: GlobFilePattern | DirectoryPattern }>;
-    /**
      * Optional listener functions that should be called when no cache entry is found.
      */
     onCacheMiss?: GoalProjectListenerRegistration | GoalProjectListenerRegistration[];
+}
+
+/**
+ * Options for putting goal cache entries.
+ */
+export interface GoalCacheOptions extends GoalCacheCoreOptions {
+    /**
+     * Collection of glob patterns with classifiers to determine which
+     * files need to be cached between goal invocations, possibly
+     * excluding paths using regular expressions.
+     */
+    entries: CacheEntry[];
+}
+
+/**
+ * Options for restoring goal cache entries.
+ */
+export interface GoalCacheRestoreOptions extends GoalCacheCoreOptions {
+    entries?: Array<{ classifier: string }>;
 }
 
 const DefaultGoalCache = new NoOpGoalCache();
@@ -120,7 +139,7 @@ export function cachePut(options: GoalCacheOptions,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
+                const goalCache = cacheStore(gi);
                 const entries = !!classifier ?
                     options.entries.filter(pattern => allClassifiers.includes(pattern.classifier)) :
                     options.entries;
@@ -158,7 +177,7 @@ async function pushTestSucceeds(pushTest: PushTest, gi: GoalInvocation, p: GitPr
     });
 }
 
-async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
+async function invokeCacheMissListeners(optsToUse: GoalCacheOptions | GoalCacheRestoreOptions,
                                         p: GitProject,
                                         gi: GoalInvocation,
                                         event: GoalProjectListenerEvent): Promise<void> {
@@ -173,7 +192,7 @@ async function invokeCacheMissListeners(optsToUse: GoalCacheOptions,
 
 export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "NoOpListener",
-    listener: async () => {},
+    listener: async () => { },
     pushTest: AnyPush,
 };
 
@@ -184,7 +203,7 @@ export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistratio
  * needs to be restored. If omitted, all classifiers defined in the options are restored.
  * @param classifiers Additional classifiers that need to be restored.
  */
-export function cacheRestore(options: GoalCacheOptions,
+export function cacheRestore(options: GoalCacheRestoreOptions,
                              classifier?: string,
                              ...classifiers: string[]): GoalProjectListenerRegistration {
     const allClassifiers = [];
@@ -192,7 +211,7 @@ export function cacheRestore(options: GoalCacheOptions,
         allClassifiers.push(...[classifier, ...classifiers]);
     }
     const listenerName = `restoring ${classifier ? "caches: " + allClassifiers.join(",") : "caches"}`;
-    const optsToUse: GoalCacheOptions = {
+    const optsToUse: GoalCacheRestoreOptions = {
         onCacheMiss: NoOpGoalProjectListenerRegistration,
         ...options,
     };
@@ -202,12 +221,12 @@ export function cacheRestore(options: GoalCacheOptions,
                          gi: GoalInvocation,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
+                const goalCache = cacheStore(gi);
                 const classifiersToBeRestored = [];
                 if (allClassifiers.length > 0) {
                     classifiersToBeRestored.push(...allClassifiers);
                 } else {
-                    classifiersToBeRestored.push(...options.entries.map(entry => entry.classifier));
+                    classifiersToBeRestored.push(...optsToUse.entries.map(entry => entry.classifier));
                 }
                 for (const c of classifiersToBeRestored) {
                     try {
@@ -244,7 +263,7 @@ export function cacheRemove(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p, gi) => {
             if (!!isCacheEnabled(gi)) {
-                const goalCache = (gi.configuration.sdm.goalCache || DefaultGoalCache) as GoalCache;
+                const goalCache = cacheStore(gi);
                 const classifiersToBeRemoved = [];
                 if (allClassifiers.length > 0) {
                     classifiersToBeRemoved.push(...allClassifiers);
@@ -266,5 +285,11 @@ async function getFilePathsThroughPattern(project: Project, globPattern: string 
 }
 
 function isCacheEnabled(gi: GoalInvocation): boolean {
-    return _.get(gi.configuration, "sdm.cache.enabled") || false;
+    return _.get(gi.configuration, "sdm.cache.enabled", false);
+}
+
+function cacheStore(gi: GoalInvocation): GoalCache {
+    const store: GoalCache = _.get(gi.configuration, "sdm.cache.store",
+        gi.configuration.sdm.goalCache || DefaultGoalCache);
+    return store;
 }
