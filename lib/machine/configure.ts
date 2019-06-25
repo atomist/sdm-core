@@ -120,13 +120,13 @@ export function configure<G = {}, T extends SdmContext = PushListenerInvocation>
                         configuration: cfg,
                     });
 
-                let goals = {};
+                let gs = {};
                 if (!!(configurer as any).goals) {
-                    goals = (configurer as any as GoalCreatingConfigurer<any>).goals(sdm);
+                    gs = (configurer as any as GoalCreatingConfigurer<any>).goals(sdm);
                 }
 
                 const configured = !!(configurer as any).sdm ?
-                    await (configurer as any).sdm(sdm, goals) : await (configurer as any)(sdm, goals);
+                    await (configurer as any).sdm(sdm, gs) : await (configurer as any)(sdm, gs);
 
                 if (Array.isArray(configured)) {
                     sdm.withPushRules(configured[0], ...configured.slice(1));
