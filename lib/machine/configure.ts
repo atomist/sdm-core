@@ -93,14 +93,19 @@ export type GoalData = Record<string, GoalStructure>;
  * Configure a SoftwareDeliveryMachine instance by adding command, events etc and optionally returning
  * GoalData, an array of GoalContributions or void when no goals should be added to this SDM.
  */
-export type Configurer<F extends SdmContext = PushListenerInvocation> = (sdm: SoftwareDeliveryMachine) =>
+export type Configurer<G = {}, F extends SdmContext = PushListenerInvocation> = (sdm: SoftwareDeliveryMachine, goals?: G) =>
     Promise<void | GoalData | Array<GoalContribution<F>>>;
+
+export interface GoalCreatingConfigurer<G, F extends SdmContext = PushListenerInvocation> {
+    sdm: Configurer<G, F>;
+    goals: (sdm: SoftwareDeliveryMachine) => G;
+}
 
 /**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
  */
-export function configure<T extends SdmContext = PushListenerInvocation>(
-    configurer: Configurer<T>,
+export function configure<G = {}, T extends SdmContext = PushListenerInvocation>(
+    configurer: GoalCreatingConfigurer<G, T> | Configurer<G, T>,
     options: {
         name?: string,
         postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
@@ -115,7 +120,13 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
                         configuration: cfg,
                     });
 
-                const configured = await configurer(sdm);
+                let goals = {};
+                if (!!(configurer as any).goals) {
+                    goals = (configurer as any as GoalCreatingConfigurer<any>).goals(sdm);
+                }
+
+                const configured = !!(configurer as any).sdm ?
+                    await (configurer as any).sdm(sdm, goals) : await (configurer as any)(sdm, goals);
 
                 if (Array.isArray(configured)) {
                     sdm.withPushRules(configured[0], ...configured.slice(1));
