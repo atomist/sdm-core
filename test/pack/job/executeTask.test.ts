@@ -108,7 +108,7 @@ describe("executeTask", () => {
                                 token: "123456",
                                 nested: {
                                     foo: "bar",
-                                }
+                                },
                             },
                         }),
                     }],
@@ -135,7 +135,7 @@ describe("executeTask", () => {
 class NestedParameter {
 
     @Parameter()
-    foo: string;
+    public foo: string;
 }
 
 @CommandHandler("Some test command")
