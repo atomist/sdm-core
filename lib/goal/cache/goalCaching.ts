@@ -15,6 +15,7 @@
  */
 
 import {
+    DefaultExcludes,
     GitProject,
     Project,
     projectUtils,
@@ -281,7 +282,13 @@ export function cacheRemove(options: GoalCacheOptions,
 }
 
 async function getFilePathsThroughPattern(project: Project, globPattern: string | string[]): Promise<string[]> {
-    return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
+    const oldExcludes = DefaultExcludes;
+    DefaultExcludes.splice(0, DefaultExcludes.length);  // necessary evil
+    try {
+        return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
+    } finally {
+        DefaultExcludes.push(...oldExcludes);
+    }
 }
 
 function isCacheEnabled(gi: GoalInvocation): boolean {
