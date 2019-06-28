@@ -25,6 +25,8 @@ import {
 import { redact } from "@atomist/automation-client/lib/util/redact";
 import {
     EventHandlerRegistration,
+    JobTask,
+    JobTaskType,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
 import {
@@ -32,10 +34,6 @@ import {
     OnAnyJobTask,
     SetJobTaskState,
 } from "../../typings/types";
-import {
-    JobTask,
-    JobTaskType,
-} from "./createJob";
 import {
     prepareCommandInvocation,
     prepareHandlerContext,

@@ -56,7 +56,7 @@
   "devDependencies": {
     "@atomist/automation-client": "1.5.4-master.20190618091503",
     "@atomist/microgrammar": "^1.2.0",
-    "@atomist/sdm": "1.5.2-master.20190612102726",
+    "@atomist/sdm": "1.5.2-to-job.20190628100243",
     "@atomist/slack-messages": "^1.1.0",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.132",

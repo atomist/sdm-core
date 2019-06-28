@@ -138,9 +138,6 @@ export {
     jobSupport,
 } from "./lib/pack/job/job";
 export {
-    createJob,
-} from "./lib/pack/job/createJob";
-export {
     invokeCommand,
 } from "./lib/pack/job/invokeCommand";
 export { github };

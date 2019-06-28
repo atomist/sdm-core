@@ -32,9 +32,9 @@ import {
 } from "@atomist/automation-client/lib/decorators";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { BuildableAutomationServer } from "@atomist/automation-client/lib/server/BuildableAutomationServer";
+import { JobTaskType } from "@atomist/sdm";
 import * as _ from "lodash";
 import * as assert from "power-assert";
-import { JobTaskType } from "../../../lib/pack/job/createJob";
 import { ExecuteTaskListener } from "../../../lib/pack/job/executeTask";
 import {
     AtmJobTaskState,
