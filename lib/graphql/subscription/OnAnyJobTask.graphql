@@ -1,5 +1,5 @@
 subscription OnAnyJobTask($registration: String) {
-  AtmJobTask(owner: $registration) {
+  AtmJobTask(owner: $registration, state: created) {
     id
     data
     name
