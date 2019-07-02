@@ -121,7 +121,9 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
                     sdm.withPushRules(configured[0], ...configured.slice(1));
                 } else if (!!configured) {
                     const goalContributions = convertGoalData(configured);
-                    sdm.withPushRules(goalContributions[0], ...(goalContributions.slice(1) || []));
+                    if (goalContributions.length > 0) {
+                        sdm.withPushRules(goalContributions[0], ...(goalContributions.slice(1) || []));
+                    }
                 }
 
                 return sdm;
