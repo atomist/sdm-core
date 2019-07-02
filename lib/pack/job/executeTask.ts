@@ -59,70 +59,68 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
 export const ExecuteTaskListener: OnEvent<OnAnyJobTask.Subscription> = async (e, ctx) => {
     const task = e.data.AtmJobTask[0];
 
-    if (task.state === AtmJobTaskState.created) {
-        let jobData: any;
-        let taskData: JobTask<any>;
+    let jobData: any;
+    let taskData: JobTask<any>;
 
-        try {
-            jobData = JSON.parse(task.job.data);
-            taskData = JSON.parse(task.data) as JobTask<any>;
-        } catch (e) {
-            logger.warn("Parsing of job or task data failed: %s", e.message);
+    try {
+        jobData = JSON.parse(task.job.data);
+        taskData = JSON.parse(task.data) as JobTask<any>;
+    } catch (e) {
+        logger.warn("Parsing of job or task data failed: %s", e.message);
+        await updateJobTaskState(
+            task.id,
+            AtmJobTaskState.failed,
+            redact(`Task command '${task.name}' failed: ${e.message}`),
+            ctx);
+    }
+
+    if (taskData.type === JobTaskType.Command) {
+        const md = automationClientInstance().automationServer.automations.commands
+            .find(c => c.name === task.name);
+
+        if (!md) {
             await updateJobTaskState(
                 task.id,
                 AtmJobTaskState.failed,
-                redact(`Task command '${task.name}' failed: ${e.message}`),
+                `Task command '${task.name}' could not be found`,
                 ctx);
-        }
+        } else {
+            try {
+                // Invoke the command
+                const result = await automationClientInstance().automationServer.invokeCommand(
+                    prepareCommandInvocation(md, taskData.parameters),
+                    prepareHandlerContext(ctx, jobData),
+                );
 
-        if (taskData.type === JobTaskType.Command) {
-            const md = automationClientInstance().automationServer.automations.commands
-                .find(c => c.name === task.name);
-
-            if (!md) {
-                await updateJobTaskState(
-                    task.id,
-                    AtmJobTaskState.failed,
-                    `Task command '${task.name}' could not be found`,
-                    ctx);
-            } else {
-                try {
-                    // Invoke the command
-                    const result = await automationClientInstance().automationServer.invokeCommand(
-                        prepareCommandInvocation(md, taskData.parameters),
-                        prepareHandlerContext(ctx, jobData),
-                    );
-
-                    // Handle result
-                    if (!!result && result.code !== undefined) {
-                        if (result.code === 0) {
-                            await updateJobTaskState(
-                                task.id,
-                                AtmJobTaskState.success,
-                                `Task command '${task.name}' successfully executed`,
-                                ctx);
-                        } else {
-                            await updateJobTaskState(
-                                task.id,
-                                AtmJobTaskState.failed,
-                                redact(result.message || `Task command '${task.name}' failed`),
-                                ctx);
-                        }
-                    } else {
+                // Handle result
+                if (!!result && result.code !== undefined) {
+                    if (result.code === 0) {
                         await updateJobTaskState(
                             task.id,
                             AtmJobTaskState.success,
                             `Task command '${task.name}' successfully executed`,
                             ctx);
+                    } else {
+                        await updateJobTaskState(
+                            task.id,
+                            AtmJobTaskState.failed,
+                            redact(result.message || `Task command '${task.name}' failed`),
+                            ctx);
                     }
-                } catch (e) {
-                    logger.warn("Command execution failed: %s", e.message);
+                } else {
                     await updateJobTaskState(
                         task.id,
-                        AtmJobTaskState.failed,
-                        redact(`Task command '${task.name}' failed: ${e.message}`),
+                        AtmJobTaskState.success,
+                        `Task command '${task.name}' successfully executed`,
                         ctx);
                 }
+            } catch (e) {
+                logger.warn("Command execution failed: %s", e.message);
+                await updateJobTaskState(
+                    task.id,
+                    AtmJobTaskState.failed,
+                    redact(`Task command '${task.name}' failed: ${e.message}`),
+                    ctx);
             }
         }
     }
