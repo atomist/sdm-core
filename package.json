@@ -47,16 +47,16 @@
     "ts-essentials": "^1.0.2"
   },
   "peerDependencies": {
-    "@atomist/automation-client": ">=1.5.3",
+    "@atomist/automation-client": ">=1.6.0",
     "@atomist/microgrammar": ">=1.2.0",
-    "@atomist/sdm": ">=1.5.1",
+    "@atomist/sdm": ">=1.6.0",
     "@atomist/slack-messages": ">=1.1.0",
     "@atomist/tree-path": ">=1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.5.4-master.20190618091503",
+    "@atomist/automation-client": "1.6.0-master.20190702113653",
     "@atomist/microgrammar": "^1.2.0",
-    "@atomist/sdm": "1.5.2-master.20190702112950",
+    "@atomist/sdm": "1.6.0-master.20190702114952",
     "@atomist/slack-messages": "^1.1.0",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.132",
