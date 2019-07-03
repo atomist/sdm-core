@@ -36,6 +36,7 @@ import {
     ConfigureOptions,
     configureSdm,
 } from "../internal/machine/configureSdm";
+import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { toArray } from "../util/misc/array";
 import { createSoftwareDeliveryMachine } from "./machineFactory";
 
@@ -104,22 +105,23 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
     options: {
         name?: string,
         postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
-        configuration?: Configuration,
+        preProcessor?: (cfg: LocalSoftwareDeliveryMachineConfiguration) => Promise<LocalSoftwareDeliveryMachineConfiguration>,
     } & ConfigureOptions = {}): Configuration {
     return {
         postProcessors: [
             ...(toArray(options.postProcessors || [])),
             configureSdm(async cfg => {
+                let cfgToUse = cfg;
 
                 // Modify the configuration before creating the SDM instance
-                if (!!options.configuration) {
-                    _.merge(cfg, options.configuration);
+                if (!!options.preProcessor) {
+                    cfgToUse = await options.preProcessor(cfgToUse);
                 }
 
                 const sdm = createSoftwareDeliveryMachine(
                     {
-                        name: options.name || cfg.name,
-                        configuration: cfg,
+                        name: options.name || cfgToUse.name,
+                        configuration: cfgToUse,
                     });
 
                 const configured = await configurer(sdm);
