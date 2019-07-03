@@ -104,11 +104,18 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
     options: {
         name?: string,
         postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
+        configuration?: Configuration,
     } & ConfigureOptions = {}): Configuration {
     return {
         postProcessors: [
             ...(toArray(options.postProcessors || [])),
             configureSdm(async cfg => {
+
+                // Modify the configuration before creating the SDM instance
+                if (!!options.configuration) {
+                    _.merge(cfg, options.configuration);
+                }
+
                 const sdm = createSoftwareDeliveryMachine(
                     {
                         name: options.name || cfg.name,
