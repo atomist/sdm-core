@@ -113,8 +113,7 @@ export class RolarProgressLog implements ProgressLog {
         const postingLogs = this.localLogs;
         this.localLogs = [];
 
-        if (postingLogs && postingLogs.length > 0) {
-
+        if (isClosed === true || (!!postingLogs && postingLogs.length > 0)) {
             const closedRequestParam = isClosed ? "?closed=true" : "";
             const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
             let result;
@@ -123,13 +122,23 @@ export class RolarProgressLog implements ProgressLog {
                     method: HttpMethod.Post,
                     body: {
                         host: os.hostname(),
-                        content: postingLogs,
+                        content: postingLogs || [],
                     },
                     headers: { "Content-Type": "application/json" },
+                    retry: {
+                        retries: 0,
+                    },
+                    options: {
+                        timeout: 2500,
+                    },
                 });
             } catch (err) {
                 this.localLogs = postingLogs.concat(this.localLogs);
-                logger.error(err);
+                if (!/timeout.*exceeded/i.test(err.message)) {
+                    logger.error(err.message);
+                } else {
+                    logger.warn("Calling rolar timed out");
+                }
             }
             return result;
         }
