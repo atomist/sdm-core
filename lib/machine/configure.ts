@@ -101,7 +101,7 @@ export type Configurer<F extends SdmContext = PushListenerInvocation> = (sdm: So
  *  Process the configuration before creating the SDM instance
  */
 export type ConfigurationPreProcessor = (cfg: LocalSoftwareDeliveryMachineConfiguration) =>
-    Promise<LocalSoftwareDeliveryMachineConfiguration>
+    Promise<LocalSoftwareDeliveryMachineConfiguration>;
 
 /**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
