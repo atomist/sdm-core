@@ -98,6 +98,12 @@ export type Configurer<F extends SdmContext = PushListenerInvocation> = (sdm: So
     Promise<void | GoalData | Array<GoalContribution<F>>>;
 
 /**
+ *  Process the configuration before creating the SDM instance
+ */
+export type ConfigurationPreProcessor = (cfg: LocalSoftwareDeliveryMachineConfiguration) =>
+    Promise<LocalSoftwareDeliveryMachineConfiguration>
+
+/**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
  */
 export function configure<T extends SdmContext = PushListenerInvocation>(
@@ -105,7 +111,7 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
     options: {
         name?: string,
         postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
-        preProcessor?: (cfg: LocalSoftwareDeliveryMachineConfiguration) => Promise<LocalSoftwareDeliveryMachineConfiguration>,
+        preProcessors?: ConfigurationPreProcessor | ConfigurationPreProcessor[],
     } & ConfigureOptions = {}): Configuration {
     return {
         postProcessors: [
@@ -114,8 +120,10 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
                 let cfgToUse = cfg;
 
                 // Modify the configuration before creating the SDM instance
-                if (!!options.preProcessor) {
-                    cfgToUse = await options.preProcessor(cfgToUse);
+                if (!!options.preProcessors) {
+                    for (const preProcessor of toArray(options.preProcessors)) {
+                        cfgToUse = await preProcessor(cfgToUse);
+                    }
                 }
 
                 const sdm = createSoftwareDeliveryMachine(
