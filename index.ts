@@ -122,6 +122,7 @@ export {
     SdmVersionForCommit,
 } from "./lib/typings/types";
 import * as github from "./lib/util/github/ghub";
+
 export {
     gitHubGoalStatus,
     githubGoalStatusSupport,
@@ -206,4 +207,9 @@ export {
     Configurer,
     GoalData,
     GoalStructure,
+    CreateGoals,
+    GoalConfigurer,
+    GoalCreator,
+    ConfigurationPreProcessor,
+    AllGoals,
 } from "./lib/machine/configure";
