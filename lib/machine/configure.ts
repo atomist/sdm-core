@@ -110,7 +110,7 @@ export type GoalConfigurer<G extends AllGoals> = (sdm: SoftwareDeliveryMachine, 
  * Type to orchestrating the creation and configuration of goal instances for this SDM
  */
 export type CreateGoals<G extends AllGoals> = (creator: GoalCreator<G>,
-                                                    configurers: GoalConfigurer<G> | Array<GoalConfigurer<G>>) => Promise<G>;
+                                               configurers: GoalConfigurer<G> | Array<GoalConfigurer<G>>) => Promise<G>;
 
 /**
  * Configure a SoftwareDeliveryMachine instance by adding command, events etc and optionally returning
