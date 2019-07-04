@@ -25,6 +25,7 @@ import {
     GoalContribution,
     goals,
     Goals,
+    GoalWithFulfillment,
     PushListenerInvocation,
     PushTest,
     SdmContext,
@@ -91,11 +92,32 @@ export interface GoalStructure {
 export type GoalData = Record<string, GoalStructure>;
 
 /**
+ * Type to collect goal instances for this SDM
+ */
+export type AllGoals = Record<string, Goal | GoalWithFulfillment>;
+
+/**
+ * Type to create goal instances for this SDM
+ */
+export type GoalCreator<G extends AllGoals> = (sdm: SoftwareDeliveryMachine) => Promise<G>;
+
+/**
+ * Type to configure provided goals with fulfillments, listeners etc
+ */
+export type GoalConfigurer<G extends AllGoals> = (sdm: SoftwareDeliveryMachine, goals: G) => Promise<void>;
+
+/**
+ * Type to orchestrating the creation and configuration of goal instances for this SDM
+ */
+export type CreateGoals<G extends AllGoals> = (creator: GoalCreator<G>,
+                                               configurers: GoalConfigurer<G> | Array<GoalConfigurer<G>>) => Promise<G>;
+
+/**
  * Configure a SoftwareDeliveryMachine instance by adding command, events etc and optionally returning
  * GoalData, an array of GoalContributions or void when no goals should be added to this SDM.
  */
-export type Configurer<F extends SdmContext = PushListenerInvocation> = (sdm: SoftwareDeliveryMachine) =>
-    Promise<void | GoalData | Array<GoalContribution<F>>>;
+export type Configurer<G extends AllGoals, F extends SdmContext = PushListenerInvocation> =
+    (sdm: SoftwareDeliveryMachine & { createGoals: CreateGoals<G> }) => Promise<void | GoalData | Array<GoalContribution<F>>>;
 
 /**
  *  Process the configuration before creating the SDM instance
@@ -106,8 +128,8 @@ export type ConfigurationPreProcessor = (cfg: LocalSoftwareDeliveryMachineConfig
 /**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
  */
-export function configure<T extends SdmContext = PushListenerInvocation>(
-    configurer: Configurer<T>,
+export function configure<G extends AllGoals, T extends SdmContext = PushListenerInvocation>(
+    configurer: Configurer<G, T>,
     options: {
         name?: string,
         preProcessors?: ConfigurationPreProcessor | ConfigurationPreProcessor[],
@@ -132,7 +154,7 @@ export function configure<T extends SdmContext = PushListenerInvocation>(
                         configuration: cfgToUse,
                     });
 
-                const configured = await configurer(sdm);
+                const configured = await invokeConfigurer(sdm, configurer);
 
                 if (Array.isArray(configured)) {
                     sdm.withPushRules(configured[0], ...configured.slice(1));
@@ -191,6 +213,31 @@ export function convertGoalData(goalData: GoalData): Array<GoalContribution<any>
     });
 
     return goalContributions;
+}
+
+/**
+ * Invoke the given configurer
+ */
+async function invokeConfigurer(sdm: SoftwareDeliveryMachine,
+                                configurer: Configurer<any, any>): Promise<void | GoalData | Array<GoalContribution<any>>> {
+
+    try {
+        // Decorate the createGoals method onto the SDM
+        (sdm as any).createGoals = async (creator: GoalCreator<any>,
+                                          configurers: GoalConfigurer<any> | Array<GoalConfigurer<any>>) => {
+            const gc = await creator(sdm);
+            if (!!configurers) {
+                for (const c of toArray(configurers)) {
+                    await c(sdm, gc);
+                }
+            }
+            return gc;
+        };
+
+        return configurer(sdm as any);
+    } finally {
+        delete (sdm as any).createGoals;
+    }
 }
 
 function convertPushTest(test: PushTest | PushTest[]): PushTest {
