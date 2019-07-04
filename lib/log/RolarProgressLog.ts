@@ -116,8 +116,8 @@ export class RolarProgressLog implements ProgressLog {
         const postingLogs = this.localLogs;
         this.localLogs = [];
 
-        if (postingLogs && postingLogs.length > 0) {
-
+        if (!!postingLogs && postingLogs.length > 0) {
+            logger.debug("Calling rolar service");
             const closedRequestParam = isClosed ? "?closed=true" : "";
             const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
             let result;
@@ -134,6 +134,7 @@ export class RolarProgressLog implements ProgressLog {
                 this.localLogs = postingLogs.concat(this.localLogs);
                 logger.error(err);
             }
+            logger.debug("Calling rolar service done");
             return result;
         }
         return Promise.resolve();
