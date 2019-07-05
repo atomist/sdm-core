@@ -129,10 +129,20 @@ export class RolarProgressLog implements ProgressLog {
                         content: postingLogs,
                     },
                     headers: { "Content-Type": "application/json" },
+                    retry: {
+                        retries: 0,
+                    },
+                    options: {
+                        timeout: 2500,
+                    }
                 });
             } catch (err) {
                 this.localLogs = postingLogs.concat(this.localLogs);
-                logger.error(err);
+                if (!/timeout.*exceeded/i.test(err.message)) {
+                    logger.error(err.message);
+                } else {
+                    logger.warn("Calling rolar timed out");
+                }
             }
             logger.debug("Calling rolar service done");
             return result;
