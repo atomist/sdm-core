@@ -134,7 +134,7 @@ export class RolarProgressLog implements ProgressLog {
                     },
                     options: {
                         timeout: 2500,
-                    }
+                    },
                 });
             } catch (err) {
                 this.localLogs = postingLogs.concat(this.localLogs);
