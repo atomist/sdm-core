@@ -98,11 +98,8 @@ export class RolarProgressLog implements ProgressLog {
         }
     }
 
-    public async flush(): Promise<any> {
-        logger.debug("Before flushing rolar");
-        const result = await this.postLogs(false);
-        logger.debug("After flushing rolar");
-        return result;
+    public flush(): Promise<any> {
+        return this.postLogs(false);
     }
 
     public close(): Promise<any> {
