@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Add invokeCommand method. [6581460](https://github.com/atomist/sdm-core/commit/6581460df84ba5b415071752ea0aa8078aba532d)
 -   Implement container-based job goal. [#162](https://github.com/atomist/sdm-core/issues/162)
 
+### Changed
+
+-   Always send closed flag and add timeout. [#184](https://github.com/atomist/sdm-core/issues/184)
+
 ### Fixed
 
 -   `ProgressLog` is not populated for code transforms. [#163](https://github.com/atomist/sdm-core/issues/163)
