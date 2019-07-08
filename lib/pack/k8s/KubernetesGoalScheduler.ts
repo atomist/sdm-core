@@ -190,7 +190,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                     .then(() => {
                         logger.debug("Finished cleaning scheduled goal jobs");
                     });
-            }, configurationValue<number>("sdm.k8s.job.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
+            }, _.get(configuration, "sdm.k8s.job.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
         }
     }
 
