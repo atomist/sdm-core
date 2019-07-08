@@ -21,10 +21,10 @@ import {
     SdmGoalState,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import * as k8s from "@kubernetes/client-node";
 import * as _ from "lodash";
-import { loadKubeConfig } from "./config";
 import {
+    deleteJob,
+    deletePods,
     listJobs,
     prettyPrintError,
     sanitizeName,
@@ -65,7 +65,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
             logger.debug(
                 `Found k8s jobs for goal set '${goalEvent.goalSetId}': '${
-                jobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
+                    jobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
             const goalJobs = jobs.filter(j => {
                 const annotations = j.metadata.annotations;
@@ -78,7 +78,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
             logger.debug(
                 `Matching k8s job for goal '${goalEvent.uniqueName}' found: '${
-                goalJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
+                    goalJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
             const ttl: number = _.get(this.sdm.configuration, "sdm.k8s.job.ttl", 1000 * 60 * 2);
 
@@ -96,73 +96,19 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
     private initialize(): void {
         setInterval(async () => {
-            const now = Date.now();
-            for (const uid of this.cache.keys()) {
-                const job = this.cache.get(uid);
-                if (job.ttl <= now) {
-                    logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
+                const now = Date.now();
+                for (const uid of this.cache.keys()) {
+                    const job = this.cache.get(uid);
+                    if (job.ttl <= now) {
+                        logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
+                        await deleteJob(job);
 
-                    // First delete the job
-                    await this.deleteJob(job);
-
-                    logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
-                    // Next, delete all still existing jobs
-                    await this.deletePods(job);
-                    this.cache.delete(uid);
-                }
-            }
-        },
-            _.get(this.sdm.configuration, "sdm.k8s.job.ttlCheckInterval", 15000));
-    }
-
-    private async deleteJob(job: { name: string, namespace: string }): Promise<void> {
-        try {
-            const kc = loadKubeConfig();
-            const batch = kc.makeApiClient(k8s.BatchV1Api);
-
-            await batch.readNamespacedJob(job.name, job.namespace);
-            try {
-                await batch.deleteNamespacedJob(
-                    job.name,
-                    job.namespace,
-                    { propagationPolicy: "Foreground" } as any);
-            } catch (e) {
-                logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${
-                    prettyPrintError(e)}`);
-            }
-        } catch (e) {
-            // This is ok to ignore because the job doesn't exist any more
-        }
-    }
-
-    private async deletePods(job: { name: string, namespace: string }): Promise<void> {
-        try {
-            const kc = loadKubeConfig();
-            const core = kc.makeApiClient(k8s.CoreV1Api);
-
-            const selector = `job-name=${job.name}`;
-            const pods = await core.listNamespacedPod(
-                job.namespace,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                selector);
-            if (pods.body && pods.body.items) {
-                for (const pod of pods.body.items) {
-                    try {
-                        await core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
-                    } catch (e) {
-                        // Probably ok because pod might be gone already
-                        logger.debug(
-                            `Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${
-                            prettyPrintError(e)}`);
+                        logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
+                        await deletePods(job);
+                        this.cache.delete(uid);
                     }
                 }
-            }
-        } catch (e) {
-            logger.warn(`Failed to list pods for k8s job '${job.namespace}:${job.name}': ${
-                prettyPrintError(e)}`);
-        }
+            },
+            _.get(this.sdm.configuration, "sdm.k8s.job.ttlCheckInterval", 15000));
     }
 }

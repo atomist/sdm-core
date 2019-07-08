@@ -217,19 +217,13 @@ export async function cleanCompletedJobs(): Promise<void> {
         logger.info(`Deleting the following k8s jobs: ${
             completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
-        const kc = loadKubeConfig();
-        const batch = kc.makeApiClient(k8s.BatchV1Api);
         for (const completedSdmJob of completedJobs) {
-            try {
-                await batch.deleteNamespacedJob(
-                    completedSdmJob.metadata.name,
-                    completedSdmJob.metadata.namespace,
-                    // propagationPolicy is needed so that pods of the job are also getting deleted
-                    { propagationPolicy: "Foreground" } as any);
-            } catch (e) {
-                logger.warn(`Failed to delete k8s job '${completedSdmJob.metadata.namespace}:${completedSdmJob.metadata.name}': ` +
-                    prettyPrintError(e));
-            }
+            const job = { name: completedSdmJob.metadata.name, namespace: completedSdmJob.metadata.namespace };
+            logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
+            await deleteJob(job);
+
+            logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
+            await deletePods(job);
         }
     }
 }
@@ -572,5 +566,56 @@ export function prettyPrintError(e: any): string {
         return e.body.message;
     } else {
         return e.message;
+    }
+}
+
+export async function deleteJob(job: { name: string, namespace: string }): Promise<void> {
+    try {
+        const kc = loadKubeConfig();
+        const batch = kc.makeApiClient(k8s.BatchV1Api);
+
+        await batch.readNamespacedJob(job.name, job.namespace);
+        try {
+            await batch.deleteNamespacedJob(
+                job.name,
+                job.namespace,
+                { propagationPolicy: "Foreground" } as any);
+        } catch (e) {
+            logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${
+                prettyPrintError(e)}`);
+        }
+    } catch (e) {
+        // This is ok to ignore because the job doesn't exist any more
+    }
+}
+
+export async function deletePods(job: { name: string, namespace: string }): Promise<void> {
+    try {
+        const kc = loadKubeConfig();
+        const core = kc.makeApiClient(k8s.CoreV1Api);
+
+        const selector = `job-name=${job.name}`;
+        const pods = await core.listNamespacedPod(
+            job.namespace,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            selector);
+        if (pods.body && pods.body.items) {
+            for (const pod of pods.body.items) {
+                try {
+                    await core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
+                } catch (e) {
+                    // Probably ok because pod might be gone already
+                    logger.debug(
+                        `Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${
+                            prettyPrintError(e)}`);
+                }
+            }
+        }
+    } catch (e) {
+        logger.warn(`Failed to list pods for k8s job '${job.namespace}:${job.name}': ${
+            prettyPrintError(e)}`);
     }
 }
