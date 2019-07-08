@@ -207,7 +207,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
  * @returns {Promise<void>}
  */
 export async function cleanCompletedJobs(): Promise<void> {
-    const selector = `creator=${sanitizeName(configurationValue<string>("name"))}`;
+    const selector = `atomist.com/creator=${sanitizeName(configurationValue<string>("name"))}`;
 
     const jobs = await listJobs(selector);
     const completedJobs =
