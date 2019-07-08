@@ -116,8 +116,9 @@ export class RolarProgressLog implements ProgressLog {
         if (isClosed === true || (!!postingLogs && postingLogs.length > 0)) {
             const closedRequestParam = isClosed ? "?closed=true" : "";
             const url = `${this.rolarBaseUrl}/api/logs/${this.logPath.join("/")}${closedRequestParam}`;
+            let result;
             try {
-                return this.httpClient.exchange(url, {
+                result = await this.httpClient.exchange(url, {
                     method: HttpMethod.Post,
                     body: {
                         host: os.hostname(),
@@ -139,6 +140,7 @@ export class RolarProgressLog implements ProgressLog {
                     logger.warn("Calling rolar timed out");
                 }
             }
+            return result;
         }
         return Promise.resolve();
     }
