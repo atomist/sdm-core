@@ -45,7 +45,7 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
                     invocationId: guid(),
                     correlationId: guid(),
                     workspaceName: workspaceId,
-                    workspaceId: workspaceId,
+                    workspaceId,
                     operation: "ManagePendingGoalSets",
                     ts: Date.now(),
                     name: li.sdm.configuration.name,
