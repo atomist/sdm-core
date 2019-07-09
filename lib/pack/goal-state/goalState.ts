@@ -19,11 +19,14 @@ import {
     ExtensionPack,
     metadata,
 } from "@atomist/sdm";
+import * as cluster from "cluster";
+import * as _ from "lodash";
 import { isInLocalMode } from "../../internal/machine/modes";
 import {
     cancelGoalSetsCommand,
     listPendingGoalSetsCommand,
 } from "./cancelGoals";
+import { ManageGoalSetsTrigger } from "./manageGoalSets";
 import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";
 
@@ -42,6 +45,14 @@ export function goalStateSupport(): ExtensionPack {
                 sdm.addCommand(resetGoalsCommand(sdm));
                 sdm.addCommand(cancelGoalSetsCommand(sdm));
                 sdm.addCommand(listPendingGoalSetsCommand(sdm));
+
+                if ((cluster.isMaster || !_.get(sdm.configuration, "cluster.enabled")) &&
+                    !process.env.ATOMIST_ISOLATED_GOAL) {
+                    sdm.addTriggeredListener({
+                        trigger: { interval: 1000 * 30 },
+                        listener: ManageGoalSetsTrigger,
+                    });
+                }
             }
         },
     };
