@@ -18,6 +18,7 @@ import {
     addressEvent,
     Configuration,
     guid,
+    logger,
 } from "@atomist/automation-client";
 import { WebSocketLifecycle } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketLifecycle";
 import { AbstractWebSocketMessageClient } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketMessageClient";
@@ -51,7 +52,11 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
                     name: li.sdm.configuration.name,
                     version: li.sdm.configuration.version,
                 });
-                await manageGoalSets(workspaceId, li.sdm);
+                try {
+                    await manageGoalSets(workspaceId, li.sdm);
+                } catch (e) {
+                    logger.warn("Error managing pending goal sets: %s", e.stack);
+                }
             });
         }
     }
@@ -60,35 +65,31 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
 async function manageGoalSets(workspaceId: string, sdm: SoftwareDeliveryMachine): Promise<void> {
     const graphClient = sdm.configuration.graphql.client.factory.create(workspaceId, sdm.configuration);
 
-    let pgs = await pendingGoalSets({ graphClient } as any, sdm.configuration.name);
-    while (pgs.length > 0) {
-        for (const goalSet of pgs) {
+    let pgs = await pendingGoalSets({ graphClient } as any, sdm.configuration.name, 0, 100);
+    for (const goalSet of pgs) {
 
-            const goals = await fetchGoalsForCommit({ graphClient } as any, {
-                owner: goalSet.repo.owner,
-                repo: goalSet.repo.name,
-                sha: goalSet.sha,
-                branch: goalSet.branch,
-            } as any, goalSet.repo.providerId, goalSet.goalSetId);
+        const goals = await fetchGoalsForCommit({ graphClient } as any, {
+            owner: goalSet.repo.owner,
+            repo: goalSet.repo.name,
+            sha: goalSet.sha,
+            branch: goalSet.branch,
+        } as any, goalSet.repo.providerId, goalSet.goalSetId);
 
-            const state = goalSetState(goals || []);
+        const state = goalSetState(goals || []);
 
-            if (state !== goalSet.state) {
-                const newGoalSet = {
-                    ...goalSet,
-                    state,
-                };
+        if (state !== goalSet.state) {
+            const newGoalSet = {
+                ...goalSet,
+                state,
+            };
 
-                const messageClient = new TriggeredMessageClient(
-                    (sdm.configuration.ws as any).lifecycle,
-                    workspaceId,
-                    sdm.configuration);
-                await messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
-            }
+            const messageClient = new TriggeredMessageClient(
+                (sdm.configuration.ws as any).lifecycle,
+                workspaceId,
+                sdm.configuration);
+            await messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
         }
-        pgs = await pendingGoalSets({ graphClient } as any, sdm.configuration.name);
     }
-
 }
 
 class TriggeredMessageClient extends AbstractWebSocketMessageClient {

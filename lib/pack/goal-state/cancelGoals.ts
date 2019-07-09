@@ -146,11 +146,12 @@ export function cancelGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHand
 
 export async function pendingGoalSets(ctx: HandlerContext,
                                       name: string,
-                                      offset: number = 0): Promise<InProcessSdmGoalSets.SdmGoalSet[]> {
+                                      offset: number = 0,
+                                      fetch: number = 50): Promise<InProcessSdmGoalSets.SdmGoalSet[]> {
     const results = await ctx.graphClient.query<InProcessSdmGoalSets.Query, InProcessSdmGoalSets.Variables>({
         name: "InProcessSdmGoalSets",
         variables: {
-            fetch: 50,
+            fetch,
             offset,
             registration: [name],
         },
