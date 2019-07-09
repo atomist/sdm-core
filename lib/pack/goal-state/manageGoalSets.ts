@@ -65,7 +65,7 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
 async function manageGoalSets(workspaceId: string, sdm: SoftwareDeliveryMachine): Promise<void> {
     const graphClient = sdm.configuration.graphql.client.factory.create(workspaceId, sdm.configuration);
 
-    let pgs = await pendingGoalSets({ graphClient } as any, sdm.configuration.name, 0, 100);
+    const pgs = await pendingGoalSets({ graphClient } as any, sdm.configuration.name, 0, 100);
     for (const goalSet of pgs) {
 
         const goals = await fetchGoalsForCommit({ graphClient } as any, {
