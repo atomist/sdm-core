@@ -50,13 +50,16 @@ import {
  * List all pending goal sets and allow to cancel
  * @param sdm
  */
-export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<{}> {
+export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): CommandHandlerRegistration<{ msgId: string }> {
     return {
         name: "ListGoalSets",
         description: "List pending goal sets",
+        parameters: {
+            msgId: { required: false, displayable: false },
+        },
         intent: `list goal sets ${sdm.configuration.name.replace("@", "")}`,
         listener: async ci => {
-            const id = guid();
+            const id = ci.parameters.msgId || guid();
             let offset = 0;
             let pgs = await pendingGoalSets(ci.context, sdm.configuration.name, offset);
             const attachments: Attachment[] = [];
@@ -78,7 +81,10 @@ export function listPendingGoalSetsCommand(sdm: SoftwareDeliveryMachine): Comman
                 pgs = await pendingGoalSets(ci.context, sdm.configuration.name, offset);
             }
 
-            const update: Action = buttonForCommand({ text: "Refresh" }, "ListGoalSets");
+            const update: Action = buttonForCommand(
+                { text: "Refresh" },
+                "ListGoalSets",
+                { msgId: id });
 
             let msg: SlackMessage;
             if (attachments.length > 0) {
