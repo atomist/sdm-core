@@ -1,6 +1,69 @@
-query InProcessSdmGoals {
+query InProcessSdmGoals($registration: [String!]!) {
   SdmGoal(state: [in_process, requested], _first: 100) {
-    ...SdmGoalFields
+    environment
+    uniqueName
+    name
+    sha
+    branch
+    fulfillment {
+      method
+      name
+    }
+    description
+    url
+    externalUrl
+    externalUrls {
+      label
+      url
+    }
+    state
+    phase
+    externalKey
+    goalSet
+    goalSetId
+    ts
+    error
+    retryFeasible
+    preConditions {
+      environment
+      uniqueName
+      name
+    }
+    approval {
+      correlationId
+      registration
+      name
+      version
+      ts
+      userId
+      channelId
+    }
+    approvalRequired
+    preApproval {
+      correlationId
+      registration
+      name
+      version
+      ts
+      userId
+      channelId
+    }
+    preApprovalRequired
+    provenance(registration: $registration) {
+      correlationId
+      registration
+      name
+      version
+      ts
+      userId
+      channelId
+    }
+    data
+    push {
+      ...PushFields
+    }
+    version
+    signature
     ...SdmGoalRepo
   }
 }

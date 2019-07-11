@@ -137,13 +137,16 @@ async function timeoutInProcessGoals(workspaceId: string,
 
     const gs = (await ctx.graphClient.query<InProcessSdmGoals.Query, InProcessSdmGoals.Variables>({
         name: "InProcessSdmGoals",
+        variables: {
+            registration: [sdm.configuration.name],
+        },
         options: {
             ...QueryNoCacheOptions,
             log: configurationValue("sdm.query.logging", false),
         },
     })).SdmGoal;
 
-    for (const goal of gs.filter(g => g.provenance.some(p => p.registration === sdm.configuration.name))) {
+    for (const goal of gs) {
         if (goal.ts < end) {
             await updateGoal(
                 ctx,
