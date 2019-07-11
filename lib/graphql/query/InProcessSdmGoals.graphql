@@ -49,7 +49,7 @@ query InProcessSdmGoals($registration: [String!]!) {
       channelId
     }
     preApprovalRequired
-    provenance(registration: $registration) {
+    provenance(registration: $registration) @required {
       correlationId
       registration
       name
