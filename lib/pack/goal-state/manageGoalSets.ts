@@ -83,6 +83,8 @@ async function manageGoalSets(workspaceId: string, sdm: SoftwareDeliveryMachine)
                 state,
             };
 
+            logger.debug(`GoalSet '${goalSet.goalSetId}' now in state '${state}'`);
+
             const messageClient = new TriggeredMessageClient(
                 (sdm.configuration.ws as any).lifecycle,
                 workspaceId,

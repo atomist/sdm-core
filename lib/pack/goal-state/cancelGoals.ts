@@ -17,6 +17,7 @@
 import {
     addressEvent,
     buttonForCommand,
+    configurationValue,
     guid,
     HandlerContext,
     QueryNoCacheOptions,
@@ -161,7 +162,10 @@ export async function pendingGoalSets(ctx: HandlerContext,
             offset,
             registration: [name],
         },
-        options: QueryNoCacheOptions,
+        options: {
+            ...QueryNoCacheOptions,
+            log: configurationValue("sdm.query.logging", false),
+        },
     });
     return (results.SdmGoalSet || []).map(gs => gs);
 }
