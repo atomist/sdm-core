@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.6.0...HEAD)
 
+### Changed
+
+-   Update dependencies. [43c04d2](https://github.com/atomist/sdm-core/commit/43c04d212daa40b19d6672b560007fa0438e4aa0)
+
 ## [1.6.0](https://github.com/atomist/sdm-core/compare/1.5.2...1.6.0) - 2019-07-09
 
 ### Added
