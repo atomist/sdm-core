@@ -39,7 +39,7 @@ import { pendingGoalSets } from "./cancelGoals";
 export const ManageGoalSetsTrigger: TriggeredListener = async li => {
     const workspaceIds = li.sdm.configuration.workspaceIds;
     if (!!workspaceIds && workspaceIds.length > 0) {
-        for await (const workspaceId of workspaceIds) {
+        for (const workspaceId of workspaceIds) {
             const ses = namespace.create();
             ses.run(async () => {
                 namespace.set({
