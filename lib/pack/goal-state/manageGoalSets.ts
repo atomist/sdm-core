@@ -143,7 +143,7 @@ async function timeoutInProcessGoals(workspaceId: string,
         },
     })).SdmGoal;
 
-    for (const goal of gs) {
+    for (const goal of gs.filter(g => g.provenance.some(p => p.registration === sdm.configuration.name))) {
         if (goal.ts < end) {
             await updateGoal(
                 ctx,
