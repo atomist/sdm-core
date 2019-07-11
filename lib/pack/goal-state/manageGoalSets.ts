@@ -96,8 +96,8 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
     }
 };
 
-async function manageGoalSets(sdm: SoftwareDeliveryMachine,
-                              ctx: HandlerContext): Promise<void> {
+export async function manageGoalSets(sdm: SoftwareDeliveryMachine,
+                                     ctx: HandlerContext): Promise<void> {
 
     const pgs = await pendingGoalSets(ctx, sdm.configuration.name, 0, 100);
     for (const goalSet of pgs) {
@@ -123,8 +123,8 @@ async function manageGoalSets(sdm: SoftwareDeliveryMachine,
     }
 }
 
-async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
-                                     ctx: HandlerContext): Promise<void> {
+export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
+                                            ctx: HandlerContext): Promise<void> {
     const timeout = _.get(sdm.configuration, "sdm.goal.inProcessTimeout", 1000 * 60 * 60);
     const end = Date.now() - timeout;
 
