@@ -86,8 +86,8 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
                         },
                     } as any;
 
-                    await manageGoalSets(workspaceId, li.sdm, ctx);
-                    await timeoutInProcessGoals(workspaceId, li.sdm, ctx);
+                    await manageGoalSets(li.sdm, ctx);
+                    // await timeoutInProcessGoals(li.sdm, ctx);
                 } catch (e) {
                     logger.warn("Error managing pending goal sets: %s", e.stack);
                 }
@@ -96,8 +96,7 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
     }
 };
 
-async function manageGoalSets(workspaceId: string,
-                              sdm: SoftwareDeliveryMachine,
+async function manageGoalSets(sdm: SoftwareDeliveryMachine,
                               ctx: HandlerContext): Promise<void> {
 
     const pgs = await pendingGoalSets(ctx, sdm.configuration.name, 0, 100);
@@ -119,18 +118,12 @@ async function manageGoalSets(workspaceId: string,
             };
 
             logger.debug(`GoalSet '${goalSet.goalSetId}' now in state '${state}'`);
-
-            const messageClient = new TriggeredMessageClient(
-                (sdm.configuration.ws as any).lifecycle,
-                workspaceId,
-                sdm.configuration);
-            await messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
+            await ctx.messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
         }
     }
 }
 
-async function timeoutInProcessGoals(workspaceId: string,
-                                     sdm: SoftwareDeliveryMachine,
+async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
                                      ctx: HandlerContext): Promise<void> {
     const timeout = _.get(sdm.configuration, "sdm.goal.inProcessTimeout", 1000 * 60 * 60);
     const end = Date.now() - timeout;
