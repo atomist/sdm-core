@@ -1,0 +1,6 @@
+query InProcessSdmGoals {
+  SdmGoal(state: [in_process, requested], _first: 100) {
+    ...SdmGoalFields
+    ...SdmGoalRepo
+  }
+}

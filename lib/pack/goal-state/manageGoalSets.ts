@@ -16,9 +16,13 @@
 
 import {
     addressEvent,
+    AutomationContextAware,
     Configuration,
+    configurationValue,
     guid,
+    HandlerContext,
     logger,
+    QueryNoCacheOptions,
 } from "@atomist/automation-client";
 import { WebSocketLifecycle } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketLifecycle";
 import { AbstractWebSocketMessageClient } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketMessageClient";
@@ -27,9 +31,14 @@ import {
     fetchGoalsForCommit,
     GoalSetRootType,
     goalSetState,
+    SdmGoalState,
     SoftwareDeliveryMachine,
     TriggeredListener,
+    updateGoal,
 } from "@atomist/sdm";
+import * as _ from "lodash";
+import { InProcessSdmGoals } from "../../typings/types";
+import { formatDuration } from "../../util/misc/time";
 import { pendingGoalSets } from "./cancelGoals";
 
 /**
@@ -42,9 +51,10 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
         for (const workspaceId of workspaceIds) {
             const ses = namespace.create();
             ses.run(async () => {
+                const id = guid();
                 namespace.set({
-                    invocationId: guid(),
-                    correlationId: guid(),
+                    invocationId: id,
+                    correlationId: id,
                     workspaceName: workspaceId,
                     workspaceId,
                     operation: "ManagePendingGoalSets",
@@ -53,7 +63,31 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
                     version: li.sdm.configuration.version,
                 });
                 try {
-                    await manageGoalSets(workspaceId, li.sdm);
+                    const graphClient = li.sdm.configuration.graphql.client.factory.create(workspaceId, li.sdm.configuration);
+                    const messageClient = new TriggeredMessageClient(
+                        (li.sdm.configuration.ws as any).lifecycle,
+                        workspaceId,
+                        li.sdm.configuration) as any;
+                    const ctx: HandlerContext & AutomationContextAware = {
+                        graphClient,
+                        messageClient,
+                        workspaceId,
+                        correlationId: id,
+                        invocationId: id,
+                        context: {
+                            name: li.sdm.configuration.name,
+                            version: li.sdm.configuration.version,
+                            operation: "ManagePendingGoalSets",
+                            ts: Date.now(),
+                            workspaceId,
+                            workspaceName: workspaceId,
+                            correlationId: id,
+                            invocationId: id,
+                        },
+                    } as any;
+
+                    await manageGoalSets(workspaceId, li.sdm, ctx);
+                    await timeoutInProcessGoals(workspaceId, li.sdm, ctx);
                 } catch (e) {
                     logger.warn("Error managing pending goal sets: %s", e.stack);
                 }
@@ -62,13 +96,14 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
     }
 };
 
-async function manageGoalSets(workspaceId: string, sdm: SoftwareDeliveryMachine): Promise<void> {
-    const graphClient = sdm.configuration.graphql.client.factory.create(workspaceId, sdm.configuration);
+async function manageGoalSets(workspaceId: string,
+                              sdm: SoftwareDeliveryMachine,
+                              ctx: HandlerContext): Promise<void> {
 
-    const pgs = await pendingGoalSets({ graphClient } as any, sdm.configuration.name, 0, 100);
+    const pgs = await pendingGoalSets(ctx, sdm.configuration.name, 0, 100);
     for (const goalSet of pgs) {
 
-        const goals = await fetchGoalsForCommit({ graphClient } as any, {
+        const goals = await fetchGoalsForCommit(ctx, {
             owner: goalSet.repo.owner,
             repo: goalSet.repo.name,
             sha: goalSet.sha,
@@ -90,6 +125,34 @@ async function manageGoalSets(workspaceId: string, sdm: SoftwareDeliveryMachine)
                 workspaceId,
                 sdm.configuration);
             await messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
+        }
+    }
+}
+
+async function timeoutInProcessGoals(workspaceId: string,
+                                     sdm: SoftwareDeliveryMachine,
+                                     ctx: HandlerContext): Promise<void> {
+    const timeout = _.get(sdm.configuration, "sdm.goal.inProcessTimeout", 1000 * 60 * 60);
+    const end = Date.now() - timeout;
+
+    const gs = (await ctx.graphClient.query<InProcessSdmGoals.Query, InProcessSdmGoals.Variables>({
+        name: "InProcessSdmGoals",
+        options: {
+            ...QueryNoCacheOptions,
+            log: configurationValue("sdm.query.logging", false),
+        },
+    })).SdmGoal;
+
+    for (const goal of gs) {
+        if (goal.ts < end) {
+            await updateGoal(
+                ctx,
+                goal as any,
+                {
+                    state: SdmGoalState.canceled,
+                    description: `Canceled: ${goal.name}`,
+                    phase: `${formatDuration(timeout)} timeout`,
+                });
         }
     }
 }

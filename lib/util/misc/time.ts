@@ -20,5 +20,5 @@ export function formatDuration(duration: number, format: string = "h[h] m[m] s[s
     const momentDurationFormatSetup = require("moment-duration-format");
     momentDurationFormatSetup(moment);
 
-    return moment.duration(duration, "millisecond").format(format);
+    return moment.duration(duration, "millisecond").format(format, { trim: "both"});
 }
