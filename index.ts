@@ -155,9 +155,6 @@ export {
 export {
     renderCommitMessage,
 } from "./lib/util/slack/diffRendering";
-export {
-    lookFor200OnEndpointRootGet,
-} from "./lib/util/verify/lookFor200OnEndpointRootGet";
 export * from "./lib/util/webhook/ImageLink";
 export {
     Preference,
