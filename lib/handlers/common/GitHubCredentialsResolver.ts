@@ -28,6 +28,7 @@ import { ProviderType as RepoProviderType } from "@atomist/automation-client/lib
 import { CredentialsResolver } from "@atomist/sdm";
 import * as _ from "lodash";
 import {
+    GitHubAppInstallationByOwner,
     ProviderType,
     ScmProviderByType,
 } from "../../typings/types";
@@ -49,6 +50,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
             [
                 obtainTokenFromConfiguration(this),
                 ObtainTokenFromIncomingMessage,
+                ObtainTokenFromGitHubApp,
                 ObtainTokenFromProvider,
             ],
             context,
@@ -61,6 +63,7 @@ export class GitHubCredentialsResolver implements CredentialsResolver {
             [
                 ObtainTokenFromIncomingMessage,
                 obtainTokenFromConfiguration(this),
+                ObtainTokenFromGitHubApp,
                 ObtainTokenFromProvider,
             ],
             context,
@@ -117,6 +120,20 @@ const ObtainTokenFromProvider: ObtainToken = async (ctx, id) => {
 };
 
 /**
+ * Obtain a token from an GitHubAppInstallation
+ */
+const ObtainTokenFromGitHubApp: ObtainToken = async (ctx, id) => {
+    // Check the graph to see if we have a token on the GitHubAppInstallation
+    if (!!id && (id.providerType === RepoProviderType.github_com)) {
+        const token = await fetchTokenByGitHubAppName(id.owner, ctx);
+        if (hasToken(token)) {
+            return token;
+        }
+    }
+    return undefined;
+};
+
+/**
  * Obtain a token from the SDM configuration
  */
 function obtainTokenFromConfiguration(resolver: GitHubCredentialsResolver): ObtainToken {
@@ -150,4 +167,16 @@ async function fetchTokenByProviderType(providerType: ProviderType,
     });
 
     return _.get(provider, "SCMProvider[0].credential.secret");
+}
+
+async function fetchTokenByGitHubAppName(owner: string,
+                                         ctx: HandlerContext): Promise<string> {
+    const app = await ctx.graphClient.query<GitHubAppInstallationByOwner.Query, GitHubAppInstallationByOwner.Variables>({
+        name: "GitHubAppInstallationByOwner",
+        variables: {
+            name: owner,
+        },
+    });
+
+    return _.get(app, "GitHubAppInstallation[0].token.secret");
 }
