@@ -87,7 +87,7 @@ export const ManageGoalSetsTrigger: TriggeredListener = async li => {
                     } as any;
 
                     await manageGoalSets(li.sdm, ctx);
-                    // await timeoutInProcessGoals(li.sdm, ctx);
+                    await timeoutInProcessGoals(li.sdm, ctx);
                 } catch (e) {
                     logger.warn("Error managing pending goal sets: %s", e.stack);
                 }
