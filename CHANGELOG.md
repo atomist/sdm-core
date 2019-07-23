@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.6.1...HEAD)
 
+### Added
+
+-   Cancel in process goals after a timeout. [7cce199](https://github.com/atomist/sdm-core/commit/7cce199a377864e2c27c075f1161bd051208b06e)
+
 ## [1.6.1](https://github.com/atomist/sdm-core/compare/1.6.0...1.6.1) - 2019-07-11
 
 ### Changed
