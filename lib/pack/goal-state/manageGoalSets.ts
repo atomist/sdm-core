@@ -141,6 +141,7 @@ export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
 
     for (const goal of gs) {
         if (goal.ts < end) {
+            logger.debug(`Canceling goal '${goal.uniqueName}' of goal set '${goal.goalSetId}' because it timed out`);
             await updateGoal(
                 ctx,
                 goal as any,
