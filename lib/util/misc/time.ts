@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export function formatDuration(duration: number, format: string = "h[h] m[m] s[s]"): string {
+export function formatDuration(duration: number, format: string = "d[d] h[h] m[m] s[s]"): string {
     const moment = require("moment");
     // The following require is needed to initialize the format function
     const momentDurationFormatSetup = require("moment-duration-format");
