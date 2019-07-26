@@ -117,7 +117,7 @@ export async function manageGoalSets(sdm: SoftwareDeliveryMachine,
                 state,
             };
 
-            logger.debug(`GoalSet '${goalSet.goalSetId}' now in state '${state}'`);
+            logger.debug(`Goal set '${goalSet.goalSetId}' now in state '${state}'`);
             await ctx.messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
         }
     }
