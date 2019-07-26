@@ -108,7 +108,7 @@ export type GoalCreator<G extends AllGoals> = (sdm: SoftwareDeliveryMachine) => 
 export type GoalConfigurer<G extends AllGoals> = (sdm: SoftwareDeliveryMachine, goals: G) => Promise<void>;
 
 /**
- * Type to orchestrating the creation and configuration of goal instances for this SDM
+ * Type to orchestrate the creation and configuration of goal instances for this SDM
  */
 export type CreateGoals<G extends AllGoals> = (creator: GoalCreator<G>,
                                                configurers: GoalConfigurer<G> | Array<GoalConfigurer<G>>) => Promise<G>;
@@ -138,7 +138,6 @@ export function configure<G extends AllGoals, T extends SdmContext = PushListene
     } & ConfigureOptions = {}): Configuration {
     return {
         postProcessors: [
-            ...(toArray(options.postProcessors || [])),
             configureSdm(async cfg => {
                 let cfgToUse = cfg;
 
@@ -168,6 +167,7 @@ export function configure<G extends AllGoals, T extends SdmContext = PushListene
 
                 return sdm;
             }, options),
+            ...(toArray(options.postProcessors || [])),
         ],
     };
 }
