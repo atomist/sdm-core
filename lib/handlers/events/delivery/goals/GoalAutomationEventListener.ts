@@ -39,7 +39,7 @@ import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
-import { SdmGoalById } from "../../../../typings/types";
+import { SdmGoalsByGoalSetIdAndUniqueName } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
 export class GoalAutomationEventListener extends AutomationEventListenerSupport {
@@ -52,7 +52,8 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
         if (cluster.isMaster) {
             const teamId = process.env.ATOMIST_GOAL_TEAM;
             const teamName = process.env.ATOMIST_GOAL_TEAM_NAME || teamId;
-            const goalId = process.env.ATOMIST_GOAL_ID;
+            const goalSetId = [process.env.ATOMIST_GOAL_SET_ID];
+            const uniqueName = [process.env.ATOMIST_GOAL_UNIQUE_NAME];
             const correlationId = process.env.ATOMIST_CORRELATION_ID || guid();
 
             // Obtain goal via graphql query
@@ -60,10 +61,11 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 `${this.sdm.configuration.endpoints.graphql}/${teamId}`,
                 { Authorization: `Bearer ${client.configuration.apiKey}` });
 
-            const goal = await graphClient.query<SdmGoalById.Query, SdmGoalById.Variables>({
-                name: "SdmGoalById",
+            const goal = await graphClient.query<SdmGoalsByGoalSetIdAndUniqueName.Query, SdmGoalsByGoalSetIdAndUniqueName.Variables>({
+                name: "SdmGoalsByGoalSetIdAndUniqueName",
                 variables: {
-                    id: goalId,
+                    goalSetId,
+                    uniqueName, 
                 },
                 options: QueryNoCacheOptions,
             });
