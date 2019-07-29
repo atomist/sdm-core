@@ -65,7 +65,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 name: "SdmGoalsByGoalSetIdAndUniqueName",
                 variables: {
                     goalSetId,
-                    uniqueName, 
+                    uniqueName,
                 },
                 options: QueryNoCacheOptions,
             });
