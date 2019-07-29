@@ -24,7 +24,6 @@ import {
     actionableButton,
     CommandHandlerRegistration,
     ExtensionPack,
-    fetchGoalsForCommit,
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
     metadata,
@@ -113,9 +112,9 @@ export async function defaultDestinationFactory(goal: SdmGoalEvent): Promise<Des
  */
 export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegistration): NotificationFactory {
     return async gi => {
-        const { completedGoal, context, id } = gi;
-        const goals = await fetchGoalsForCommit(context, id, completedGoal.repo.providerId, completedGoal.goalSetId);
-        const goalId = (goals.find(g => g.uniqueName === completedGoal.uniqueName) as any).id;
+        const { completedGoal, context } = gi;
+        const goalSetId = completedGoal.goalSetId;
+        const uniqueName = completedGoal.uniqueName;
         const msgId = guid();
 
         let state: string;
@@ -128,7 +127,8 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
                 msg = slackErrorMessage("", "", context, {
                     actions: completedGoal.retryFeasible ? [
                         actionableButton({ text: "Restart" }, updateGoalCommand, {
-                            id: goalId,
+                            goalSetId,
+                            uniqueName,
                             msgId,
                             state: SdmGoalState.requested,
                         })] : [],
@@ -139,7 +139,8 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
                 suffix = "Awaiting Approval";
                 msg = slackInfoMessage("", "", {
                     actions: [actionableButton({ text: "Approve" }, updateGoalCommand, {
-                        id: goalId,
+                        goalSetId,
+                        uniqueName,
                         msgId,
                         state: SdmGoalState.approved,
                     })],
@@ -150,7 +151,8 @@ export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegi
                 suffix = "Awaiting Start";
                 msg = slackInfoMessage("", "", {
                     actions: [actionableButton({ text: "Start" }, updateGoalCommand, {
-                        id: goalId,
+                        goalSetId,
+                        uniqueName,
                         msgId,
                         state: SdmGoalState.pre_approved,
                     })],

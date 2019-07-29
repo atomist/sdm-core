@@ -36,12 +36,13 @@ import {
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {
-    SdmGoalById,
     SdmGoalFields,
+    SdmGoalsByGoalSetIdAndUniqueName,
 } from "../../typings/types";
 
 export function updateGoalStateCommand(): CommandHandlerRegistration<{
-    id: string,
+    goalSetId: string,
+    uniqueName: string,
     state: SdmGoalState,
     msgId: string,
     slackRequester: string,
@@ -53,7 +54,8 @@ export function updateGoalStateCommand(): CommandHandlerRegistration<{
         name: "UpdateGoalStateCommand",
         description: "Update goal state",
         parameters: {
-            id: {},
+            goalSetId: {},
+            uniqueName: {},
             state: {},
             msgId: {},
             slackRequester: {
@@ -70,10 +72,11 @@ export function updateGoalStateCommand(): CommandHandlerRegistration<{
             channelId: { uri: MappedParameters.SlackChannel, required: false, declarationType: DeclarationType.Mapped },
         },
         listener: async ci => {
-            const goalResult = await ci.context.graphClient.query<SdmGoalById.Query, SdmGoalById.Variables>({
-                name: "SdmGoalById",
+            const goalResult = await ci.context.graphClient.query<SdmGoalsByGoalSetIdAndUniqueName.Query, SdmGoalsByGoalSetIdAndUniqueName.Variables>({
+                name: "SdmGoalsByGoalSetIdAndUniqueName",
                 variables: {
-                    id: ci.parameters.id,
+                    goalSetId: [ci.parameters.goalSetId],
+                    uniqueName: [ci.parameters.uniqueName],
                 },
                 options: QueryNoCacheOptions,
             });
