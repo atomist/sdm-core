@@ -32,7 +32,6 @@ import {
     SdmGoalEvent,
     SdmGoalMessage,
     SdmGoalState,
-    SdmProvenance,
     updateGoal,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
@@ -190,42 +189,72 @@ function isGoalRejected(sdmGoal: SdmGoalEvent): boolean {
 }
 
 export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
-    return `uniqueName:${goal.uniqueName}
-        environment:${goal.environment}
-        goalSetId:${goal.goalSetId}
-        state:${goal.state}
-        ts:${goal.ts}
-        version:${goal.version}
-        repo:${goal.repo.owner}/${goal.repo.name}/${goal.repo.providerId}
-        sha:${goal.sha}
-        branch:${goal.branch}
-        fulfillment:${goal.fulfillment.name}-${goal.fulfillment.method}
-        preConditions:${(goal.preConditions || []).map(p => `${
-        p.environment}/${normalizeValue(p.name)}/${normalizeValue(p.uniqueName)}`)}
-        data:${normalizeValue(goal.data)}
-        url:${normalizeValue(goal.url)}
-        externalUrls:${(goal.externalUrls || []).map(u => u.url).join(",")}
-        provenance:${(goal.provenance || []).map(normalizeProvenance).join(",")}
-        retry:${normalizeValue(goal.retryFeasible)}
-        approvalRequired:${normalizeValue(goal.approvalRequired)}
-        approval:${normalizeProvenance(goal.approval)}
-        preApprovalRequired:${normalizeValue(goal.preApprovalRequired)}
-        preApproval:${normalizeProvenance(goal.preApproval)}`;
-}
-
-function normalizeProvenance(p: SdmProvenance): string {
-    if (!!p) {
-        return `${normalizeValue(p.registration)}:${normalizeValue(p.version)}/${normalizeValue(p.name)}-${
-            normalizeValue(p.userId)}-${normalizeValue(p.channelId)}-${p.ts}`;
-    } else {
-        return "undefined";
-    }
-}
-
-function normalizeValue(value: any): string {
-    if (!!value) {
-        return value.toString();
-    } else {
-        return "undefined";
-    }
+    // Create a new goal with only the relevant and sensible fields
+    const newGoal: Omit<SdmGoalEvent, "push"> = {
+        uniqueName: goal.uniqueName,
+        name: goal.name,
+        environment: goal.environment,
+        repo: {
+            owner: goal.repo.owner,
+            name: goal.repo.name,
+            providerId: goal.repo.providerId,
+        },
+        goalSet: goal.goalSet,
+        goalSetId: goal.goalSetId,
+        externalKey: goal.externalKey,
+        sha: goal.sha,
+        branch: goal.branch,
+        state: goal.state,
+        phase: goal.phase,
+        version: goal.version,
+        description: goal.description,
+        ts: goal.ts,
+        data: goal.data,
+        url: goal.url,
+        externalUrls: !!goal.externalUrls ? goal.externalUrls.map(e => ({
+            url: e.url,
+            label: e.label,
+        })) : undefined,
+        preApprovalRequired: goal.preApprovalRequired,
+        preApproval: !!goal.preApproval ? {
+            channelId: goal.preApproval.channelId,
+            correlationId: goal.preApproval.correlationId,
+            name: goal.preApproval.name,
+            registration: goal.preApproval.registration,
+            ts: goal.preApproval.ts,
+            userId: goal.preApproval.userId,
+            version: goal.preApproval.version,
+        } : undefined,
+        approvalRequired: goal.approvalRequired,
+        approval: !!goal.approval ? {
+            channelId: goal.approval.channelId,
+            correlationId: goal.approval.correlationId,
+            name: goal.approval.name,
+            registration: goal.approval.registration,
+            ts: goal.approval.ts,
+            userId: goal.approval.userId,
+            version: goal.approval.version,
+        } : undefined,
+        retryFeasible: goal.retryFeasible,
+        error: goal.error,
+        preConditions: !!goal.preConditions ? goal.preConditions.map(c => ({
+            environment: c.environment,
+            name: c.name,
+            uniqueName: c.uniqueName,
+        })) : undefined,
+        fulfillment: !!goal.fulfillment ? {
+            method: goal.fulfillment.method,
+            name: goal.fulfillment.name,
+        } : undefined,
+        provenance: !!goal.provenance ? goal.provenance.map(p => ({
+            channelId: p.channelId,
+            correlationId: p.correlationId,
+            name: p.name,
+            registration: p.registration,
+            ts: p.ts,
+            userId: p.userId,
+            version: p.version,
+        })) : undefined,
+    };
+    return JSON.stringify(newGoal);
 }
