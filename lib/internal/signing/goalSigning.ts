@@ -202,9 +202,9 @@ function sort(obj: any) {
     const sorted = [];
     _.forEach(obj, (v, k) => {
         if (Array.isArray(v)) {
-            sorted.push(k, v.map(vv => sort(vv)));
+            sorted.push(k, v.map(sort));
         } else {
-            sorted.push(k, v)
+            sorted.push(k, v);
         }
     });
     return sorted.sort();
