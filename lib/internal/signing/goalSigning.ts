@@ -32,10 +32,10 @@ import {
     SdmGoalEvent,
     SdmGoalMessage,
     SdmGoalState,
-    SdmProvenance,
     updateGoal,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as _ from "lodash";
 import * as path from "path";
 import { DeepPartial } from "ts-essentials";
 import { toArray } from "../../util/misc/array";
@@ -190,42 +190,22 @@ function isGoalRejected(sdmGoal: SdmGoalEvent): boolean {
 }
 
 export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
-    return `uniqueName:${goal.uniqueName}
-        environment:${goal.environment}
-        goalSetId:${goal.goalSetId}
-        state:${goal.state}
-        ts:${goal.ts}
-        version:${goal.version}
-        repo:${goal.repo.owner}/${goal.repo.name}/${goal.repo.providerId}
-        sha:${goal.sha}
-        branch:${goal.branch}
-        fulfillment:${goal.fulfillment.name}-${goal.fulfillment.method}
-        preConditions:${(goal.preConditions || []).map(p => `${
-        p.environment}/${normalizeValue(p.name)}/${normalizeValue(p.uniqueName)}`)}
-        data:${normalizeValue(goal.data)}
-        url:${normalizeValue(goal.url)}
-        externalUrls:${(goal.externalUrls || []).map(u => u.url).join(",")}
-        provenance:${(goal.provenance || []).map(normalizeProvenance).join(",")}
-        retry:${normalizeValue(goal.retryFeasible)}
-        approvalRequired:${normalizeValue(goal.approvalRequired)}
-        approval:${normalizeProvenance(goal.approval)}
-        preApprovalRequired:${normalizeValue(goal.preApprovalRequired)}
-        preApproval:${normalizeProvenance(goal.preApproval)}`;
+    const goalCopy = _.cloneDeep(goal);
+    // Don't include the signature string itself in the payload
+    delete (goalCopy as any).signature;
+    // Delete the automatically generated id as it keeps changing
+    delete (goalCopy as any).id;
+    return JSON.stringify(sort(goalCopy));
 }
 
-function normalizeProvenance(p: SdmProvenance): string {
-    if (!!p) {
-        return `${normalizeValue(p.registration)}:${normalizeValue(p.version)}/${normalizeValue(p.name)}-${
-            normalizeValue(p.userId)}-${normalizeValue(p.channelId)}-${p.ts}`;
-    } else {
-        return "undefined";
-    }
-}
-
-function normalizeValue(value: any): string {
-    if (!!value) {
-        return value.toString();
-    } else {
-        return "undefined";
-    }
+function sort(obj: any) {
+    const sorted = [];
+    _.forEach(obj, (v, k) => {
+        if (Array.isArray(v)) {
+            sorted.push(k, v.map(vv => sort(vv)));
+        } else {
+            sorted.push(k, v)
+        }
+    });
+    return sorted.sort();
 }
