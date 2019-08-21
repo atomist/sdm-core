@@ -40,11 +40,11 @@ export function prepareCommandInvocation(md: CommandHandlerMetadata,
     const params = mergeParameters(parameters, {});
     const ci: CommandInvocation = {
         name: md.name,
-        args: md.parameters.filter(p => !!params[p.name]).map(p => ({
+        args: md.parameters.filter(p => params[p.name] !== undefined).map(p => ({
             name: p.name,
             value: params[p.name],
         })),
-        mappedParameters: md.mapped_parameters.filter(p => !!params[p.name]).map(p => ({
+        mappedParameters: md.mapped_parameters.filter(p => params[p.name] !== undefined).map(p => ({
             name: p.name,
             value: params[p.name],
         })),
