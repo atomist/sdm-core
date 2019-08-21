@@ -159,7 +159,8 @@ async function rejectGoal(reason: string,
         sdmGoal,
         {
             state: SdmGoalState.failure,
-            description: `Rejected ${sdmGoal.name} because ${reason}`,
+            description: `Rejected: ${sdmGoal.name}`,
+            phase: reason,
         });
 }
 
