@@ -72,7 +72,8 @@ export function updateGoalStateCommand(): CommandHandlerRegistration<{
             channelId: { uri: MappedParameters.SlackChannel, required: false, declarationType: DeclarationType.Mapped },
         },
         listener: async ci => {
-            const goalResult = await ci.context.graphClient.query<SdmGoalsByGoalSetIdAndUniqueName.Query, SdmGoalsByGoalSetIdAndUniqueName.Variables>({
+            const goalResult = await ci.context.graphClient.query<SdmGoalsByGoalSetIdAndUniqueName.Query,
+                SdmGoalsByGoalSetIdAndUniqueName.Variables>({
                 name: "SdmGoalsByGoalSetIdAndUniqueName",
                 variables: {
                     goalSetId: [ci.parameters.goalSetId],
