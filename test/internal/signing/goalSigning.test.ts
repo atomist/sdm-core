@@ -168,7 +168,8 @@ describe("goalSigning", () => {
         const messageClient: MessageClient = {
             send: async (msg: any) => {
                 assert.strictEqual(msg.state, SdmGoalState.failure);
-                assert.strictEqual(msg.description, "Rejected build because signature was invalid");
+                assert.strictEqual(msg.description, "Rejected: build");
+                assert.strictEqual(msg.phase, "signature invalid");
             },
             respond: async (msg: any) => {
             },

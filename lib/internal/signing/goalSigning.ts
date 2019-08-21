@@ -124,12 +124,12 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
                     `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${
                         verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
             } else {
-                await rejectGoal("signature was invalid", goal, ctx);
+                await rejectGoal("signature invalid", goal, ctx);
                 throw new Error("SDM goal signature invalid. Rejecting goal!");
             }
 
         } else {
-            await rejectGoal("signature was missing", goal, ctx);
+            await rejectGoal("signature missing", goal, ctx);
             throw new Error("SDM goal signature is missing. Rejecting goal!");
         }
     }
@@ -193,70 +193,78 @@ function isGoalRejected(sdmGoal: SdmGoalEvent): boolean {
 export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
     // Create a new goal with only the relevant and sensible fields
     const newGoal: Omit<SdmGoalEvent, "push"> = {
-        uniqueName: goal.uniqueName,
-        name: goal.name,
-        environment: goal.environment,
+        uniqueName: normalizeValue(goal.uniqueName),
+        name: normalizeValue(goal.name),
+        environment: normalizeValue(goal.environment),
         repo: {
-            owner: goal.repo.owner,
-            name: goal.repo.name,
-            providerId: goal.repo.providerId,
+            owner: normalizeValue(goal.repo.owner),
+            name: normalizeValue(goal.repo.name),
+            providerId: normalizeValue(goal.repo.providerId),
         },
-        goalSet: goal.goalSet,
-        goalSetId: goal.goalSetId,
-        externalKey: goal.externalKey,
-        sha: goal.sha,
-        branch: goal.branch,
-        state: goal.state,
-        phase: goal.phase,
-        version: goal.version,
-        description: goal.description,
-        ts: goal.ts,
-        data: goal.data,
-        url: goal.url,
+        goalSet: normalizeValue(goal.goalSet),
+        goalSetId: normalizeValue(goal.goalSetId),
+        externalKey: normalizeValue(goal.externalKey),
+        sha: normalizeValue(goal.sha),
+        branch: normalizeValue(goal.branch),
+        state: normalizeValue(goal.state),
+        phase: normalizeValue(goal.phase),
+        version: normalizeValue(goal.version),
+        description: normalizeValue(goal.description),
+        ts: normalizeValue(goal.ts),
+        data: normalizeValue(goal.data),
+        url: normalizeValue(goal.url),
         externalUrls: !!goal.externalUrls ? goal.externalUrls.map(e => ({
-            url: e.url,
-            label: e.label,
+            url: normalizeValue(e.url),
+            label: normalizeValue(e.label),
         })) : undefined,
-        preApprovalRequired: goal.preApprovalRequired,
+        preApprovalRequired: normalizeValue(goal.preApprovalRequired),
         preApproval: !!goal.preApproval ? {
-            channelId: goal.preApproval.channelId,
-            correlationId: goal.preApproval.correlationId,
-            name: goal.preApproval.name,
-            registration: goal.preApproval.registration,
-            ts: goal.preApproval.ts,
-            userId: goal.preApproval.userId,
-            version: goal.preApproval.version,
+            channelId: normalizeValue(goal.preApproval.channelId),
+            correlationId: normalizeValue(goal.preApproval.correlationId),
+            name: normalizeValue(goal.preApproval.name),
+            registration: normalizeValue(goal.preApproval.registration),
+            ts: normalizeValue(goal.preApproval.ts),
+            userId: normalizeValue(goal.preApproval.userId),
+            version: normalizeValue(goal.preApproval.version),
         } : undefined,
-        approvalRequired: goal.approvalRequired,
+        approvalRequired: normalizeValue(goal.approvalRequired),
         approval: !!goal.approval ? {
-            channelId: goal.approval.channelId,
-            correlationId: goal.approval.correlationId,
-            name: goal.approval.name,
-            registration: goal.approval.registration,
-            ts: goal.approval.ts,
-            userId: goal.approval.userId,
-            version: goal.approval.version,
+            channelId: normalizeValue(goal.approval.channelId),
+            correlationId: normalizeValue(goal.approval.correlationId),
+            name: normalizeValue(goal.approval.name),
+            registration: normalizeValue(goal.approval.registration),
+            ts: normalizeValue(goal.approval.ts),
+            userId: normalizeValue(goal.approval.userId),
+            version: normalizeValue(goal.approval.version),
         } : undefined,
-        retryFeasible: goal.retryFeasible,
-        error: goal.error,
+        retryFeasible: normalizeValue(goal.retryFeasible),
+        error: normalizeValue(goal.error),
         preConditions: !!goal.preConditions ? goal.preConditions.map(c => ({
-            environment: c.environment,
-            name: c.name,
-            uniqueName: c.uniqueName,
+            environment: normalizeValue(c.environment),
+            name: normalizeValue(c.name),
+            uniqueName: normalizeValue(c.uniqueName),
         })) : undefined,
         fulfillment: !!goal.fulfillment ? {
-            method: goal.fulfillment.method,
-            name: goal.fulfillment.name,
+            method: normalizeValue(goal.fulfillment.method),
+            name: normalizeValue(goal.fulfillment.name),
         } : undefined,
         provenance: !!goal.provenance ? goal.provenance.map(p => ({
-            channelId: p.channelId,
-            correlationId: p.correlationId,
-            name: p.name,
-            registration: p.registration,
-            ts: p.ts,
-            userId: p.userId,
-            version: p.version,
+            channelId: normalizeValue(p.channelId),
+            correlationId: normalizeValue(p.correlationId),
+            name: normalizeValue(p.name),
+            registration: normalizeValue(p.registration),
+            ts: normalizeValue(p.ts),
+            userId: normalizeValue(p.userId),
+            version: normalizeValue(p.version),
         })) : undefined,
     };
     return stringify(newGoal);
+}
+
+function normalizeValue(value: any): any {
+    if (!!value) {
+        return value;
+    } else {
+        return undefined;
+    }
 }
