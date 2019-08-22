@@ -216,7 +216,7 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
         externalUrls: !!goal.externalUrls ? goal.externalUrls.map(e => ({
             url: normalizeValue(e.url),
             label: normalizeValue(e.label),
-        })) : undefined,
+        })) : [],
         preApprovalRequired: normalizeValue(goal.preApprovalRequired),
         preApproval: !!goal.preApproval ? {
             channelId: normalizeValue(goal.preApproval.channelId),
@@ -243,7 +243,7 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
             environment: normalizeValue(c.environment),
             name: normalizeValue(c.name),
             uniqueName: normalizeValue(c.uniqueName),
-        })) : undefined,
+        })) : [],
         fulfillment: !!goal.fulfillment ? {
             method: normalizeValue(goal.fulfillment.method),
             name: normalizeValue(goal.fulfillment.name),
@@ -256,13 +256,13 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
             ts: normalizeValue(p.ts),
             userId: normalizeValue(p.userId),
             version: normalizeValue(p.version),
-        })) : undefined,
+        })) : [],
     };
     return stringify(newGoal);
 }
 
 function normalizeValue(value: any): any {
-    if (!!value) {
+    if (value !== undefined && value !== null) {
         return value;
     } else {
         return undefined;
