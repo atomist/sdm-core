@@ -209,4 +209,5 @@ export {
     GoalCreator,
     ConfigurationPreProcessor,
     AllGoals,
+    DeliveryGoals,
 } from "./lib/machine/configure";

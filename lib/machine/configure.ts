@@ -95,29 +95,34 @@ export type GoalData = Record<string, GoalStructure>;
 /**
  * Type to collect goal instances for this SDM
  */
-export type AllGoals = Record<string, Goal | GoalWithFulfillment>;
+export type DeliveryGoals = Record<string, Goal | GoalWithFulfillment>;
+
+/**
+ * @deprecated use DeliveryGoals
+ */
+export type AllGoals = DeliveryGoals;
 
 /**
  * Type to create goal instances for this SDM
  */
-export type GoalCreator<G extends AllGoals> = (sdm: SoftwareDeliveryMachine) => Promise<G>;
+export type GoalCreator<G extends DeliveryGoals> = (sdm: SoftwareDeliveryMachine) => Promise<G>;
 
 /**
  * Type to configure provided goals with fulfillments, listeners etc
  */
-export type GoalConfigurer<G extends AllGoals> = (sdm: SoftwareDeliveryMachine, goals: G) => Promise<void>;
+export type GoalConfigurer<G extends DeliveryGoals> = (sdm: SoftwareDeliveryMachine, goals: G) => Promise<void>;
 
 /**
  * Type to orchestrate the creation and configuration of goal instances for this SDM
  */
-export type CreateGoals<G extends AllGoals> = (creator: GoalCreator<G>,
-                                               configurers: GoalConfigurer<G> | Array<GoalConfigurer<G>>) => Promise<G>;
+export type CreateGoals<G extends DeliveryGoals> = (creator: GoalCreator<G>,
+                                                    configurers: GoalConfigurer<G> | Array<GoalConfigurer<G>>) => Promise<G>;
 
 /**
  * Configure a SoftwareDeliveryMachine instance by adding command, events etc and optionally returning
  * GoalData, an array of GoalContributions or void when no goals should be added to this SDM.
  */
-export type Configurer<G extends AllGoals, F extends SdmContext = PushListenerInvocation> =
+export type Configurer<G extends DeliveryGoals, F extends SdmContext = PushListenerInvocation> =
     (sdm: SoftwareDeliveryMachine & { createGoals: CreateGoals<G> }) => Promise<void | GoalData | Array<GoalContribution<F>>>;
 
 /**
@@ -129,7 +134,7 @@ export type ConfigurationPreProcessor = (cfg: LocalSoftwareDeliveryMachineConfig
 /**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
  */
-export function configure<G extends AllGoals, T extends SdmContext = PushListenerInvocation>(
+export function configure<G extends DeliveryGoals, T extends SdmContext = PushListenerInvocation>(
     configurer: Configurer<G, T>,
     options: {
         name?: string,
