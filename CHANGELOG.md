@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Cancel in process goals after a timeout. [7cce199](https://github.com/atomist/sdm-core/commit/7cce199a377864e2c27c075f1161bd051208b06e)
 -   Improve goal normalization for signing. [#188](https://github.com/atomist/sdm-core/issues/188)
 
+### Deprecated
+
+-   Deprecated AllGoals in favor of DeliveryGoals. [3a5d597](https://github.com/atomist/sdm-core/commit/3a5d597f4b0caea7a1bcd73daf034c4b68a5cf8b)
+
 ## [1.6.1](https://github.com/atomist/sdm-core/compare/1.6.0...1.6.1) - 2019-07-11
 
 ### Changed
