@@ -41,7 +41,7 @@ export interface GoalStateOptions {
         /**
          * Optionally set the timeout after which goals should be cancelled.
          * Defaults to 1 hour.
-         **/
+         */
         timeout?: number;
     };
 }
