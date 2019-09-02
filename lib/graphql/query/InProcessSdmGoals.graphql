@@ -1,5 +1,5 @@
 query InProcessSdmGoals($registration: [String!]!) {
-  SdmGoal(state: [in_process, requested], _first: 100) {
+  SdmGoal(state: [in_process, requested], _first: 100, _orderBy: "ts", _ordering: asc) {
     environment
     uniqueName
     name

@@ -26,14 +26,30 @@ import {
     cancelGoalSetsCommand,
     listPendingGoalSetsCommand,
 } from "./cancelGoals";
-import { ManageGoalSetsTrigger } from "./manageGoalSets";
+import { manageGoalSetsTrigger } from "./manageGoalSets";
 import { resetGoalsCommand } from "./resetGoals";
 import { setGoalStateCommand } from "./setGoalState";
 
 /**
+ * Configuration options for the goal state support
+ */
+export interface GoalStateOptions {
+    /** Configure the goal cancellation support */
+    cancellation?: {
+        /** Enable goal cancellation based on timeouts */
+        enabled?: boolean;
+        /**
+         * Optionally set the timeout after which goals should be cancelled.
+         * Defaults to 1 hour.
+         **/
+        timeout?: number;
+    }
+}
+
+/**
  * Allow goal setting
  */
-export function goalStateSupport(): ExtensionPack {
+export function goalStateSupport(options?: GoalStateOptions): ExtensionPack {
     return {
         ...metadata("goal-state"),
         configure: sdm => {
@@ -47,10 +63,12 @@ export function goalStateSupport(): ExtensionPack {
                 sdm.addCommand(listPendingGoalSetsCommand(sdm));
 
                 if ((cluster.isMaster || !_.get(sdm.configuration, "cluster.enabled")) &&
-                    !process.env.ATOMIST_ISOLATED_GOAL) {
+                    !process.env.ATOMIST_ISOLATED_GOAL &&
+                    !!options && !!options.cancellation && !!options.cancellation.enabled) {
+                    logger.info(`Timeout based goal cancellation enabled for this SDM`);
                     sdm.addTriggeredListener({
                         trigger: { interval: 1000 * 30 },
-                        listener: ManageGoalSetsTrigger,
+                        listener: manageGoalSetsTrigger(options.cancellation),
                     });
                 }
             }

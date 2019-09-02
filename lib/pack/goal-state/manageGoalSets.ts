@@ -45,56 +45,58 @@ import { pendingGoalSets } from "./cancelGoals";
  * TriggeredListener that queries pending goal sets and updates their state according to state of
  * goals
  */
-export const ManageGoalSetsTrigger: TriggeredListener = async li => {
-    const workspaceIds = li.sdm.configuration.workspaceIds;
-    if (!!workspaceIds && workspaceIds.length > 0) {
-        for (const workspaceId of workspaceIds) {
-            const ses = namespace.create();
-            ses.run(async () => {
-                const id = guid();
-                namespace.set({
-                    invocationId: id,
-                    correlationId: id,
-                    workspaceName: workspaceId,
-                    workspaceId,
-                    operation: "ManagePendingGoalSets",
-                    ts: Date.now(),
-                    name: li.sdm.configuration.name,
-                    version: li.sdm.configuration.version,
-                });
-                try {
-                    const graphClient = li.sdm.configuration.graphql.client.factory.create(workspaceId, li.sdm.configuration);
-                    const messageClient = new TriggeredMessageClient(
-                        (li.sdm.configuration.ws as any).lifecycle,
-                        workspaceId,
-                        li.sdm.configuration) as any;
-                    const ctx: HandlerContext & AutomationContextAware = {
-                        graphClient,
-                        messageClient,
-                        workspaceId,
-                        correlationId: id,
+export function manageGoalSetsTrigger(options?: { timeout?: number }): TriggeredListener {
+    return async li => {
+        const workspaceIds = li.sdm.configuration.workspaceIds;
+        if (!!workspaceIds && workspaceIds.length > 0) {
+            for (const workspaceId of workspaceIds) {
+                const ses = namespace.create();
+                ses.run(async () => {
+                    const id = guid();
+                    namespace.set({
                         invocationId: id,
-                        context: {
-                            name: li.sdm.configuration.name,
-                            version: li.sdm.configuration.version,
-                            operation: "ManagePendingGoalSets",
-                            ts: Date.now(),
+                        correlationId: id,
+                        workspaceName: workspaceId,
+                        workspaceId,
+                        operation: "ManagePendingGoalSets",
+                        ts: Date.now(),
+                        name: li.sdm.configuration.name,
+                        version: li.sdm.configuration.version,
+                    });
+                    try {
+                        const graphClient = li.sdm.configuration.graphql.client.factory.create(workspaceId, li.sdm.configuration);
+                        const messageClient = new TriggeredMessageClient(
+                            (li.sdm.configuration.ws as any).lifecycle,
                             workspaceId,
-                            workspaceName: workspaceId,
+                            li.sdm.configuration) as any;
+                        const ctx: HandlerContext & AutomationContextAware = {
+                            graphClient,
+                            messageClient,
+                            workspaceId,
                             correlationId: id,
                             invocationId: id,
-                        },
-                    } as any;
+                            context: {
+                                name: li.sdm.configuration.name,
+                                version: li.sdm.configuration.version,
+                                operation: "ManagePendingGoalSets",
+                                ts: Date.now(),
+                                workspaceId,
+                                workspaceName: workspaceId,
+                                correlationId: id,
+                                invocationId: id,
+                            },
+                        } as any;
 
-                    await manageGoalSets(li.sdm, ctx);
-                    // await timeoutInProcessGoals(li.sdm, ctx);
-                } catch (e) {
-                    logger.warn("Error managing pending goal sets: %s", e.stack);
-                }
-            });
+                        await manageGoalSets(li.sdm, ctx);
+                        await timeoutInProcessGoals(li.sdm, ctx, options);
+                    } catch (e) {
+                        logger.warn("Error managing pending goal sets: %s", e.stack);
+                    }
+                });
+            }
         }
-    }
-};
+    };
+}
 
 export async function manageGoalSets(sdm: SoftwareDeliveryMachine,
                                      ctx: HandlerContext): Promise<void> {
@@ -124,8 +126,11 @@ export async function manageGoalSets(sdm: SoftwareDeliveryMachine,
 }
 
 export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
-                                            ctx: HandlerContext): Promise<void> {
-    const timeout = _.get(sdm.configuration, "sdm.goal.inProcessTimeout", 1000 * 60 * 60);
+                                            ctx: HandlerContext,
+                                            options?: { timeout?: number }): Promise<void> {
+    const timeout = !!options && !!options.timeout
+        ? options.timeout
+        : _.get(sdm.configuration, "sdm.goal.inProcessTimeout", 1000 * 60 * 60);
     const end = Date.now() - timeout;
 
     const gs = (await ctx.graphClient.query<InProcessSdmGoals.Query, InProcessSdmGoals.Variables>({
@@ -141,7 +146,8 @@ export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
 
     for (const goal of gs) {
         if (goal.ts < end) {
-            logger.debug(`Canceling goal '${goal.uniqueName}' of goal set '${goal.goalSetId}' because it timed out`);
+            logger.debug(
+                `Canceling goal '${goal.uniqueName}' of goal set '${goal.goalSetId}' because it timed out after '${formatDuration(timeout)}'`);
             await updateGoal(
                 ctx,
                 goal as any,
