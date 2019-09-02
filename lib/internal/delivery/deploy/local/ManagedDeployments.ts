@@ -29,8 +29,8 @@ import {
     Deployment,
     killAndWait,
     Targeter,
-    TargetInfo,
 } from "@atomist/sdm";
+import { TargetInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
 import { ChildProcess } from "child_process";
 import * as https from "https";
 

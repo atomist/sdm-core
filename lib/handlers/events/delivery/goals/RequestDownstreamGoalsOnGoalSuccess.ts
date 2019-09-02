@@ -36,11 +36,13 @@ import {
     RepoRefResolver,
     resolveCredentialsPromise,
     SdmGoalEvent,
-    SdmGoalFulfillmentMethod,
-    SdmGoalKey,
     SoftwareDeliveryMachineConfiguration,
     updateGoal,
 } from "@atomist/sdm";
+import {
+    SdmGoalFulfillmentMethod,
+    SdmGoalKey,
+} from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import {

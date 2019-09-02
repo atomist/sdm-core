@@ -41,13 +41,13 @@ import {
     ProgressLog,
     resolveCredentialsPromise,
     SdmGoalEvent,
-    SdmGoalFulfillmentMethod,
     SdmGoalState,
     serializeResult,
     SoftwareDeliveryMachineConfiguration,
     updateGoal,
     WriteToAllProgressLog,
 } from "@atomist/sdm";
+import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";

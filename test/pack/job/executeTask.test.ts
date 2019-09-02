@@ -64,7 +64,7 @@ describe("executeTask", () => {
             operationName: "ExecuteTask",
         },
         secrets: [],
-    };
+    } as any;
 
     it("should fail if command can't be found", async () => {
         const server = new BuildableAutomationServer(defaultConfiguration());

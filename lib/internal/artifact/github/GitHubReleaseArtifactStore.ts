@@ -22,11 +22,11 @@ import {
     RemoteRepoRef,
 } from "@atomist/automation-client";
 import {
-    AppInfo,
     ArtifactStore,
     DeployableArtifact,
     toToken,
 } from "@atomist/sdm";
+import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
 import * as GitHubApi from "@octokit/rest";
 // tslint:disable-next-line:import-blacklist
 import axios from "axios";
