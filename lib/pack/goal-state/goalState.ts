@@ -18,6 +18,7 @@ import { logger } from "@atomist/automation-client";
 import {
     ExtensionPack,
     metadata,
+    SdmGoalState,
 } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
@@ -43,6 +44,11 @@ export interface GoalStateOptions {
          * Defaults to 1 hour.
          */
         timeout?: number;
+        /**
+         * Optional state the goal should be set to when it times out
+         * Defaults to SdmGoalState.canceled
+         */
+        state?: SdmGoalState.canceled | SdmGoalState.failure;
     };
 }
 

@@ -40,12 +40,13 @@ import * as _ from "lodash";
 import { InProcessSdmGoals } from "../../typings/types";
 import { formatDuration } from "../../util/misc/time";
 import { pendingGoalSets } from "./cancelGoals";
+import { GoalStateOptions } from "./goalState";
 
 /**
  * TriggeredListener that queries pending goal sets and updates their state according to state of
  * goals
  */
-export function manageGoalSetsTrigger(options?: { timeout?: number }): TriggeredListener {
+export function manageGoalSetsTrigger(options?: GoalStateOptions["cancellation"]): TriggeredListener {
     return async li => {
         const workspaceIds = li.sdm.configuration.workspaceIds;
         if (!!workspaceIds && workspaceIds.length > 0) {
@@ -127,7 +128,7 @@ export async function manageGoalSets(sdm: SoftwareDeliveryMachine,
 
 export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
                                             ctx: HandlerContext,
-                                            options?: { timeout?: number }): Promise<void> {
+                                            options?: GoalStateOptions["cancellation"]): Promise<void> {
     const timeout = !!options && !!options.timeout
         ? options.timeout
         : _.get(sdm.configuration, "sdm.goal.inProcessTimeout", 1000 * 60 * 60);
@@ -144,6 +145,8 @@ export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
         },
     })).SdmGoal;
 
+    const state = !!options && !!options.state ? options.state : SdmGoalState.canceled;
+
     for (const goal of gs) {
         if (goal.ts < end) {
             logger.debug(
@@ -152,8 +155,8 @@ export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
                 ctx,
                 goal as any,
                 {
-                    state: SdmGoalState.canceled,
-                    description: `Canceled: ${goal.name}`,
+                    state,
+                    description: `${state === SdmGoalState.canceled ? "Canceled" : "Failed"}: ${goal.name}`,
                     phase: `${formatDuration(timeout)} timeout`,
                 });
         }
