@@ -43,7 +43,7 @@ export interface GoalStateOptions {
          * Defaults to 1 hour.
          **/
         timeout?: number;
-    }
+    };
 }
 
 /**
