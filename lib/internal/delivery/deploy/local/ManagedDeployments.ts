@@ -26,11 +26,13 @@ import {
     RepoRef,
 } from "@atomist/automation-client";
 import {
-    Deployment,
     killAndWait,
     Targeter,
 } from "@atomist/sdm";
-import { TargetInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
+import {
+    Deployment,
+    TargetInfo,
+} from "@atomist/sdm/lib/spi/deploy/Deployment";
 import { ChildProcess } from "child_process";
 import * as https from "https";
 
