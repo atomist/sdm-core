@@ -29,11 +29,11 @@ import {
     fetchGoalsFromPush,
     mapKeyToGoal,
     SdmGoalEvent,
-    SdmGoalKey,
     SdmGoalState,
     SoftwareDeliveryMachineConfiguration,
     updateGoal,
 } from "@atomist/sdm";
+import { SdmGoalKey } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";

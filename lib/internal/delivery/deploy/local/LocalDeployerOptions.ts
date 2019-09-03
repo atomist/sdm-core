@@ -15,8 +15,7 @@
  */
 
 // tslint:disable:deprecation
-
-import { Deployment } from "@atomist/sdm";
+import { Deployment } from "@atomist/sdm/lib/spi/deploy/Deployment";
 import { ChildProcess } from "child_process";
 import { LookupStrategy } from "./ManagedDeployments";
 

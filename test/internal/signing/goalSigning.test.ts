@@ -19,10 +19,12 @@ import {
     GoalSigningConfiguration,
     GoalSigningScope,
     SdmGoalEvent,
-    SdmGoalFulfillmentMethod,
-    SdmGoalMessage,
     SdmGoalState,
 } from "@atomist/sdm";
+import {
+    SdmGoalFulfillmentMethod,
+    SdmGoalMessage,
+} from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as path from "path";

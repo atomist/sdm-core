@@ -30,10 +30,10 @@ import {
     GoalSigningScope,
     GoalVerificationKey,
     SdmGoalEvent,
-    SdmGoalMessage,
     SdmGoalState,
     updateGoal,
 } from "@atomist/sdm";
+import { SdmGoalMessage } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import * as stringify from "fast-json-stable-stringify";
 import * as fs from "fs-extra";
 import * as path from "path";

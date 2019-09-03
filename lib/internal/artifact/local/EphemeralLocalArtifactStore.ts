@@ -16,11 +16,11 @@
 
 import { logger } from "@atomist/automation-client";
 import {
-    AppInfo,
     ArtifactStore,
     DeployableArtifact,
     StoredArtifact,
 } from "@atomist/sdm";
+import { AppInfo } from "@atomist/sdm/lib/spi/deploy/Deployment";
 
 /* tslint:disable:deprecation */
 
