@@ -47,21 +47,21 @@
     "ts-essentials": "^2.0.12"
   },
   "peerDependencies": {
-    "@atomist/automation-client": "^1.6.3",
-    "@atomist/microgrammar": ">=1.2.0",
-    "@atomist/sdm": "^1.6.2",
-    "@atomist/slack-messages": ">=1.1.1",
-    "@atomist/tree-path": ">=1.0.3"
+    "@atomist/automation-client": "^1.7.0",
+    "@atomist/microgrammar": "^1.2.1",
+    "@atomist/sdm": "^1.7.0",
+    "@atomist/slack-messages": "^1.1.1",
+    "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.6.3-master.20190903132130",
+    "@atomist/automation-client": "^1.7.0",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "1.6.2-master.20190903184656",
+    "@atomist/sdm": "^1.7.0",
     "@atomist/slack-messages": " ^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.138",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.6.2",
+    "@types/node": "^12.7.4",
     "@types/power-assert": "^1.5.0",
     "@types/rimraf": "^2.0.2",
     "axios-mock-adapter": "^1.17.0",
@@ -75,7 +75,7 @@
     "ts-node": "^8.3.0",
     "tslint": "^5.19.0",
     "typedoc": "^0.15.0",
-    "typescript": "3.5.3"
+    "typescript": "^3.6.2"
   },
   "directories": {
     "test": "test"
