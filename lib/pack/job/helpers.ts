@@ -15,6 +15,7 @@
  */
 
 import {
+    AutomationContextAware,
     CommandInvocation,
     HandlerContext,
     mergeParameters,
@@ -75,6 +76,9 @@ export function prepareHandlerContext(ctx: HandlerContext, trigger: any): Handle
         ctx.messageClient.respond = async () => {
             return;
         };
+    }
+    if (!!trigger) {
+        (ctx as any as AutomationContextAware).trigger = trigger;
     }
     return ctx;
 }
