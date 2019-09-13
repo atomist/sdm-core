@@ -47,9 +47,29 @@ import {
 } from "./util";
 
 /**
+ * Extension to GoalContainer to specify additional docker options
+ */
+export type DockerGoalContainer = GoalContainer & { dockerOptions?: string[]};
+
+/**
  * Additional options for Docker CLI implementation of container goals.
  */
 export interface DockerContainerRegistration extends ContainerRegistration {
+    /**
+     * Containers to run for this goal.  The goal result is based on
+     * the exit status of the first element of the `containers` array.
+     * The other containers are considered "sidecar" containers
+     * provided functionality that the main container needs to
+     * function.  The working directory of the first container is set
+     * to [[ContainerProjectHome]], which contains the project upon
+     * which the goal should operate.
+     *
+     * This extends the base containers property to be able to pass
+     * additional dockerOptions to a single container, eg.
+     * '--link=mongo:mongo'.
+     */
+    containers: DockerGoalContainer[];
+
     /**
      * Additional Docker CLI command-line options.  Command-line
      * options provided here will be appended to the default set of
@@ -147,6 +167,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 `--network-alias=${container.name}`,
                 ...containerArgs,
                 ...(registration.dockerOptions || []),
+                ...((container as DockerGoalContainer).dockerOptions || []),
                 ...atomistEnvs,
                 container.image,
                 ...(container.args || []),
