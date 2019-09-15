@@ -120,7 +120,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
             }
 
             if (!!verifiedWith) {
-                logger.info(
+                logger.debug(
                     `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${
                         verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
             } else {
@@ -144,7 +144,7 @@ export async function signGoal(goal: SdmGoalMessage,
                                gsc: GoalSigningConfiguration): Promise<SdmGoalMessage & SignatureMixin> {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
         (goal as any).signature = await findAlgorithm(gsc.signingKey, gsc).sign(normalizeGoal(goal), gsc.signingKey);
-        logger.info(`Signed goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
+        logger.debug(`Signed goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
         return goal as any;
     } else {
         return goal as any;
