@@ -90,7 +90,7 @@ export class GoalAutomationEventListener extends AutomationEventListenerSupport 
                 await new Promise<void>((resolve, reject) => {
                     client.processEvent(event, pResults => {
                         pResults.then(results => {
-                            logger.info("Processing goal completed with results %j", results);
+                            logger.debug("Processing goal completed with results %j", results);
                             resolve();
                         }, reject);
                     });

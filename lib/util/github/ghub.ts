@@ -54,7 +54,7 @@ export function createStatus(creds: string | ProjectOperationCredentials, rr: Gi
     const config = authHeaders(toToken(creds));
     const saferStatus = ensureValidUrl(inputStatus);
     const url = `${rr.scheme}${rr.apiBase}/repos/${rr.owner}/${rr.repo}/statuses/${rr.sha}`;
-    logger.info("Updating github status: %s to %j", url, saferStatus);
+    logger.debug("Updating github status: %s to %j", url, saferStatus);
     return doWithRetry(() =>
         axios.post(url, saferStatus, config).catch(err =>
             Promise.reject(new Error(`Error hitting ${url} to set status ${JSON.stringify(saferStatus)}: ${err.message}`)),
@@ -106,7 +106,7 @@ export interface Tag {
 export function createTag(creds: string | ProjectOperationCredentials, rr: GitHubRepoRef, tag: Tag): AxiosPromise {
     const config = authHeaders(toToken(creds));
     const url = `${rr.scheme}${rr.apiBase}/repos/${rr.owner}/${rr.repo}/git/tags`;
-    logger.info("Updating github tag: %s to %j", url, tag);
+    logger.debug("Updating github tag: %s to %j", url, tag);
     return doWithRetry(() => axios.post(url, tag, config)
         .catch(err =>
             Promise.reject(new Error(`Error hitting ${url} to set tag ${JSON.stringify(tag)}: ${err.message}`)),
@@ -116,7 +116,7 @@ export function createTag(creds: string | ProjectOperationCredentials, rr: GitHu
 export function createTagReference(creds: string | ProjectOperationCredentials, rr: GitHubRepoRef, tag: Tag): AxiosPromise {
     const config = authHeaders(toToken(creds));
     const url = `${rr.scheme}${rr.apiBase}/repos/${rr.owner}/${rr.repo}/git/refs`;
-    logger.info("Creating github reference: %s to %j", url, tag);
+    logger.debug("Creating github reference: %s to %j", url, tag);
     return doWithRetry(() => axios.post(url, { ref: `refs/tags/${tag.tag}`, sha: tag.object }, config)
         .catch(err =>
             Promise.reject(new Error(`Error hitting ${url} to set tag ${JSON.stringify(tag)}: ${err.message}`)),
@@ -126,7 +126,7 @@ export function createTagReference(creds: string | ProjectOperationCredentials, 
 export function deleteRepository(creds: string | ProjectOperationCredentials, rr: GitHubRepoRef): AxiosPromise {
     const config = authHeaders(toToken(creds));
     const url = `${rr.scheme}${rr.apiBase}/repos/${rr.owner}/${rr.repo}`;
-    logger.info("Deleting repository: %s", url);
+    logger.debug("Deleting repository: %s", url);
     return axios.delete(url, config)
         .catch(err => {
             logger.error(err.message);
@@ -148,7 +148,7 @@ export interface Release {
 export function createRelease(creds: string | ProjectOperationCredentials, rr: GitHubRepoRef, release: Release): AxiosPromise {
     const config = authHeaders(toToken(creds));
     const url = `${rr.scheme}${rr.apiBase}/repos/${rr.owner}/${rr.repo}/releases`;
-    logger.info("Updating github release: %s to %j", url, release);
+    logger.debug("Updating github release: %s to %j", url, release);
     return doWithRetry(() => axios.post(url, release, config)
         .catch(err =>
             Promise.reject(new Error(`Error hitting ${url} to set release ${JSON.stringify(release)}: ${err.message}`)),
@@ -204,7 +204,7 @@ export function isPublicRepo(creds: string | ProjectOperationCredentials, rr: Gi
     return axios.get(url, config)
         .then(ap => {
             const privateness = ap.data.private;
-            logger.info(`Retrieved ${url}. Private is '${privateness}'`);
+            logger.debug(`Retrieved ${url}. Private is '${privateness}'`);
             return !privateness;
         })
         .catch(err => {

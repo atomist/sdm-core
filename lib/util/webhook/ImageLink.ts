@@ -158,7 +158,7 @@ export async function postWebhook(
     teamId: string,
     retryOptions: RetryOptions = DefaultRetryOptions,
 ): Promise<boolean> {
-    logger.info("Posting webhook: %j", payload);
+    logger.debug("Posting webhook: %j", payload);
 
     const baseUrl = process.env.ATOMIST_WEBHOOK_BASEURL || "https://webhook.atomist.com";
     const url = `${baseUrl}/atomist/${webhook}/teams/${teamId}`;

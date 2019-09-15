@@ -90,7 +90,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
             .filter(g => preconditionsAreMet(g, { goalsForCommit: goals }));
 
         if (goalsToRequest.length > 0) {
-            logger.info("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
+            logger.debug("because %s is successful, these goals are now ready: %s", goalKeyString(sdmGoal),
                 goalsToRequest.map(goalKeyString).join(", "));
         }
 
@@ -131,11 +131,11 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent): boolean {
         return true;
     }
     if (dependentGoal.state === SdmGoalState.skipped) {
-        logger.info("Goal %s was skipped, but now maybe it can go", dependentGoal.uniqueName);
+        logger.debug("Goal %s was skipped, but now maybe it can go", dependentGoal.uniqueName);
         return true;
     }
     if (dependentGoal.state === SdmGoalState.failure && dependentGoal.retryFeasible) {
-        logger.info("Goal %s failed, but maybe we will retry it", dependentGoal.uniqueName);
+        logger.debug("Goal %s failed, but maybe we will retry it", dependentGoal.uniqueName);
         return true;
     }
     logger.warn("Goal %s in state %s will not be requested", dependentGoal.uniqueName, dependentGoal.state);
