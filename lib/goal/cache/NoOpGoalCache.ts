@@ -27,11 +27,11 @@ import { GoalCache } from "./goalCaching";
  */
 export class NoOpGoalCache implements GoalCache {
     public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
-        logger.debug(`Warning: No-Op goal cache in use; no cache will be preserved!`);
+        logger.warn(`No-Op goal cache in use; no cache will be preserved!`);
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
-        logger.debug(`Warning: No-Op goal cache in use; no cache will be removed!`);
+        logger.warn(`No-Op goal cache in use; no cache will be removed!`);
     }
 
     public async retrieve(gi: GoalInvocation, project: Project, classifier?: string): Promise<void> {
