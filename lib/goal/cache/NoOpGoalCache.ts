@@ -16,6 +16,7 @@
 
 import {
     GitProject,
+    logger,
     Project,
 } from "@atomist/automation-client";
 import { GoalInvocation } from "@atomist/sdm";
@@ -26,9 +27,11 @@ import { GoalCache } from "./goalCaching";
  */
 export class NoOpGoalCache implements GoalCache {
     public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
+        logger.warn(`No-Op goal cache in use; no cache will be preserved!`);
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
+        logger.warn(`No-Op goal cache in use; no cache will be removed!`);
     }
 
     public async retrieve(gi: GoalInvocation, project: Project, classifier?: string): Promise<void> {
