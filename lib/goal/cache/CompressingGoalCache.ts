@@ -23,6 +23,7 @@ import {
     spawnLog,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as os from "os";
 import * as path from "path";
 import {
     FileSystemGoalCacheArchiveStore,
@@ -65,7 +66,7 @@ export class CompressingGoalCache implements GoalCache {
 
     public async put(gi: GoalInvocation, project: LocalProject, files: string[], classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
-        const teamArchiveFileName = path.join(project.baseDir, `${archiveName}.${guid().slice(0, 7)}`);
+        const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
 
         await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
             log: gi.progressLog,
@@ -76,9 +77,6 @@ export class CompressingGoalCache implements GoalCache {
             cwd: project.baseDir,
         });
         await this.store.store(gi, classifier, teamArchiveFileName + ".gz");
-        if (await fs.pathExists(teamArchiveFileName)) {
-            await fs.unlink(teamArchiveFileName);
-        }
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
@@ -87,7 +85,7 @@ export class CompressingGoalCache implements GoalCache {
 
     public async retrieve(gi: GoalInvocation, project: LocalProject, classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
-        const teamArchiveFileName = path.join(project.baseDir, `${archiveName}.${guid().slice(0, 7)}`);
+        const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
         await this.store.retrieve(gi, classifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
             await spawnLog("tar", ["-xzf", teamArchiveFileName], {
