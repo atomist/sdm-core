@@ -76,7 +76,9 @@ export class CompressingGoalCache implements GoalCache {
             cwd: project.baseDir,
         });
         await this.store.store(gi, classifier, teamArchiveFileName + ".gz");
-        await fs.unlink(teamArchiveFileName);
+        if (await fs.pathExists(teamArchiveFileName)) {
+            await fs.unlink(teamArchiveFileName);
+        }
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
