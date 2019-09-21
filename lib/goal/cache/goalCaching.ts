@@ -132,18 +132,21 @@ export function cachePut(options: GoalCacheOptions,
                          ...classifiers: string[]): GoalProjectListenerRegistration {
     const allClassifiers = [];
     if (classifier) {
-        allClassifiers.push(...[classifier, ...classifiers]);
+        allClassifiers.push(classifier, ...(classifiers || []));
     }
-    const listenerName = `creating ${classifier ? classifier + " cache" : "caches"}`;
+
+    const entries = !!classifier ?
+        options.entries.filter(pattern => allClassifiers.includes(pattern.classifier)) :
+        options.entries;
+
+    const listenerName = `caching ${entries.map(e => e.classifier).join(", ")}`;
+
     return {
         name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = cacheStore(gi);
-                const entries = !!classifier ?
-                    options.entries.filter(pattern => allClassifiers.includes(pattern.classifier)) :
-                    options.entries;
                 for (const entry of entries) {
                     const files = [];
                     if (isGlobFilePattern(entry.pattern)) {
@@ -209,13 +212,23 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
                              ...classifiers: string[]): GoalProjectListenerRegistration {
     const allClassifiers = [];
     if (classifier) {
-        allClassifiers.push(...[classifier, ...classifiers]);
+        allClassifiers.push(classifier, ...(classifiers || []));
     }
-    const listenerName = `restoring ${classifier ? "caches: " + allClassifiers.join(",") : "caches"}`;
+
     const optsToUse: GoalCacheRestoreOptions = {
         onCacheMiss: NoOpGoalProjectListenerRegistration,
         ...options,
     };
+
+    const classifiersToBeRestored = [];
+    if (allClassifiers.length > 0) {
+        classifiersToBeRestored.push(...allClassifiers);
+    } else {
+        classifiersToBeRestored.push(...optsToUse.entries.map(entry => entry.classifier));
+    }
+
+    const listenerName = `restoring ${classifiersToBeRestored.join(", ")}`;
+
     return {
         name: listenerName,
         listener: async (p: GitProject,
@@ -223,12 +236,6 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
                          event: GoalProjectListenerEvent): Promise<void | ExecuteGoalResult> => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = cacheStore(gi);
-                const classifiersToBeRestored = [];
-                if (allClassifiers.length > 0) {
-                    classifiersToBeRestored.push(...allClassifiers);
-                } else {
-                    classifiersToBeRestored.push(...optsToUse.entries.map(entry => entry.classifier));
-                }
                 for (const c of classifiersToBeRestored) {
                     try {
                         await goalCache.retrieve(gi, p, c);
@@ -259,18 +266,22 @@ export function cacheRemove(options: GoalCacheOptions,
     if (classifier) {
         allClassifiers.push(...[classifier, ...classifiers]);
     }
-    const listenerName = `removing ${classifier ? "caches: " + allClassifiers.join(",") : "caches"}`;
+
+    const classifiersToBeRemoved = [];
+    if (allClassifiers.length > 0) {
+        classifiersToBeRemoved.push(...allClassifiers);
+    } else {
+        classifiersToBeRemoved.push(...options.entries.map(entry => entry.classifier));
+    }
+
+    const listenerName = `removing ${classifiersToBeRemoved.join(", ")}`;
+
     return {
         name: listenerName,
         listener: async (p, gi) => {
             if (!!isCacheEnabled(gi)) {
                 const goalCache = cacheStore(gi);
-                const classifiersToBeRemoved = [];
-                if (allClassifiers.length > 0) {
-                    classifiersToBeRemoved.push(...allClassifiers);
-                } else {
-                    classifiersToBeRemoved.push(...options.entries.map(entry => entry.classifier));
-                }
+
                 for (const c of classifiersToBeRemoved) {
                     await goalCache.remove(gi, c);
                 }
