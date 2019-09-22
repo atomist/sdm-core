@@ -224,8 +224,8 @@ export function convertGoalData(goalData: GoalData): Array<GoalContribution<any>
 /**
  * Invoke the given configurer
  */
-async function invokeConfigurer(sdm: SoftwareDeliveryMachine,
-                                configurer: Configurer<any, any>): Promise<void | GoalData | Array<GoalContribution<any>>> {
+export async function invokeConfigurer(sdm: SoftwareDeliveryMachine,
+                                       configurer: Configurer<any, any>): Promise<void | GoalData | Array<GoalContribution<any>>> {
 
     try {
         // Decorate the createGoals method onto the SDM
