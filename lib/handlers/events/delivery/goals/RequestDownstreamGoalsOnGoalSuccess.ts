@@ -138,7 +138,7 @@ function shouldBePlannedOrSkipped(dependentGoal: SdmGoalEvent): boolean {
         logger.debug("Goal %s failed, but maybe we will retry it", dependentGoal.uniqueName);
         return true;
     }
-    logger.warn("Goal %s in state %s will not be requested", dependentGoal.uniqueName, dependentGoal.state);
+    logger.debug("Goal '%s' in state '%s' will not be requested", dependentGoal.uniqueName, dependentGoal.state);
     return false;
 }
 
@@ -158,7 +158,6 @@ function expectToBeFulfilledAfterRequest(dependentGoal: SdmGoalEvent, name: stri
 
 function isDirectlyDependentOn(successfulGoal: SdmGoalKey, goal: SdmGoalEvent): boolean {
     if (!goal) {
-        logger.warn("Internal error: Trying to work out if %j is dependent on null or undefined goal", successfulGoal);
         return false;
     }
     if (!goal.preConditions || goal.preConditions.length === 0) {

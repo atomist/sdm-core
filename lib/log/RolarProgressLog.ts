@@ -137,7 +137,7 @@ export class RolarProgressLog implements ProgressLog {
                 if (!/timeout.*exceeded/i.test(err.message)) {
                     logger.error(err.message);
                 } else {
-                    logger.warn("Calling rolar timed out");
+                    logger.debug("Calling rolar timed out");
                 }
             }
             return result;

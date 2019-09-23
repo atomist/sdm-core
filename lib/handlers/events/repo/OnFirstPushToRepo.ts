@@ -77,7 +77,6 @@ export class OnFirstPushToRepo
 
         let addressChannels: AddressChannels;
         if (!screenName) {
-            logger.warn("Warning: Cannot get screen name of committer for first push on %j", id);
             addressChannels = AddressNoChannels;
         } else {
             addressChannels = m => context.messageClient.addressUsers(m, screenName);

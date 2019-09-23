@@ -56,12 +56,12 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
                                         fs.removeSync(p);
                                     }
                                 } catch (e) {
-                                    logger.warn("Failed to delete cached file '%s': %s", p, e.message);
+                                    logger.debug("Failed to delete cached file '%s': %s", p, e.message);
                                 }
                             });
                         });
                     } catch (err) {
-                        logger.warn("Failed to clean cache directory '%s': %s", cachePath, err.message);
+                        logger.debug("Failed to clean cache directory '%s': %s", cachePath, err.message);
                     }
                 }
             });

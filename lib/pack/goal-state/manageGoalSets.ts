@@ -91,7 +91,7 @@ export function manageGoalSetsTrigger(options?: GoalStateOptions["cancellation"]
                         await manageGoalSets(li.sdm, ctx);
                         await timeoutInProcessGoals(li.sdm, ctx, options);
                     } catch (e) {
-                        logger.warn("Error managing pending goal sets: %s", e.stack);
+                        logger.debug("Error managing pending goal sets: %s", e.stack);
                     }
                 });
             }
