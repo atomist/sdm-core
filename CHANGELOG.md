@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.7.0...HEAD)
 
+### Changed
+
+-   Make output less verbose during development. [#198](https://github.com/atomist/sdm-core/issues/198)
+
 ## [1.7.0](https://github.com/atomist/sdm-core/compare/1.6.1...1.7.0) - 2019-09-09
 
 ### Added
