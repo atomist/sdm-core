@@ -79,12 +79,12 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         await verifyGoal(sdmGoal, this.configuration.sdm.goalSigning, ctx);
 
         if ((await cancelableGoal(sdmGoal, this.configuration)) && (await isGoalCanceled(sdmGoal, ctx))) {
-            logger.info(`Goal ${sdmGoal.uniqueName} has been canceled. Not fulfilling`);
+            logger.debug(`Goal ${sdmGoal.uniqueName} has been canceled. Not fulfilling`);
             return Success;
         }
 
         if (sdmGoal.fulfillment.method === SdmGoalFulfillmentMethod.SideEffect) {
-            logger.info("No fulfilling side-effected goal '%s' with method '%s/%s'",
+            logger.debug("Not fulfilling side-effected goal '%s' with method '%s/%s'",
                 sdmGoal.uniqueName, sdmGoal.fulfillment.method, sdmGoal.fulfillment.name);
             return Success;
         } else if (sdmGoal.fulfillment.method === SdmGoalFulfillmentMethod.Other) {

@@ -52,7 +52,7 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
         const { id, completedGoal, allGoals, credentials } = inv;
 
         if (completedGoal.state === "failure") {
-            logger.info("Setting GitHub status to failed on %s", id.sha);
+            logger.debug("Setting GitHub status to failed on %s", id.sha);
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)}: ${completedGoal.description}`,
@@ -61,7 +61,7 @@ export function setGitHubStatusOnGoalCompletion(sdm: SoftwareDeliveryMachine): G
             });
         }
         if (allSuccessful(allGoals)) {
-            logger.info("Setting GitHub status to success on %s", id.sha);
+            logger.debug("Setting GitHub status to success on %s", id.sha);
             return createStatus(credentials, id as GitHubRepoRef, {
                 context: context(sdm),
                 description: `${prefix(sdm)}: all succeeded`,

@@ -71,7 +71,7 @@ export function goalStateSupport(options?: GoalStateOptions): ExtensionPack {
                 if ((cluster.isMaster || !_.get(sdm.configuration, "cluster.enabled")) &&
                     !process.env.ATOMIST_ISOLATED_GOAL &&
                     !!options && !!options.cancellation && !!options.cancellation.enabled) {
-                    logger.info(`Timeout based goal cancellation enabled for this SDM`);
+                    logger.debug(`Timeout based goal cancellation enabled for this SDM`);
                     sdm.addTriggeredListener({
                         trigger: { interval: 1000 * 30 },
                         listener: manageGoalSetsTrigger(options.cancellation),

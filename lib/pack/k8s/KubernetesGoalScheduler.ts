@@ -214,7 +214,7 @@ export async function cleanCompletedJobs(): Promise<void> {
         jobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
 
     if (completedJobs.length > 0) {
-        logger.info(`Deleting the following k8s jobs: ${
+        logger.debug(`Deleting the following k8s jobs: ${
             completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
 
         for (const completedSdmJob of completedJobs) {

@@ -396,7 +396,7 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
                     const exitCode: number = _.get(containerStatus, "state.terminated.exitCode");
                     if (exitCode === 0) {
                         const msg = `Container '${container.name}' exited with status 0`;
-                        loglog(msg, logger.info, container.log);
+                        loglog(msg, logger.debug, container.log);
                         resolve(pod.status);
                     } else {
                         const msg = `Container '${container.name}' exited with status ${exitCode}`;
