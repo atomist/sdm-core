@@ -131,16 +131,32 @@ export type Configurer<G extends DeliveryGoals, F extends SdmContext = PushListe
 export type ConfigurationPreProcessor = (cfg: LocalSoftwareDeliveryMachineConfiguration) =>
     Promise<LocalSoftwareDeliveryMachineConfiguration>;
 
+export interface ConfigureMachineOptions extends ConfigureOptions {
+    /**
+     * SDM name if you want to override the default which uses the
+     * package name.
+     */
+    name?: string;
+    /**
+     * These functions are called in the first postProcessor.
+     * Specifically, the first post-processor is [[configureSdm]]
+     * these functions are called in its
+     * [[SoftwareDeliveryMachineMaker]] function prior to it calling
+     * the [[createSoftwareDeliveryMachine]].
+     */
+    preProcessors?: ConfigurationPreProcessor | ConfigurationPreProcessor[];
+    /**
+     * These functions are called after the [[configureSdm]] post-processor.
+     */
+    postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[];
+}
+
 /**
  * Function to create an SDM configuration constant to be exported from an index.ts/js.
  */
 export function configure<G extends DeliveryGoals, T extends SdmContext = PushListenerInvocation>(
     configurer: Configurer<G, T>,
-    options: {
-        name?: string,
-        preProcessors?: ConfigurationPreProcessor | ConfigurationPreProcessor[],
-        postProcessors?: ConfigurationPostProcessor | ConfigurationPostProcessor[],
-    } & ConfigureOptions = {}): Configuration {
+    options: ConfigureMachineOptions = {}): Configuration {
     return {
         postProcessors: [
             configureSdm(async cfg => {
