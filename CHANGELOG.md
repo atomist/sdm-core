@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.7.0...HEAD)
 
+### Added
+
+-   Add type for configure argument. [#199](https://github.com/atomist/sdm-core/issues/199)
+
 ### Changed
 
 -   Make output less verbose during development. [#198](https://github.com/atomist/sdm-core/issues/198)
