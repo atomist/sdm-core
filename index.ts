@@ -153,6 +153,9 @@ export {
     truncateCommitMessage,
 } from "./lib/util/lifecycleHelpers";
 export {
+    toArray,
+} from "./lib/util/misc/array";
+export {
     renderCommitMessage,
 } from "./lib/util/slack/diffRendering";
 export * from "./lib/util/webhook/ImageLink";
