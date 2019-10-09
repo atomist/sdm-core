@@ -149,7 +149,7 @@ export async function uploadAsset(token: string,
         },
         name: p.basename(path),
     });
-    return r.data;
+    return r.data as any;
 }
 
 export function githubApi(token: string, apiUrl: string = "https://api.github.com/"): GitHubApi {

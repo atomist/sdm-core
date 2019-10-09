@@ -838,7 +838,7 @@ describe("goal/container/k8s", () => {
                 const egr = await e(goalInvocation);
                 try {
                     const body: k8s.V1DeleteOptions = { gracePeriodSeconds: 0, propagationPolicy: "Background" };
-                    await k8sCore.deleteNamespacedPod(p.metadata.name, ns, undefined, body);
+                    await k8sCore.deleteNamespacedPod(p.metadata.name, ns, undefined, undefined, undefined, undefined, undefined, body);
                 } catch (e) { /* ignore */ }
                 return egr;
             }
