@@ -70,6 +70,9 @@ const aPush: PushFields.Fragment = {
             },
         },
     },
+    after: {
+        sha: guid(),
+    },
     commits: [{
         sha: guid(),
     }],
