@@ -49,14 +49,14 @@
     "ts-essentials": "^2.0.12"
   },
   "peerDependencies": {
-    "@atomist/automation-client": "^1.7.0",
+    "@atomist/automation-client": "^1.8.0",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "^1.7.0",
+    "@atomist/sdm": "^1.8.0",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "^1.7.0",
+    "@atomist/automation-client": "1.8.0-master.20191009152926",
     "@atomist/microgrammar": "^1.2.1",
     "@atomist/sdm": "1.8.0-master.20191009103804",
     "@atomist/slack-messages": " ^1.1.1",
