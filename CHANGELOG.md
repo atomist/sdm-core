@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Add type for configure argument. [#199](https://github.com/atomist/sdm-core/issues/199)
+-   Introduce universal generators. [#200](https://github.com/atomist/sdm-core/issues/200)
 
 ### Changed
 
