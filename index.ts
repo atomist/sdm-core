@@ -214,3 +214,14 @@ export {
     AllGoals,
     DeliveryGoals,
 } from "./lib/machine/configure";
+export {
+    UniversalTransform,
+    universalGeneratorSupport,
+    UniversalGeneratorSupportOptions,
+} from "./lib/pack/universal-generator/generatorSupport";
+export {
+    universalGenerator,
+} from "./lib/pack/universal-generator/generator";
+export {
+    assertUniversalGenerator,
+} from "./lib/pack/universal-generator/test/assertGenerator";
