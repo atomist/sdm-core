@@ -192,7 +192,7 @@ function isGoalRejected(sdmGoal: SdmGoalEvent): boolean {
 
 export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
     // Create a new goal with only the relevant and sensible fields
-    const newGoal: Omit<SdmGoalEvent, "push"> = {
+    const newGoal: Omit<SdmGoalEvent, "push"> & { parameters: string } = {
         uniqueName: normalizeValue(goal.uniqueName),
         name: normalizeValue(goal.name),
         environment: normalizeValue(goal.environment),
@@ -210,8 +210,21 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
         phase: normalizeValue(goal.phase),
         version: normalizeValue(goal.version),
         description: normalizeValue(goal.description),
+        descriptions: !!goal.descriptions ? {
+            planned: normalizeValue(goal.descriptions.planned),
+            requested: normalizeValue(goal.descriptions.requested),
+            inProcess: normalizeValue(goal.descriptions.inProcess),
+            completed: normalizeValue(goal.descriptions.completed),
+            failed: normalizeValue(goal.descriptions.failed),
+            skipped: normalizeValue(goal.descriptions.skipped),
+            canceled: normalizeValue(goal.descriptions.canceled),
+            stopped: normalizeValue(goal.descriptions.stopped),
+            waitingForApproval: normalizeValue(goal.descriptions.waitingForApproval),
+            waitingForPreApproval: normalizeValue(goal.descriptions.waitingForPreApproval),
+        } : undefined,
         ts: normalizeValue(goal.ts),
         data: normalizeValue(goal.data),
+        parameters: normalizeValue((goal as any).parameters),
         url: normalizeValue(goal.url),
         externalUrls: !!goal.externalUrls ? goal.externalUrls.map(e => ({
             url: normalizeValue(e.url),
