@@ -197,7 +197,7 @@ async function cancelGoalSet(goalSetId: string, ctx: HandlerContext, id?: string
             await updateGoal(ctx, goal, {
                 state: SdmGoalState.canceled,
                 description: !!goal.descriptions && !!goal.descriptions.canceled
-                    ? goal.descriptions.canceled :`Canceled: ${goal.name}`,
+                    ? goal.descriptions.canceled : `Canceled: ${goal.name}`,
             });
         }
     }
