@@ -33,6 +33,8 @@ import * as os from "os";
 import * as path from "path";
 import {
     Container,
+    ContainerInput,
+    ContainerOutput,
     ContainerProjectHome,
     ContainerRegistration,
     ContainerScheduler,
@@ -43,12 +45,33 @@ import {
     containerEnvVars,
     copyProject,
     loglog,
+    prepareInputAndOutput,
 } from "./util";
+
+/**
+ * Extension to GoalContainer to specify additional docker options
+ */
+export type DockerGoalContainer = GoalContainer & { dockerOptions?: string[]};
 
 /**
  * Additional options for Docker CLI implementation of container goals.
  */
 export interface DockerContainerRegistration extends ContainerRegistration {
+    /**
+     * Containers to run for this goal.  The goal result is based on
+     * the exit status of the first element of the `containers` array.
+     * The other containers are considered "sidecar" containers
+     * provided functionality that the main container needs to
+     * function.  The working directory of the first container is set
+     * to [[ContainerProjectHome]], which contains the project upon
+     * which the goal should operate.
+     *
+     * This extends the base containers property to be able to pass
+     * additional dockerOptions to a single container, eg.
+     * '--link=mongo:mongo'.
+     */
+    containers: DockerGoalContainer[];
+
     /**
      * Additional Docker CLI command-line options.  Command-line
      * options provided here will be appended to the default set of
@@ -76,6 +99,7 @@ interface SpawnedContainer {
  * first container, then kill all the rest.
  */
 export function executeDockerJob(goal: Container, registration: DockerContainerRegistration): ExecuteGoal {
+    // tslint:disable-next-line:cyclomatic-complexity
     return doWithProject(async gi => {
         const { goalEvent, progressLog, project } = gi;
 
@@ -89,14 +113,25 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         const goalName = goalEvent.uniqueName.split("#")[0].toLowerCase();
         const namePrefix = "sdm-";
         const nameSuffix = `-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`;
+        const tmpDir = path.join(os.homedir(), ".atomist", "tmp", project.id.owner, project.id.repo, goalEvent.goalSetId);
 
         const projectDir = project.baseDir;
-        const containerDir = path.join(os.homedir(), ".atomist", "tmp", project.id.owner, project.id.repo, goalEvent.goalSetId,
-            `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        const containerDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
         try {
             await copyProject(projectDir, containerDir);
         } catch (e) {
             const message = `Failed to duplicate project directory for goal ${goalName}: ${e.message}`;
+            loglog(message, logger.error, progressLog);
+            return { code: 1, message };
+        }
+
+        // TODO cd add this to k8s support too
+        const inputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        const outputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        try {
+            await prepareInputAndOutput(inputDir, outputDir, gi);
+        } catch (e) {
+            const message = `Failed to prepare input and output for goal ${goalName}: ${e.message}`;
             loglog(message, logger.error, progressLog);
             return { code: 1, message };
         }
@@ -113,7 +148,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 ((networkCreateRes.error) ? `: ${networkCreateRes.error.message}` : "");
             loglog(message, logger.error, progressLog);
             try {
-                await dockerCleanup({ containerDir, projectDir, spawnOpts });
+                await dockerCleanup({ containerDir, inputDir, outputDir, projectDir, spawnOpts });
             } catch (e) {
                 networkCreateRes.code++;
                 message += `; ${e.message}`;
@@ -141,10 +176,13 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 "--rm",
                 `--name=${containerName}`,
                 `--volume=${containerDir}:${ContainerProjectHome}`,
+                `--volume=${inputDir}:${ContainerInput}`,
+                `--volume=${outputDir}:${ContainerOutput}`,
                 `--network=${network}`,
                 `--network-alias=${container.name}`,
                 ...containerArgs,
                 ...(registration.dockerOptions || []),
+                ...((container as DockerGoalContainer).dockerOptions || []),
                 ...atomistEnvs,
                 container.image,
                 ...(container.args || []),
@@ -157,7 +195,15 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         }
         if (failures.length > 0) {
             try {
-                await dockerCleanup({ containerDir, network, projectDir, spawnOpts, containers: spawnedContainers });
+                await dockerCleanup({
+                    containerDir,
+                    inputDir,
+                    outputDir,
+                    network,
+                    projectDir,
+                    spawnOpts,
+                    containers: spawnedContainers,
+                });
             } catch (e) {
                 failures.push(e.message);
             }
@@ -181,17 +227,44 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             failures.push(message);
         }
 
+        const outputFile = path.join(outputDir, "result.json");
+        let outputResult;
+        if ((await fs.pathExists(outputFile)) && failures.length === 0) {
+            try {
+                outputResult = await fs.readJson(outputFile);
+                if (!!outputResult && typeof outputResult.data !== "string") {
+                    outputResult.data = JSON.stringify(outputResult.data);
+                }
+            } catch (e) {
+                const message = `Failed to read output from Docker container '${main.name}': ${e.message}`;
+                loglog(message, logger.error, progressLog);
+                failures.push(message);
+            }
+        }
+
         const sidecars = spawnedContainers.slice(1);
         try {
-            await dockerCleanup({ containerDir, network, projectDir, spawnOpts, containers: sidecars });
+            await dockerCleanup({
+                containerDir,
+                inputDir,
+                outputDir,
+                network,
+                projectDir,
+                spawnOpts,
+                containers: sidecars,
+            });
         } catch (e) {
             failures.push(e.message);
         }
 
-        return {
-            code: failures.length,
-            message: (failures.length > 0) ? failures.join("; ") : "Successfully completed container job",
-        };
+        if (failures.length === 0 && !!outputResult) {
+            return outputResult;
+        } else {
+            return {
+                code: failures.length,
+                message: (failures.length > 0) ? failures.join("; ") : "Successfully completed container job",
+            };
+        }
     }, { readOnly: false });
 }
 
@@ -245,6 +318,14 @@ interface CleanupOptions {
      */
     projectDir: string;
     /**
+     * Directory containing the input of the container goal.
+     */
+    inputDir: string;
+    /**
+     * Directory containing the output of the container goal.
+     */
+    outputDir: string;
+    /**
      * Options to use when calling spawnLog.  Also provides the
      * progress log.
      */
@@ -297,6 +378,22 @@ async function dockerCleanup(opts: CleanupOptions): Promise<void> {
             await fs.remove(opts.containerDir);
         } catch (e) {
             const message = `Failed to remove container directory '${opts.containerDir}': ${e.message}`;
+            loglog(message, logger.error, opts.spawnOpts.log);
+        }
+        try {
+            if (!!opts.inputDir) {
+                await fs.remove(opts.inputDir);
+            }
+        } catch (e) {
+            const message = `Failed to remove container input directory '${opts.inputDir}': ${e.message}`;
+            loglog(message, logger.error, opts.spawnOpts.log);
+        }
+        try {
+            if (!!opts.outputDir) {
+                await fs.remove(opts.outputDir);
+            }
+        } catch (e) {
+            const message = `Failed to remove container output directory '${opts.outputDir}': ${e.message}`;
             loglog(message, logger.error, opts.spawnOpts.log);
         }
     }
