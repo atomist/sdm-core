@@ -97,9 +97,9 @@ describe("goalCaching", () => {
         fakePushId = fakePush().id;
         fakeGoal = fakeGoalInvocation(fakePushId);
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-        fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = {
             enabled: true,
+            store: testCache,
         };
     });
 
@@ -258,7 +258,7 @@ describe("goalCaching", () => {
     });
 
     it("should default to NoOpGoalCache", async () => {
-        fakeGoal.configuration.sdm.goalCache = undefined;
+        fakeGoal.configuration.sdm.cache.store = undefined;
         const fallback: GoalProjectListenerRegistration = {
             name: "fallback",
             listener: async p => {
