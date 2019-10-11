@@ -18,7 +18,6 @@ import { MessageClient } from "@atomist/automation-client";
 import {
     GoalSigningConfiguration,
     GoalSigningScope,
-    SdmGoalEvent,
     SdmGoalState,
 } from "@atomist/sdm";
 import {
@@ -30,7 +29,6 @@ import * as _ from "lodash";
 import * as path from "path";
 import * as assert from "power-assert";
 import {
-    SignatureMixin,
     signGoal,
     verifyGoal,
 } from "../../../lib/internal/signing/goalSigning";
@@ -50,9 +48,10 @@ describe("goalSigning", () => {
         fulfillment: {
             method: SdmGoalFulfillmentMethod.Sdm,
             name: "npm-run-build",
+            registration: "@atomist/atomist-sdm",
         },
         description: "Building",
-
+        descriptions: {} as any,
         url: "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-pack-node",
         externalUrls: [],
         state: SdmGoalState.in_process,
@@ -130,6 +129,7 @@ describe("goalSigning", () => {
             owner: "atomist",
             providerId: "zjlmxjzwhurspem",
         },
+        parameters: JSON.stringify({ foo: "bar" }),
     };
 
     it("should correctly sign and verify goal", async () => {
@@ -151,7 +151,7 @@ describe("goalSigning", () => {
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
         };
-        const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc) as SdmGoalEvent & SignatureMixin;
+        const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc) as any;
         assert(!!signedGoal.signature);
 
         signedGoal.externalUrls = [{ url: "https://google.com", label: "Google" }];
@@ -162,6 +162,7 @@ describe("goalSigning", () => {
                 org: {
                     provider: {
                         providerId: "zjlmxjzwhurspem",
+                        apiUrl: "https://api.github.com",
                     },
                 },
             },
@@ -183,22 +184,24 @@ describe("goalSigning", () => {
             assert.strictEqual(e.message, "SDM goal signature invalid. Rejecting goal!");
         }
 
-        const maliciousOne = { ..._.cloneDeep(goalMessage)
-                , uniqueName: "build#goals.ts:42\n        environment:prod\n        goalSetId:mwah-ahah-ahhh"
-                , environment: "dev"
-                , goalSetId: "aaaa-bbbb",
-            };
+        const maliciousOne = {
+            ..._.cloneDeep(goalMessage)
+            , uniqueName: "build#goals.ts:42\n        environment:prod\n        goalSetId:mwah-ahah-ahhh"
+            , environment: "dev"
+            , goalSetId: "aaaa-bbbb",
+        };
 
-        const maliciousTwo = { ..._.cloneDeep(goalMessage)
-                , uniqueName: "build#goals.ts:42"
-                , environment: "prod"
-                , goalSetId: "mwah-ahah-ahhh\n        environment:dev\n        goalSetId:aaaa-bbbb",
-            };
+        const maliciousTwo = {
+            ..._.cloneDeep(goalMessage)
+            , uniqueName: "build#goals.ts:42"
+            , environment: "prod"
+            , goalSetId: "mwah-ahah-ahhh\n        environment:dev\n        goalSetId:aaaa-bbbb",
+        };
 
-        const signedGoalMalOne = await signGoal(_.cloneDeep(maliciousOne) as any, gsc) as SdmGoalEvent & SignatureMixin;
+        const signedGoalMalOne = await signGoal(_.cloneDeep(maliciousOne) as any, gsc) as any;
         assert(!!signedGoal.signature);
 
-        const signedGoalMalTwo = {..._.cloneDeep(maliciousTwo), signature: signedGoalMalOne.signature};
+        const signedGoalMalTwo = { ..._.cloneDeep(maliciousTwo), signature: signedGoalMalOne.signature };
 
         try {
             await verifyGoal(signedGoalMalTwo as any, gsc, { context: { name: "Test SDM" }, messageClient } as any);
