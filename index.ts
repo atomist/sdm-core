@@ -48,6 +48,10 @@ export {
     K8sGoalContainerSpec,
 } from "./lib/goal/container/k8s";
 export {
+    hasRepositoryGoals,
+    repositoryDrivenContainer,
+} from "./lib/goal/container/repositoryDrivenContainer";
+export {
     DisplayDeployEnablement,
 } from "./lib/handlers/commands/DisplayDeployEnablement";
 export {
@@ -221,6 +225,19 @@ export {
     AllGoals,
     DeliveryGoals,
 } from "./lib/machine/configure";
+export {
+    configureYaml,
+    ConfigureYamlOptions,
+    ConfigurationMaker,
+    CommandMaker,
+    EventMaker,
+} from "./lib/machine/yaml/configureYaml";
+export {
+    GoalMaker,
+} from "./lib/machine/yaml/goals";
+export {
+    PushTestMaker,
+} from "./lib/machine/yaml/pushTests";
 export {
     UniversalTransform,
     universalGeneratorSupport,
