@@ -33,7 +33,6 @@ import axios from "axios";
 import * as fs from "fs-extra";
 import * as p from "path";
 import * as tmp from "tmp-promise";
-import * as URL from "url";
 import {
     createRelease,
     createTag,
@@ -153,15 +152,8 @@ export async function uploadAsset(token: string,
 }
 
 export function githubApi(token: string, apiUrl: string = "https://api.github.com/"): GitHubApi {
-    // separate the url
-    const url = URL.parse(apiUrl);
-
-    const gitHubApi = new GitHubApi({
-        host: url.hostname,
-        protocol: url.protocol.slice(0, -1),
-        port: +url.port,
+    return new GitHubApi({
+        auth: !!token ? `token ${token}` : undefined,
+        baseUrl: apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl,
     });
-
-    gitHubApi.authenticate({ type: "token", token });
-    return gitHubApi;
 }
