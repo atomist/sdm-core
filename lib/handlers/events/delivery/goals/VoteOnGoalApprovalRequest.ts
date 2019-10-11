@@ -42,7 +42,9 @@ import {
     UnanimousGoalApprovalRequestVoteDecisionManager,
     updateGoal,
 } from "@atomist/sdm";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import {
+    isGoalRelevant,
+} from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 
@@ -78,7 +80,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
 
     public async handle(event: EventFired<OnAnyApprovedSdmGoal.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
-        const sdmGoal: SdmGoalEvent = event.data.SdmGoal[0] as SdmGoalEvent;
+        const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
@@ -122,13 +124,15 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                     }
                     await updateGoal(context, sdmGoal, {
                         state: SdmGoalState.requested,
-                        description: goal.requestedDescription,
+                        description: !!sdmGoal.descriptions && !!sdmGoal.descriptions.requested
+                            ? sdmGoal.descriptions.requested : goal.requestedDescription,
                         data: g.data,
                     });
                 } else if (sdmGoal.state === SdmGoalState.approved) {
                     await updateGoal(context, sdmGoal, {
                         state: SdmGoalState.success,
-                        description: goal.successDescription,
+                        description: !!sdmGoal.descriptions && !!sdmGoal.descriptions.completed
+                            ? sdmGoal.descriptions.completed : goal.successDescription,
                     });
                 }
                 break;
@@ -140,7 +144,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                     };
                     await updateGoal(context, g, {
                         state: SdmGoalState.waiting_for_pre_approval,
-                        description: `${goal.waitingForPreApprovalDescription} \u00B7 start by @${sdmGoal.preApproval.userId} denied`,
+                        description: `${!!sdmGoal.descriptions && !!sdmGoal.descriptions.waitingForPreApproval ?
+                            sdmGoal.descriptions.waitingForPreApproval : goal.waitingForPreApprovalDescription} \u00B7 start by @${sdmGoal.preApproval.userId} denied`,
                     });
                 } else if (sdmGoal.state === SdmGoalState.approved) {
                     const g: SdmGoalEvent = {
@@ -149,7 +154,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                     };
                     await updateGoal(context, g, {
                         state: SdmGoalState.waiting_for_approval,
-                        description: `${goal.waitingForApprovalDescription} \u00B7 approval by @${sdmGoal.approval.userId} denied`,
+                        description: `${!!sdmGoal.descriptions && !!sdmGoal.descriptions.waitingForApproval ?
+                            sdmGoal.descriptions.waitingForApproval : goal.waitingForApprovalDescription} \u00B7 approval by @${sdmGoal.approval.userId} denied`,
                     });
                 }
                 break;

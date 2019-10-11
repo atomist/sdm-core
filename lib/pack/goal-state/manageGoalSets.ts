@@ -151,12 +151,20 @@ export async function timeoutInProcessGoals(sdm: SoftwareDeliveryMachine,
         if (goal.ts < end) {
             logger.debug(
                 `Canceling goal '${goal.uniqueName}' of goal set '${goal.goalSetId}' because it timed out after '${formatDuration(timeout)}'`);
+            let description = `${state === SdmGoalState.canceled ? "Canceled" : "Failed"}: ${goal.name}`;
+            if (!!goal.descriptions) {
+                if (state === SdmGoalState.canceled && !!goal.descriptions.canceled) {
+                    description = goal.descriptions.canceled;
+                } else if (state === SdmGoalState.failure && !!goal.descriptions.failed) {
+                    description = goal.descriptions.failed;
+                }
+            }
             await updateGoal(
                 ctx,
                 goal as any,
                 {
                     state,
-                    description: `${state === SdmGoalState.canceled ? "Canceled" : "Failed"}: ${goal.name}`,
+                    description,
                     phase: `${formatDuration(timeout)} timeout`,
                 });
         }
