@@ -30,7 +30,7 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
-import { NoOpGoalCache } from "./NoOpGoalCache";
+import { CompressingGoalCache } from "./CompressingGoalCache";
 
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced
@@ -118,7 +118,7 @@ export interface GoalCacheRestoreOptions extends GoalCacheCoreOptions {
     entries?: Array<{ classifier: string }>;
 }
 
-const DefaultGoalCache = new NoOpGoalCache();
+const DefaultGoalCache = new CompressingGoalCache();
 
 /**
  * Goal listener that performs caching after a goal has been run.
