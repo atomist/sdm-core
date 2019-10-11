@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    GitProject,
-    HandlerContext,
-} from "@atomist/automation-client";
+import { GitProject } from "@atomist/automation-client";
 import {
     DefaultGoalNameGenerator,
+    FulfillableGoal,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
     Fulfillment,
@@ -27,8 +25,10 @@ import {
     Goal,
     GoalFulfillmentCallback,
     ImplementationRegistration,
+    RepoContext,
     SdmGoalEvent,
     SoftwareDeliveryMachine,
+    testProgressReporter,
 } from "@atomist/sdm";
 import {
     isConfiguredInEnv,
@@ -41,6 +41,10 @@ import {
     cachePut,
     cacheRestore,
 } from "../cache/goalCaching";
+import {
+    BuildingContainer,
+    isBuildingContainer,
+} from "./buildingContainer";
 import { dockerContainerScheduler } from "./docker";
 import { k8sContainerScheduler } from "./k8s";
 import { runningInK8s } from "./util";
@@ -53,9 +57,27 @@ import { runningInK8s } from "./util";
  * @param registration Goal containers, volumes, cache details, etc.
  * @return SDM container goal
  */
-export function container<T extends ContainerRegistration>(displayName: string, registration: T): Container {
-    return new Container({ displayName }).with(registration);
+export function container<T extends ContainerRegistration>(displayName: string, registration: T): FulfillableGoal {
+    if (registration.containers.some(isBuildingContainer)) {
+        return new BuildingContainer({ displayName }, registration);
+    } else {
+        return new Container({ displayName }).with(registration);
+    }
 }
+
+export const ContainerProgressReporter = testProgressReporter({
+    test: /docker 'network' 'create'/i,
+    phase: "starting up",
+}, {
+    test: /docker 'network' 'rm'/i,
+    phase: "shutting down",
+}, {
+    test: /docker 'run' .* '--workdir=[a-zA-Z\/]*' .* '--network-alias=([a-zA-Z \-_]*)'/i,
+    phase: "running $1",
+}, {
+    test: /atm:phase=(.*)/i,
+    phase: "$1",
+});
 
 /**
  * Ports to expose from container.
@@ -76,6 +98,11 @@ export interface ContainerVolumeMount {
     mountPath: string;
     /** Name of volume from [[GoalContainer.volumes]]. */
     name: string;
+}
+
+export interface ContainerSecrets {
+    env?: Array<{ name: string } & GoalContainerSecret>;
+    fileMounts?: Array<{ mountPath: string } & GoalContainerSecret>;
 }
 
 /**
@@ -108,6 +135,23 @@ export interface GoalContainer {
      * Volumes to mount in container.
      */
     volumeMounts?: ContainerVolumeMount[];
+
+    secrets?: ContainerSecrets;
+}
+
+export interface GoalContainerProviderSecret {
+    provider: {
+        type: "docker" | "npm" | "maven2" | "scm" | "atomist";
+        names?: string[];
+    };
+}
+
+export interface GoalContainerEncryptedSecret {
+    encrypted: string;
+}
+
+export interface GoalContainerSecret {
+    value: GoalContainerProviderSecret | GoalContainerEncryptedSecret;
 }
 
 /**
@@ -127,6 +171,21 @@ export interface GoalContainerVolume {
  * File system location of goal project in containers.
  */
 export const ContainerProjectHome = "/atm/home";
+
+/**
+ * File system location for goal container input.
+ */
+export const ContainerInput = "/atm/input";
+
+/**
+ * File system location for goal container output.
+ */
+export const ContainerOutput = "/atm/output";
+
+/**
+ * Goal execution result file
+ */
+export const ContainerResult = `${ContainerOutput}/result.json`;
 
 /**
  * Specification of containers and volumes for a container goal.
@@ -153,7 +212,7 @@ export interface GoalContainerSpec {
  * [[ContainerRegistration]] object.
  */
 export type ContainerSpecCallback =
-    (r: ContainerRegistration, p: GitProject, g: Container, e: SdmGoalEvent, c: HandlerContext) => Promise<GoalContainerSpec>;
+    (r: ContainerRegistration, p: GitProject, g: Container, e: SdmGoalEvent, c: RepoContext) => Promise<GoalContainerSpec>;
 
 /**
  * Container goal artifacts and implementations information.
@@ -223,6 +282,8 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
     }
 
     public with(registration: ContainerRegistration): this {
+        super.with(registration);
+
         registration.name = (registration.name || `container-${this.definition.displayName}`).replace(/\.+/g, "-");
         if (!this.details.scheduler) {
             if (runningInK8s()) {
@@ -236,7 +297,15 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
             this.withProjectListener(cacheRestore({ entries: registration.input.map(c => ({ classifier: c })) }));
         }
         if (registration.output && registration.output.length > 0) {
-            this.withProjectListener(cachePut({ entries: registration.output }));
+            const cp = cachePut({ entries: registration.output });
+            this.withProjectListener({
+                ...cp,
+                listener: async (p, r, event) => {
+                    if (!process.env.ATOMIST_ISOLATED_GOAL_INIT) {
+                        return cp.listener(p, r, event);
+                    }
+                },
+            });
         }
         return this;
     }
