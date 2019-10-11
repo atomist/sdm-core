@@ -6,6 +6,7 @@ fragment SdmGoalWithGoalsFields on SdmGoal {
   branch
   fulfillment {
     method
+    registration
     name
   }
   description
@@ -69,6 +70,7 @@ fragment SdmGoalWithGoalsFields on SdmGoal {
       branch
       fulfillment {
         method
+        registration
         name
       }
       description
@@ -120,6 +122,19 @@ fragment SdmGoalWithGoalsFields on SdmGoal {
         userId
         channelId
       }
+      descriptions {
+        canceled
+        completed
+        failed
+        inProcess
+        planned
+        requested
+        stopped
+        skipped
+        waitingForApproval
+        waitingForPreApproval
+      }
+      parameters
       data
       version
     }

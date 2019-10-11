@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-import { automationClientInstance } from "@atomist/automation-client";
-import { SdmGoalEvent } from "@atomist/sdm";
+import {
+    goal,
+    GoalWithFulfillment,
+    Parameterized,
+} from "@atomist/sdm";
 
-export function isGoalRelevant(sdmGoal: SdmGoalEvent,
-                               registration: string = automationClientInstance().configuration.name): boolean {
-    const provenance = sdmGoal.fulfillment.registration;
-    return provenance === registration || registration.startsWith(`${provenance}-job`);
+export function item(name: string, registration: string, uniqueName?: string, parameters?: Parameterized): GoalWithFulfillment {
+    const g = goal({ displayName: name, uniqueName: uniqueName || name }).with({
+        name,
+        registration,
+    });
+    if (!!parameters) {
+        g.plan = async () => ({ parameters });
+    }
+    return g;
 }
