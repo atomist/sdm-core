@@ -52,7 +52,7 @@ describe("goalSigning", () => {
             name: "npm-run-build",
         },
         description: "Building",
-
+        descriptions: {} as any,
         url: "https://app.atomist.com/workspace/T29E48P34/logs/atomist/sdm-pack-node",
         externalUrls: [],
         state: SdmGoalState.in_process,
@@ -130,6 +130,7 @@ describe("goalSigning", () => {
             owner: "atomist",
             providerId: "zjlmxjzwhurspem",
         },
+        parameters: JSON.stringify({ foo: "bar" }),
     };
 
     it("should correctly sign and verify goal", async () => {
@@ -183,22 +184,24 @@ describe("goalSigning", () => {
             assert.strictEqual(e.message, "SDM goal signature invalid. Rejecting goal!");
         }
 
-        const maliciousOne = { ..._.cloneDeep(goalMessage)
-                , uniqueName: "build#goals.ts:42\n        environment:prod\n        goalSetId:mwah-ahah-ahhh"
-                , environment: "dev"
-                , goalSetId: "aaaa-bbbb",
-            };
+        const maliciousOne = {
+            ..._.cloneDeep(goalMessage)
+            , uniqueName: "build#goals.ts:42\n        environment:prod\n        goalSetId:mwah-ahah-ahhh"
+            , environment: "dev"
+            , goalSetId: "aaaa-bbbb",
+        };
 
-        const maliciousTwo = { ..._.cloneDeep(goalMessage)
-                , uniqueName: "build#goals.ts:42"
-                , environment: "prod"
-                , goalSetId: "mwah-ahah-ahhh\n        environment:dev\n        goalSetId:aaaa-bbbb",
-            };
+        const maliciousTwo = {
+            ..._.cloneDeep(goalMessage)
+            , uniqueName: "build#goals.ts:42"
+            , environment: "prod"
+            , goalSetId: "mwah-ahah-ahhh\n        environment:dev\n        goalSetId:aaaa-bbbb",
+        };
 
         const signedGoalMalOne = await signGoal(_.cloneDeep(maliciousOne) as any, gsc) as SdmGoalEvent & SignatureMixin;
         assert(!!signedGoal.signature);
 
-        const signedGoalMalTwo = {..._.cloneDeep(maliciousTwo), signature: signedGoalMalOne.signature};
+        const signedGoalMalTwo = { ..._.cloneDeep(maliciousTwo), signature: signedGoalMalOne.signature };
 
         try {
             await verifyGoal(signedGoalMalTwo as any, gsc, { context: { name: "Test SDM" }, messageClient } as any);
