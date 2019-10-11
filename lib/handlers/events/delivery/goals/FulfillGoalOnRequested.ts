@@ -125,6 +125,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             preferences,
             id,
             credentials,
+            parameters: !!event.data.SdmGoal[0].parameters ? JSON.parse(event.data.SdmGoal[0].parameters) : {},
         };
 
         const goalScheduler = await findGoalScheduler(goalInvocation, this.configuration);
