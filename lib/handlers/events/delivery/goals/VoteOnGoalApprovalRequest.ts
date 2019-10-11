@@ -144,7 +144,7 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                     };
                     await updateGoal(context, g, {
                         state: SdmGoalState.waiting_for_pre_approval,
-                        description: `${!!sdmGoal.descriptions && !!sdmGoal.descriptions.waitingForPreApproval ? 
+                        description: `${!!sdmGoal.descriptions && !!sdmGoal.descriptions.waitingForPreApproval ?
                             sdmGoal.descriptions.waitingForPreApproval : goal.waitingForPreApprovalDescription} \u00B7 start by @${sdmGoal.preApproval.userId} denied`,
                     });
                 } else if (sdmGoal.state === SdmGoalState.approved) {
