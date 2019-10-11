@@ -14,15 +14,39 @@
  * limitations under the License.
  */
 
-import { LeveledLogMethod } from "@atomist/automation-client";
 import {
+    LeveledLogMethod,
+    QueryNoCacheOptions,
+} from "@atomist/automation-client";
+import {
+    Build,
+    ExecuteGoalResult,
+    GoalInvocation,
     ProgressLog,
     SdmContext,
     SdmGoalEvent,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as _ from "lodash";
+import * as path from "path";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
+import {
+    DockerRegistryProvider,
+    Password,
+    PushFields,
+} from "../../typings/types";
+import {
+    postBuildWebhook,
+    postLinkImageWebhook,
+} from "../../util/webhook/ImageLink";
+import {
+    ContainerInput,
+    ContainerOutput,
+    ContainerProjectHome,
+    ContainerResult,
+} from "./container";
+import Images = PushFields.Images;
 
 /**
  * Simple test to see if SDM is running in Kubernetes.  It is called
@@ -52,6 +76,9 @@ export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext)
         context: ctx.context,
     });
     return [{
+        name: "ATOMIST_WORKSPACE_ID",
+        value: ctx.context.workspaceId,
+    }, {
         name: "ATOMIST_SLUG",
         value: `${goalEvent.repo.owner}/${goalEvent.repo.name}`,
     }, {
@@ -70,11 +97,23 @@ export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext)
         name: "ATOMIST_VERSION",
         value: version,
     }, {
-        name: "ATOMIST_GOAL_SET_ID",
-        value: goalEvent.goalSetId,
-    }, {
         name: "ATOMIST_GOAL",
-        value: goalEvent.uniqueName,
+        value: `${ContainerInput}/goal.json`,
+    }, {
+        name: "ATOMIST_SECRETS",
+        value: `${ContainerInput}/secrets.json`,
+    }, {
+        name: "ATOMIST_RESULT",
+        value: ContainerResult,
+    }, {
+        name: "ATOMIST_INPUT_DIR",
+        value: ContainerInput,
+    }, {
+        name: "ATOMIST_OUTPUT_DIR",
+        value: ContainerOutput,
+    }, {
+        name: "ATOMIST_PROJECT_DIR",
+        value: ContainerProjectHome,
     }].filter(e => !!e.value);
 }
 
@@ -107,6 +146,65 @@ export async function copyProject(src: string, dest: string): Promise<void> {
     }
 }
 
+export async function prepareInputAndOutput(input: string, output: string, gi: GoalInvocation): Promise<void> {
+    try {
+        await fs.emptyDir(input);
+    } catch (e) {
+        e.message = `Failed to empty directory '${input}'`;
+        throw e;
+    }
+    try {
+        await fs.writeJson(path.join(input, "goal.json"), gi.goalEvent, { spaces: 2 });
+        await fs.writeJson(path.join(input, "secrets.json"), {
+            apiKey: gi.configuration.apiKey,
+            credentials: gi.credentials,
+        }, { spaces: 2 });
+
+        const { context } = gi;
+        const dockerRegistries = await context.graphClient.query<DockerRegistryProvider.Query, DockerRegistryProvider.Variables>({
+            name: "DockerRegistryProvider",
+            options: QueryNoCacheOptions,
+        });
+
+        if (!!dockerRegistries && !!dockerRegistries.DockerRegistryProvider) {
+
+            const dockerConfig = {
+                auths: {},
+            } as any;
+
+            for (const dockerRegistry of dockerRegistries.DockerRegistryProvider) {
+
+                const credential = await context.graphClient.query<Password.Query, Password.Variables>({
+                    name: "Password",
+                    variables: {
+                        id: dockerRegistry.credential.id,
+                    },
+                });
+
+                dockerConfig.auths[dockerRegistry.url] = {
+                    auth: Buffer.from(credential.Password[0].owner.login + ":" + credential.Password[0].secret).toString("base64"),
+                };
+            }
+            await fs.writeJson(path.join(input, "docker.config.json"), dockerConfig, { spaces: 2 });
+        }
+
+    } catch (e) {
+        e.message = `Failed to write metadata to '${input}'`;
+        try {
+            await fs.remove(input);
+        } catch (err) {
+            e.message += `; Failed to clean up '${input}': ${err.message}`;
+        }
+        throw e;
+    }
+    try {
+        await fs.emptyDir(output);
+    } catch (e) {
+        e.message = `Failed to empty directory '${output}'`;
+        throw e;
+    }
+}
+
 /**
  * Write to client and progress logs.  Add newline to progress log.
  *
@@ -117,4 +215,59 @@ export async function copyProject(src: string, dest: string): Promise<void> {
 export function loglog(msg: string, l: LeveledLogMethod, p: ProgressLog): void {
     l(msg);
     p.write(msg + "\n");
+}
+
+export async function processResult(result: any,
+                                    gi: GoalInvocation): Promise<ExecuteGoalResult | undefined> {
+    const { goalEvent, context } = gi;
+    if (!!result) {
+        if (result.SdmGoal) {
+            const goal = result.SdmGoal as SdmGoalEvent;
+            const r = {
+                state: goal.state,
+                phase: goal.phase,
+                description: goal.description,
+                externalUrls: goal.externalUrls,
+                data: convertData(goal.data),
+            };
+
+            const builds = _.get(goal, "push.builds") as Build[];
+            if (!!builds) {
+                for (const build of builds) {
+                    await postBuildWebhook(
+                        goalEvent.repo.owner,
+                        goalEvent.repo.name,
+                        goalEvent.branch,
+                        goalEvent.sha,
+                        build.status as any,
+                        context.workspaceId);
+                }
+            }
+
+            const images = _.get(goal, "push.after.images") as Images[];
+            if (!!images) {
+                for (const image of images) {
+                    await postLinkImageWebhook(
+                        goalEvent.repo.owner,
+                        goalEvent.repo.name,
+                        goalEvent.sha,
+                        image.imageName,
+                        context.workspaceId,
+                    );
+                }
+            }
+
+            return r;
+        } else {
+            return {
+                ...result,
+                data: convertData(result.data),
+            };
+        }
+    }
+    return undefined;
+}
+
+function convertData(data: any): string {
+    return !!data && typeof data !== "string" ? JSON.stringify(data) : data;
 }

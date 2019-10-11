@@ -20,6 +20,7 @@ import {
 } from "@atomist/automation-client";
 import {
     DefaultGoalNameGenerator,
+    FulfillableGoal,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
     Fulfillment,
@@ -29,6 +30,7 @@ import {
     ImplementationRegistration,
     SdmGoalEvent,
     SoftwareDeliveryMachine,
+    testProgressReporter,
 } from "@atomist/sdm";
 import {
     isConfiguredInEnv,
@@ -41,6 +43,10 @@ import {
     cachePut,
     cacheRestore,
 } from "../cache/goalCaching";
+import {
+    BuildingContainer,
+    isBuildingContainer,
+} from "./buildingContainer";
 import { dockerContainerScheduler } from "./docker";
 import { k8sContainerScheduler } from "./k8s";
 import { runningInK8s } from "./util";
@@ -53,9 +59,27 @@ import { runningInK8s } from "./util";
  * @param registration Goal containers, volumes, cache details, etc.
  * @return SDM container goal
  */
-export function container<T extends ContainerRegistration>(displayName: string, registration: T): Container {
-    return new Container({ displayName }).with(registration);
+export function container<T extends ContainerRegistration>(displayName: string, registration: T): FulfillableGoal {
+    if (registration.containers.some(isBuildingContainer)) {
+        return new BuildingContainer({ displayName }, registration);
+    } else {
+        return new Container({ displayName }).with(registration);
+    }
 }
+
+export const ContainerProgressReporter = testProgressReporter({
+    test: /docker 'network' 'create'/i,
+    phase: "starting up",
+}, {
+    test: /docker 'network' 'rm'/i,
+    phase: "shutting down",
+}, {
+    test: /docker 'run' .* '--workdir=[a-zA-Z\/]*' .* '--network-alias=([a-zA-Z \-_]*)'/i,
+    phase: "running $1",
+}, {
+    test: /atm:phase=(.*)/i,
+    phase: "$1",
+});
 
 /**
  * Ports to expose from container.
@@ -127,6 +151,21 @@ export interface GoalContainerVolume {
  * File system location of goal project in containers.
  */
 export const ContainerProjectHome = "/atm/home";
+
+/**
+ * File system location for goal container input.
+ */
+export const ContainerInput = "/atm/input";
+
+/**
+ * File system location for goal container output.
+ */
+export const ContainerOutput = "/atm/output";
+
+/**
+ * Goal execution result file
+ */
+export const ContainerResult = `${ContainerOutput}/result.json`;
 
 /**
  * Specification of containers and volumes for a container goal.
