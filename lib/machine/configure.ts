@@ -27,6 +27,7 @@ import {
     goals,
     Goals,
     GoalWithFulfillment,
+    notGoalTest,
     PushListenerInvocation,
     PushTest,
     SdmContext,
@@ -279,9 +280,17 @@ export async function invokeConfigurer(sdm: SoftwareDeliveryMachine,
 
 function convertPushTest(test: PushTest | PushTest[]): PushTest {
     if (Array.isArray(test)) {
-        return allSatisfied(...test);
+        return allSatisfied(...test.map(wrapTest));
     } else {
-        return test || AnyPush;
+        return wrapTest(test || AnyPush);
+    }
+}
+
+function wrapTest(test: PushTest): PushTest {
+    if (!!(test as any).pushTest) {
+        return test;
+    } else {
+        return notGoalTest(test);
     }
 }
 
