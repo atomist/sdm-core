@@ -22,6 +22,7 @@ import {
     NodeFsLocalProject,
 } from "@atomist/automation-client";
 import {
+    CloningProjectLoader,
     execPromise,
     ExecuteGoalResult,
     fakePush,
@@ -37,7 +38,12 @@ import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
 import { DeepPartial } from "ts-essentials";
-import { Container } from "../../../lib/goal/container/container";
+import {
+    Container,
+    ContainerInput,
+    ContainerOutput,
+    ContainerResult,
+} from "../../../lib/goal/container/container";
 import {
     executeK8sJob,
     K8sContainerRegistration,
@@ -82,6 +88,11 @@ describe("goal/container/k8s", () => {
             },
             sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
             uniqueName: "BeechwoodPark.ts#L243",
+            push: {
+                commits: [{
+                    sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                }],
+            },
         } as any;
         const kgs = new KubernetesGoalScheduler();
         kgs.podSpec = {
@@ -96,7 +107,43 @@ describe("goal/container/k8s", () => {
         } as any;
         const rc: RepoContext = {
             configuration: {
+                apiKey: "AT0M15TAP1K3Y",
                 sdm: {
+                    projectLoader: CloningProjectLoader,
+                    encryption: {
+                        passphrase: "Od3553y",
+                        privateKey: `-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,ECAC148A43D19DB2
+
+pZRWxykMr+lP2fmjFpwVjEvNFJPRWrUoTVbDDzoLZOjKRKZvO7dp90m3y5EzrWID
+NLPNkMEhNKaLkdmEsQX3sO8FDuLDslfBvX8VIlgIIvL4etnwHnKHpcY4IBT+DcIL
+f6m6fsBMzuX4OLMnODPI3sp3jK+R8VdXS7xfa/OIXeh9SHkp2sB78+6dUru4BUx2
+rypdVq3tvLTB0ElQLd+9Y7ms6qoFYCJrigNk8TTEbcMZGxOWQ79L4xKoVp0zG/r4
+M8CyM7evZ3QPoHWyTqAkU2S8rRDignl1C+giRYSaG9Uu2OoS9LV0BrjoSN5AgAfX
+da1QLrPXMVmNADFqAdC78s+KBQEAvsyNAGHTA62eNjD3dGtKKZsvGamzQnEyl7Em
+b4uN5MuNdB1CBM7lQz1m9oOegrWom26zrCEE2Pf+fo39N8LHdACuZTpZYzoZe43j
+Ms6YqD6EHTE1zx8pc3yCcmSUtU2ch+UCcPOXVLb/mxffIeHaOLikzerAF4iG9Gee
+OMNQvk4nUXSRQilUgEaII+QTx+GEpPtCef8ioS1hx/37tkpsIB24suISNp6vRB+4
+jZHlRF+aCel80YIqKwJR4LfZvMXiEJERbN5uxqTHCwXoCU+e+Bv7SP1jMOYpvEIL
+hseGAriQ9i4cJVO7R46IYUwsKcGpr61Uax3rbjlITSusct8JptWsTob7Z/gy8P9F
+eascXJ5Ii8fMzcDTxQW1CNEOid/WQdEQFLMZSacCpUi3nKzN/JdPdigC7yqOa6Cf
+QAdB/khyrF/0t9BmzJlfsFm8D2cXaN+rls3TPiKkfDSXAchcIPJSDZ5ky85Sp4c+
+1m5kgBvTBS560WdAw6UvTvhJTfPCP3f+27ChXXduAeVt3aDyrOqcoT9KPw+NNpOH
+aph9L6+nIVF+kqX1kOLg5Shp+uGRqlwi5An7X0C4rIOXTX5LvV1zJ4x3u45xlLuw
+ONGxLB31Hy94q2LmZqtIaekdN635yrO/FUUTBwTnI0xE291g0DowhxzN98l0VKWv
+dDpSFZhfN5nZPELLRXaMQLKsEOQTk5PVWycU+CxKJ1xB47pts+3zhuu14Aj87bBj
+Ja2GlWEEa2m6K6plaGRnBFRvP07QPSnoagiMJJ6rA5FlWSvHXWIxVQt99RzLhmeU
+uHVuUuNxWnZ0dFMZvYGefKEjD/wPrqqCFYQoxCknpzyvEfHEulTcEu1u+4vNA6p7
+ulG/ku7JhZU1CYkbl83G7zju81dKYS4hSZE1E/VEJtRCN93r9YpyTO24yxELMemN
+4hT8vwn4e/SvME16kxFzZYl+0dltxH4rqvZ9Phpap7LYRbjZYuBBxqO/FC6DvLyj
+RGe/Na+6E7hFNv+ibghbFhXuYfbnmXx/1rGZwuNZu01W1R3RUUfSvChL6ffyo26n
+qLiXI8YeIzmpKgwXXNLIpUEAo/ZX+kMxvJpLiLKxfJ0og7XcYvFAKsMZbc8lyEv4
+dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
+6ba7erlpdnnwr1Xl7R+DC1BVYVW7SyuXn2jIZBoA27reQzZyjCrlHw==
+-----END RSA PRIVATE KEY-----
+`,
+                    },
                     goalScheduler: [kgs],
                 },
             },
@@ -110,6 +157,7 @@ describe("goal/container/k8s", () => {
                 },
                 workspaceId: "AR05343M1LY",
             },
+            credentials: { token: "5cmT0k3nC43d3nt145" },
         } as any;
 
         it("should add k8s service to goal event data", async () => {
@@ -127,8 +175,14 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
+            assert(iv.startsWith("input-"));
+            assert(ov.startsWith("output-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
@@ -139,14 +193,6 @@ describe("goal/container/k8s", () => {
                         spec: {
                             initContainer: [
                                 {
-                                    name: i,
-                                    image: "rod/argent:1945.6.14",
-                                    volumeMounts: [
-                                        {
-                                            mountPath: "/atm/home",
-                                            name: v,
-                                        },
-                                    ],
                                     env: [
                                         {
                                             name: "ATOMIST_JOB_NAME",
@@ -185,20 +231,9 @@ describe("goal/container/k8s", () => {
                                             value: "true",
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
                                         },
-                                        {
-                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                            value: "true",
-                                        },
-                                    ],
-                                },
-                            ],
-                            container: [
-                                {
-                                    args: ["true"],
-                                    env: [
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -224,12 +259,85 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_CONFIG",
+                                            value: "{\"cluster\":{\"enabled\":false},\"ws\":{\"enabled\":false}}",
+                                        },
+                                    ],
+                                    image: "rod/argent:1945.6.14",
+                                    name: i,
+                                },
+                            ],
+                            container: [
+                                {
+                                    args: ["true"],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_SLUG",
+                                            value: "TheZombies/odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_OWNER",
+                                            value: "TheZombies",
+                                        },
+                                        {
+                                            name: "ATOMIST_REPO",
+                                            value: "odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_SHA",
+                                            value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                                        },
+                                        {
+                                            name: "ATOMIST_BRANCH",
+                                            value: "psychedelic-rock",
+                                        },
+                                        {
+                                            name: "ATOMIST_VERSION",
+                                            value: "1968.4.19",
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -246,11 +354,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -270,6 +394,11 @@ describe("goal/container/k8s", () => {
                 },
                 sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
                 uniqueName: "BeechwoodPark.ts#L243",
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
             };
             assert.deepStrictEqual(ge, e);
         });
@@ -303,8 +432,14 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
+            assert(iv.startsWith("input-"));
+            assert(ov.startsWith("output-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
@@ -315,14 +450,6 @@ describe("goal/container/k8s", () => {
                         spec: {
                             initContainer: [
                                 {
-                                    name: i,
-                                    image: "rod/argent:1945.6.14",
-                                    volumeMounts: [
-                                        {
-                                            mountPath: "/atm/home",
-                                            name: v,
-                                        },
-                                    ],
                                     env: [
                                         {
                                             name: "ATOMIST_JOB_NAME",
@@ -361,20 +488,9 @@ describe("goal/container/k8s", () => {
                                             value: "true",
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
                                         },
-                                        {
-                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                            value: "true",
-                                        },
-                                    ],
-                                },
-                            ],
-                            container: [
-                                {
-                                    args: ["true"],
-                                    env: [
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -400,12 +516,85 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_CONFIG",
+                                            value: "{\"cluster\":{\"enabled\":false},\"ws\":{\"enabled\":false}}",
+                                        },
+                                    ],
+                                    name: i,
+                                    image: "rod/argent:1945.6.14",
+                                },
+                            ],
+                            container: [
+                                {
+                                    args: ["true"],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_SLUG",
+                                            value: "TheZombies/odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_OWNER",
+                                            value: "TheZombies",
+                                        },
+                                        {
+                                            name: "ATOMIST_REPO",
+                                            value: "odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_SHA",
+                                            value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                                        },
+                                        {
+                                            name: "ATOMIST_BRANCH",
+                                            value: "psychedelic-rock",
+                                        },
+                                        {
+                                            name: "ATOMIST_VERSION",
+                                            value: "1968.4.19",
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -421,11 +610,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -445,6 +650,11 @@ describe("goal/container/k8s", () => {
                 },
                 sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
                 uniqueName: "BeechwoodPark.ts#L243",
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
             };
             assert.deepStrictEqual(ge, e);
         });
@@ -511,8 +721,14 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
+            assert(iv.startsWith("input-"));
+            assert(ov.startsWith("output-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
@@ -561,28 +777,9 @@ describe("goal/container/k8s", () => {
                                             value: "true",
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
                                         },
-                                        {
-                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                            value: "true",
-                                        },
-                                    ],
-                                    image: "rod/argent:1945.6.14",
-                                    name: i,
-                                    volumeMounts: [
-                                        {
-                                            mountPath: "/atm/home",
-                                            name: v,
-                                        },
-                                    ],
-                                },
-                            ],
-                            container: [
-                                {
-                                    args: ["first"],
-                                    env: [
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -608,12 +805,85 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_CONFIG",
+                                            value: "{\"cluster\":{\"enabled\":false},\"ws\":{\"enabled\":false}}",
+                                        },
+                                    ],
+                                    image: "rod/argent:1945.6.14",
+                                    name: i,
+                                },
+                            ],
+                            container: [
+                                {
+                                    args: ["first"],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_SLUG",
+                                            value: "TheZombies/odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_OWNER",
+                                            value: "TheZombies",
+                                        },
+                                        {
+                                            name: "ATOMIST_REPO",
+                                            value: "odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_SHA",
+                                            value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                                        },
+                                        {
+                                            name: "ATOMIST_BRANCH",
+                                            value: "psychedelic-rock",
+                                        },
+                                        {
+                                            name: "ATOMIST_VERSION",
+                                            value: "1968.4.19",
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -642,6 +912,10 @@ describe("goal/container/k8s", () => {
                                     args: ["second"],
                                     env: [
                                         {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
                                         },
@@ -666,12 +940,20 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -697,11 +979,33 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
+                                {
+                                    hostPath: {
+                                        path: "/william/shakespeare",
+                                    },
+                                    name: "tempest",
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -721,11 +1025,16 @@ describe("goal/container/k8s", () => {
                 },
                 sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
                 uniqueName: "BeechwoodPark.ts#L243",
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
             };
             assert.deepStrictEqual(ge, e);
         });
 
-        it("should add add schedule pod spec envs and volumeMounts", async () => {
+        it("should add scheduler pod spec envs and volumeMounts to init container", async () => {
             const kgsx = new KubernetesGoalScheduler();
             kgsx.podSpec = {
                 spec: {
@@ -781,14 +1090,27 @@ describe("goal/container/k8s", () => {
                         name: "colin-blunstone",
                     },
                 ],
+                initContainers: [
+                    {
+                        args: ["/bin/sh", "-c", "echo 'hello'"],
+                        image: "rod/argent:latest",
+                        name: "init-rod-argent",
+                    },
+                ],
                 name: "MaybeAfterHesGone",
             };
             const c = k8sFulfillmentCallback(g, r);
             const ge = await c(sge, rcx);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
+            assert(iv.startsWith("input-"));
+            assert(ov.startsWith("output-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
@@ -799,18 +1121,6 @@ describe("goal/container/k8s", () => {
                         spec: {
                             initContainer: [
                                 {
-                                    name: i,
-                                    image: "rod/argent:1945.6.14",
-                                    volumeMounts: [
-                                        {
-                                            mountPath: "/opt/atm",
-                                            name: "sdm-config",
-                                        },
-                                        {
-                                            mountPath: "/atm/home",
-                                            name: v,
-                                        },
-                                    ],
                                     env: [
                                         {
                                             name: "ATOMIST_CONFIG_PATH",
@@ -853,20 +1163,9 @@ describe("goal/container/k8s", () => {
                                             value: "true",
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
                                         },
-                                        {
-                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                            value: "true",
-                                        },
-                                    ],
-                                },
-                            ],
-                            container: [
-                                {
-                                    args: ["true"],
-                                    env: [
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -892,12 +1191,146 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_CONFIG",
+                                            value: "{\"cluster\":{\"enabled\":false},\"ws\":{\"enabled\":false}}",
+                                        },
+                                    ],
+                                    name: i,
+                                    image: "rod/argent:1945.6.14",
+                                    volumeMounts: [
+                                        {
+                                            mountPath: "/opt/atm",
+                                            name: "sdm-config",
+                                        },
+                                    ],
+                                },
+                                {
+                                    args: ["/bin/sh", "-c", "echo 'hello'"],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_SLUG",
+                                            value: "TheZombies/odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_OWNER",
+                                            value: "TheZombies",
+                                        },
+                                        {
+                                            name: "ATOMIST_REPO",
+                                            value: "odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_SHA",
+                                            value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                                        },
+                                        {
+                                            name: "ATOMIST_BRANCH",
+                                            value: "psychedelic-rock",
+                                        },
+                                        {
+                                            name: "ATOMIST_VERSION",
+                                            value: "1968.4.19",
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                    ],
+                                    image: "rod/argent:latest",
+                                    name: "init-rod-argent",
+                                },
+                            ],
+                            container: [
+                                {
+                                    args: ["true"],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_SLUG",
+                                            value: "TheZombies/odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_OWNER",
+                                            value: "TheZombies",
+                                        },
+                                        {
+                                            name: "ATOMIST_REPO",
+                                            value: "odessey-and-oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_SHA",
+                                            value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                                        },
+                                        {
+                                            name: "ATOMIST_BRANCH",
+                                            value: "psychedelic-rock",
+                                        },
+                                        {
+                                            name: "ATOMIST_VERSION",
+                                            value: "1968.4.19",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -914,11 +1347,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -938,6 +1387,229 @@ describe("goal/container/k8s", () => {
                 },
                 sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
                 uniqueName: "BeechwoodPark.ts#L243",
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
+            };
+            assert.deepStrictEqual(ge, e);
+        });
+
+        it("should add secrets to k8s service goal event data", async () => {
+            const r: K8sContainerRegistration = {
+                containers: [
+                    {
+                        args: ["true"],
+                        image: "colin/blunstone:1945.6.24",
+                        name: "colin-blunstone",
+                        secrets: {
+                            env: [{ name: "SCM_TOKEN", value: { provider: { type: "scm" } } }],
+                            fileMounts: [
+                                { mountPath: "/opt/secret/api-key", value: { provider: { type: "atomist" } } },
+                                // tslint:disable-next-line:max-line-length
+                                {
+                                    mountPath: "/opt/secret/something",
+                                    value: { encrypted: "WJ6PcPgZUaDpZWn/J8asXS677ZOLgHGWcMqWtK16oi8UD6HuyGxUV1Vv24mZluReeklHLspDhacfRWNzmOVxGpEOupgJcuTaLMNfDT5F8drl4SIr2ENj2gvuBO2LfwDGAzAG+0ShyeY92SZK4UhBMdTgcrC+aUn980KlclnAeiUvGDQmGDyZ95eMTvxkHlQ9rakxW9A5aZoj/mVxdXjxq5ioTHu6LLKNBFG7nowFnrneNt+hHH97Gs+LdCnYtqvC8zkzyqlIjjQS3Mmqja9fhL9ToxFZyZy2ZCM0gwcnTHKKJ8GhYfLxAq2ZrDsyvAWOpEyXUuNuxJ5N0pUDUBufAQ==" },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        image: "mongo:latest",
+                        name: "mongo",
+                    },
+                ],
+                initContainers: [
+                    {
+                        args: ["/bin/sh", "-c", "echo 'hello'"],
+                        image: "rod/argent:latest",
+                        name: "init-rod-argent",
+                        volumeMounts: [
+                            { mountPath: "/bill/s", name: "tempest" },
+                        ],
+                    },
+                ],
+                name: "MaybeAfterHesGone",
+                volumes: [
+                    { hostPath: { path: "/william/shakespeare" }, name: "tempest" },
+                ],
+            };
+            const c = k8sFulfillmentCallback(g, r);
+            const ge = await c(sge, rc);
+            const p = JSON.parse(ge.data);
+            const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
+            const sv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[4].name`);
+            assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
+            assert(sv, "failed to find volume name");
+            assert(v.startsWith("project-"));
+            assert(iv.startsWith("input-"));
+            assert(ov.startsWith("output-"));
+            assert(sv.startsWith("secret-"));
+            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
+            assert(i, "failed to find initContainer name");
+            assert(i.startsWith("container-goal-init-"));
+            const d = {
+                "@atomist/sdm/service": {
+                    MaybeAfterHesGone: {
+                        type: "@atomist/sdm/service/k8s",
+                        spec: {
+                            initContainer: [
+                                {
+                                    env: [
+                                        { name: "ATOMIST_JOB_NAME", value: "rod-argent-job-0abcdef-beechwoodpark.ts" },
+                                        {
+                                            name: "ATOMIST_REGISTRATION_NAME",
+                                            value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
+                                        },
+                                        { name: "ATOMIST_GOAL_TEAM", value: "AR05343M1LY" },
+                                        { name: "ATOMIST_GOAL_TEAM_NAME", value: "Odessey and Oracle" },
+                                        { name: "ATOMIST_GOAL_ID", value: "CHANGES" },
+                                        { name: "ATOMIST_GOAL_SET_ID", value: "0abcdef-123456789-abcdef" },
+                                        { name: "ATOMIST_GOAL_UNIQUE_NAME", value: "BeechwoodPark.ts#L243" },
+                                        {
+                                            name: "ATOMIST_CORRELATION_ID",
+                                            value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
+                                        },
+                                        { name: "ATOMIST_ISOLATED_GOAL", value: "true" },
+                                        { name: "ATOMIST_WORKSPACE_ID", value: "AR05343M1LY" },
+                                        { name: "ATOMIST_SLUG", value: "TheZombies/odessey-and-oracle" },
+                                        { name: "ATOMIST_OWNER", value: "TheZombies" },
+                                        { name: "ATOMIST_REPO", value: "odessey-and-oracle" },
+                                        { name: "ATOMIST_SHA", value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892" },
+                                        { name: "ATOMIST_BRANCH", value: "psychedelic-rock" },
+                                        { name: "ATOMIST_VERSION", value: "1968.4.19" },
+                                        { name: "ATOMIST_GOAL", value: `${ContainerInput}/goal.json` },
+                                        { name: "ATOMIST_RESULT", value: ContainerResult },
+                                        { name: "ATOMIST_INPUT_DIR", value: ContainerInput },
+                                        { name: "ATOMIST_OUTPUT_DIR", value: ContainerOutput },
+                                        { name: "ATOMIST_PROJECT_DIR", value: "/atm/home" },
+                                        { name: "ATOMIST_ISOLATED_GOAL_INIT", value: "true" },
+                                        {
+                                            name: "ATOMIST_CONFIG",
+                                            value: "{\"cluster\":{\"enabled\":false},\"ws\":{\"enabled\":false}}",
+                                        },
+                                    ],
+                                    image: "rod/argent:1945.6.14",
+                                    name: i,
+                                    volumeMounts: [
+                                        { name: sv, mountPath: "/opt/secret" },
+                                    ],
+                                },
+                                {
+                                    args: ["/bin/sh", "-c", "echo 'hello'"],
+                                    env: [
+                                        { name: "SCM_TOKEN", value: "5cmT0k3nC43d3nt145" },
+                                        { name: "ATOMIST_WORKSPACE_ID", value: "AR05343M1LY" },
+                                        { name: "ATOMIST_SLUG", value: "TheZombies/odessey-and-oracle" },
+                                        { name: "ATOMIST_OWNER", value: "TheZombies" },
+                                        { name: "ATOMIST_REPO", value: "odessey-and-oracle" },
+                                        { name: "ATOMIST_SHA", value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892" },
+                                        { name: "ATOMIST_BRANCH", value: "psychedelic-rock" },
+                                        { name: "ATOMIST_VERSION", value: "1968.4.19" },
+                                        { name: "ATOMIST_GOAL", value: `${ContainerInput}/goal.json` },
+                                        { name: "ATOMIST_RESULT", value: ContainerResult },
+                                        { name: "ATOMIST_INPUT_DIR", value: ContainerInput },
+                                        { name: "ATOMIST_OUTPUT_DIR", value: ContainerOutput },
+                                        { name: "ATOMIST_PROJECT_DIR", value: "/atm/home" },
+                                    ],
+                                    image: "rod/argent:latest",
+                                    name: "init-rod-argent",
+                                    volumeMounts: [
+                                        { mountPath: "/bill/s", name: "tempest" },
+                                        { mountPath: "/opt/secret/api-key", name: sv, subPath: "api-key" },
+                                        { mountPath: "/opt/secret/something", name: sv, subPath: "something" },
+                                    ],
+                                },
+                            ],
+                            container: [
+                                {
+                                    args: ["true"],
+                                    env: [
+                                        { name: "SCM_TOKEN", value: "5cmT0k3nC43d3nt145" },
+                                        { name: "ATOMIST_WORKSPACE_ID", value: "AR05343M1LY" },
+                                        { name: "ATOMIST_SLUG", value: "TheZombies/odessey-and-oracle" },
+                                        { name: "ATOMIST_OWNER", value: "TheZombies" },
+                                        { name: "ATOMIST_REPO", value: "odessey-and-oracle" },
+                                        { name: "ATOMIST_SHA", value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892" },
+                                        { name: "ATOMIST_BRANCH", value: "psychedelic-rock" },
+                                        { name: "ATOMIST_VERSION", value: "1968.4.19" },
+                                        { name: "ATOMIST_GOAL", value: `${ContainerInput}/goal.json` },
+                                        { name: "ATOMIST_RESULT", value: ContainerResult },
+                                        { name: "ATOMIST_INPUT_DIR", value: ContainerInput },
+                                        { name: "ATOMIST_OUTPUT_DIR", value: ContainerOutput },
+                                        { name: "ATOMIST_PROJECT_DIR", value: "/atm/home" },
+                                    ],
+                                    image: "colin/blunstone:1945.6.24",
+                                    name: "colin-blunstone",
+                                    volumeMounts: [
+                                        { mountPath: "/opt/secret/api-key", name: sv, subPath: "api-key" },
+                                        { mountPath: "/opt/secret/something", name: sv, subPath: "something" },
+                                    ],
+                                    workingDir: "/atm/home",
+                                },
+                                {
+                                    env: [
+                                        { name: "SCM_TOKEN", value: "5cmT0k3nC43d3nt145" },
+                                        { name: "ATOMIST_WORKSPACE_ID", value: "AR05343M1LY" },
+                                        { name: "ATOMIST_SLUG", value: "TheZombies/odessey-and-oracle" },
+                                        { name: "ATOMIST_OWNER", value: "TheZombies" },
+                                        { name: "ATOMIST_REPO", value: "odessey-and-oracle" },
+                                        { name: "ATOMIST_SHA", value: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892" },
+                                        { name: "ATOMIST_BRANCH", value: "psychedelic-rock" },
+                                        { name: "ATOMIST_VERSION", value: "1968.4.19" },
+                                        { name: "ATOMIST_GOAL", value: `${ContainerInput}/goal.json` },
+                                        { name: "ATOMIST_RESULT", value: ContainerResult },
+                                        { name: "ATOMIST_INPUT_DIR", value: ContainerInput },
+                                        { name: "ATOMIST_OUTPUT_DIR", value: ContainerOutput },
+                                        { name: "ATOMIST_PROJECT_DIR", value: "/atm/home" },
+                                    ],
+                                    image: "mongo:latest",
+                                    name: "mongo",
+                                    volumeMounts: [
+                                        { mountPath: "/opt/secret/api-key", name: sv, subPath: "api-key" },
+                                        { mountPath: "/opt/secret/something", name: sv, subPath: "something" },
+                                    ],
+                                },
+                            ],
+                            volume: [
+                                { name: v, emptyDir: {} },
+                                { name: iv, emptyDir: {} },
+                                { name: ov, emptyDir: {} },
+                                { hostPath: { path: "/william/shakespeare" }, name: "tempest" },
+                                { name: sv, emptyDir: {} },
+                            ],
+                            volumeMount: [
+                                { mountPath: "/atm/home", name: v },
+                                { mountPath: ContainerInput, name: iv },
+                                { mountPath: ContainerOutput, name: ov },
+                            ],
+                        },
+                    },
+                },
+            };
+            assert.deepStrictEqual(p, d);
+            delete ge.data;
+            const e = {
+                branch: "psychedelic-rock",
+                goalSetId: "0abcdef-123456789-abcdef",
+                id: "CHANGES",
+                repo: {
+                    name: "odessey-and-oracle",
+                    owner: "TheZombies",
+                    providerId: "CBS",
+                },
+                sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                uniqueName: "BeechwoodPark.ts#L243",
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
             };
             assert.deepStrictEqual(ge, e);
         });
@@ -976,10 +1648,17 @@ describe("goal/container/k8s", () => {
                 },
                 sha: fakeId.sha,
                 uniqueName: goal.definition.uniqueName,
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
             },
             id: fakeId,
             progressLog: {
-                write: d => { logData += d; },
+                write: d => {
+                    logData += d;
+                },
             },
         } as any;
 
@@ -998,6 +1677,15 @@ describe("goal/container/k8s", () => {
             await fs.ensureDir(workingDir);
             tmpDirs.push(workingDir);
             process.env.ATOMIST_PROJECT_DIR = workingDir;
+
+            const inputDir = `${tmpDirPrefix}-${guid()}`;
+            await fs.ensureDir(inputDir);
+            tmpDirs.push(inputDir);
+            process.env.ATOMIST_INPUT_DIR = inputDir;
+            const outputDir = `${tmpDirPrefix}-${guid()}`;
+            await fs.ensureDir(outputDir);
+            tmpDirs.push(outputDir);
+            process.env.ATOMIST_OUTPUT_DIR = outputDir;
         });
 
         after(async function directoryCleanup(): Promise<void> {
@@ -1006,10 +1694,12 @@ describe("goal/container/k8s", () => {
             } else {
                 delete process.env.ATOMIST_PROJECT_DIR;
             }
+            delete process.env.ATOMIST_INPUT_DIR;
+            delete process.env.ATOMIST_OUTPUT_DIR;
             await Promise.all(tmpDirs.map(d => fs.remove(d)));
         });
 
-        it("should run in init mode and copy project", async () => {
+        it("should run in init mode", async () => {
             const r = {
                 containers: [
                     {
@@ -1041,9 +1731,14 @@ describe("goal/container/k8s", () => {
                 sha: fakeId.sha,
                 state: SdmGoalState.in_process,
                 uniqueName: goal.definition.uniqueName,
+                push: {
+                    commits: [{
+                        sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
+                    }],
+                },
             };
             assert.deepStrictEqual(x, eg, logData);
-            const ec = await fs.readFile(fw, "utf8");
+            const ec = await fs.readFile(fp, "utf8");
             assert(ec === "Counting the days until they set you free again\n");
         }).timeout(10000);
 
@@ -1107,7 +1802,8 @@ describe("goal/container/k8s", () => {
                 try {
                     const body: k8s.V1DeleteOptions = { gracePeriodSeconds: 0, propagationPolicy: "Background" };
                     await k8sCore.deleteNamespacedPod(p.metadata.name, ns, undefined, undefined, undefined, undefined, undefined, body);
-                } catch (e) { /* ignore */ }
+                } catch (e) { /* ignore */
+                }
                 return egr;
             }
 
