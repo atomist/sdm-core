@@ -22,48 +22,27 @@ describe("isGoalRelevant", () => {
 
     it("should handle own goal", () => {
         const goal = {
-            provenance: [{
-                registration: "some-other-sdm",
-                ts: 2,
-            }, {
+            fulfillment: {
                 registration: "my-super-sdm",
-                ts: 1,
-            }, {
-                registration: "again-some-other-sdm",
-                ts: 3,
-            }],
+            },
         } as any as SdmGoalEvent;
         assert.equal(isGoalRelevant(goal, "my-super-sdm"), true);
     });
 
     it("should not handle goal of different SDM", () => {
         const goal = {
-            provenance: [{
-                registration: "some-other-sdm",
-                ts: 3,
-            }, {
-                registration: "my-super-sdm",
-                ts: 2,
-            }, {
-                registration: "again-some-other-sdm",
-                ts: 1,
-            }],
+            fulfillment: {
+                registration: "some-super-sdm",
+            },
         } as any as SdmGoalEvent;
         assert.equal(isGoalRelevant(goal, "my-super-sdm"), false);
     });
 
     it("should handle own goal in a SDM job", () => {
         const goal = {
-            provenance: [{
-                registration: "some-other-sdm",
-                ts: 3,
-            }, {
+            fulfillment: {
                 registration: "my-super-sdm",
-                ts: 1,
-            }, {
-                registration: "again-some-other-sdm",
-                ts: 2,
-            }],
+            },
         } as any as SdmGoalEvent;
         assert.equal(isGoalRelevant(goal, "my-super-sdm-job-4342234-build"), true);
     });

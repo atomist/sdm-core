@@ -9,6 +9,7 @@ fragment SdmGoalWithPushFields on SdmGoal {
   }
   fulfillment {
     method
+    registration
     name
   }
   description
@@ -60,6 +61,19 @@ fragment SdmGoalWithPushFields on SdmGoal {
     userId
     channelId
   }
+  descriptions {
+    canceled
+    completed
+    failed
+    inProcess
+    planned
+    requested
+    stopped
+    skipped
+    waitingForApproval
+    waitingForPreApproval
+  }
+  parameters
   data
   version
   signature
