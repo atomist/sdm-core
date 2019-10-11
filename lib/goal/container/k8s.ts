@@ -142,7 +142,10 @@ export function k8sFulfillmentCallback(
 ): (sge: SdmGoalEvent, rc: RepoContext) => Promise<SdmGoalEvent> {
 
     return async (goalEvent, repoContext) => {
-        const spec: K8sGoalContainerSpec = _.merge({}, { containers: registration.containers, volumes: registration.volumes });
+        const spec: K8sGoalContainerSpec = _.merge({}, {
+            containers: registration.containers,
+            volumes: registration.volumes,
+        });
         if (registration.callback) {
             const project = await GitCommandGitProject.cloned(repoContext.credentials, repoContext.id);
             _.merge(spec, await registration.callback(registration, project, goal, goalEvent, repoContext.context));
@@ -158,16 +161,9 @@ export function k8sFulfillmentCallback(
             spec.containers[0].workingDir = ContainerProjectHome;
         }
         const containerEnvs = await containerEnvVars(goalEvent, repoContext);
-        const sdmEnvs = [
-            {
-                name: "ATOMIST_PROJECT_DIR",
-                value: ContainerProjectHome,
-            },
-        ];
         spec.containers.forEach(c => {
             c.env = [
                 ...containerEnvs,
-                ...sdmEnvs,
                 ...(c.env || []),
             ];
         });
@@ -188,7 +184,10 @@ export function k8sFulfillmentCallback(
         initContainer.env = [
             ...(initContainer.env || []),
             ...k8sJobEnv(k8sScheduler.podSpec, goalEvent, repoContext.context as any),
-            ...sdmEnvs,
+            {
+                name: "ATOMIST_PROJECT_DIR",
+                value: ContainerProjectHome,
+            },
             {
                 name: "ATOMIST_ISOLATED_GOAL_INIT",
                 value: "true",
@@ -267,7 +266,10 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
             return goalEvent;
         }
 
-        const spec: K8sGoalContainerSpec = _.merge({}, { containers: registration.containers, volumes: registration.volumes },
+        const spec: K8sGoalContainerSpec = _.merge({}, {
+                containers: registration.containers,
+                volumes: registration.volumes,
+            },
             (registration.callback) ? await registration.callback(registration, project, goal, goalEvent, context) : {});
         let containerName: string = _.get(spec, "containers[0].name");
         if (!containerName) {
