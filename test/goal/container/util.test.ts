@@ -24,6 +24,12 @@ import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
 import {
+    ContainerInput,
+    ContainerOutput,
+    ContainerProjectHome,
+    ContainerResult,
+} from "../../../lib/goal/container/container";
+import {
     containerEnvVars,
     copyProject,
 } from "../../../lib/goal/container/util";
@@ -80,12 +86,24 @@ describe("goal/container/util", () => {
                     value: "1968.4.19",
                 },
                 {
-                    name: "ATOMIST_GOAL_SET_ID",
-                    value: "0abcdef-123456789-abcdef",
+                    name: "ATOMIST_GOAL",
+                    value: `${ContainerInput}/goal.json`,
                 },
                 {
-                    name: "ATOMIST_GOAL",
-                    value: "BeechwoodPark.ts#L243",
+                    name: "ATOMIST_RESULT",
+                    value: ContainerResult,
+                },
+                {
+                    name: "ATOMIST_INPUT_DIR",
+                    value: ContainerInput,
+                },
+                {
+                    name: "ATOMIST_OUTPUT_DIR",
+                    value: ContainerOutput,
+                },
+                {
+                    name: "ATOMIST_PROJECT_DIR",
+                    value: ContainerProjectHome,
                 },
             ];
             assert.deepStrictEqual(ge, e);
