@@ -49,7 +49,9 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import {
+    isGoalRelevant,
+} from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
 import { formatDuration } from "../../../../util/misc/time";
@@ -125,6 +127,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             preferences,
             id,
             credentials,
+            parameters: !!event.data.SdmGoal[0].parameters ? JSON.parse(event.data.SdmGoal[0].parameters) : {},
         };
 
         const goalScheduler = await findGoalScheduler(goalInvocation, this.configuration);
@@ -142,7 +145,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 await updateGoal(ctx, sdmGoal, {
                     state: !!result && !!result.state ? result.state : SdmGoalState.in_process,
                     phase: !!result && !!result.phase ? result.phase : "scheduled",
-                    description: !!result && !!result.description ? result.description : descriptionFromState(goal, SdmGoalState.in_process),
+                    description: !!result && !!result.description ? result.description : descriptionFromState(goal, SdmGoalState.in_process, sdmGoal),
                     url: progressLog.url,
                     externalUrls: !!result ? result.externalUrls : undefined,
                 });
