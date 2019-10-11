@@ -1,0 +1,9 @@
+query BinaryRepositoryProvider($name: String, $type: BinaryRepositoryType) {
+  BinaryRepositoryProvider(name: $name, type: $type) {
+    url
+    name
+    credential {
+      id
+    }
+  }
+}
