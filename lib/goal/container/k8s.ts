@@ -34,9 +34,11 @@ import {
     ServiceRegistrationGoalDataKey,
 } from "@atomist/sdm";
 import * as k8s from "@kubernetes/client-node";
+import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
+import * as path from "path";
 import * as request from "request";
 import { Writable } from "stream";
 import {
@@ -56,16 +58,21 @@ import {
 import { toArray } from "../../util/misc/array";
 import {
     Container,
+    ContainerInput,
+    ContainerOutput,
     ContainerProjectHome,
     ContainerRegistration,
     ContainerScheduler,
     GoalContainer,
     GoalContainerVolume,
 } from "./container";
+import { prepareSecrets } from "./provider";
 import {
     containerEnvVars,
     copyProject,
     loglog,
+    prepareInputAndOutput,
+    processResult,
 } from "./util";
 
 /**
@@ -142,7 +149,10 @@ export function k8sFulfillmentCallback(
 ): (sge: SdmGoalEvent, rc: RepoContext) => Promise<SdmGoalEvent> {
 
     return async (goalEvent, repoContext) => {
-        const spec: K8sGoalContainerSpec = _.merge({}, { containers: registration.containers, volumes: registration.volumes });
+        const spec: K8sGoalContainerSpec = _.merge({}, {
+            containers: registration.containers,
+            volumes: registration.volumes,
+        });
         if (registration.callback) {
             const project = await GitCommandGitProject.cloned(repoContext.credentials, repoContext.id);
             _.merge(spec, await registration.callback(registration, project, goal, goalEvent, repoContext.context));
@@ -158,16 +168,9 @@ export function k8sFulfillmentCallback(
             spec.containers[0].workingDir = ContainerProjectHome;
         }
         const containerEnvs = await containerEnvVars(goalEvent, repoContext);
-        const sdmEnvs = [
-            {
-                name: "ATOMIST_PROJECT_DIR",
-                value: ContainerProjectHome,
-            },
-        ];
         spec.containers.forEach(c => {
             c.env = [
                 ...containerEnvs,
-                ...sdmEnvs,
                 ...(c.env || []),
             ];
         });
@@ -180,6 +183,7 @@ export function k8sFulfillmentCallback(
         if (!k8sScheduler.podSpec) {
             throw new Error("KubernetesGoalScheduler has no podSpec defined");
         }
+
         const initContainer = _.cloneDeep(k8sScheduler.podSpec.spec.containers[0]);
         delete initContainer.lifecycle;
         delete initContainer.livenessProbe;
@@ -188,20 +192,75 @@ export function k8sFulfillmentCallback(
         initContainer.env = [
             ...(initContainer.env || []),
             ...k8sJobEnv(k8sScheduler.podSpec, goalEvent, repoContext.context as any),
-            ...sdmEnvs,
+            {
+                name: "ATOMIST_PROJECT_DIR",
+                value: ContainerProjectHome,
+            },
+            {
+                name: "ATOMIST_INPUT_DIR",
+                value: ContainerInput,
+            },
+            {
+                name: "ATOMIST_OUTPUT_DIR",
+                value: ContainerOutput,
+            },
             {
                 name: "ATOMIST_ISOLATED_GOAL_INIT",
                 value: "true",
             },
         ];
         const projectVolume = `project-${guid().split("-")[0]}`;
+        const inputVolume = `input-${guid().split("-")[0]}`;
+        const outputVolume = `output-${guid().split("-")[0]}`;
         initContainer.volumeMounts = [
             ...(initContainer.volumeMounts || []),
             {
                 mountPath: ContainerProjectHome,
                 name: projectVolume,
             },
+            {
+                mountPath: ContainerInput,
+                name: inputVolume,
+            },
+            {
+                mountPath: ContainerOutput,
+                name: outputVolume,
+            },
         ];
+
+        const secrets = await prepareSecrets(registration.containers[0], repoContext);
+        spec.containers.forEach(c => {
+            c.env = [
+                ...(secrets.env || []),
+                ...(c.env || []),
+            ];
+        });
+        const secretsVolumes = [];
+        if (!!secrets?.files) {
+            const ns = await readNamespace();
+            for (const file of secrets.files) {
+                const fileName = path.basename(file.mountPath);
+                const secretName = `secret-${guid().split("-")[0]}`;
+                await createOrUpdateSecret(ns, fileName, secretName, file.value);
+                initContainer.volumeMounts = [
+                    ...(initContainer.volumeMounts || []),
+                    {
+                        mountPath: file.mountPath,
+                        name: secretName,
+                    },
+                ];
+                spec.containers.forEach(c => {
+                    c.volumeMounts = [
+                        ...(c.volumeMounts || []),
+                        {
+                            mountPath: file.mountPath,
+                            name: secretName,
+                        },
+                    ];
+                });
+                secretsVolumes.push(secretName);
+            }
+        }
 
         const serviceSpec: { type: string, spec: K8sServiceSpec } = {
             type: K8sServiceRegistrationType.K8sService,
@@ -213,11 +272,33 @@ export function k8sFulfillmentCallback(
                         name: projectVolume,
                         emptyDir: {},
                     },
+                    {
+                        name: inputVolume,
+                        emptyDir: {},
+                    },
+                    {
+                        name: outputVolume,
+                        emptyDir: {},
+                    },
+                    ...(secretsVolumes.map(s => ({
+                        name: s,
+                        secret: {
+                            secretName: s,
+                        },
+                    }))),
                 ],
                 volumeMount: [
                     {
                         mountPath: ContainerProjectHome,
                         name: projectVolume,
+                    },
+                    {
+                        mountPath: ContainerInput,
+                        name: inputVolume,
+                    },
+                    {
+                        mountPath: ContainerOutput,
+                        name: outputVolume,
                     },
                 ],
             },
@@ -254,6 +335,8 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
         const { context, goalEvent, progressLog, project } = gi;
 
         const projectDir = process.env.ATOMIST_PROJECT_DIR || ContainerProjectHome;
+        const inputDir = process.env.ATOMIST_INPUT_DIR || ContainerInput;
+        const outputDir = process.env.ATOMIST_OUTPUT_DIR || ContainerOutput;
 
         if (process.env.ATOMIST_ISOLATED_GOAL_INIT === "true") {
             try {
@@ -263,11 +346,22 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
                 loglog(message, logger.error, progressLog);
                 return { code: 1, message };
             }
+            try {
+                await prepareInputAndOutput(inputDir, outputDir, gi);
+            } catch (e) {
+                const message = `Failed to prepare input and output for goal ${goalEvent.name}: ${e.message}`;
+                loglog(message, logger.error, progressLog);
+                return { code: 1, message };
+            }
             goalEvent.state = SdmGoalState.in_process;
             return goalEvent;
         }
 
-        const spec: K8sGoalContainerSpec = _.merge({}, { containers: registration.containers, volumes: registration.volumes },
+
+        const spec: K8sGoalContainerSpec = _.merge({}, {
+                containers: registration.containers,
+                volumes: registration.volumes,
+            },
             (registration.callback) ? await registration.callback(registration, project, goal, goalEvent, context) : {});
         let containerName: string = _.get(spec, "containers[0].name");
         if (!containerName) {
@@ -341,7 +435,21 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
             status.code++;
             status.message += ` but f${message.slice(1)}`;
         }
-        return status;
+
+        const outputFile = path.join(outputDir, "result.json");
+        let outputResult;
+        if ((await fs.pathExists(outputFile)) && status.code === 0) {
+            try {
+                outputResult = await processResult(await fs.readJson(outputFile), gi);
+            } catch (e) {
+                const message = `Failed to read output from Docker container: ${e.message}`;
+                loglog(message, logger.error, progressLog);
+                status.code++;
+                status.message += ` but f${message.slice(1)}`;
+            }
+        }
+
+        return outputResult || status;
     }, { readOnly: false });
 }
 
@@ -453,4 +561,31 @@ function followK8sLog(container: K8sContainer): request.Request {
     };
     const logOptions: k8s.LogOptions = { follow: true };
     return k8sLog.log(container.ns, container.pod, container.name, logStream, doneCallback, logOptions);
+}
+
+async function createOrUpdateSecret(ns: string,
+                                    key: string,
+                                    name: string,
+                                    data: any): Promise<void> {
+    const secret: DeepPartial<k8s.V1Secret> = {
+        apiVersion: "v1",
+        kind: "Secret",
+        metadata: {
+            name,
+        },
+        type: "Opaque",
+        stringData: {
+            [key]: typeof data !== "string" ? JSON.stringify(data) : data,
+        },
+    };
+
+    const kc = loadKubeConfig();
+    const core = kc.makeApiClient(k8s.CoreV1Api);
+
+    try {
+        await core.readNamespacedSecret(name, ns);
+        await core.replaceNamespacedSecret(name, ns, secret as any);
+    } catch (e) {
+        await core.createNamespacedSecret(ns, secret as any);
+    }
 }

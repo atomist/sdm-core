@@ -37,7 +37,12 @@ import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
 import { DeepPartial } from "ts-essentials";
-import { Container } from "../../../lib/goal/container/container";
+import {
+    Container,
+    ContainerInput,
+    ContainerOutput,
+    ContainerResult,
+} from "../../../lib/goal/container/container";
 import {
     executeK8sJob,
     K8sContainerRegistration,
@@ -127,7 +132,11 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
@@ -145,6 +154,14 @@ describe("goal/container/k8s", () => {
                                         {
                                             mountPath: "/atm/home",
                                             name: v,
+                                        },
+                                        {
+                                            mountPath: ContainerInput,
+                                            name: iv,
+                                        },
+                                        {
+                                            mountPath: ContainerOutput,
+                                            name: ov,
                                         },
                                     ],
                                     env: [
@@ -189,6 +206,14 @@ describe("goal/container/k8s", () => {
                                             value: "/atm/home",
                                         },
                                         {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
                                             name: "ATOMIST_ISOLATED_GOAL_INIT",
                                             value: "true",
                                         },
@@ -199,6 +224,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["true"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -224,12 +253,20 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -246,11 +283,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -303,7 +356,11 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
@@ -321,6 +378,14 @@ describe("goal/container/k8s", () => {
                                         {
                                             mountPath: "/atm/home",
                                             name: v,
+                                        },
+                                        {
+                                            mountPath: ContainerInput,
+                                            name: iv,
+                                        },
+                                        {
+                                            mountPath: ContainerOutput,
+                                            name: ov,
                                         },
                                     ],
                                     env: [
@@ -365,6 +430,14 @@ describe("goal/container/k8s", () => {
                                             value: "/atm/home",
                                         },
                                         {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
                                             name: "ATOMIST_ISOLATED_GOAL_INIT",
                                             value: "true",
                                         },
@@ -375,6 +448,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["true"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -400,12 +477,20 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -421,11 +506,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -511,7 +612,11 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
@@ -565,6 +670,14 @@ describe("goal/container/k8s", () => {
                                             value: "/atm/home",
                                         },
                                         {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
                                             name: "ATOMIST_ISOLATED_GOAL_INIT",
                                             value: "true",
                                         },
@@ -576,6 +689,14 @@ describe("goal/container/k8s", () => {
                                             mountPath: "/atm/home",
                                             name: v,
                                         },
+                                        {
+                                            mountPath: ContainerInput,
+                                            name: iv,
+                                        },
+                                        {
+                                            mountPath: ContainerOutput,
+                                            name: ov,
+                                        },
                                     ],
                                 },
                             ],
@@ -583,6 +704,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["first"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -608,12 +733,20 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -642,6 +775,10 @@ describe("goal/container/k8s", () => {
                                     args: ["second"],
                                     env: [
                                         {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
                                         },
@@ -666,12 +803,20 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -697,11 +842,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -787,7 +948,11 @@ describe("goal/container/k8s", () => {
             const ge = await c(sge, rcx);
             const p = JSON.parse(ge.data);
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            const iv: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[1].name`);
+            const ov: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[2].name`);
             assert(v, "failed to find volume name");
+            assert(iv, "failed to find volume name");
+            assert(ov, "failed to find volume name");
             assert(v.startsWith("project-"));
             const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
@@ -809,6 +974,14 @@ describe("goal/container/k8s", () => {
                                         {
                                             mountPath: "/atm/home",
                                             name: v,
+                                        },
+                                        {
+                                            mountPath: ContainerInput,
+                                            name: iv,
+                                        },
+                                        {
+                                            mountPath: ContainerOutput,
+                                            name: ov,
                                         },
                                     ],
                                     env: [
@@ -857,6 +1030,14 @@ describe("goal/container/k8s", () => {
                                             value: "/atm/home",
                                         },
                                         {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
+                                        },
+                                        {
                                             name: "ATOMIST_ISOLATED_GOAL_INIT",
                                             value: "true",
                                         },
@@ -867,6 +1048,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["true"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -892,12 +1077,20 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT_DIR",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT_DIR",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -914,11 +1107,27 @@ describe("goal/container/k8s", () => {
                                     name: v,
                                     emptyDir: {},
                                 },
+                                {
+                                    name: iv,
+                                    emptyDir: {},
+                                },
+                                {
+                                    name: ov,
+                                    emptyDir: {},
+                                },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
                                     name: v,
+                                },
+                                {
+                                    mountPath: ContainerInput,
+                                    name: iv,
+                                },
+                                {
+                                    mountPath: ContainerOutput,
+                                    name: ov,
                                 },
                             ],
                         },
@@ -998,6 +1207,15 @@ describe("goal/container/k8s", () => {
             await fs.ensureDir(workingDir);
             tmpDirs.push(workingDir);
             process.env.ATOMIST_PROJECT_DIR = workingDir;
+
+            const inputDir = `${tmpDirPrefix}-${guid()}`;
+            await fs.ensureDir(inputDir);
+            tmpDirs.push(inputDir);
+            process.env.ATOMIST_INPUT_DIR = inputDir;
+            const outputDir = `${tmpDirPrefix}-${guid()}`;
+            await fs.ensureDir(outputDir);
+            tmpDirs.push(outputDir);
+            process.env.ATOMIST_OUTPUT_DIR = outputDir;
         });
 
         after(async function directoryCleanup(): Promise<void> {
@@ -1006,6 +1224,8 @@ describe("goal/container/k8s", () => {
             } else {
                 delete process.env.ATOMIST_PROJECT_DIR;
             }
+            delete process.env.ATOMIST_INPUT_DIR;
+            delete process.env.ATOMIST_OUTPUT_DIR;
             await Promise.all(tmpDirs.map(d => fs.remove(d)));
         });
 
