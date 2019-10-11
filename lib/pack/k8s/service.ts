@@ -36,14 +36,20 @@ export enum K8sServiceRegistrationType {
  * Open for future extension to support adding other k8s resource types.
  */
 export interface K8sServiceSpec {
-    // Additional containers to be added into the goal job
+    /** Additional containers to be added into the goal job. */
     container?: DeepPartial<k8s.V1Container> | Array<DeepPartial<k8s.V1Container>>;
+    /** Additional init containers to be added into the goal job. */
     initContainer?: DeepPartial<k8s.V1Container> | Array<DeepPartial<k8s.V1Container>>;
 
-    // Additional volumes and volumeMounts to be added into the goal job
-    volumeMount?: DeepPartial<k8s.V1VolumeMount> | Array<DeepPartial<k8s.V1VolumeMount>>;
+    /** Additional volumes to be added into the goal job. */
     volume?: DeepPartial<k8s.V1Volume> | Array<DeepPartial<k8s.V1Volume>>;
+    /**
+     * Additional volumeMounts to be added into the goal job.  Each
+     * will be added to all containers and initContainers.
+     */
+    volumeMount?: DeepPartial<k8s.V1VolumeMount> | Array<DeepPartial<k8s.V1VolumeMount>>;
 
+    /** Additional image pull secrets to be added into the goal job. */
     imagePullSecret?: DeepPartial<k8s.V1LocalObjectReference> | Array<DeepPartial<k8s.V1LocalObjectReference>>;
 }
 
