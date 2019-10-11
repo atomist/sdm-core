@@ -60,7 +60,7 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
 
     public async handle(event: EventFired<OnAnyCompletedSdmGoal.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
-        const sdmGoal: SdmGoalEvent = event.data.SdmGoal[0] as SdmGoalEvent;
+        const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
         if (!isGoalRelevant(sdmGoal)) {
             logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
