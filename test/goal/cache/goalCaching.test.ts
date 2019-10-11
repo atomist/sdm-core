@@ -82,7 +82,9 @@ class TestGoalArtifactCache implements GoalCache {
 
 const ErrorProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "Error",
-    listener: async () => { throw Error("Test cache miss"); },
+    listener: async () => {
+        throw Error("Test cache miss");
+    },
     pushTest: AnyPush,
 };
 
@@ -97,9 +99,9 @@ describe("goalCaching", () => {
         fakePushId = fakePush().id;
         fakeGoal = fakeGoalInvocation(fakePushId);
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-        fakeGoal.configuration.sdm.goalCache = testCache;
         fakeGoal.configuration.sdm.cache = {
             enabled: true,
+            store: testCache,
         };
     });
 
@@ -108,6 +110,9 @@ describe("goalCaching", () => {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
             onCacheMiss: ErrorProjectListenerRegistration,
         };
+
+        fakeGoal.goalEvent.data = JSON.stringify({ foo: "bar" });
+
         await cachePut(options)
             .listener(project, fakeGoal, GoalProjectListenerEvent.after);
         // it should find it in the cache
@@ -116,6 +121,10 @@ describe("goalCaching", () => {
         await cacheRestore(options)
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test.txt"));
+        const data = JSON.parse(fakeGoal.goalEvent.data);
+        assert.deepStrictEqual(data["@atomist/sdm/input"], ["default"]);
+        assert.deepStrictEqual(data["@atomist/sdm/output"], ["default"]);
+        assert.deepStrictEqual(data.foo, "bar");
     });
 
     it("should call fallback on cache miss", async () => {
@@ -258,7 +267,7 @@ describe("goalCaching", () => {
     });
 
     it("should default to NoOpGoalCache", async () => {
-        fakeGoal.configuration.sdm.goalCache = undefined;
+        fakeGoal.configuration.sdm.cache.store = undefined;
         const fallback: GoalProjectListenerRegistration = {
             name: "fallback",
             listener: async p => {
