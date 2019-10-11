@@ -95,11 +95,11 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         }
 
         await Promise.all(goalsToRequest.map(async sdmG => {
-            const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
             if (sdmG.preApprovalRequired) {
                 return updateGoal(context, sdmG, {
                     state: SdmGoalState.waiting_for_pre_approval,
-                    description: goal ? goal.waitingForPreApprovalDescription : `Start required: ${sdmG.name}`,
+                    description: !!sdmGoal.descriptions && !!sdmGoal.descriptions.waitingForPreApproval
+                        ? sdmGoal.descriptions.waitingForPreApproval : `Start required: ${sdmG.name}`,
                 });
             } else {
                 let g = sdmG;
@@ -117,7 +117,8 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                 }
                 return updateGoal(context, g, {
                     state: SdmGoalState.requested,
-                    description: goal ? goal.requestedDescription : `Ready: ${g.name}`,
+                    description: !!sdmGoal.descriptions && !!sdmGoal.descriptions.requested
+                        ? sdmGoal.descriptions.requested : `Ready: ${g.name}`,
                     data: g.data,
                 });
             }
