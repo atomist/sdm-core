@@ -30,7 +30,7 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
-import { NoOpGoalCache } from "./NoOpGoalCache";
+import { CompressingGoalCache } from "./CompressingGoalCache";
 
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced
@@ -118,7 +118,7 @@ export interface GoalCacheRestoreOptions extends GoalCacheCoreOptions {
     entries?: Array<{ classifier: string }>;
 }
 
-const DefaultGoalCache = new NoOpGoalCache();
+const DefaultGoalCache = new CompressingGoalCache();
 
 /**
  * Goal listener that performs caching after a goal has been run.
@@ -158,6 +158,16 @@ export function cachePut(options: GoalCacheOptions,
                         await goalCache.put(gi, p, files, entry.classifier);
                     }
                 }
+
+                // Set outputs on the goal data
+                const { goalEvent } = gi;
+                const data = {
+                    "@atomist/sdm/output": entries.map(e => e.classifier),
+                };
+                goalEvent.data = JSON.stringify({
+                    ...(JSON.parse(goalEvent.data || "{}")),
+                    ...data,
+                });
             }
         },
         pushTest: options.pushTest,
@@ -246,6 +256,16 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
             } else {
                 await invokeCacheMissListeners(optsToUse, p, gi, event);
             }
+
+            // Set inputs on the goal data
+            const { goalEvent } = gi;
+            const data = {
+                "@atomist/sdm/input": classifiersToBeRestored,
+            };
+            goalEvent.data = JSON.stringify({
+                ...(JSON.parse(goalEvent.data || "{}")),
+                ...data,
+            });
         },
         pushTest: optsToUse.pushTest,
         events: [GoalProjectListenerEvent.before],
@@ -296,7 +316,7 @@ async function getFilePathsThroughPattern(project: Project, globPattern: string 
     const oldExcludes = DefaultExcludes;
     DefaultExcludes.splice(0, DefaultExcludes.length);  // necessary evil
     try {
-        return projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
+        return await projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
     } finally {
         DefaultExcludes.push(...oldExcludes);
     }
@@ -307,7 +327,5 @@ function isCacheEnabled(gi: GoalInvocation): boolean {
 }
 
 function cacheStore(gi: GoalInvocation): GoalCache {
-    const store: GoalCache = _.get(gi.configuration, "sdm.cache.store",
-        gi.configuration.sdm.goalCache || DefaultGoalCache);
-    return store;
+    return _.get(gi.configuration, "sdm.cache.store", DefaultGoalCache);
 }

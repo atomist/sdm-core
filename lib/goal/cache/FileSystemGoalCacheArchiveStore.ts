@@ -20,6 +20,7 @@ import {
     spawnLog,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as os from "os";
 import * as path from "path";
 import { GoalCacheArchiveStore } from "./CompressingGoalCache";
 
@@ -55,8 +56,9 @@ export class FileSystemGoalCacheArchiveStore implements GoalCacheArchiveStore {
     }
 
     private static async getCacheDirectory(gi: GoalInvocation, classifier: string = "default"): Promise<string> {
+        const defaultCachePath = path.join(os.homedir(), ".atomist", "cache");
         const possibleCacheConfiguration = gi.configuration.sdm.cache as (CacheConfiguration["cache"] | undefined);
-        const sdmCacheDir = possibleCacheConfiguration ? (possibleCacheConfiguration.path || "/opt/data") : "/opt/data";
+        const sdmCacheDir = possibleCacheConfiguration ? (possibleCacheConfiguration.path || defaultCachePath) : defaultCachePath;
         const cacheDir = path.join(sdmCacheDir, classifier);
         await fs.mkdirs(cacheDir);
         return cacheDir;
