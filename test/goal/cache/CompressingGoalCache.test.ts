@@ -78,8 +78,7 @@ describe("CompressingGoalCache", () => {
         const fakeGoal = fakeGoalInvocation(fakePushId);
         const testCache = new CompressingGoalCache();
         fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-        fakeGoal.configuration.sdm.goalCache = testCache;
-        fakeGoal.configuration.sdm.cache = { enabled: true, path: testDir() };
+        fakeGoal.configuration.sdm.cache = { enabled: true, path: testDir(), store: testCache };
 
         const options: GoalCacheOptions = {
             entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
