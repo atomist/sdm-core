@@ -31,6 +31,7 @@ import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
+import { SetGoalsOnGoal } from "../../handlers/events/delivery/goals/SetGoalsOnGoal";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
 import { VoteOnGoalApprovalRequest } from "../../handlers/events/delivery/goals/VoteOnGoalApprovalRequest";
@@ -93,7 +94,17 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     this.configuration.sdm.credentialsResolver,
                     this.configuration.sdm.preferenceStoreFactory,
                     this.configuration.sdm.enrichGoal,
-                    this.configuration.sdm.tagGoalSet)],
+                    this.configuration.sdm.tagGoalSet),
+                    () => new SetGoalsOnGoal(
+                        this.configuration.sdm.projectLoader,
+                        this.configuration.sdm.repoRefResolver,
+                        this.pushMapping,
+                        this.goalsSetListeners,
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory,
+                        this.configuration.sdm.enrichGoal,
+                        this.configuration.sdm.tagGoalSet)],
                 commandHandlers: [],
                 ingesters: [],
             };
