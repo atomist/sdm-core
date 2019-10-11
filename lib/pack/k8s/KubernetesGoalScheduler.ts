@@ -38,7 +38,6 @@ import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
-import { DeepPartial } from "ts-essentials";
 import { toArray } from "../../util/misc/array";
 import {
     loadKubeClusterConfig,
@@ -121,6 +120,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         }
 
         try {
+            logger.debug(`Job spec for ${jobDesc}: ${JSON.stringify(jobSpec)}`);
             // Previous deletion might not have completed; hence the retry here
             const jobResult = (await doWithRetry<{ body: k8s.V1Job }>(
                 () => batch.createNamespacedJob(jobSpec.metadata.namespace, jobSpec),
@@ -247,7 +247,7 @@ export function k8sJobName(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent): string 
 export function k8sJobEnv(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent, context: HandlerContext): k8s.V1EnvVar[] {
     const goalName = k8sJobGoalName(goalEvent);
     const jobName = k8sJobName(podSpec, goalEvent);
-    const envVars: Array<DeepPartial<k8s.V1EnvVar>> = [
+    const envVars: k8s.V1EnvVar[] = [
         {
             name: "ATOMIST_JOB_NAME",
             value: jobName,
@@ -285,7 +285,7 @@ export function k8sJobEnv(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent, context: 
             value: "true",
         },
     ];
-    return envVars as k8s.V1EnvVar[];
+    return envVars;
 }
 
 /**
@@ -347,7 +347,7 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
 
                         if (!!spec.volumeMount) {
                             const vm = toArray<k8s.V1VolumeMount>(spec.volumeMount as any);
-                            jobSpec.spec.template.spec.containers.forEach(c => {
+                            [...jobSpec.spec.template.spec.containers, ...jobSpec.spec.template.spec.initContainers].forEach(c => {
                                 c.volumeMounts = [
                                     ...(c.volumeMounts || []),
                                     ...vm,

@@ -90,7 +90,7 @@ export class CompressingGoalCache implements GoalCache {
             gi.progressLog.write(message);
             return;
         }
-        await this.store.store(gi, classifier, teamArchiveFileName + ".gz");
+        await this.store.store(gi, this.sanitizeClassifier(classifier),teamArchiveFileName + ".gz");
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
@@ -100,7 +100,7 @@ export class CompressingGoalCache implements GoalCache {
     public async retrieve(gi: GoalInvocation, project: LocalProject, classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
-        await this.store.retrieve(gi, classifier, teamArchiveFileName);
+        await this.store.retrieve(gi, this.sanitizeClassifier(classifier), teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
             await spawnLog("tar", ["-xzf", teamArchiveFileName], {
                 log: gi.progressLog,
@@ -109,5 +109,11 @@ export class CompressingGoalCache implements GoalCache {
         } else {
             throw Error("No cache entry");
         }
+    }
+
+    private sanitizeClassifier(classifier?: string): string {
+         return !!classifier ?
+             classifier.replace(/\./g, "_")
+                 .replace(/\//g, "_") : classifier;
     }
 }
