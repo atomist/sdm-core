@@ -1,0 +1,9 @@
+query DockerRegistryProvider($name: String) {
+  DockerRegistryProvider(name: $name) {
+    url
+    name
+    credential {
+      id
+    }
+  }
+}
