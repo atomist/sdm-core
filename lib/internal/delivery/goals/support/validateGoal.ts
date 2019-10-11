@@ -16,6 +16,7 @@
 
 import { automationClientInstance } from "@atomist/automation-client";
 import { SdmGoalEvent } from "@atomist/sdm";
+import { SdmGoalFieldsFragment } from "../../../../typings/types";
 
 export function isGoalRelevant(sdmGoal: SdmGoalEvent,
                                registration: string = automationClientInstance().configuration.name): boolean {

@@ -192,7 +192,7 @@ function isGoalRejected(sdmGoal: SdmGoalEvent): boolean {
 
 export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
     // Create a new goal with only the relevant and sensible fields
-    const newGoal: Omit<SdmGoalEvent, "push"> = {
+    const newGoal: Omit<SdmGoalEvent, "push"> & { parameters: string } = {
         uniqueName: normalizeValue(goal.uniqueName),
         name: normalizeValue(goal.name),
         environment: normalizeValue(goal.environment),
@@ -257,6 +257,7 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
             userId: normalizeValue(p.userId),
             version: normalizeValue(p.version),
         })) : [],
+        parameters: normalizeValue((goal as any).parameters),
     };
     return stringify(newGoal);
 }

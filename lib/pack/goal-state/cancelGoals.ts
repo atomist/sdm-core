@@ -196,7 +196,8 @@ async function cancelGoalSet(goalSetId: string, ctx: HandlerContext, id?: string
             SdmGoalState.failure].includes(goal.state)) {
             await updateGoal(ctx, goal, {
                 state: SdmGoalState.canceled,
-                description: `Canceled: ${goal.name}`,
+                description: !!goal.descriptions && !!goal.descriptions.canceled
+                    ? goal.descriptions.canceled :`Canceled: ${goal.name}`,
             });
         }
     }
