@@ -12,6 +12,7 @@ query InProcessSdmGoals($registration: [String!]!) {
     branch
     fulfillment {
       method
+      registration
       name
     }
     description
@@ -63,6 +64,19 @@ query InProcessSdmGoals($registration: [String!]!) {
       userId
       channelId
     }
+    descriptions {
+      canceled
+      completed
+      failed
+      inProcess
+      planned
+      requested
+      stopped
+      skipped
+      waitingForApproval
+      waitingForPreApproval
+    }
+    parameters
     data
     push {
       ...PushFields
