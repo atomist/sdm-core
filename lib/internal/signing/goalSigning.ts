@@ -210,8 +210,21 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
         phase: normalizeValue(goal.phase),
         version: normalizeValue(goal.version),
         description: normalizeValue(goal.description),
+        descriptions: !!goal.descriptions ? {
+            planned: normalizeValue(goal.descriptions.planned),
+            requested: normalizeValue(goal.descriptions.requested),
+            inProcess: normalizeValue(goal.descriptions.inProcess),
+            completed: normalizeValue(goal.descriptions.completed),
+            failed: normalizeValue(goal.descriptions.failed),
+            skipped: normalizeValue(goal.descriptions.skipped),
+            canceled: normalizeValue(goal.descriptions.canceled),
+            stopped: normalizeValue(goal.descriptions.stopped),
+            waitingForApproval: normalizeValue(goal.descriptions.waitingForApproval),
+            waitingForPreApproval: normalizeValue(goal.descriptions.waitingForPreApproval),
+        } : undefined,
         ts: normalizeValue(goal.ts),
         data: normalizeValue(goal.data),
+        parameters: normalizeValue((goal as any).parameters),
         url: normalizeValue(goal.url),
         externalUrls: !!goal.externalUrls ? goal.externalUrls.map(e => ({
             url: normalizeValue(e.url),
@@ -257,7 +270,6 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
             userId: normalizeValue(p.userId),
             version: normalizeValue(p.version),
         })) : [],
-        parameters: normalizeValue((goal as any).parameters),
     };
     return stringify(newGoal);
 }
