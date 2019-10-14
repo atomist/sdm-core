@@ -25,29 +25,29 @@ import {
     assertUniversalGenerator,
 } from "../../../lib/pack/universal-generator/test/assertGenerator";
 
-const SpringGeneratorRegistration: GeneratorRegistration<{ name: string }> = {
-    name: "SpringBootGenerator",
-    intent: "create spring",
-    startingPoint: GitHubRepoRef.from({ owner: "atomist-seeds", repo: "spring-rest", branch: "master" }),
-    parameters: {
-        name: {},
-    },
-    transform: async (p, papi: any) => {
-        await p.addFile("params", `${papi.parameters.name} was here`);
-    },
-};
-
-const Trans1UniversalTransform: UniversalTransform<{ firstName: string }> = {
-    parameters: {
-        firstName: {},
-    },
-    test: async p => true,
-    transforms: async (p, papi: any) => {
-        await p.addFile("trans1", `${papi.parameters.firstName} ${papi.parameters.name} was here`);
-    },
-};
-
 describe("universalGenerator", () => {
+
+    const SpringGeneratorRegistration: GeneratorRegistration<{ name: string }> = {
+        name: "SpringBootGenerator",
+        intent: "create spring",
+        startingPoint: GitHubRepoRef.from({ owner: "atomist-seeds", repo: "spring-rest", branch: "master" }),
+        parameters: {
+            name: {},
+        },
+        transform: async (p, papi: any) => {
+            await p.addFile("params", `${papi.parameters.name} was here`);
+        },
+    };
+
+    const Trans1UniversalTransform: UniversalTransform<{ firstName: string }> = {
+        parameters: {
+            firstName: {},
+        },
+        test: async p => true,
+        transforms: async (p, papi: any) => {
+            await p.addFile("trans1", `${papi.parameters.firstName} ${papi.parameters.name} was here`);
+        },
+    };
 
     it("should fail to generate project with missing initial parameters", async () => {
 
@@ -135,6 +135,7 @@ describe("universalGenerator", () => {
         await assertGeneratorResult(result);
 
     }).timeout(10000);
+
 });
 
 async function assertGeneratorResult(result: AssertGeneratorResult): Promise<void> {
