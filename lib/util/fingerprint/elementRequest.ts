@@ -73,22 +73,21 @@ export interface ElementRequest {
  * @param {Partial<ElementRequest>} opts
  * @return {Promise<Element[]>}
  */
-export async function findElements(p: Project,
-                                   opts: Partial<ElementRequest> = {}): Promise<Element[]> {
+export async function findElements(p: Project, opts: Partial<ElementRequest> = {}): Promise<Element[]> {
     const optsToUse: ElementRequest = {
         ...JavaScriptElementRequest,
         ...opts,
     };
-    const matches = await astUtils.findMatches(p,
-        optsToUse.fileParser,
-        optsToUse.globPattern,
-        optsToUse.pathExpression,
-    );
+    const matches = await astUtils.matches(p, {
+        parseWith: optsToUse.fileParser,
+        globPatterns: optsToUse.globPattern,
+        pathExpression: optsToUse.pathExpression,
+    });
     const helper = new CFamilyLangHelper();
     return matches.map(m => {
         const identifier = optsToUse.extractIdentifier(m);
         const body = m.$value;
-        const canonicalBody = !!optsToUse.canonicalize ? optsToUse.canonicalize(m) :  helper.canonicalize(body);
+        const canonicalBody = !!optsToUse.canonicalize ? optsToUse.canonicalize(m) : helper.canonicalize(body);
         return {
             node: m,
             path: m.sourceLocation.path,
