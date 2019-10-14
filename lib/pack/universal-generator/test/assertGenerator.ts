@@ -36,6 +36,7 @@ import {
 import * as assert from "assert";
 import * as flatten from "flat";
 import * as _ from "lodash";
+import { DeepPartial } from "ts-essentials";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import { toArray } from "../../../util/misc/array";
 import { invokeCommand } from "../../job/invokeCommand";
@@ -51,7 +52,9 @@ export interface AssertGeneratorResult {
 export async function assertUniversalGenerator(generatorUnderTest: GeneratorRegistration<any>,
                                                transformsUnderTest: UniversalTransform<any> | Array<UniversalTransform<any>>,
                                                initialParams: Record<string, any>,
-                                               promptForParams: Record<string, any> = {}): Promise<AssertGeneratorResult> {
+                                               promptForParams: Record<string, any> = {},
+                                               config: DeepPartial<SoftwareDeliveryMachineConfiguration> = {},
+): Promise<AssertGeneratorResult> {
     try {
         // Prepare the result of generator run
         let project: Project;
@@ -76,9 +79,11 @@ export async function assertUniversalGenerator(generatorUnderTest: GeneratorRegi
                         return successOn<Project>(p);
                     },
                 },
-            });
+            },
+            config,
+        );
 
-        const automationServer = new BuildableAutomationServer({});
+        const automationServer = new BuildableAutomationServer(configuration);
         const sdm = new TestSoftwareDeliveryMachine("test", configuration);
 
         (global as any).__runningAutomationClient = {
