@@ -102,10 +102,8 @@ export async function assertUniversalGenerator(generatorUnderTest: GeneratorRegi
                     parameterSpecs = msg.parameter_specs;
                 }
             },
-            send: async () => {
-            },
-            delete: async () => {
-            },
+            send: async () => { },
+            delete: async () => { },
         };
 
         // Invoke the generator with the initial set of parameters

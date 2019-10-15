@@ -16,6 +16,8 @@
 
 import {
     GitHubRepoRef,
+    Parameters,
+    Value,
 } from "@atomist/automation-client";
 import { GeneratorRegistration } from "@atomist/sdm";
 import * as assert from "assert";
@@ -132,6 +134,44 @@ describe("universalGenerator", () => {
             params,
             promptForParams);
 
+        await assertGeneratorResult(result);
+
+    }).timeout(10000);
+
+    it("should generate project with values from config", async () => {
+        @Parameters()
+        class TestParameters {
+            @Value("sdm.test.path.no")
+            public no: string;
+        }
+        const TestTransform: UniversalTransform<TestParameters> = {
+            parameters: {
+                no: {},
+            },
+            test: async p => true,
+            transforms: async (p, papi) => {
+                await p.addFile("no", papi.parameters.no);
+            },
+        };
+        const params = {
+            target: {
+                owner: "sdm-org",
+                repo: "test",
+            },
+            name: "Mouse",
+        };
+        const promptForParams = {
+            firstName: "Mickey",
+        };
+        const c = {
+            sdm: {
+                path: {
+                    no: "yes",
+                },
+            },
+        };
+        const result = await assertUniversalGenerator(SpringGeneratorRegistration, [Trans1UniversalTransform, TestTransform],
+            params, promptForParams, c);
         await assertGeneratorResult(result);
 
     }).timeout(10000);
