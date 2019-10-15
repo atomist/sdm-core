@@ -92,7 +92,7 @@ async function enhanceWithSpecificParameters<P>(universalTransforms: Array<Unive
     const unsatisfiedParameters: ParametersObject<any> = {};
     for (const universalTransform of universalTransforms) {
         _.forEach(universalTransform.parameters, (v, k) => {
-            if (ctx.parameters[k] === undefined) {
+            if (!(v as any).path && ctx.parameters[k] === undefined) {
                 unsatisfiedParameters[k] = v;
             }
         });

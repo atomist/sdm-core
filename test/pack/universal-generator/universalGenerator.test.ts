@@ -139,14 +139,10 @@ describe("universalGenerator", () => {
     }).timeout(10000);
 
     it("should generate project with values from config", async () => {
-        @Parameters()
-        class TestParameters {
-            @Value("sdm.test.path.no")
-            public no: string;
-        }
-        const TestTransform: UniversalTransform<TestParameters> = {
+
+        const TestTransform: UniversalTransform<{ no: string }> = {
             parameters: {
-                no: {},
+                no: { path: "sdm.test.path.no" },
             },
             test: async p => true,
             transforms: async (p, papi) => {
@@ -173,6 +169,8 @@ describe("universalGenerator", () => {
         const result = await assertUniversalGenerator(SpringGeneratorRegistration, [Trans1UniversalTransform, TestTransform],
             params, promptForParams, c);
         await assertGeneratorResult(result);
+        const f = await result.project.getFile("no");
+        assert.strictEqual(await f.getContent(), "yes");
 
     }).timeout(10000);
 
