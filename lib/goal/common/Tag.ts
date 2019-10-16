@@ -18,19 +18,22 @@ import {
     DefaultGoalNameGenerator,
     FulfillableGoal,
     FulfillableGoalDetails,
+    Fulfillment,
     getGoalDefinitionFrom,
     Goal,
+    SoftwareDeliveryMachine,
 } from "@atomist/sdm";
 import { executeTag } from "../../internal/delivery/build/executeTag";
 
 /**
- * Goal that performs project tagging on GitHub
+ * Goal that performs project tagging using Git.  If no fulfillment is
+ * added to the goal, one is added during registration that tags using
+ * the goal set pre-release version as created by the [[Version]]
+ * goal.
  */
 export class Tag extends FulfillableGoal {
 
-    constructor(goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("tag"),
-                ...dependsOn: Goal[]) {
-
+    constructor(goalDetailsOrUniqueName: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("tag"), ...dependsOn: Goal[]) {
         super({
             workingDescription: "Tagging",
             completedDescription: "Tagged",
@@ -38,10 +41,31 @@ export class Tag extends FulfillableGoal {
             ...getGoalDefinitionFrom(goalDetailsOrUniqueName, DefaultGoalNameGenerator.generateName("tag")),
             displayName: "tag",
         }, ...dependsOn);
+    }
 
-        this.addFulfillment({
-            name: DefaultGoalNameGenerator.generateName("tag"),
-            goalExecutor: executeTag(),
+    /**
+     * Called by the SDM on initialization.  This function calls
+     * `super.register` and adds a startup listener to the SDM.
+     *
+     * The startup listener registers a default goal fulfillment that
+     * calles [[executeTag]] with no arguments.
+     */
+    public register(sdm: SoftwareDeliveryMachine): void {
+        super.register(sdm);
+
+        sdm.addStartupListener(async () => {
+            if (this.fulfillments.length === 0 && this.callbacks.length === 0) {
+                this.addFulfillment({
+                    name: DefaultGoalNameGenerator.generateName("prerelease-tag"),
+                    goalExecutor: executeTag(),
+                });
+            }
         });
     }
+
+    public addFulfillment(fulfillment: Fulfillment): this {
+        super.addFulfillment(fulfillment);
+        return this;
+    }
+
 }
