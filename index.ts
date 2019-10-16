@@ -63,6 +63,8 @@ export {
     EphemeralLocalArtifactStore,
 } from "./lib/internal/artifact/local/EphemeralLocalArtifactStore";
 export {
+    createGitTag,
+    CreateGitTagOptions,
     createTagForStatus,
     executeTag,
 } from "./lib/internal/delivery/build/executeTag";
@@ -211,6 +213,7 @@ export {
     GoalConfigurer,
     GoalCreator,
     ConfigurationPreProcessor,
+    ConfigureMachineOptions,
     AllGoals,
     DeliveryGoals,
 } from "./lib/machine/configure";
