@@ -24,8 +24,8 @@ import {
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
 import * as cluster from "cluster";
+import * as fg from "fast-glob";
 import * as fs from "fs-extra";
-import * as glob from "glob";
 import * as path from "path";
 
 /**
@@ -42,27 +42,26 @@ export class CacheCleanupAutomationEventListener extends AutomationEventListener
         if (cluster.isMaster && possibleCacheConfiguration && possibleCacheConfiguration.enabled) {
             const cachePath = possibleCacheConfiguration.path || "/opt/data";
 
-            setTimeout(() => {
-                const ts = Date.now() - (1000 * 60 * 60 * 2); // 2 hour threshold
-                if (fs.existsSync(cachePath)) {
-                    try {
-                        glob("**/*", { cwd: cachePath }, (err, matches) => {
-                            matches.forEach(m => {
-                                const p = path.join(cachePath, m);
-                                try {
-                                    const st = fs.statSync(p);
-                                    if (st.mtimeMs < ts && st.isFile()) {
-                                        logger.debug(`Deleting cached file '${p}'`);
-                                        fs.removeSync(p);
-                                    }
-                                } catch (e) {
-                                    logger.debug("Failed to delete cached file '%s': %s", p, e.message);
+            setTimeout(async () => {
+                try {
+                    const ts = Date.now() - (1000 * 60 * 60 * 2); // 2 hour threshold
+                    if (fs.existsSync(cachePath)) {
+                        const matches = await fg("**/*", { cwd: cachePath });
+                        for (const m of matches) {
+                            const p = path.join(cachePath, m);
+                            try {
+                                const st = await fs.stat(p);
+                                if (st.mtimeMs < ts && st.isFile()) {
+                                    logger.debug(`Deleting cached file '${p}'`);
+                                    await fs.remove(p);
                                 }
-                            });
-                        });
-                    } catch (err) {
-                        logger.debug("Failed to clean cache directory '%s': %s", cachePath, err.message);
+                            } catch (e) {
+                                logger.debug("Failed to delete cached file '%s': %s", p, e.message);
+                            }
+                        }
                     }
+                } catch (err) {
+                    logger.debug("Failed to clean cache directory '%s': %s", cachePath, err.message);
                 }
             });
         }
