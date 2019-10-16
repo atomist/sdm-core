@@ -27,7 +27,6 @@ import {
     or,
     PlannedGoal,
     PlannedGoals,
-    PredicatedGoalDefinition,
     PushListenerInvocation,
     pushTest,
     PushTest,
