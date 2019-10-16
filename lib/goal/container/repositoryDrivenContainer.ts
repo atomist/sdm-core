@@ -22,6 +22,7 @@ import {
     Goal,
     GoalProjectListenerEvent,
     Goals,
+    GoalWithFulfillment,
     hasFile,
     not,
     or,
@@ -52,10 +53,14 @@ export const hasRepositoryGoals: PushTest = pushTest("has SDM goals", async pli 
     return (await pli.project.getFiles(".atomist/*_goals.{yml,yaml}")).length > 0;
 });
 
+export function repositoryDrivenContainer(tests: Record<string, (p: PushListenerInvocation) => Promise<boolean>> = {}): Goal {
+    return new RepositoryDrivenContainer(tests);
+}
+
 export class RepositoryDrivenContainer extends FulfillableGoal {
 
-    constructor(...dependsOn: Goal[]) {
-        super({ uniqueName: "repository-driven-goal"}, ...dependsOn);
+    constructor(private readonly tests: Record<string, (p: PushListenerInvocation) => Promise<boolean>>) {
+        super({ uniqueName: "repository-driven-goal"});
 
         this.addFulfillment({
             // progressReporter: TODO cd add
@@ -112,7 +117,7 @@ export class RepositoryDrivenContainer extends FulfillableGoal {
                     if (config.hasOwnProperty(k)) {
                         const value = config[k];
                         const v = camelcaseKeys(value, { deep: true }) as any;
-                        const test = and(...toArray(mapTests(v.test, {})));
+                        const test = and(...toArray(mapTests(v.test, this.tests)));
                         if (await test.mapping(pli)) {
                             const plannedGoals = toArray(mapGoals(v.goals, {}));
                             plan[k] = {
