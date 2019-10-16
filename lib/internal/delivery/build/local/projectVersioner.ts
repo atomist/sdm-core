@@ -68,21 +68,69 @@ export function executeVersioner(projectVersioner: ProjectVersioner): ExecuteGoa
     };
 }
 
+/**
+ * Get prerelease, i.e., timestamped, version associated with the goal
+ * set for the provided goal invocation.  The Version goal must be
+ * executed within the goal set prior to calling this function.
+ *
+ * @param gi Goal invocation
+ * @return Prerelease semantic version string
+ */
+export async function goalInvocationVersion(gi: GoalInvocation): Promise<string | undefined> {
+    return getGoalVersion({
+        branch: gi.id.branch,
+        context: gi.context,
+        owner: gi.goalEvent.repo.owner,
+        providerId: gi.goalEvent.repo.providerId,
+        repo: gi.goalEvent.repo.name,
+        sha: gi.goalEvent.sha,
+    });
+}
+
+/** Object wrapping [[getGoalVersion]] function arguments. */
+export interface GetGoalVersionArguments {
+    /** Context providing a graph client. */
+    context: HandlerContext;
+    /** Repository owner, i.e., user or organization. */
+    owner: string;
+    /** Git repository provider identifier. */
+    providerId: string;
+    /** Repository name. */
+    repo: string;
+    /** Commit SHA. */
+    sha: string;
+    /** Branch, "master" if not provided */
+    branch?: string;
+}
+
+/**
+ * Read and return prerelease version for the goal set associated with
+ * the provided commit.
+ *
+ * @param args Properties determining which version to retrieve
+ * @return Prerelease semantic version string
+ */
+export async function getGoalVersion(args: GetGoalVersionArguments): Promise<string | undefined> {
+    const branch = args.branch || "master";
+    const version = await args.context.graphClient.query<SdmVersionForCommit.Query, SdmVersionForCommit.Variables>({
+        name: "SdmVersionForCommit",
+        variables: {
+            name: [args.repo],
+            owner: [args.owner],
+            providerId: [args.providerId],
+            sha: [args.sha],
+            branch: [branch],
+        },
+    });
+    return _.get(version, "SdmVersion[0].version");
+}
+
+/** See getGoalVersion. */
 export async function readSdmVersion(owner: string,
-                                     name: string,
+                                     repo: string,
                                      providerId: string,
                                      sha: string,
                                      branch: string,
-                                     context: HandlerContext): Promise<string> {
-    const version = await context.graphClient.query<SdmVersionForCommit.Query, SdmVersionForCommit.Variables>({
-            name: "SdmVersionForCommit",
-            variables: {
-                name: [name],
-                owner: [owner],
-                providerId: [providerId],
-                sha: [sha],
-                branch: [branch],
-            },
-        });
-    return _.get(version, "SdmVersion[0].version");
+                                     context: HandlerContext): Promise<string | undefined> {
+    return getGoalVersion({ branch, context, owner, providerId, repo, sha });
 }

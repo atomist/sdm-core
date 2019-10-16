@@ -16,36 +16,148 @@
 
 import {
     GitHubRepoRef,
+    GitProject,
+    logger,
     ProjectOperationCredentials,
     RemoteRepoRef,
-    Success,
 } from "@atomist/automation-client";
 import {
     ExecuteGoal,
     ExecuteGoalResult,
     GoalInvocation,
+    LoggingProgressLog,
+    ProgressLog,
+    SdmGoalEvent,
+    spawnLog,
 } from "@atomist/sdm";
 import {
     createTag,
     createTagReference,
     Tag,
 } from "../../../util/github/ghub";
-import { readSdmVersion } from "./local/projectVersioner";
+import { goalInvocationVersion } from "./local/projectVersioner";
 
-export function executeTag(): ExecuteGoal {
+/**
+ * Options for creating a tag.  If neither `name` or `release` are
+ * truthy, a prerelease, i.e., timestamped, version tag is created.
+ * If both `name` and `release` are truthy, `name` takes precedence.
+ */
+export interface ExecuteTagOptions {
+    /** Name of tag to create. */
+    name?: string;
+    /**
+     * If `true`, create a release semantic version tag, not a
+     * prerelease version tag.
+     */
+    release?: boolean;
+    /**
+     * Semantic version build metadata to append to tag, e.g.,
+     * "sdm.BUILD_NUMBER".
+     */
+    build?: string;
+}
+
+/**
+ * Create and return an execute goal object that creates a Git tag,
+ * suitable for use with the [[Tag]] goal.
+ *
+ * @param opts Options that determine the tag created
+ * @return Success if successful, Failure otherwise
+ */
+export function executeTag(opts: ExecuteTagOptions = {}): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { configuration, goalEvent, credentials, id, context } = goalInvocation;
+        const { configuration, goalEvent, credentials, id, context, progressLog } = goalInvocation;
 
-        return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: true }, async p => {
-            const version = await readSdmVersion(goalEvent.repo.owner, goalEvent.repo.name,
-                goalEvent.repo.providerId, goalEvent.sha, id.branch, context);
-            await createTagForStatus(id, goalEvent.sha, goalEvent.push.after.message, version, credentials);
-
-            return Success;
+        return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async project => {
+            try {
+                let tag: string;
+                let message: string = (goalEvent.push.after && goalEvent.push.after.message) ? goalEvent.push.after.message : undefined;
+                if (opts.name) {
+                    tag = opts.name;
+                    message = message || `Tag ${opts.name}`;
+                } else {
+                    const version = await goalInvocationVersion(goalInvocation);
+                    if (opts.release) {
+                        tag = version.replace(/[-+].*/, "");
+                        message = message || `Release ${tag}`;
+                    } else {
+                        tag = version;
+                        message = message || `Prerelease ${tag}`;
+                    }
+                }
+                if (opts.build) {
+                    tag += "+" + opts.build;
+                }
+                await createGitTag({ project, tag, message, log: progressLog });
+                return { code: 0, message: `Created tag '${tag}' for ${goalEvent.repo.owner}/${goalEvent.repo.name}` };
+            } catch (e) {
+                const message = `Failed to create tag for ${goalEvent.repo.owner}/${goalEvent.repo.name}: ${e.message}`;
+                logger.error(message);
+                progressLog.write(message);
+                return { code: 1, message };
+            }
         });
     };
 }
 
+/** [[createTag]] function arguments. */
+export interface CreateGitTagOptions {
+    /** Git repository project to operate on. */
+    project: GitProject;
+    /** Name of tag to create and push. */
+    tag: string;
+    /** Optional message to associate with Git tag. */
+    message?: string;
+    /** Optional progress log to write updates to. */
+    log?: ProgressLog;
+}
+
+/**
+ * Create and push a Git tag with optional message.
+ *
+ * @param opts Options for creating a Git tag.
+ */
+export async function createGitTag(opts: CreateGitTagOptions): Promise<void> {
+    if (!opts.tag) {
+        throw new Error("You must provide a valid Git tag");
+    }
+    if (!opts.project) {
+        throw new Error("You must provide a Git project");
+    }
+    if (!opts.log) {
+        opts.log = new LoggingProgressLog("logger");
+    }
+    const remote = opts.project.remote || "origin";
+    try {
+        const spawnOpts = { cwd: opts.project.baseDir, log: opts.log };
+        const tagArgs = ["tag", opts.tag];
+        if (opts.message) {
+            tagArgs.splice(1, 0, "-m", opts.message);
+        }
+        const tagResult = await spawnLog("git", tagArgs, spawnOpts);
+        if (tagResult.code) {
+            throw new Error(`git tag failed: ${tagResult.message}`);
+        }
+        const pushResult = await spawnLog("git", ["push", remote, opts.tag], spawnOpts);
+        if (pushResult.code) {
+            throw new Error(`git push failed: ${pushResult.message}`);
+        }
+    } catch (e) {
+        const message = `Failed to create and push git tag '${opts.tag}': ${e.message}`;
+        throw e;
+    }
+}
+
+/**
+ * Create a GitHub tag using the GitHub API.
+ *
+ * @param id GitHub remote repository reference
+ * @param sha Commit SHA to tag
+ * @param message Tag message
+ * @param version Name of tag
+ * @param credentials GitHub token object
+ * @deprecated use createGitTag
+ */
 export async function createTagForStatus(id: RemoteRepoRef,
                                          sha: string,
                                          message: string,
