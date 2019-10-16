@@ -15,9 +15,8 @@
  */
 
 import {
+    configurationValue,
     GitHubRepoRef,
-    Parameters,
-    Value,
 } from "@atomist/automation-client";
 import { GeneratorRegistration } from "@atomist/sdm";
 import * as assert from "assert";
@@ -94,7 +93,7 @@ describe("universalGenerator", () => {
 
     }).timeout(10000);
 
-    it("should generate project with only initial", async () => {
+    it("should generate project with only initial parameters", async () => {
 
         const params = {
             target: {
@@ -140,13 +139,10 @@ describe("universalGenerator", () => {
 
     it("should generate project with values from config", async () => {
 
-        const TestTransform: UniversalTransform<{ no: string }> = {
-            parameters: {
-                no: { path: "sdm.test.path.no" },
-            },
+        const TestTransform: UniversalTransform = {
             test: async p => true,
             transforms: async (p, papi) => {
-                await p.addFile("no", papi.parameters.no);
+                await p.addFile("no", configurationValue("sdm.path.no"));
             },
         };
         const params = {

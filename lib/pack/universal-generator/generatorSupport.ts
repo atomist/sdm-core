@@ -20,7 +20,7 @@ import {
     ExtensionPack,
     GeneratorRegistration,
     metadata,
-    ParametersObject,
+    ParametersObjectValue,
 } from "@atomist/sdm";
 import { toArray } from "../../util/misc/array";
 import { universalGenerator } from "./generator";
@@ -34,7 +34,7 @@ export interface UniversalTransform<PARAMS = any> {
     /** CodeTransforms to execute */
     transforms: CodeTransform<PARAMS> | Array<CodeTransform<PARAMS>>;
     /** Additional parameters the CodeTransforms need */
-    parameters?: ParametersObject<PARAMS>;
+    parameters?: Record<string, ParametersObjectValue>;
 }
 
 /**
