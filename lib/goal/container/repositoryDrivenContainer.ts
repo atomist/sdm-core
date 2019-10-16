@@ -29,8 +29,8 @@ import {
     PlannedGoals,
     PredicatedGoalDefinition,
     PushListenerInvocation,
-    PushTest,
     pushTest,
+    PushTest,
     ToDefaultBranch,
 } from "@atomist/sdm";
 import * as camelcaseKeys from "camelcase-keys";
