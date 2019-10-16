@@ -21,7 +21,7 @@ import {
     SdmGoalEvent,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
-import { readSdmVersion } from "../../internal/delivery/build/local/projectVersioner";
+import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
 
 /**
@@ -43,14 +43,14 @@ export function runningInK8s(): boolean {
  * @return SDM goal environment variables
  */
 export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext): Promise<Array<{ name: string, value: string }>> {
-    const version = await readSdmVersion(
-        goalEvent.repo.owner,
-        goalEvent.repo.name,
-        goalEvent.repo.providerId,
-        goalEvent.sha,
-        goalEvent.branch,
-        ctx.context,
-    );
+    const version = await getGoalVersion({
+        owner: goalEvent.repo.owner,
+        repo: goalEvent.repo.name,
+        providerId: goalEvent.repo.providerId,
+        sha: goalEvent.sha,
+        branch: goalEvent.branch,
+        context: ctx.context,
+    });
     return [{
         name: "ATOMIST_SLUG",
         value: `${goalEvent.repo.owner}/${goalEvent.repo.name}`,
