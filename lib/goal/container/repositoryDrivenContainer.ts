@@ -31,6 +31,7 @@ import {
     PushListenerInvocation,
     pushTest,
     PushTest,
+    testProgressReporter,
     ToDefaultBranch,
 } from "@atomist/sdm";
 import * as camelcaseKeys from "camelcase-keys";
@@ -63,7 +64,16 @@ export class RepositoryDrivenContainer extends FulfillableGoal {
         super({ uniqueName: "repository-driven-goal"});
 
         this.addFulfillment({
-            // progressReporter: TODO cd add
+            progressReporter: testProgressReporter({
+                test: /docker 'network' 'create'/i,
+                phase: "starting up",
+            }, {
+                test: /docker 'network' 'rm'/i,
+                phase: "shutting down",
+            },  {
+                test: /docker 'run' .* '--workdir=[a-zA-Z\/]*' .* '--network-alias=([a-zA-Z \-_]*)'/i,
+                phase: "running $1",
+            }),
             goalExecutor: async gi => {
                 const registration = gi.parameters.registration as ContainerRegistration;
 
