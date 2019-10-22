@@ -15,10 +15,12 @@
  */
 
 import {
+    ConfigurationAware,
     EventFired,
     GraphQL,
     HandlerContext,
     HandlerResult,
+    InMemoryProject,
     RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";
@@ -37,13 +39,18 @@ import {
     resolveCredentialsPromise,
     TagGoalSet,
 } from "@atomist/sdm";
-import { OnPushToAnyBranch } from "../../../../typings/types";
+import { addressChannelsFor } from "@atomist/sdm/src/lib/api/context/addressChannels";
+import { NoPreferenceStore } from "@atomist/sdm/src/lib/api/context/preferenceStore";
+import { PushListenerInvocation } from "@atomist/sdm/src/lib/api/listener/PushListener";
+import {
+    OnAnyCompletedSdmGoal,
+} from "../../../../typings/types";
 
 /**
- * Set up goalSet on a push (e.g. for delivery).
+ * Set up goalSet on a goal (e.g. for delivery).
  */
-@EventHandler("Set up goalSet on Push", GraphQL.subscription("OnPushToAnyBranch"))
-export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscription> {
+@EventHandler("Set up goalSet on Goal", GraphQL.subscription("OnAnyCompletedSdmGoal"))
+export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     /**
      * Configure goal setting
@@ -66,26 +73,45 @@ export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscriptio
                 private readonly tagGoalSet: TagGoalSet) {
     }
 
-    public async handle(event: EventFired<OnPushToAnyBranch.Subscription>,
+    public async handle(event: EventFired<OnAnyCompletedSdmGoal.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
-        const push: OnPushToAnyBranch.Push = event.data.Push[0];
+        const goal = event.data.SdmGoal[0];
+        const push = goal.push;
         const id: RemoteRepoRef = this.repoRefResolver.toRemoteRepoRef(push.repo, {});
         const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
 
-        await chooseAndSetGoals({
-            projectLoader: this.projectLoader,
-            repoRefResolver: this.repoRefResolver,
-            goalsListeners: this.goalsListeners,
-            goalSetter: this.goalSetter,
-            implementationMapping: this.implementationMapping,
-            preferencesFactory: this.preferenceStoreFactory,
-            enrichGoal: this.enrichGoal,
-            tagGoalSet: this.tagGoalSet,
-        }, {
+        const addressChannels = addressChannelsFor(push.repo, context);
+        const preferences = !!this.preferenceStoreFactory ? this.preferenceStoreFactory(context) : NoPreferenceStore;
+        const configuration = (context as any as ConfigurationAware).configuration;
+
+        const pli: PushListenerInvocation = {
+            project: new InMemoryProject(id) as any,
+            credentials,
+            id,
+            push,
+            context,
+            addressChannels,
+            configuration,
+            preferences: preferences || NoPreferenceStore,
+        };
+
+        const matches = await this.goalSetter.mapping(pli);
+        if (!!matches.goals && matches.goals.length > 0) {
+            await chooseAndSetGoals({
+                projectLoader: this.projectLoader,
+                repoRefResolver: this.repoRefResolver,
+                goalsListeners: this.goalsListeners,
+                goalSetter: this.goalSetter,
+                implementationMapping: this.implementationMapping,
+                preferencesFactory: this.preferenceStoreFactory,
+                enrichGoal: this.enrichGoal,
+                tagGoalSet: this.tagGoalSet,
+            }, {
                 context,
                 credentials,
                 push,
             });
+        }
         return Success;
     }
 }

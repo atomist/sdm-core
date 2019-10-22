@@ -57,9 +57,9 @@
     "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.8.0-master.20191011121753",
+    "@atomist/automation-client": "1.8.0-master.20191018181918",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "1.8.0-dynamic-goals.20191013133647",
+    "@atomist/sdm": "1.8.0-dynamic-goals.20191022214309",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.144",
