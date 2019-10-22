@@ -110,7 +110,7 @@ export async function defaultDestinationFactory(goal: SdmGoalEvent): Promise<Des
 /**
  * Default NotificationFactory that sends messages with restart, start and approve buttons where appropriate.
  */
-export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegistration): NotificationFactory {
+export function defaultNotificationFactory(updateGoalCommand: CommandHandlerRegistration<any>): NotificationFactory {
     return async gi => {
         const { completedGoal, context } = gi;
         const goalSetId = completedGoal.goalSetId;

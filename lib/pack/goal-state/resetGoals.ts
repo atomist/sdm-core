@@ -61,8 +61,11 @@ export class ResetGoalsParameters {
 
 }
 
-export function resetGoalsCommand(sdm: SoftwareDeliveryMachine,
-                                  repoTargets: Maker<RepoTargets> = GitHubRepoTargets): CommandHandlerRegistration {
+export function resetGoalsCommand(
+    sdm: SoftwareDeliveryMachine,
+    repoTargets: Maker<RepoTargets> = GitHubRepoTargets,
+): CommandHandlerRegistration<ResetGoalsParameters & RepoTargetingParameters> {
+
     return {
         name: "ResetGoalsOnCommit",
         description: "Plan goals on a commit",
@@ -75,7 +78,7 @@ export function resetGoalsCommand(sdm: SoftwareDeliveryMachine,
     };
 }
 
-function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<ResetGoalsParameters> {
+function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<ResetGoalsParameters & RepoTargetingParameters> {
     return async (cli: CommandListenerInvocation<ResetGoalsParameters & RepoTargetingParameters>) => {
 
         const rules = {
@@ -87,6 +90,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
             preferencesFactory: sdm.configuration.sdm.preferenceStoreFactory,
         };
 
+        const slug = `${cli.parameters.targets.repoRef.owner}/${cli.parameters.targets.repoRef.repo}`;
         let repoData;
         try {
             repoData = await fetchBranchTips(cli.context, {
@@ -95,12 +99,8 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
                 repo: cli.parameters.targets.repoRef.repo,
             });
         } catch (e) {
-            return cli.context.messageClient.respond(
-                slackWarningMessage(
-                    "Set Goal State",
-                    `Repository ${bold(`${
-                        cli.parameters.targets.repoRef.owner}/${cli.parameters.targets.repoRef.repo}`)} not found`,
-                    cli.context));
+            const text = `Repository ${bold(slug)} not found`;
+            return cli.context.messageClient.respond(slackWarningMessage("Set Goal State", text, cli.context));
         }
         const branch = cli.parameters.targets.repoRef.branch || repoData.defaultBranch;
         let sha;
@@ -110,8 +110,7 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
             return cli.context.messageClient.respond(
                 slackWarningMessage(
                     "Set Goal State",
-                    `Branch ${bold(branch)} not found on ${bold(`${
-                        cli.parameters.targets.repoRef.owner}/${cli.parameters.targets.repoRef.repo}`)}`,
+                    `Branch ${bold(branch)} not found on ${bold(slug)}`,
                     cli.context));
         }
 
@@ -130,19 +129,18 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
             push,
         });
 
+        const slugBranch = `${id.owner}/${id.repo}/${push.branch}`;
         if (goals) {
             await cli.addressChannels(slackSuccessMessage(
                 "Plan Goals",
-                `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${
-                    bold(`${id.owner}/${id.repo}/${push.branch}`)} to ${italic(goals.name)}`,
+                `Successfully planned goals on ${codeLine(push.after.sha.slice(0, 7))} of ${bold(slugBranch)} to ${italic(goals.name)}`,
                 {
                     footer: `${cli.parameters.name}:${cli.parameters.version}`,
                 }));
         } else {
             await cli.addressChannels(slackWarningMessage(
                 "Plan Goals",
-                `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${
-                    bold(`${id.owner}/${id.repo}/${push.branch}`)}`,
+                `No goals found for ${codeLine(push.after.sha.slice(0, 7))} of ${bold(slugBranch)}`,
                 cli.context,
                 {
                     footer: `${cli.parameters.name}:${cli.parameters.version}`,

@@ -40,16 +40,18 @@ import {
     SdmGoalsByGoalSetIdAndUniqueName,
 } from "../../typings/types";
 
-export function updateGoalStateCommand(): CommandHandlerRegistration<{
-    goalSetId: string,
-    uniqueName: string,
-    state: SdmGoalState,
-    msgId: string,
-    slackRequester: string,
-    githubRequester: string,
-    teamId: string,
-    channelId: string,
-}> {
+export interface UpdateGoalStateParameters {
+    goalSetId: string;
+    uniqueName: string;
+    state: SdmGoalState;
+    msgId: string;
+    slackRequester: string;
+    githubRequester: string;
+    teamId: string;
+    channelId: string;
+}
+
+export function updateGoalStateCommand(): CommandHandlerRegistration<UpdateGoalStateParameters> {
     return {
         name: "UpdateGoalStateCommand",
         description: "Update goal state",
