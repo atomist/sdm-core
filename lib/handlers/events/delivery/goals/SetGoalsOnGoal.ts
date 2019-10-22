@@ -96,7 +96,7 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
         };
 
         const matches = await this.goalSetter.mapping(pli);
-        if (!!matches.goals && matches.goals.length > 0 && !!_.get(pli, "facts.goalTestMatch")) {
+        if (!!matches && !!matches.goals && matches.goals.length > 0 && !!_.get(pli, "facts.goalTestMatch")) {
             await chooseAndSetGoals({
                 projectLoader: this.projectLoader,
                 repoRefResolver: this.repoRefResolver,
