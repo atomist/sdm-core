@@ -42,9 +42,8 @@ import {
 import { addressChannelsFor } from "@atomist/sdm/src/lib/api/context/addressChannels";
 import { NoPreferenceStore } from "@atomist/sdm/src/lib/api/context/preferenceStore";
 import { PushListenerInvocation } from "@atomist/sdm/src/lib/api/listener/PushListener";
-import {
-    OnAnyCompletedSdmGoal,
-} from "../../../../typings/types";
+import * as _ from "lodash";
+import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
 /**
  * Set up goalSet on a goal (e.g. for delivery).
@@ -85,6 +84,7 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
         const configuration = (context as any as ConfigurationAware).configuration;
 
         const pli: PushListenerInvocation = {
+            // Provide an empty project to check if there is a goal test in the push rules
             project: new InMemoryProject(id) as any,
             credentials,
             id,
@@ -96,7 +96,7 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
         };
 
         const matches = await this.goalSetter.mapping(pli);
-        if (!!matches.goals && matches.goals.length > 0) {
+        if (!!matches.goals && matches.goals.length > 0 && !!_.get(pli, "facts.goalTestMatch")) {
             await chooseAndSetGoals({
                 projectLoader: this.projectLoader,
                 repoRefResolver: this.repoRefResolver,
