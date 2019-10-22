@@ -17,6 +17,7 @@
 import {
     guid,
     LocalProject,
+    logger,
 } from "@atomist/automation-client";
 import {
     GoalInvocation,
@@ -67,15 +68,28 @@ export class CompressingGoalCache implements GoalCache {
     public async put(gi: GoalInvocation, project: LocalProject, files: string[], classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
+        const slug = `${gi.id.owner}/${gi.id.repo}`;
 
-        await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
+        const tarResult = await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
             log: gi.progressLog,
             cwd: project.baseDir,
         });
-        await spawnLog("gzip", ["-3", teamArchiveFileName], {
+        if (tarResult.code) {
+            const message = `Failed to create tar archive '${teamArchiveFileName}' for ${slug}`;
+            logger.error(message);
+            gi.progressLog.write(message);
+            return;
+        }
+        const gzipResult = await spawnLog("gzip", ["-3", teamArchiveFileName], {
             log: gi.progressLog,
             cwd: project.baseDir,
         });
+        if (gzipResult.code) {
+            const message = `Failed to gzip tar archive '${teamArchiveFileName}' for ${slug}`;
+            logger.error(message);
+            gi.progressLog.write(message);
+            return;
+        }
         await this.store.store(gi, classifier, teamArchiveFileName + ".gz");
     }
 
