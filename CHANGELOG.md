@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Make output less verbose during development. [#198](https://github.com/atomist/sdm-core/issues/198)
 
+### Fixed
+
+-   Respect exit status of compressing cache operations. [f8e2585](https://github.com/atomist/sdm-core/commit/f8e2585cc1ef93d80dbb41d10dc7eb174daa5ba2)
+
 ## [1.7.0](https://github.com/atomist/sdm-core/compare/1.6.1...1.7.0) - 2019-09-09
 
 ### Added
