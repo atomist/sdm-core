@@ -27,21 +27,21 @@ import {
 import { EventHandler } from "@atomist/automation-client/lib/decorators";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
+    addressChannelsFor,
     chooseAndSetGoals,
     CredentialsResolver,
     EnrichGoal,
     GoalImplementationMapper,
     GoalSetter,
     GoalsSetListener,
+    NoPreferenceStore,
     PreferenceStoreFactory,
     ProjectLoader,
+    PushListenerInvocation,
     RepoRefResolver,
     resolveCredentialsPromise,
     TagGoalSet,
 } from "@atomist/sdm";
-import { addressChannelsFor } from "@atomist/sdm/src/lib/api/context/addressChannels";
-import { NoPreferenceStore } from "@atomist/sdm/src/lib/api/context/preferenceStore";
-import { PushListenerInvocation } from "@atomist/sdm/src/lib/api/listener/PushListener";
 import * as _ from "lodash";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
