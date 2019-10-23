@@ -42,8 +42,10 @@ import {
     resolveCredentialsPromise,
     TagGoalSet,
 } from "@atomist/sdm";
-import * as _ from "lodash";
-import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
+import {
+    OnAnyCompletedSdmGoal,
+    SdmGoalState,
+} from "../../../../typings/types";
 
 /**
  * Set up goalSet on a goal (e.g. for delivery).
@@ -75,6 +77,12 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
     public async handle(event: EventFired<OnAnyCompletedSdmGoal.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
         const goal = event.data.SdmGoal[0];
+
+        // Don't pass in_process goals down into the tests
+        if (goal.state === SdmGoalState.in_process) {
+            return Success;
+        }
+
         const push = goal.push;
         const id: RemoteRepoRef = this.repoRefResolver.toRemoteRepoRef(push.repo, {});
         const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
@@ -84,8 +92,8 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
         const configuration = (context as any as ConfigurationAware).configuration;
 
         const pli: PushListenerInvocation = {
-            // Provide an empty project to check if there is a goal test in the push rules
-            project: new InMemoryProject(id) as any,
+            // Provide an undefined project to check if there is a goal test in the push rules
+            project: undefined,
             credentials,
             id,
             push,
@@ -96,6 +104,8 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
         };
 
         const matches = await this.goalSetter.mapping(pli);
+
+        // When there are matches it means we have some goalTests that matched the goal
         if (!!matches && !!matches.goals && matches.goals.length > 0) {
             await chooseAndSetGoals({
                 projectLoader: this.projectLoader,
