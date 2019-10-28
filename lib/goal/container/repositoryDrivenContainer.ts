@@ -44,6 +44,7 @@ import {
     Container,
     ContainerRegistration,
     GoalContainer,
+    GoalContainerVolume,
 } from "./container";
 import { executeDockerJob } from "./docker";
 
@@ -149,7 +150,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals): PlannedGoal | Pla
     } else {
         if (!!goals.containers) {
             const name = _.get(goals, "containers.name") || _.get(goals, "containers[0].name");
-            return mapPlannedGoal(name, goals, toArray(goals.containers));
+            return mapPlannedGoal(name, goals, toArray(goals.containers), toArray(goals.volumes));
         } else if (!!goals.script) {
             const script = goals.script;
             return mapPlannedGoal(script.name, script, [{
@@ -157,14 +158,14 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals): PlannedGoal | Pla
                 image: script.image || "ubuntu:latest",
                 command: script.command,
                 args: script.args,
-            }]);
+            }], toArray(goals.volumes));
         } else {
             throw new Error(`Unable to construct goal from '${JSON.stringify(goals)}'`);
         }
     }
 }
 
-function mapPlannedGoal(name: string, details: any, containers: GoalContainer[]): PlannedGoal {
+function mapPlannedGoal(name: string, details: any, containers: GoalContainer[], volumes: GoalContainerVolume[]): PlannedGoal {
 
     const gd = new Goal({ uniqueName: name, displayName: name });
     return {
@@ -188,6 +189,7 @@ function mapPlannedGoal(name: string, details: any, containers: GoalContainer[])
         parameters: {
             registration: {
                 containers,
+                volumes,
                 input: details.input,
                 output: details.output,
             },
