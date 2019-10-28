@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Configuration } from "@atomist/automation-client";
+import {
+    Configuration,
+    GitProject,
+    HandlerContext,
+} from "@atomist/automation-client";
+import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import {
     and,
     Goal,
@@ -25,6 +30,7 @@ import {
     or,
     pushTest,
     PushTest,
+    SdmGoalEvent,
     SoftwareDeliveryMachine,
     ToDefaultBranch,
 } from "@atomist/sdm";
@@ -33,10 +39,16 @@ import * as fs from "fs-extra";
 import * as glob from "glob";
 import * as yaml from "js-yaml";
 import * as _ from "lodash";
+import * as os from "os";
 import * as path from "path";
 import * as trace from "stack-trace";
 import * as util from "util";
-import { container } from "../goal/container/container";
+import {
+    Container,
+    container,
+    ContainerRegistration,
+    GoalContainerSpec,
+} from "../goal/container/container";
 import { toArray } from "../util/misc/array";
 import {
     configure,
@@ -165,6 +177,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
             return container(
                 _.get(goals, "containers.name") || _.get(goals, "containers[0].name"),
                 {
+                    callback: resolvePlaceholderContainerSpecCallback,
                     containers: toArray(goals.containers),
                     input: goals.input,
                     output: goals.output,
@@ -174,6 +187,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
             return container(
                 script.name,
                 {
+                    callback: resolvePlaceholderContainerSpecCallback,
                     name: script.name,
                     containers: [{
                         name: script.name,
@@ -234,3 +248,43 @@ async function resolveFiles(cwd: string, patterns: string | string[]): Promise<s
     }
     return files;
 }
+
+async function resolvePlaceholderContainerSpecCallback(r: ContainerRegistration,
+                                                       p: GitProject,
+                                                       g: Container,
+                                                       e: SdmGoalEvent,
+                                                       c: HandlerContext): Promise<GoalContainerSpec> {
+    await resolvePlaceholders(r as any, value => resolvePlaceholder(value, e));
+    return r;
+}
+
+const PlaceholderExpression = /\$\{([.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
+
+async function resolvePlaceholder(value: string, goal: SdmGoalEvent): Promise<string> {
+    if (!PlaceholderExpression.test(value)) {
+        return value;
+    }
+    PlaceholderExpression.lastIndex = 0;
+    let currentValue = value;
+    let result: RegExpExecArray;
+    // tslint:disable-next-line:no-conditional-assignment
+    while (result = PlaceholderExpression.exec(currentValue)) {
+        const fm = result[0];
+        let envValue = _.get(goal, result[1]);
+        if (result[1] === "home") {
+            envValue = os.userInfo().homedir;
+        }
+        const defaultValue = result[2] ? result[2].trim().slice(1) : undefined;
+
+        if (envValue) {
+            currentValue = currentValue.split(fm).join(envValue);
+        } else if (defaultValue) {
+            currentValue = currentValue.split(fm).join(defaultValue);
+        } else {
+            throw new Error(`Placeholder '${result[1]}' can't be resolved`);
+        }
+        PlaceholderExpression.lastIndex = 0;
+    }
+    return currentValue;
+}
+
