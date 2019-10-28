@@ -202,8 +202,9 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
 
     constructor(details: ContainerGoalDetails = {}, ...dependsOn: Goal[]) {
         const prefix = "container" + (details.displayName ? `-${details.displayName}` : "");
-        super(getGoalDefinitionFrom(details, DefaultGoalNameGenerator.generateName(prefix)), ...dependsOn);
-        this.details = details;
+        const detailsToUse = { ...details, isolate: true };
+        super(getGoalDefinitionFrom(detailsToUse, DefaultGoalNameGenerator.generateName(prefix)), ...dependsOn);
+        this.details = detailsToUse;
     }
 
     public register(sdm: SoftwareDeliveryMachine): void {

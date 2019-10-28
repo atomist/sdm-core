@@ -121,9 +121,10 @@ export interface K8sContainerRegistration extends ContainerRegistration {
 }
 
 export const k8sContainerScheduler: ContainerScheduler = (goal, registration: K8sContainerRegistration) => {
+    registration.name = registration.name ||
+        DefaultGoalNameGenerator.generateName(`container-k8s-${goal.definition.displayName}`);
     goal.addFulfillment({
         goalExecutor: executeK8sJob(goal, registration),
-        name: DefaultGoalNameGenerator.generateName(`container-k8s-${goal.definition.displayName}`),
         ...registration as ImplementationRegistration,
     });
 
@@ -216,7 +217,7 @@ export function k8sFulfillmentCallback(
 
         const data: any = JSON.parse(goalEvent.data || "{}");
         const servicesData: any = {};
-        _.set<any>(servicesData, `${ServiceRegistrationGoalDataKey}.${registration.name}`, serviceSpec);
+        _.set<any>(servicesData, `${ServiceRegistrationGoalDataKey}.${goal.name}`, serviceSpec);
         goalEvent.data = JSON.stringify(_.merge(data, servicesData));
         return goalEvent;
     };
