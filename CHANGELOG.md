@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   Make output less verbose during development. [#198](https://github.com/atomist/sdm-core/issues/198)
+-   Use git to tag. [#205](https://github.com/atomist/sdm-core/issues/205)
 
 ### Fixed
 
