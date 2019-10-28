@@ -147,7 +147,7 @@ function mapTest(test: any,
     } else if (test.and) {
         return and(...toArray(mapTests(test.and, additionalTests)));
     } else if (test.or) {
-        return or(...toArray(mapTests(test.and, additionalTests)));
+        return or(...toArray(mapTests(test.or, additionalTests)));
     } else if (!!additionalTests[test]) {
         return additionalTests[test];
     }
