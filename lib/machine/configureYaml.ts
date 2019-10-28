@@ -124,9 +124,9 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
         }
 
         // If provided, call the callback so that GoalData can be further configured in code
-        if (!!options.process) {
+        /* if (!!options.process) {
             return options.process(goalData, sdm);
-        }
+        } */
 
         return goalData;
     }, options.options || {});
