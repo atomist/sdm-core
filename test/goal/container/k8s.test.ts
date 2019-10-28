@@ -126,6 +126,9 @@ describe("goal/container/k8s", () => {
             const c = k8sFulfillmentCallback(g, r);
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
+            const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            assert(v, "failed to find volume name");
+            assert(v.startsWith("project-"));
             const d = {
                 "@atomist/sdm/service": {
                     MaybeAfterHesGone: {
@@ -138,7 +141,7 @@ describe("goal/container/k8s", () => {
                                 volumeMounts: [
                                     {
                                         mountPath: "/atm/home",
-                                        name: "home",
+                                        name: v,
                                     },
                                 ],
                                 env: [
@@ -228,14 +231,14 @@ describe("goal/container/k8s", () => {
                             ],
                             volume: [
                                 {
-                                    name: "home",
+                                    name: v,
                                     emptyDir: {},
                                 },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
-                                    name: "home",
+                                    name: v,
                                 },
                             ],
                         },
@@ -287,6 +290,9 @@ describe("goal/container/k8s", () => {
             const c = k8sFulfillmentCallback(g, r);
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
+            const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            assert(v, "failed to find volume name");
+            assert(v.startsWith("project-"));
             const d = {
                 "@atomist/sdm/service": {
                     MaybeAfterHesGone: {
@@ -299,7 +305,7 @@ describe("goal/container/k8s", () => {
                                 volumeMounts: [
                                     {
                                         mountPath: "/atm/home",
-                                        name: "home",
+                                        name: v,
                                     },
                                 ],
                                 env: [
@@ -388,14 +394,14 @@ describe("goal/container/k8s", () => {
                             ],
                             volume: [
                                 {
-                                    name: "home",
+                                    name: v,
                                     emptyDir: {},
                                 },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
-                                    name: "home",
+                                    name: v,
                                 },
                             ],
                         },
@@ -480,6 +486,9 @@ describe("goal/container/k8s", () => {
             const c = k8sFulfillmentCallback(g, r);
             const ge = await c(sge, rc);
             const p = JSON.parse(ge.data);
+            const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
+            assert(v, "failed to find volume name");
+            assert(v.startsWith("project-"));
             const d = {
                 "@atomist/sdm/service": {
                     MaybeAfterHesGone: {
@@ -533,7 +542,7 @@ describe("goal/container/k8s", () => {
                                 volumeMounts: [
                                     {
                                         mountPath: "/atm/home",
-                                        name: "home",
+                                        name: v,
                                     },
                                 ],
                                 workingDir: "/atm/home",
@@ -645,14 +654,14 @@ describe("goal/container/k8s", () => {
                             ],
                             volume: [
                                 {
-                                    name: "home",
+                                    name: v,
                                     emptyDir: {},
                                 },
                             ],
                             volumeMount: [
                                 {
                                     mountPath: "/atm/home",
-                                    name: "home",
+                                    name: v,
                                 },
                             ],
                         },
