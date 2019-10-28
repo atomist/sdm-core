@@ -44,8 +44,8 @@ import * as path from "path";
 import * as trace from "stack-trace";
 import * as util from "util";
 import {
-    Container,
     container,
+    Container,
     ContainerRegistration,
     GoalContainerSpec,
 } from "../goal/container/container";
