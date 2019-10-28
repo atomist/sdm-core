@@ -133,7 +133,7 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
 }
 
 export function mapTests(tests: any,
-                  additionalTests: Record<string, PushTest>): PushTest | PushTest[] {
+                         additionalTests: Record<string, PushTest>): PushTest | PushTest[] {
     return toArray(tests || []).map(t => mapTest(t, additionalTests));
 }
 
