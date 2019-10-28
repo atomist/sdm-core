@@ -41,8 +41,9 @@ import { toArray } from "../util/misc/array";
 import {
     configure,
     ConfigureMachineOptions,
-    CreateGoals,
     DeliveryGoals,
+    GoalConfigurer,
+    GoalCreator,
     GoalData,
 } from "./configure";
 
@@ -56,9 +57,12 @@ export type GoalDataProcessor = (goals: GoalData, sdm: SoftwareDeliveryMachine) 
  */
 export interface ConfigureYamlOptions<G extends DeliveryGoals> {
     options?: ConfigureMachineOptions;
+
     tests?: Record<string, PushTest>;
-    goals?: (sdm: SoftwareDeliveryMachine & { createGoals: CreateGoals<G> }) => Promise<G>;
-    process?: GoalDataProcessor;
+
+    goals?: GoalCreator<G>;
+    configurers?: GoalConfigurer<G> | Array<GoalConfigurer<G>>;
+    // process?: GoalDataProcessor;
 }
 
 /**
@@ -76,7 +80,7 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
 
     return configure<G>(async sdm => {
 
-        const additionalGoals = options.goals ? await options.goals(sdm) : {};
+        const additionalGoals = options.goals ? await sdm.createGoals(options.goals, options.configurers) : {};
         const files = await resolveFiles(cwd, patterns);
 
         const goalData: GoalData = {};
