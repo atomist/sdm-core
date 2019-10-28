@@ -19,6 +19,7 @@ import {
     and,
     Goal,
     hasFile,
+    ImmaterialGoals,
     not,
     or,
     pushTest,
@@ -136,7 +137,7 @@ function mapTest(test: any,
     : PushTest {
     if (test.hasFile) {
         return hasFile(test.hasFile);
-    } else if (test === "isDefaultBranch") {
+    } else if (test === "isDefaultBranch" || test === "ToDefaultBranch") {
         return ToDefaultBranch;
     } else if (typeof test === "function") {
         return pushTest(test.toString(), test);
@@ -211,6 +212,8 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
                         },
                         events: [GoalProjectListenerEvent.after],
                     }); */
+        } else if (goals === "immaterial") {
+            return ImmaterialGoals.andLock().goals;
         } else if (additionalGoals[goals]) {
             return additionalGoals[goals];
         }
