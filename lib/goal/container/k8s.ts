@@ -17,6 +17,7 @@
 import {
     GitCommandGitProject,
     GitProject,
+    guid,
     HandlerContext,
     logger,
 } from "@atomist/automation-client";
@@ -174,6 +175,7 @@ export function k8sFulfillmentCallback(
         }
         const image: string = _.get(k8sScheduler.podSpec, "spec.containers[0].image");
         const jobEnvs = k8sJobEnv(k8sScheduler.podSpec, goalEvent, repoContext.context as any);
+        const projectVolume = `project-${guid().split("-")[0]}`;
 
         const serviceSpec: { type: string, spec: K8sServiceSpec } = {
             type: K8sServiceRegistrationType.K8sService,
@@ -192,21 +194,21 @@ export function k8sFulfillmentCallback(
                     volumeMounts: [
                         {
                             mountPath: ContainerProjectHome,
-                            name: "home",
+                            name: projectVolume,
                         },
                     ],
                     workingDir: ContainerProjectHome,
                 },
                 volume: [
                     {
-                        name: "home",
+                        name: projectVolume,
                         emptyDir: {},
                     },
                 ],
                 volumeMount: [
                     {
                         mountPath: ContainerProjectHome,
-                        name: "home",
+                        name: projectVolume,
                     },
                 ],
             },
