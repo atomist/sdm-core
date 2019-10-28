@@ -32,6 +32,7 @@ import {
 import * as camelcaseKeys from "camelcase-keys";
 import * as yaml from "js-yaml";
 import * as _ from "lodash";
+import * as os from "os";
 import { DeliveryGoals } from "../../machine/configure";
 import { mapTests } from "../../machine/configureYaml";
 import { toArray } from "../../util/misc/array";
@@ -153,7 +154,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals): PlannedGoal | Pla
             const script = goals.script;
             return mapPlannedGoal(script.name, script, [{
                 name: script.name,
-                image: script.image ? script.image : "ubuntu:latest",
+                image: script.image || "ubuntu:latest",
                 command: script.command,
                 args: script.args,
             }]);
@@ -206,7 +207,10 @@ async function resolvePlaceholder(value: string, pli: PushListenerInvocation): P
     // tslint:disable-next-line:no-conditional-assignment
     while (result = PlaceholderExpression.exec(currentValue)) {
         const fm = result[0];
-        const envValue = _.get(pli, result[1]);
+        let envValue = _.get(pli, result[1]);
+        if (result[1] === "home") {
+            envValue = os.userInfo().homedir;
+        }
         const defaultValue = result[2] ? result[2].trim().slice(1) : undefined;
 
         if (envValue) {
@@ -214,7 +218,7 @@ async function resolvePlaceholder(value: string, pli: PushListenerInvocation): P
         } else if (defaultValue) {
             currentValue = currentValue.split(fm).join(defaultValue);
         } else {
-            throw new Error(`Environment variable '${result[1]}' is not defined`);
+            throw new Error(`Placeholder '${result[1]}' can't be resolved`);
         }
         PlaceholderExpression.lastIndex = 0;
     }
