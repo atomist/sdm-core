@@ -47,7 +47,7 @@ import {
 import { executeDockerJob } from "./docker";
 
 export const hasRepositoryGoals: PushTest = pushTest("has SDM goals", async pli => {
-    return (await pli.project.getFiles(".atomist/*_goals.{yml,yaml}")).length > 0;
+    return (await pli.project.getFiles(".atomist/*goals.{yml,yaml}")).length > 0;
 });
 
 export function repositoryDrivenContainer(options: { tests?: Record<string, PushTest> } = {}): Goal {
@@ -109,7 +109,7 @@ export class RepositoryDrivenContainer extends FulfillableGoal {
     }
 
     public async plan(pli: PushListenerInvocation, goals: Goals): Promise<PlannedGoals> {
-        const configYamls = (await pli.project.getFiles(".atomist/*_goals.{yml,yaml}"))
+        const configYamls = (await pli.project.getFiles(".atomist/*goals.{yml,yaml}"))
             .sort((f1, f2) => f1.path.localeCompare(f2.path));
 
         const plan: PlannedGoals = {};
