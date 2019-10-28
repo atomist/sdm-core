@@ -20,6 +20,7 @@ import {
     Goal,
     hasFile,
     ImmaterialGoals,
+    Locking,
     not,
     or,
     pushTest,
@@ -214,6 +215,8 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
                     }); */
         } else if (goals === "immaterial") {
             return ImmaterialGoals.andLock().goals;
+        } else if (goals === "lock") {
+            return Locking;
         } else if (additionalGoals[goals]) {
             return additionalGoals[goals];
         }
