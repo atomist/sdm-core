@@ -22,22 +22,18 @@ import {
     Goal,
     GoalProjectListenerEvent,
     Goals,
-    GoalWithFulfillment,
-    hasFile,
-    not,
-    or,
     PlannedGoal,
     PlannedGoals,
     PushListenerInvocation,
     pushTest,
     PushTest,
     testProgressReporter,
-    ToDefaultBranch,
 } from "@atomist/sdm";
 import * as camelcaseKeys from "camelcase-keys";
 import * as yaml from "js-yaml";
 import * as _ from "lodash";
 import { DeliveryGoals } from "../../machine/configure";
+import { mapTests } from "../../machine/configureYaml";
 import { toArray } from "../../util/misc/array";
 import {
     cachePut,
@@ -54,14 +50,14 @@ export const hasRepositoryGoals: PushTest = pushTest("has SDM goals", async pli 
     return (await pli.project.getFiles(".atomist/*_goals.{yml,yaml}")).length > 0;
 });
 
-export function repositoryDrivenContainer(tests: Record<string, (p: PushListenerInvocation) => Promise<boolean>> = {}): Goal {
-    return new RepositoryDrivenContainer(tests);
+export function repositoryDrivenContainer(options: { tests?: Record<string, PushTest> } = {}): Goal {
+    return new RepositoryDrivenContainer(options.tests || {});
 }
 
 export class RepositoryDrivenContainer extends FulfillableGoal {
 
-    constructor(private readonly tests: Record<string, (p: PushListenerInvocation) => Promise<boolean>>) {
-        super({ uniqueName: "repository-driven-goal"});
+    constructor(private readonly tests: Record<string, PushTest>) {
+        super({ uniqueName: "repository-driven-goal" });
 
         this.addFulfillment({
             progressReporter: testProgressReporter({
@@ -70,7 +66,7 @@ export class RepositoryDrivenContainer extends FulfillableGoal {
             }, {
                 test: /docker 'network' 'rm'/i,
                 phase: "shutting down",
-            },  {
+            }, {
                 test: /docker 'run' .* '--workdir=[a-zA-Z\/]*' .* '--network-alias=([a-zA-Z \-_]*)'/i,
                 phase: "running $1",
             }),
@@ -144,33 +140,6 @@ export class RepositoryDrivenContainer extends FulfillableGoal {
 
         return plan;
     }
-}
-
-function mapTests(tests: any,
-                  additionalTests: Record<string, (p: PushListenerInvocation) => Promise<boolean>>)
-    : PushTest | PushTest[] {
-    return toArray(tests).map(t => mapTest(t, additionalTests));
-}
-
-function mapTest(test: any,
-                 additionalTests: Record<string, (p: PushListenerInvocation) => Promise<boolean>>)
-    : PushTest {
-    if (test.hasFile) {
-        return hasFile(test.hasFile);
-    } else if (test === "isDefaultBranch") {
-        return ToDefaultBranch;
-    } else if (typeof test === "function") {
-        return pushTest(test.toString(), test);
-    } else if (test.not) {
-        return not(mapTest(test.not, additionalTests));
-    } else if (test.and) {
-        return and(...toArray(mapTests(test.and, additionalTests)));
-    } else if (test.or) {
-        return or(...toArray(mapTests(test.and, additionalTests)));
-    } else if (!!additionalTests[test]) {
-        return pushTest(test, additionalTests[test]);
-    }
-    throw new Error(`Unable to construct push test from '${JSON.stringify(test)}'`);
 }
 
 function mapGoals(goals: any, additionalGoals: DeliveryGoals): PlannedGoal | PlannedGoal[] {

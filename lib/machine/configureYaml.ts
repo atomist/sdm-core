@@ -132,14 +132,13 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
     }, options.options || {});
 }
 
-function mapTests(tests: any,
+export function mapTests(tests: any,
                   additionalTests: Record<string, PushTest>): PushTest | PushTest[] {
     return toArray(tests || []).map(t => mapTest(t, additionalTests));
 }
 
-function mapTest(test: any,
-                 additionalTests: Record<string, PushTest>)
-    : PushTest {
+export function mapTest(test: any,
+                        additionalTests: Record<string, PushTest>): PushTest {
     if (test.hasFile) {
         return hasFile(test.hasFile);
     } else if (test === "isDefaultBranch" || test === "ToDefaultBranch") {

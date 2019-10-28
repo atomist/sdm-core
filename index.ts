@@ -48,6 +48,10 @@ export {
     K8sGoalContainerSpec,
 } from "./lib/goal/container/k8s";
 export {
+    hasRepositoryGoals,
+    repositoryDrivenContainer,
+} from "./lib/goal/container/repositoryDrivenContainer";
+export {
     DisplayDeployEnablement,
 } from "./lib/handlers/commands/DisplayDeployEnablement";
 export {
