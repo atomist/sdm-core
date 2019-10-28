@@ -215,6 +215,11 @@ export {
     DeliveryGoals,
 } from "./lib/machine/configure";
 export {
+    configureYaml,
+    ConfigureYamlOptions,
+    GoalDataProcessor,
+} from "./lib/machine/configureYaml";
+export {
     UniversalTransform,
     universalGeneratorSupport,
     UniversalGeneratorSupportOptions,
