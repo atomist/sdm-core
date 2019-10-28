@@ -217,7 +217,7 @@ export function k8sFulfillmentCallback(
 
         const data: any = JSON.parse(goalEvent.data || "{}");
         const servicesData: any = {};
-        _.set<any>(servicesData, `${ServiceRegistrationGoalDataKey}.${goal.name}`, serviceSpec);
+        _.set<any>(servicesData, `${ServiceRegistrationGoalDataKey}.${registration.name}`, serviceSpec);
         goalEvent.data = JSON.stringify(_.merge(data, servicesData));
         return goalEvent;
     };
