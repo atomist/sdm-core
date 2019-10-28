@@ -22,7 +22,6 @@ import {
 } from "@atomist/automation-client";
 import { sleep } from "@atomist/automation-client/lib/internal/util/poll";
 import {
-    DefaultGoalNameGenerator,
     doWithProject,
     ExecuteGoal,
     GoalScheduler,
@@ -121,8 +120,6 @@ export interface K8sContainerRegistration extends ContainerRegistration {
 }
 
 export const k8sContainerScheduler: ContainerScheduler = (goal, registration: K8sContainerRegistration) => {
-    registration.name = registration.name ||
-        DefaultGoalNameGenerator.generateName(`container-k8s-${goal.definition.displayName}`);
     goal.addFulfillment({
         goalExecutor: executeK8sJob(goal, registration),
         ...registration as ImplementationRegistration,

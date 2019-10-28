@@ -19,7 +19,6 @@ import {
     logger,
 } from "@atomist/automation-client";
 import {
-    DefaultGoalNameGenerator,
     doWithProject,
     ExecuteGoal,
     ImplementationRegistration,
@@ -61,8 +60,6 @@ export interface DockerContainerRegistration extends ContainerRegistration {
 }
 
 export const dockerContainerScheduler: ContainerScheduler = (goal, registration: DockerContainerRegistration) => {
-    registration.name = registration.name ||
-        DefaultGoalNameGenerator.generateName(`container-docker-${goal.definition.displayName}`);
     goal.addFulfillment({
         goalExecutor: executeDockerJob(goal, registration),
         ...registration as ImplementationRegistration,

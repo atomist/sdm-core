@@ -223,6 +223,7 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
     }
 
     public with(registration: ContainerRegistration): this {
+        registration.name = (registration.name || `container-${this.definition.displayName}`).replace(/\.+/g, "-");
         if (!this.details.scheduler) {
             if (runningInK8s()) {
                 this.details.scheduler = k8sContainerScheduler;
