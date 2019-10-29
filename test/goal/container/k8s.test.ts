@@ -707,6 +707,13 @@ describe("goal/container/k8s", () => {
                                 },
                             ],
                             image: "rod/argent:1945.6.14",
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/health",
+                                    port: "http",
+                                },
+                                initialDelaySeconds: 20,
+                            },
                             name: "rod-argent",
                             volumeMounts: [
                                 {

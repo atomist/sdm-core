@@ -174,6 +174,9 @@ export function k8sFulfillmentCallback(
             throw new Error("KubernetesGoalScheduler has no podSpec defined");
         }
         const initContainer: k8s.V1Container = _.cloneDeep(k8sScheduler.podSpec.spec.containers[0]);
+        delete initContainer.lifecycle;
+        delete initContainer.livenessProbe;
+        delete initContainer.readinessProbe;
         initContainer.name = `container-goal-init-${guid().split("-")[0]}`;
         initContainer.env = [
             ...(initContainer.env || []),
