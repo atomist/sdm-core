@@ -179,6 +179,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
                 {
                     callback: resolvePlaceholderContainerSpecCallback,
                     containers: toArray(goals.containers),
+                    volumes: toArray(goals.volumes),
                     input: goals.input,
                     output: goals.output,
                 });

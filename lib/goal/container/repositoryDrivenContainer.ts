@@ -158,7 +158,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals): PlannedGoal | Pla
                 image: script.image || "ubuntu:latest",
                 command: script.command,
                 args: script.args,
-            }], toArray(goals.volumes));
+            }], []);
         } else {
             throw new Error(`Unable to construct goal from '${JSON.stringify(goals)}'`);
         }
