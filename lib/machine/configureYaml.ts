@@ -43,9 +43,11 @@ import * as os from "os";
 import * as path from "path";
 import * as trace from "stack-trace";
 import * as util from "util";
+import { CompressingGoalCache } from "../goal/cache/CompressingGoalCache";
 import {
     container,
     Container,
+    ContainerProgressReporter,
     ContainerRegistration,
     GoalContainerSpec,
 } from "../goal/container/container";
@@ -91,6 +93,12 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
     const cwd = path.dirname(callerCallSite.getFileName());
 
     return configure<G>(async sdm => {
+
+        sdm.configuration.sdm.cache = {
+            enabled: true,
+            path: path.join(os.homedir(), ".atomist", "cache", "container"),
+            store: new CompressingGoalCache(),
+        };
 
         const additionalGoals = options.goals ? await sdm.createGoals(options.goals, options.configurers) : {};
         const files = await resolveFiles(cwd, patterns);
@@ -182,6 +190,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
                     volumes: toArray(goals.volumes),
                     input: goals.input,
                     output: goals.output,
+                    progressReporter: ContainerProgressReporter,
                 });
         } else if (goals.script) {
             const script = goals.script;
@@ -198,6 +207,7 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals, cwd: string): Goal
                     }],
                     input: goals.input,
                     output: goals.output,
+                    progressReporter: ContainerProgressReporter,
                 });
             /* } else if (goals.aspect) {
                 const aspect = goals.aspect;

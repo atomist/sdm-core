@@ -29,6 +29,7 @@ import {
     ImplementationRegistration,
     SdmGoalEvent,
     SoftwareDeliveryMachine,
+    testProgressReporter,
 } from "@atomist/sdm";
 import {
     isConfiguredInEnv,
@@ -56,6 +57,17 @@ import { runningInK8s } from "./util";
 export function container<T extends ContainerRegistration>(displayName: string, registration: T): Container {
     return new Container({ displayName }).with(registration);
 }
+
+export const ContainerProgressReporter = testProgressReporter({
+    test: /docker 'network' 'create'/i,
+    phase: "starting up",
+}, {
+    test: /docker 'network' 'rm'/i,
+    phase: "shutting down",
+}, {
+    test: /docker 'run' .* '--workdir=[a-zA-Z\/]*' .* '--network-alias=([a-zA-Z \-_]*)'/i,
+    phase: "running $1",
+});
 
 /**
  * Ports to expose from container.
