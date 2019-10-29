@@ -173,32 +173,31 @@ export function k8sFulfillmentCallback(
         if (!k8sScheduler.podSpec) {
             throw new Error("KubernetesGoalScheduler has no podSpec defined");
         }
-        const image: string = _.get(k8sScheduler.podSpec, "spec.containers[0].image");
-        const jobEnvs = k8sJobEnv(k8sScheduler.podSpec, goalEvent, repoContext.context as any);
+        const initContainer: k8s.V1Container = _.cloneDeep(k8sScheduler.podSpec.spec.containers[0]);
+        initContainer.name = `container-goal-init-${guid().split("-")[0]}`;
+        initContainer.env = [
+            ...(initContainer.env || []),
+            ...k8sJobEnv(k8sScheduler.podSpec, goalEvent, repoContext.context as any),
+            {
+                name: "ATOMIST_ISOLATED_GOAL_INIT",
+                value: "true",
+            },
+        ];
         const projectVolume = `project-${guid().split("-")[0]}`;
+        initContainer.volumeMounts = [
+            ...(initContainer.volumeMounts || []),
+            {
+                mountPath: ContainerProjectHome,
+                name: projectVolume,
+            },
+        ];
+        initContainer.workingDir = ContainerProjectHome;
 
         const serviceSpec: { type: string, spec: K8sServiceSpec } = {
             type: K8sServiceRegistrationType.K8sService,
             spec: {
                 container: spec.containers,
-                initContainer: {
-                    env: [
-                        ...jobEnvs,
-                        {
-                            name: "ATOMIST_ISOLATED_GOAL_INIT",
-                            value: "true",
-                        },
-                    ],
-                    image,
-                    name: "atm-init",
-                    volumeMounts: [
-                        {
-                            mountPath: ContainerProjectHome,
-                            name: projectVolume,
-                        },
-                    ],
-                    workingDir: ContainerProjectHome,
-                },
+                initContainer,
                 volume: [
                     {
                         name: projectVolume,
