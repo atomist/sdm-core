@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 -   Respect exit status of compressing cache operations. [f8e2585](https://github.com/atomist/sdm-core/commit/f8e2585cc1ef93d80dbb41d10dc7eb174daa5ba2)
+-   Use more complete SDM container spec for init. [a3782e4](https://github.com/atomist/sdm-core/commit/a3782e4dc4c6a50994ada048accb4a7b3d1f8452)
 
 ## [1.7.0](https://github.com/atomist/sdm-core/compare/1.6.1...1.7.0) - 2019-09-09
 
