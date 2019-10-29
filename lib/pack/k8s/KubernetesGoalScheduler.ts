@@ -610,7 +610,7 @@ export async function deletePods(job: { name: string, namespace: string }): Prom
                     // Probably ok because pod might be gone already
                     logger.debug(
                         `Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${
-                            prettyPrintError(e)}`);
+                        prettyPrintError(e)}`);
                 }
             }
         }

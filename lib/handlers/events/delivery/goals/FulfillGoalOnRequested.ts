@@ -31,6 +31,7 @@ import {
     cancelableGoal,
     descriptionFromState,
     executeGoal,
+    ExecuteGoalResult,
     formatDate,
     GoalExecutionListener,
     GoalImplementationMapper,
@@ -67,6 +68,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                 private readonly goalExecutionListeners: GoalExecutionListener[]) {
     }
 
+    /* tslint:disable:cyclomatic-complexity */
     public async handle(event: EventFired<OnAnyRequestedSdmGoal.Subscription>,
                         ctx: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
@@ -164,22 +166,37 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                     },
                     implementation,
                     goalInvocation);
-                await reportEndAndClose(result, start, progressLog);
+                const terminatingStates = [
+                    SdmGoalState.canceled,
+                    SdmGoalState.failure,
+                    SdmGoalState.skipped,
+                    SdmGoalState.stopped,
+                    SdmGoalState.success,
+                ];
+                if (!result || !result.state || terminatingStates.includes(result.state)) {
+                    await reportEndAndClose(result, start, progressLog);
+                }
                 return {
                     ...result,
                     // successfully handled event even if goal failed
                     code: 0,
                 };
             } catch (e) {
-                await reportEndAndClose(e, start, progressLog);
+                e.message = `Goal executor threw exception: ${e.message}`;
+                const egr: ExecuteGoalResult = {
+                    code: 1,
+                    message: e.message,
+                    state: SdmGoalState.failure,
+                };
+                await reportEndAndClose(egr, start, progressLog);
                 throw e;
             }
         }
     }
+    /* tslint:enable:cyclomatic-complexity */
 }
 
-async function findGoalScheduler(gi: GoalInvocation,
-                                 configuration: SoftwareDeliveryMachineConfiguration): Promise<GoalScheduler | undefined> {
+async function findGoalScheduler(gi: GoalInvocation, configuration: SoftwareDeliveryMachineConfiguration): Promise<GoalScheduler | undefined> {
     let goalSchedulers: GoalScheduler[];
     if (!configuration.sdm.goalScheduler) {
         return undefined;
@@ -210,7 +227,7 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog): Pro
     await progressLog.flush();
 }
 
-async function reportEndAndClose(result: any, start: number, progressLog: ProgressLog): Promise<void> {
+async function reportEndAndClose(result: ExecuteGoalResult, start: number, progressLog: ProgressLog): Promise<void> {
     progressLog.write(`/--`);
     progressLog.write(`Result: ${serializeResult(result)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
