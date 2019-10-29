@@ -158,9 +158,16 @@ export function k8sFulfillmentCallback(
             spec.containers[0].workingDir = ContainerProjectHome;
         }
         const containerEnvs = await containerEnvVars(goalEvent, repoContext);
+        const sdmEnvs = [
+            {
+                name: "ATOMIST_PROJECT_DIR",
+                value: ContainerProjectHome,
+            },
+        ];
         spec.containers.forEach(c => {
             c.env = [
                 ...containerEnvs,
+                ...sdmEnvs,
                 ...(c.env || []),
             ];
         });
@@ -181,6 +188,7 @@ export function k8sFulfillmentCallback(
         initContainer.env = [
             ...(initContainer.env || []),
             ...k8sJobEnv(k8sScheduler.podSpec, goalEvent, repoContext.context as any),
+            ...sdmEnvs,
             {
                 name: "ATOMIST_ISOLATED_GOAL_INIT",
                 value: "true",
@@ -194,13 +202,12 @@ export function k8sFulfillmentCallback(
                 name: projectVolume,
             },
         ];
-        initContainer.workingDir = ContainerProjectHome;
 
         const serviceSpec: { type: string, spec: K8sServiceSpec } = {
             type: K8sServiceRegistrationType.K8sService,
             spec: {
                 container: spec.containers,
-                initContainer,
+                initContainer: [initContainer],
                 volume: [
                     {
                         name: projectVolume,
@@ -246,9 +253,11 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
     return doWithProject(async gi => {
         const { context, goalEvent, progressLog, project } = gi;
 
+        const projectDir = process.env.ATOMIST_PROJECT_DIR || ContainerProjectHome;
+
         if (process.env.ATOMIST_ISOLATED_GOAL_INIT === "true") {
             try {
-                await copyProject(project.baseDir, process.cwd());
+                await copyProject(project.baseDir, projectDir);
             } catch (e) {
                 const message = `Failed to copy project for goal execution: ${e.message}`;
                 loglog(message, logger.error, progressLog);
@@ -325,7 +334,7 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
         }
 
         try {
-            await copyProject(process.cwd(), project.baseDir);
+            await copyProject(projectDir, project.baseDir);
         } catch (e) {
             const message = `Failed to update project after goal execution: ${e.message}`;
             loglog(message, logger.error, progressLog);

@@ -129,7 +129,7 @@ describe("goal/container/k8s", () => {
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
             assert(v, "failed to find volume name");
             assert(v.startsWith("project-"));
-            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer.name`);
+            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
             const d = {
@@ -137,59 +137,64 @@ describe("goal/container/k8s", () => {
                     MaybeAfterHesGone: {
                         type: "@atomist/sdm/service/k8s",
                         spec: {
-                            initContainer: {
-                                name: i,
-                                image: "rod/argent:1945.6.14",
-                                workingDir: "/atm/home",
-                                volumeMounts: [
-                                    {
-                                        mountPath: "/atm/home",
-                                        name: v,
-                                    },
-                                ],
-                                env: [
-                                    {
-                                        name: "ATOMIST_JOB_NAME",
-                                        value: "rod-argent-job-0abcdef-beechwoodpark.ts",
-                                    },
-                                    {
-                                        name: "ATOMIST_REGISTRATION_NAME",
-                                        value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM",
-                                        value: "AR05343M1LY",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM_NAME",
-                                        value: "Odessey and Oracle",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_ID",
-                                        value: "CHANGES",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_SET_ID",
-                                        value: "0abcdef-123456789-abcdef",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_UNIQUE_NAME",
-                                        value: "BeechwoodPark.ts#L243",
-                                    },
-                                    {
-                                        name: "ATOMIST_CORRELATION_ID",
-                                        value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL",
-                                        value: "true",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                        value: "true",
-                                    },
-                                ],
-                            },
+                            initContainer: [
+                                {
+                                    name: i,
+                                    image: "rod/argent:1945.6.14",
+                                    volumeMounts: [
+                                        {
+                                            mountPath: "/atm/home",
+                                            name: v,
+                                        },
+                                    ],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_JOB_NAME",
+                                            value: "rod-argent-job-0abcdef-beechwoodpark.ts",
+                                        },
+                                        {
+                                            name: "ATOMIST_REGISTRATION_NAME",
+                                            value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM_NAME",
+                                            value: "Odessey and Oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_ID",
+                                            value: "CHANGES",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_SET_ID",
+                                            value: "0abcdef-123456789-abcdef",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_UNIQUE_NAME",
+                                            value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_CORRELATION_ID",
+                                            value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                    ],
+                                },
+                            ],
                             container: [
                                 {
                                     args: ["true"],
@@ -225,6 +230,10 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_GOAL",
                                             value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -296,7 +305,7 @@ describe("goal/container/k8s", () => {
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
             assert(v, "failed to find volume name");
             assert(v.startsWith("project-"));
-            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer.name`);
+            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
             const d = {
@@ -304,59 +313,64 @@ describe("goal/container/k8s", () => {
                     MaybeAfterHesGone: {
                         type: "@atomist/sdm/service/k8s",
                         spec: {
-                            initContainer: {
-                                name: i,
-                                image: "rod/argent:1945.6.14",
-                                workingDir: "/atm/home",
-                                volumeMounts: [
-                                    {
-                                        mountPath: "/atm/home",
-                                        name: v,
-                                    },
-                                ],
-                                env: [
-                                    {
-                                        name: "ATOMIST_JOB_NAME",
-                                        value: "rod-argent-job-0abcdef-beechwoodpark.ts",
-                                    },
-                                    {
-                                        name: "ATOMIST_REGISTRATION_NAME",
-                                        value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM",
-                                        value: "AR05343M1LY",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM_NAME",
-                                        value: "Odessey and Oracle",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_ID",
-                                        value: "CHANGES",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_SET_ID",
-                                        value: "0abcdef-123456789-abcdef",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_UNIQUE_NAME",
-                                        value: "BeechwoodPark.ts#L243",
-                                    },
-                                    {
-                                        name: "ATOMIST_CORRELATION_ID",
-                                        value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL",
-                                        value: "true",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                        value: "true",
-                                    },
-                                ],
-                            },
+                            initContainer: [
+                                {
+                                    name: i,
+                                    image: "rod/argent:1945.6.14",
+                                    volumeMounts: [
+                                        {
+                                            mountPath: "/atm/home",
+                                            name: v,
+                                        },
+                                    ],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_JOB_NAME",
+                                            value: "rod-argent-job-0abcdef-beechwoodpark.ts",
+                                        },
+                                        {
+                                            name: "ATOMIST_REGISTRATION_NAME",
+                                            value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM_NAME",
+                                            value: "Odessey and Oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_ID",
+                                            value: "CHANGES",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_SET_ID",
+                                            value: "0abcdef-123456789-abcdef",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_UNIQUE_NAME",
+                                            value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_CORRELATION_ID",
+                                            value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                    ],
+                                },
+                            ],
                             container: [
                                 {
                                     args: ["true"],
@@ -392,6 +406,10 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_GOAL",
                                             value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -495,7 +513,7 @@ describe("goal/container/k8s", () => {
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
             assert(v, "failed to find volume name");
             assert(v.startsWith("project-"));
-            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer.name`);
+            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
             const d = {
@@ -503,59 +521,64 @@ describe("goal/container/k8s", () => {
                     MaybeAfterHesGone: {
                         type: "@atomist/sdm/service/k8s",
                         spec: {
-                            initContainer: {
-                                env: [
-                                    {
-                                        name: "ATOMIST_JOB_NAME",
-                                        value: "rod-argent-job-0abcdef-beechwoodpark.ts",
-                                    },
-                                    {
-                                        name: "ATOMIST_REGISTRATION_NAME",
-                                        value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM",
-                                        value: "AR05343M1LY",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM_NAME",
-                                        value: "Odessey and Oracle",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_ID",
-                                        value: "CHANGES",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_SET_ID",
-                                        value: "0abcdef-123456789-abcdef",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_UNIQUE_NAME",
-                                        value: "BeechwoodPark.ts#L243",
-                                    },
-                                    {
-                                        name: "ATOMIST_CORRELATION_ID",
-                                        value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL",
-                                        value: "true",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                        value: "true",
-                                    },
-                                ],
-                                image: "rod/argent:1945.6.14",
-                                name: i,
-                                volumeMounts: [
-                                    {
-                                        mountPath: "/atm/home",
-                                        name: v,
-                                    },
-                                ],
-                                workingDir: "/atm/home",
-                            },
+                            initContainer: [
+                                {
+                                    env: [
+                                        {
+                                            name: "ATOMIST_JOB_NAME",
+                                            value: "rod-argent-job-0abcdef-beechwoodpark.ts",
+                                        },
+                                        {
+                                            name: "ATOMIST_REGISTRATION_NAME",
+                                            value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM_NAME",
+                                            value: "Odessey and Oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_ID",
+                                            value: "CHANGES",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_SET_ID",
+                                            value: "0abcdef-123456789-abcdef",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_UNIQUE_NAME",
+                                            value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_CORRELATION_ID",
+                                            value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                    ],
+                                    image: "rod/argent:1945.6.14",
+                                    name: i,
+                                    volumeMounts: [
+                                        {
+                                            mountPath: "/atm/home",
+                                            name: v,
+                                        },
+                                    ],
+                                },
+                            ],
                             container: [
                                 {
                                     args: ["first"],
@@ -591,6 +614,10 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_GOAL",
                                             value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                         {
                                             name: "GENRE",
@@ -645,6 +672,10 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_GOAL",
                                             value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                         {
                                             name: "INSTRUMENT",
@@ -758,7 +789,7 @@ describe("goal/container/k8s", () => {
             const v: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.volume[0].name`);
             assert(v, "failed to find volume name");
             assert(v.startsWith("project-"));
-            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer.name`);
+            const i: string = _.get(p, `["@atomist/sdm/service"].MaybeAfterHesGone.spec.initContainer[0].name`);
             assert(i, "failed to find initContainer name");
             assert(i.startsWith("container-goal-init-"));
             const d = {
@@ -766,67 +797,72 @@ describe("goal/container/k8s", () => {
                     MaybeAfterHesGone: {
                         type: "@atomist/sdm/service/k8s",
                         spec: {
-                            initContainer: {
-                                name: i,
-                                image: "rod/argent:1945.6.14",
-                                workingDir: "/atm/home",
-                                volumeMounts: [
-                                    {
-                                        mountPath: "/opt/atm",
-                                        name: "sdm-config",
-                                    },
-                                    {
-                                        mountPath: "/atm/home",
-                                        name: v,
-                                    },
-                                ],
-                                env: [
-                                    {
-                                        name: "ATOMIST_CONFIG_PATH",
-                                        value: "/opt/atm/client.config.json",
-                                    },
-                                    {
-                                        name: "ATOMIST_JOB_NAME",
-                                        value: "rod-argent-job-0abcdef-beechwoodpark.ts",
-                                    },
-                                    {
-                                        name: "ATOMIST_REGISTRATION_NAME",
-                                        value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM",
-                                        value: "AR05343M1LY",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_TEAM_NAME",
-                                        value: "Odessey and Oracle",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_ID",
-                                        value: "CHANGES",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_SET_ID",
-                                        value: "0abcdef-123456789-abcdef",
-                                    },
-                                    {
-                                        name: "ATOMIST_GOAL_UNIQUE_NAME",
-                                        value: "BeechwoodPark.ts#L243",
-                                    },
-                                    {
-                                        name: "ATOMIST_CORRELATION_ID",
-                                        value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL",
-                                        value: "true",
-                                    },
-                                    {
-                                        name: "ATOMIST_ISOLATED_GOAL_INIT",
-                                        value: "true",
-                                    },
-                                ],
-                            },
+                            initContainer: [
+                                {
+                                    name: i,
+                                    image: "rod/argent:1945.6.14",
+                                    volumeMounts: [
+                                        {
+                                            mountPath: "/opt/atm",
+                                            name: "sdm-config",
+                                        },
+                                        {
+                                            mountPath: "/atm/home",
+                                            name: v,
+                                        },
+                                    ],
+                                    env: [
+                                        {
+                                            name: "ATOMIST_CONFIG_PATH",
+                                            value: "/opt/atm/client.config.json",
+                                        },
+                                        {
+                                            name: "ATOMIST_JOB_NAME",
+                                            value: "rod-argent-job-0abcdef-beechwoodpark.ts",
+                                        },
+                                        {
+                                            name: "ATOMIST_REGISTRATION_NAME",
+                                            value: `@zombies/care-of-cell-44-job-0abcdef-beechwoodpark.ts`,
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_TEAM_NAME",
+                                            value: "Odessey and Oracle",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_ID",
+                                            value: "CHANGES",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_SET_ID",
+                                            value: "0abcdef-123456789-abcdef",
+                                        },
+                                        {
+                                            name: "ATOMIST_GOAL_UNIQUE_NAME",
+                                            value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_CORRELATION_ID",
+                                            value: "fedcba9876543210-0123456789abcdef-f9e8d7c6b5a43210",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL",
+                                            value: "true",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_ISOLATED_GOAL_INIT",
+                                            value: "true",
+                                        },
+                                    ],
+                                },
+                            ],
                             container: [
                                 {
                                     args: ["true"],
@@ -862,6 +898,10 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_GOAL",
                                             value: "BeechwoodPark.ts#L243",
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -943,9 +983,9 @@ describe("goal/container/k8s", () => {
             },
         } as any;
 
-        let cwd: string;
-        before(async function getCwd(): Promise<void> {
-            cwd = process.cwd();
+        let origProjectDir: string;
+        before(() => {
+            origProjectDir = process.env.ATOMIST_PROJECT_DIR;
         });
 
         beforeEach(async function resetFileSystem(): Promise<void> {
@@ -957,15 +997,16 @@ describe("goal/container/k8s", () => {
             const workingDir = `${tmpDirPrefix}-${guid()}`;
             await fs.ensureDir(workingDir);
             tmpDirs.push(workingDir);
-            process.chdir(workingDir);
+            process.env.ATOMIST_PROJECT_DIR = workingDir;
         });
 
         after(async function directoryCleanup(): Promise<void> {
+            if (origProjectDir) {
+                process.env.ATOMIST_PROJECT_DIR = origProjectDir;
+            } else {
+                delete process.env.ATOMIST_PROJECT_DIR;
+            }
             await Promise.all(tmpDirs.map(d => fs.remove(d)));
-        });
-
-        afterEach(() => {
-            process.chdir(cwd);
         });
 
         it("should run in init mode and copy project", async () => {
@@ -982,7 +1023,8 @@ describe("goal/container/k8s", () => {
             const f = `JUNK-${guid()}.md`;
             const fp = path.join(project.baseDir, f);
             await fs.writeFile(fp, "Counting the days until they set you free again\n");
-            assert(!fs.existsSync(f));
+            const fw = path.join(process.env.ATOMIST_PROJECT_DIR, f);
+            assert(!fs.existsSync(fw), `target file '${fw}' already exists`);
             process.env.ATOMIST_ISOLATED_GOAL_INIT = "true";
             const egr = await e(goalInvocation);
             delete process.env.ATOMIST_ISOLATED_GOAL_INIT;
@@ -1001,7 +1043,7 @@ describe("goal/container/k8s", () => {
                 uniqueName: goal.definition.uniqueName,
             };
             assert.deepStrictEqual(x, eg, logData);
-            const ec = await fs.readFile(f, "utf8");
+            const ec = await fs.readFile(fw, "utf8");
             assert(ec === "Counting the days until they set you free again\n");
         }).timeout(10000);
 
