@@ -16,6 +16,7 @@
 
 import {
     HttpMethod,
+    isValidSHA1,
     TokenCredentials,
 } from "@atomist/automation-client";
 import {
@@ -105,20 +106,31 @@ export class SelfBuildingContainer extends FulfillableGoal {
     }
 
     public async plan(pli: PushListenerInvocation, goals: Goals): Promise<PlannedGoals> {
-        const images: Array<{ registry: string, owner: string, repo: string, gitUrl: string, image: string }> = [];
+        const images: Array<{ registry: string, owner: string, repo: string, ref: string, image: string }> = [];
         for (const container of this.registration.containers.filter((c: any) => !!c.git)) {
-            const gitUrl = gitUrlParse((container as any).git);
+            const git = (container as any).git;
+            let owner;
+            let repo;
+            let ref = "master";
+            let slug = git;
+            if (git.includes("@")) {
+                ref = git.split("@")[1];
+                slug = git.split("@")[0];
+            }
+            owner = slug.split("/")[0];
+            repo = slug.split("/")[0];
+
             const api = githubApi((pli.credentials as TokenCredentials).token);
             const head = await api.repos.listCommits({
-                owner: gitUrl.owner,
-                repo: gitUrl.name,
+                owner,
+                repo,
                 per_page: 1,
             });
 
             const registry = pli.push.repo.owner.replace(/-/g, "").toLowerCase();
-            const url = `https://hub.docker.com/v2/repositories/${registry}/${gitUrl.name}/tags/${head.data[0].sha}`;
+            const url = `https://hub.docker.com/v2/repositories/${registry}/${repo}/tags/${head.data[0].sha}`;
             const client = pli.configuration.http.client.factory.create(url);
-            const image = `${registry}/${gitUrl.name}:${head.data[0].sha}`;
+            const image = `${registry}/${repo}:${head.data[0].sha}`;
             container.image = image;
 
             try {
@@ -127,10 +139,10 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 // If we get here the image doesn't yet exist
                 images.push({
                     registry,
-                    owner: gitUrl.owner,
-                    repo: gitUrl.name,
-                    gitUrl: (container as any).git,
+                    owner,
+                    repo,
                     image,
+                    ref,
                 });
             }
         }
@@ -142,7 +154,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                         name: `build-${i.repo}`,
                         image: "gcr.io/kaniko-project/executor",
                         args: [
-                            `--context=git://github.com/${i.owner}/${i.repo}.git`,
+                            `--context=git://github.com/${i.owner}/${i.repo}.git#${isValidSHA1(i.ref) ? i.ref : `refs/heads/${i.ref}`}`,
                             `--destination=${i.image}`,
                             "--dockerfile=Dockerfile",
                             "--cache=true",
