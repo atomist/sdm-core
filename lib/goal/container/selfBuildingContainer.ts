@@ -116,7 +116,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
             });
 
             const registry = gitUrl.owner.replace(/-/g, "").toLowerCase();
-            const url = `https://hub.docker.com/v2/repositories/${registry}/tags/${head.data[0].sha}`;
+            const url = `https://hub.docker.com/v2/repositories/${registry}/${gitUrl.name}/tags/${head.data[0].sha}`;
             const client = pli.configuration.http.client.factory.create(url);
             const image = `${registry}/${gitUrl.name}:${head.data[0].sha}`;
             c.image = image;
