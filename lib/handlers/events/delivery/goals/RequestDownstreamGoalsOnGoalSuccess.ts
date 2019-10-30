@@ -95,7 +95,6 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
         }
 
         await Promise.all(goalsToRequest.map(async sdmG => {
-            const goal = this.implementationMapper.findGoalBySdmGoal(sdmG);
             if (sdmG.preApprovalRequired) {
                 return updateGoal(context, sdmG, {
                     state: SdmGoalState.waiting_for_pre_approval,

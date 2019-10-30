@@ -20,7 +20,6 @@ import {
     GraphQL,
     HandlerContext,
     HandlerResult,
-    InMemoryProject,
     RemoteRepoRef,
     Success,
 } from "@atomist/automation-client";

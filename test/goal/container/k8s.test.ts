@@ -37,7 +37,10 @@ import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
 import { DeepPartial } from "ts-essentials";
-import { Container } from "../../../lib/goal/container/container";
+import {
+    Container,
+    ContainerEventHome,
+} from "../../../lib/goal/container/container";
 import {
     executeK8sJob,
     K8sContainerRegistration,
@@ -224,12 +227,12 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerEventHome}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_SECRETS",
+                                            value: `${ContainerEventHome}/secrets.json`,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -400,12 +403,12 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerEventHome}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_SECRETS",
+                                            value: `${ContainerEventHome}/secrets.json`,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -608,12 +611,12 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerEventHome}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_SECRETS",
+                                            value: `${ContainerEventHome}/secrets.json`,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -666,12 +669,12 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerEventHome}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_SECRETS",
+                                            value: `${ContainerEventHome}/secrets.json`,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
@@ -892,12 +895,12 @@ describe("goal/container/k8s", () => {
                                             value: "1968.4.19",
                                         },
                                         {
-                                            name: "ATOMIST_GOAL_SET_ID",
-                                            value: "0abcdef-123456789-abcdef",
+                                            name: "ATOMIST_GOAL",
+                                            value: `${ContainerEventHome}/goal.json`,
                                         },
                                         {
-                                            name: "ATOMIST_GOAL",
-                                            value: "BeechwoodPark.ts#L243",
+                                            name: "ATOMIST_SECRETS",
+                                            value: `${ContainerEventHome}/secrets.json`,
                                         },
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
