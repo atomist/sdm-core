@@ -42,6 +42,11 @@ import { goalInvocationVersion } from "./local/projectVersioner";
  * If both `name` and `release` are truthy, `name` takes precedence.
  */
 export interface ExecuteTagOptions {
+    /**
+     * Message to add to tag.  If not provided, the push after commit
+     * message title is used.
+     */
+    message?: string;
     /** Name of tag to create. */
     name?: string;
     /**
@@ -70,7 +75,12 @@ export function executeTag(opts: ExecuteTagOptions = {}): ExecuteGoal {
         return configuration.sdm.projectLoader.doWithProject({ credentials, id, context, readOnly: false }, async project => {
             try {
                 let tag: string;
-                let message: string = (goalEvent.push.after && goalEvent.push.after.message) ? goalEvent.push.after.message : undefined;
+                let message: string;
+                if (opts.message) {
+                    message = opts.message;
+                } else if (goalEvent.push.after && goalEvent.push.after.message) {
+                    message = goalEvent.push.after.message.split("\n")[0];
+                }
                 if (opts.name) {
                     tag = opts.name;
                     message = message || `Tag ${opts.name}`;
