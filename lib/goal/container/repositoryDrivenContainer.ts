@@ -27,7 +27,6 @@ import {
     PushListenerInvocation,
     pushTest,
     PushTest,
-    testProgressReporter,
 } from "@atomist/sdm";
 import * as camelcaseKeys from "camelcase-keys";
 import * as yaml from "js-yaml";
@@ -142,7 +141,11 @@ function mapGoals(goals: any, additionalGoals: DeliveryGoals): PlannedGoal | Pla
     } else {
         if (!!goals.containers) {
             const name = _.get(goals, "containers.name") || _.get(goals, "containers[0].name");
-            return mapPlannedGoal(name, goals, toArray(goals.containers), toArray(goals.volumes));
+            return mapPlannedGoal(
+                name,
+                goals,
+                toArray(goals.containers),
+                toArray(goals.volumes));
         } else if (!!goals.script) {
             const script = goals.script;
             return mapPlannedGoal(script.name, script, [{
