@@ -15,7 +15,6 @@
  */
 
 import {
-    guid,
     LeveledLogMethod,
 } from "@atomist/automation-client";
 import {
@@ -25,7 +24,6 @@ import {
     SdmGoalEvent,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
-import * as os from "os";
 import * as path from "path";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
