@@ -157,8 +157,8 @@ export class SelfBuildingContainer extends FulfillableGoal {
                         name: "creds",
                         hostPath: {
                             path: `${os.userInfo().homedir}/.docker/config.json`,
-                        }
-                    }]
+                        },
+                    }],
                 };
                 imageGoals.push({
                     details: {
@@ -170,22 +170,34 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 });
             }
             return {
-                image_build: {
+                [`${this.details.displayName}_build`]: {
                     goals: imageGoals,
                 },
-                goals: {
+                [this.details.displayName]: {
                     goals: [{
                         details: {
                             ...this.details,
                         },
                         parameters: {
                             registration: this.registration,
-                        }
+                        },
                     }],
-                    dependsOn: "image_build",
-                }
+                    dependsOn: `${this.details.displayName}_build`,
+                },
             };
         }
-        return undefined;
+        return {
+            [this.details.displayName]:
+                {
+                    goals: [{
+                        details: {
+                            ...this.details,
+                        },
+                        parameters: {
+                            registration: this.registration,
+                        },
+                    }],
+                },
+        };
     }
 }
