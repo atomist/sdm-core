@@ -298,4 +298,3 @@ async function resolvePlaceholder(value: string, goal: SdmGoalEvent): Promise<st
     }
     return currentValue;
 }
-

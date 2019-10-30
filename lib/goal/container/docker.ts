@@ -44,6 +44,7 @@ import {
     containerEnvVars,
     copyProject,
     loglog,
+    writeMetadata,
 } from "./util";
 
 /**
@@ -97,6 +98,7 @@ interface SpawnedContainer {
  * first container, then kill all the rest.
  */
 export function executeDockerJob(goal: Container, registration: DockerContainerRegistration): ExecuteGoal {
+    // tslint:disable-next-line:cyclomatic-complexity
     return doWithProject(async gi => {
         const { goalEvent, progressLog, project } = gi;
 
@@ -110,10 +112,10 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         const goalName = goalEvent.uniqueName.split("#")[0].toLowerCase();
         const namePrefix = "sdm-";
         const nameSuffix = `-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`;
+        const tmpDir = path.join(os.homedir(), ".atomist", "tmp", project.id.owner, project.id.repo, goalEvent.goalSetId);
 
         const projectDir = project.baseDir;
-        const containerDir = path.join(os.homedir(), ".atomist", "tmp", project.id.owner, project.id.repo, goalEvent.goalSetId,
-            `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        const containerDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
         try {
             await copyProject(projectDir, containerDir);
         } catch (e) {
@@ -123,13 +125,14 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         }
 
         // TODO cd add this to k8s support too
-        const metadataDir = path.join(os.homedir(), ".atomist", "tmp", project.id.owner, project.id.repo, goalEvent.goalSetId,
-            `${namePrefix}tmp-${guid()}${nameSuffix}`);
-        await fs.writeJson(path.join(metadataDir, "goal.json"), goalEvent, { spaces: 2});
-        await fs.writeJson(path.join(metadataDir, "secrets.json"), {
-            apiKey: gi.configuration.apiKey,
-            credentials: gi.credentials,
-        }, { spaces: 2});
+        const metadataDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        try {
+            await writeMetadata(metadataDir, gi);
+        } catch (e) {
+            const message = `Failed to write metadata for goal ${goalName}: ${e.message}`;
+            loglog(message, logger.error, progressLog);
+            return { code: 1, message };
+        }
 
         const spawnOpts = {
             log: progressLog,

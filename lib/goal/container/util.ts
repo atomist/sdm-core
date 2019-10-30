@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-import { LeveledLogMethod } from "@atomist/automation-client";
 import {
+    guid,
+    LeveledLogMethod,
+} from "@atomist/automation-client";
+import {
+    GoalInvocation,
     ProgressLog,
     SdmContext,
     SdmGoalEvent,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as os from "os";
+import * as path from "path";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
 import { ContainerEventHome } from "./container";
@@ -106,6 +112,14 @@ export async function copyProject(src: string, dest: string): Promise<void> {
         }
         throw e;
     }
+}
+
+export async function writeMetadata(dest: string, gi: GoalInvocation): Promise<void> {
+    await fs.writeJson(path.join(dest, "goal.json"), gi.goalEvent, { spaces: 2});
+    await fs.writeJson(path.join(dest, "secrets.json"), {
+        apiKey: gi.configuration.apiKey,
+        credentials: gi.credentials,
+    }, { spaces: 2});
 }
 
 /**
