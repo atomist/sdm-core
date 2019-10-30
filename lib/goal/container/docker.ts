@@ -33,6 +33,7 @@ import * as os from "os";
 import * as path from "path";
 import {
     Container,
+    ContainerEventHome,
     ContainerProjectHome,
     ContainerRegistration,
     ContainerScheduler,
@@ -121,6 +122,15 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             return { code: 1, message };
         }
 
+        // TODO cd add this to k8s support too
+        const metadataDir = path.join(os.homedir(), ".atomist", "tmp", project.id.owner, project.id.repo, goalEvent.goalSetId,
+            `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        await fs.writeJson(path.join(metadataDir, "goal.json"), goalEvent, { spaces: 2});
+        await fs.writeJson(path.join(metadataDir, "secrets.json"), {
+            apiKey: gi.configuration.apiKey,
+            credentials: gi.credentials,
+        }, { spaces: 2});
+
         const spawnOpts = {
             log: progressLog,
             cwd: containerDir,
@@ -161,6 +171,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 "--rm",
                 `--name=${containerName}`,
                 `--volume=${containerDir}:${ContainerProjectHome}`,
+                `--volume=${metadataDir}:${ContainerEventHome}`,
                 `--network=${network}`,
                 `--network-alias=${container.name}`,
                 ...containerArgs,
