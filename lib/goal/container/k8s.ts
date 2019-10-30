@@ -359,7 +359,7 @@ async function containerStarted(container: K8sContainer, attempts: number = 120)
         const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
         if (containerStatus && (!!_.get(containerStatus, "state.running.startedAt") || !!_.get(containerStatus, "state.terminated"))) {
             const message = `Container '${container.name}' started`;
-            loglog(message, logger.debug, container.log);
+            container.log.write(message);
             return;
         }
     }
@@ -398,7 +398,7 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
                     const exitCode: number = _.get(containerStatus, "state.terminated.exitCode");
                     if (exitCode === 0) {
                         const msg = `Container '${container.name}' exited with status 0`;
-                        loglog(msg, logger.debug, container.log);
+                        container.log.write(msg);
                         resolve(pod.status);
                     } else {
                         const msg = `Container '${container.name}' exited with status ${exitCode}`;
@@ -413,7 +413,7 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
                     return;
                 }
             }
-            loglog(`Container '${container.name}' still running`, logger.debug, container.log);
+            container.log.write(`Container '${container.name}' still running`);
         }, err => {
             err.message = `Container watcher failed: ${err.message}`;
             loglog(err.message, logger.error, container.log);
