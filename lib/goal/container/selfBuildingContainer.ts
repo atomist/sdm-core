@@ -67,7 +67,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
         this.addFulfillment({
             progressReporter: ContainerProgressReporter,
             goalExecutor: async gi => {
-                const registration = gi.parameters.registration as ContainerRegistration;
+                const reg = gi.parameters.registration as ContainerRegistration;
 
                 const c = new Container({ displayName: this.definition.displayName });
                 (c as any).register = () => {
@@ -75,9 +75,9 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 (c as any).addFulfillment = () => c;
                 (c as any).addFulfillmentCallback = () => c;
                 (c as any).withProjectListener = () => c;
-                c.with(registration);
+                c.with(reg);
 
-                return executeDockerJob(c, registration)(gi);
+                return executeDockerJob(c, reg)(gi);
             },
             name: DefaultGoalNameGenerator.generateName(`self-building-container-docker-${this.definition.displayName}`),
         });
@@ -86,18 +86,18 @@ export class SelfBuildingContainer extends FulfillableGoal {
             name: "cache-restore",
             events: [GoalProjectListenerEvent.before],
             listener: async (p, gi, e) => {
-                const registration = gi.parameters.registration as ContainerRegistration;
-                if (registration.input && registration.input.length > 0) {
-                    await cacheRestore({ entries: registration.input.map(c => ({ classifier: c })) }).listener(p, gi, e);
+                const reg = gi.parameters.registration as ContainerRegistration;
+                if (reg.input && reg.input.length > 0) {
+                    await cacheRestore({ entries: reg.input.map(c => ({ classifier: c })) }).listener(p, gi, e);
                 }
             },
         }).withProjectListener({
             name: "cache-put",
             events: [GoalProjectListenerEvent.after],
             listener: async (p, gi, e) => {
-                const registration = gi.parameters.registration as ContainerRegistration;
-                if (registration.output && registration.output.length > 0) {
-                    await cachePut({ entries: registration.output }).listener(p, gi, e);
+                const reg = gi.parameters.registration as ContainerRegistration;
+                if (reg.output && reg.output.length > 0) {
+                    await cachePut({ entries: reg.output }).listener(p, gi, e);
                 }
             },
         });
@@ -106,8 +106,8 @@ export class SelfBuildingContainer extends FulfillableGoal {
 
     public async plan(pli: PushListenerInvocation, goals: Goals): Promise<PlannedGoals> {
         const images: Array<{ registry: string, owner: string, repo: string, gitUrl: string, image: string }> = [];
-        for (const c of this.registration.containers.filter((c: any) => !!c.git)) {
-            const gitUrl = gitUrlParse((c as any).git);
+        for (const container of this.registration.containers.filter((c: any) => !!c.git)) {
+            const gitUrl = gitUrlParse((container as any).git);
             const api = githubApi((pli.credentials as TokenCredentials).token);
             const head = await api.repos.listCommits({
                 owner: gitUrl.owner,
@@ -119,7 +119,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
             const url = `https://hub.docker.com/v2/repositories/${registry}/${gitUrl.name}/tags/${head.data[0].sha}`;
             const client = pli.configuration.http.client.factory.create(url);
             const image = `${registry}/${gitUrl.name}:${head.data[0].sha}`;
-            c.image = image;
+            container.image = image;
 
             try {
                 await client.exchange(url, { method: HttpMethod.Get, retry: { retries: 0 } });
@@ -129,7 +129,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                     registry,
                     owner: gitUrl.owner,
                     repo: gitUrl.name,
-                    gitUrl: (c as any).git,
+                    gitUrl: (container as any).git,
                     image,
                 });
             }
