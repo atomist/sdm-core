@@ -105,7 +105,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
     }
 
     public async plan(pli: PushListenerInvocation, goals: Goals): Promise<PlannedGoals> {
-        const images: Array<{ owner: string, repo: string, gitUrl: string, image: string }> = [];
+        const images: Array<{ registry: string, owner: string, repo: string, gitUrl: string, image: string }> = [];
         for (const c of this.registration.containers.filter((c: any) => !!c.git)) {
             const gitUrl = gitUrlParse((c as any).git);
             const api = githubApi((pli.credentials as TokenCredentials).token);
@@ -115,18 +115,22 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 per_page: 1,
             });
 
-            const slug = `${gitUrl.owner}/${gitUrl.name}`;
-            const url = `https://hub.docker.com/v2/repositories/${slug}/tags/${head.data[0].sha}`;
+            const registry = gitUrl.owner.replace(/-/g, "").toLowerCase();
+            const url = `https://hub.docker.com/v2/repositories/${registry}/tags/${head.data[0].sha}`;
             const client = pli.configuration.http.client.factory.create(url);
+            const image = `${registry}/${gitUrl.name}:${head.data[0].sha}`;
+            c.image = image;
+
             try {
                 await client.exchange(url, { method: HttpMethod.Get, retry: { retries: 0 } });
             } catch (e) {
                 // If we get here the image doesn't yet exist
                 images.push({
+                    registry,
                     owner: gitUrl.owner,
                     repo: gitUrl.name,
                     gitUrl: (c as any).git,
-                    image: `${gitUrl.owner.replace(/-/g, "").toLowerCase()}/${gitUrl.name}:${head.data[0].sha}`,
+                    image,
                 });
             }
         }
@@ -142,7 +146,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                             `--destination=${i.image}`,
                             "--dockerfile=Dockerfile",
                             "--cache=true",
-                            `--cache-repo=${i.owner.replace(/-/g, "").toLowerCase()}/layer-cache`,
+                            `--cache-repo=${i.registry}/layer-cache`,
                         ],
                         volumeMounts: [
                             { name: "creds", mountPath: "/kaniko/.docker/config.json" },
@@ -162,7 +166,6 @@ export class SelfBuildingContainer extends FulfillableGoal {
                     },
                     parameters: {
                         registration,
-
                     },
                 });
             }
