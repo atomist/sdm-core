@@ -141,6 +141,12 @@ export interface GoalContainerVolume {
 export const ContainerProjectHome = "/atm/home";
 
 /**
+ * File system location for goal metadata.
+ */
+// TODO cd better name for this
+export const ContainerEventHome = "/atm/metadata";
+
+/**
  * Specification of containers and volumes for a container goal.
  */
 export interface GoalContainerSpec {

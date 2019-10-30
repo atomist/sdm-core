@@ -23,6 +23,7 @@ import {
 import * as fs from "fs-extra";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
+import { ContainerEventHome } from "./container";
 
 /**
  * Simple test to see if SDM is running in Kubernetes.  It is called
@@ -70,11 +71,11 @@ export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext)
         name: "ATOMIST_VERSION",
         value: version,
     }, {
-        name: "ATOMIST_GOAL_SET_ID",
-        value: goalEvent.goalSetId,
-    }, {
         name: "ATOMIST_GOAL",
-        value: goalEvent.uniqueName,
+        value: `${ContainerEventHome}/goal.json`,
+    }, {
+        name: "ATOMIST_SECRETS",
+        value: `${ContainerEventHome}/secrets.json`,
     }].filter(e => !!e.value);
 }
 
