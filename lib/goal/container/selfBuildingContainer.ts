@@ -30,7 +30,6 @@ import {
     PlannedGoals,
     PushListenerInvocation,
 } from "@atomist/sdm";
-import * as gitUrlParse from "git-url-parse";
 import * as os from "os";
 import { githubApi } from "../../internal/artifact/github/GitHubReleaseArtifactStore";
 import {
