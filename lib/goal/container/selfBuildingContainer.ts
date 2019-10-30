@@ -117,7 +117,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 slug = git.split("@")[0];
             }
             owner = slug.split("/")[0];
-            repo = slug.split("/")[0];
+            repo = slug.split("/")[1];
 
             const api = githubApi((pli.credentials as TokenCredentials).token);
             const head = await api.repos.listCommits({
