@@ -23,6 +23,7 @@ import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
+import { ContainerEventHome } from "../../../lib/goal/container/container";
 import {
     containerEnvVars,
     copyProject,
@@ -80,12 +81,12 @@ describe("goal/container/util", () => {
                     value: "1968.4.19",
                 },
                 {
-                    name: "ATOMIST_GOAL_SET_ID",
-                    value: "0abcdef-123456789-abcdef",
+                    name: "ATOMIST_GOAL",
+                    value: `${ContainerEventHome}/goal.json`,
                 },
                 {
-                    name: "ATOMIST_GOAL",
-                    value: "BeechwoodPark.ts#L243",
+                    name: "ATOMIST_SECRETS",
+                    value: `${ContainerEventHome}/secrets.json`,
                 },
             ];
             assert.deepStrictEqual(ge, e);
