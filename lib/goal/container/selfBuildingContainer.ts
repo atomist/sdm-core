@@ -42,7 +42,10 @@ import {
     ContainerProgressReporter,
     ContainerRegistration,
 } from "./container";
-import { executeDockerJob } from "./docker";
+import {
+    DockerContainerRegistration,
+    executeDockerJob,
+} from "./docker";
 
 export function selfBuildingContainer<T extends ContainerRegistration>(displayName: string, registration: T): SelfBuildingContainer {
     return new SelfBuildingContainer({ displayName }, registration);
@@ -123,27 +126,28 @@ export class SelfBuildingContainer extends FulfillableGoal {
                     owner: gitUrl.owner,
                     repo: gitUrl.name,
                     gitUrl: (c as any).git,
-                    image: `${slug}:${head.data[0].sha}:`,
+                    image: `${gitUrl.owner.replace(/-/g, "").toLowerCase()}/${gitUrl.name}:${head.data[0].sha}`,
                 });
             }
         }
         if (images.length > 0) {
             const imageGoals: PlannedGoal[] = [];
             for (const i of images) {
-                const registration: ContainerRegistration = {
+                const registration: DockerContainerRegistration = {
                     containers: [{
-                        name: `kaniko-${i.owner}-${i.repo}`,
+                        name: `build-${i.repo}`,
                         image: "gcr.io/kaniko-project/executor",
                         args: [
                             `--context=git://github.com/${i.owner}/${i.repo}.git`,
                             `--destination=${i.image}`,
                             "--dockerfile=Dockerfile",
                             "--cache=true",
-                            `--cache-repo=${i.owner}/layer-cache`,
+                            `--cache-repo=${i.owner.replace(/-/g, "").toLowerCase()}/layer-cache`,
                         ],
                         volumeMounts: [
                             { name: "creds", mountPath: "/kaniko/.docker/config.json" },
                         ],
+                        dockerOptions: ["--workdir=/workspace"],
                     }],
                     volumes: [{
                         name: "creds",
@@ -163,7 +167,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 });
             }
             return {
-                images: {
+                image_build: {
                     goals: imageGoals,
                 },
                 goals: {
@@ -175,7 +179,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                             registration: this.registration,
                         }
                     }],
-                    dependsOn: "images",
+                    dependsOn: "image_build",
                 }
             };
         }
