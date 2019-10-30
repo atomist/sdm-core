@@ -119,17 +119,23 @@ export class SelfBuildingContainer extends FulfillableGoal {
             owner = slug.split("/")[0];
             repo = slug.split("/")[1];
 
-            const api = githubApi((pli.credentials as TokenCredentials).token);
-            const head = await api.repos.listCommits({
-                owner,
-                repo,
-                per_page: 1,
-            });
+            let sha;
+            if (isValidSHA1(ref)) {
+                sha = ref;
+            } else {
+                const api = githubApi((pli.credentials as TokenCredentials).token);
+                sha = (await api.repos.listCommits({
+                    owner,
+                    repo,
+                    sha: ref,
+                    per_page: 1,
+                })).data[0].sha;
+            }
 
             const registry = pli.push.repo.owner.replace(/-/g, "").toLowerCase();
-            const url = `https://hub.docker.com/v2/repositories/${registry}/${repo}/tags/${head.data[0].sha}`;
+            const url = `https://hub.docker.com/v2/repositories/${registry}/${repo}/tags/${sha}`;
             const client = pli.configuration.http.client.factory.create(url);
-            const image = `${registry}/${repo}:${head.data[0].sha}`;
+            const image = `${registry}/${repo}:${sha}`;
             container.image = image;
 
             try {
