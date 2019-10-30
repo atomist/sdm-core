@@ -113,11 +113,27 @@ export async function copyProject(src: string, dest: string): Promise<void> {
 }
 
 export async function writeMetadata(dest: string, gi: GoalInvocation): Promise<void> {
-    await fs.writeJson(path.join(dest, "goal.json"), gi.goalEvent, { spaces: 2});
-    await fs.writeJson(path.join(dest, "secrets.json"), {
-        apiKey: gi.configuration.apiKey,
-        credentials: gi.credentials,
-    }, { spaces: 2});
+    try {
+        await fs.emptyDir(dest);
+    } catch (e) {
+        e.message = `Failed to empty directory '${dest}'`;
+        throw e;
+    }
+    try {
+        await fs.writeJson(path.join(dest, "goal.json"), gi.goalEvent, { spaces: 2});
+        await fs.writeJson(path.join(dest, "secrets.json"), {
+            apiKey: gi.configuration.apiKey,
+            credentials: gi.credentials,
+        }, { spaces: 2});
+    } catch (e) {
+        e.message = `Failed to write metadata to '${dest}'`;
+        try {
+            await fs.remove(dest);
+        } catch (err) {
+            e.message += `; Failed to clean up '${dest}': ${err.message}`;
+        }
+        throw e;
+    }
 }
 
 /**
