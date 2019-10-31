@@ -28,6 +28,7 @@ import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
 import {
     ContainerInput,
     ContainerOutput,
+    ContainerProjectHome,
     ContainerResult,
 } from "./container";
 
@@ -89,11 +90,14 @@ export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext)
         name: "ATOMIST_RESULT",
         value: ContainerResult,
     }, {
-        name: "ATOMIST_INPUT",
+        name: "ATOMIST_INPUT_DIR",
         value: ContainerInput,
     }, {
-        name: "ATOMIST_OUTPUT",
+        name: "ATOMIST_OUTPUT_DIR",
         value: ContainerOutput,
+    }, {
+        name: "ATOMIST_PROJECT_DIR",
+        value: ContainerProjectHome,
     }].filter(e => !!e.value);
 }
 
@@ -134,11 +138,11 @@ export async function prepareInputAndOutput(input: string, output: string, gi: G
         throw e;
     }
     try {
-        await fs.writeJson(path.join(input, "goal.json"), gi.goalEvent, { spaces: 2});
+        await fs.writeJson(path.join(input, "goal.json"), gi.goalEvent, { spaces: 2 });
         await fs.writeJson(path.join(input, "secrets.json"), {
             apiKey: gi.configuration.apiKey,
             credentials: gi.credentials,
-        }, { spaces: 2});
+        }, { spaces: 2 });
     } catch (e) {
         e.message = `Failed to write metadata to '${input}'`;
         try {

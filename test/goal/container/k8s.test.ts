@@ -190,8 +190,8 @@ describe("goal/container/k8s", () => {
                                             value: "true",
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
+                                            "name": "ATOMIST_PROJECT_DIR",
+                                            "value": "/atm/home",
                                         },
                                         {
                                             name: "ATOMIST_ISOLATED_GOAL_INIT",
@@ -241,20 +241,20 @@ describe("goal/container/k8s", () => {
                                             value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
-                                        },
-                                        {
                                             name: "ATOMIST_RESULT",
                                             value: ContainerResult,
                                         },
                                         {
-                                            name: "ATOMIST_INPUT",
+                                            name: "ATOMIST_INPUT_DIR",
                                             value: ContainerInput,
                                         },
                                         {
-                                            name: "ATOMIST_OUTPUT",
+                                            name: "ATOMIST_OUTPUT_DIR",
                                             value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -433,20 +433,20 @@ describe("goal/container/k8s", () => {
                                             value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
-                                        },
-                                        {
                                             name: "ATOMIST_RESULT",
                                             value: ContainerResult,
                                         },
                                         {
-                                            name: "ATOMIST_INPUT",
+                                            name: "ATOMIST_INPUT_DIR",
                                             value: ContainerInput,
                                         },
                                         {
-                                            name: "ATOMIST_OUTPUT",
+                                            name: "ATOMIST_OUTPUT_DIR",
                                             value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -657,20 +657,20 @@ describe("goal/container/k8s", () => {
                                             value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
-                                        },
-                                        {
                                             name: "ATOMIST_RESULT",
                                             value: ContainerResult,
                                         },
                                         {
-                                            name: "ATOMIST_INPUT",
+                                            name: "ATOMIST_INPUT_DIR",
                                             value: ContainerInput,
                                         },
                                         {
-                                            name: "ATOMIST_OUTPUT",
+                                            name: "ATOMIST_OUTPUT_DIR",
                                             value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                         {
                                             name: "GENRE",
@@ -731,20 +731,20 @@ describe("goal/container/k8s", () => {
                                             value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
-                                        },
-                                        {
                                             name: "ATOMIST_RESULT",
                                             value: ContainerResult,
                                         },
                                         {
-                                            name: "ATOMIST_INPUT",
+                                            name: "ATOMIST_INPUT_DIR",
                                             value: ContainerInput,
                                         },
                                         {
-                                            name: "ATOMIST_OUTPUT",
+                                            name: "ATOMIST_OUTPUT_DIR",
                                             value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                         {
                                             name: "INSTRUMENT",
@@ -973,20 +973,20 @@ describe("goal/container/k8s", () => {
                                             value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
-                                            name: "ATOMIST_PROJECT_DIR",
-                                            value: "/atm/home",
-                                        },
-                                        {
                                             name: "ATOMIST_RESULT",
                                             value: ContainerResult,
                                         },
                                         {
-                                            name: "ATOMIST_INPUT",
+                                            name: "ATOMIST_INPUT_DIR",
                                             value: ContainerInput,
                                         },
                                         {
-                                            name: "ATOMIST_OUTPUT",
+                                            name: "ATOMIST_OUTPUT_DIR",
                                             value: ContainerOutput,
+                                        },
+                                        {
+                                            name: "ATOMIST_PROJECT_DIR",
+                                            value: "/atm/home",
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
