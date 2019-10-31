@@ -151,6 +151,11 @@ export const ContainerInput = "/atm/input";
 export const ContainerOutput = "/atm/output";
 
 /**
+ * Goal execution result file
+ */
+export const ContainerResult = `${ContainerOutput}/result.json`;
+
+/**
  * Specification of containers and volumes for a container goal.
  */
 export interface GoalContainerSpec {

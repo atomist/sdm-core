@@ -37,6 +37,7 @@ import {
     ContainerOutput,
     ContainerProjectHome,
     ContainerRegistration,
+    ContainerResult,
     ContainerScheduler,
     GoalContainer,
     GoalContainerSpec,
@@ -227,11 +228,10 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             failures.push(message);
         }
 
-        const outputFile = path.join(outputDir, "result.json");
         let outputResult;
-        if ((await fs.pathExists(outputFile)) && failures.length === 0) {
+        if ((await fs.pathExists(ContainerResult)) && failures.length === 0) {
             try {
-                outputResult = await fs.readJson(outputFile);
+                outputResult = await fs.readJson(ContainerResult);
             } catch (e) {
                 const message = `Failed to read output from Docker container '${main.name}': ${e.message}`;
                 loglog(message, logger.error, progressLog);
@@ -255,7 +255,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         }
 
         if (failures.length === 0 && !!outputResult) {
-            return outputResult
+            return outputResult;
         } else {
             return {
                 code: failures.length,
