@@ -59,6 +59,9 @@ export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext)
         context: ctx.context,
     });
     return [{
+        name: "ATOMIST_WORKSPACE_ID",
+        value: ctx.context.workspaceId,
+    }, {
         name: "ATOMIST_SLUG",
         value: `${goalEvent.repo.owner}/${goalEvent.repo.name}`,
     }, {

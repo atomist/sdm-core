@@ -205,6 +205,10 @@ describe("goal/container/k8s", () => {
                                     args: ["true"],
                                     env: [
                                         {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
                                         },
@@ -392,6 +396,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["true"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -613,6 +621,10 @@ describe("goal/container/k8s", () => {
                                     args: ["first"],
                                     env: [
                                         {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
+                                        {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
                                         },
@@ -682,6 +694,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["second"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
@@ -920,6 +936,10 @@ describe("goal/container/k8s", () => {
                                 {
                                     args: ["true"],
                                     env: [
+                                        {
+                                            name: "ATOMIST_WORKSPACE_ID",
+                                            value: "AR05343M1LY",
+                                        },
                                         {
                                             name: "ATOMIST_SLUG",
                                             value: "TheZombies/odessey-and-oracle",
