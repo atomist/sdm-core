@@ -20,6 +20,7 @@ import {
 } from "@atomist/automation-client";
 import {
     DefaultGoalNameGenerator,
+    FulfillableGoal,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
     Fulfillment,
@@ -42,6 +43,10 @@ import {
     cachePut,
     cacheRestore,
 } from "../cache/goalCaching";
+import {
+    BuildingContainer,
+    isBuildingContainer,
+} from "./buildingContainer";
 import { dockerContainerScheduler } from "./docker";
 import { k8sContainerScheduler } from "./k8s";
 import { runningInK8s } from "./util";
@@ -54,8 +59,12 @@ import { runningInK8s } from "./util";
  * @param registration Goal containers, volumes, cache details, etc.
  * @return SDM container goal
  */
-export function container<T extends ContainerRegistration>(displayName: string, registration: T): Container {
-    return new Container({ displayName }).with(registration);
+export function container<T extends ContainerRegistration>(displayName: string, registration: T): FulfillableGoal {
+    if (registration.containers.some(isBuildingContainer)) {
+        return new BuildingContainer({ displayName }, registration);
+    } else {
+        return new Container({ displayName }).with(registration);
+    }
 }
 
 export const ContainerProgressReporter = testProgressReporter({

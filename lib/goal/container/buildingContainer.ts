@@ -16,7 +16,6 @@
 
 import {
     HttpMethod,
-    isValidSHA1,
     TokenCredentials,
 } from "@atomist/automation-client";
 import {
@@ -41,17 +40,20 @@ import {
     ContainerGoalDetails,
     ContainerProgressReporter,
     ContainerRegistration,
+    GoalContainer,
 } from "./container";
 import {
     DockerContainerRegistration,
     executeDockerJob,
 } from "./docker";
 
-export function selfBuildingContainer<T extends ContainerRegistration>(displayName: string, registration: T): SelfBuildingContainer {
-    return new SelfBuildingContainer({ displayName }, registration);
+export const GitImagePrefix = "git://";
+
+export function isBuildingContainer(c: GoalContainer): boolean {
+    return c.image.startsWith(GitImagePrefix);
 }
 
-export class SelfBuildingContainer extends FulfillableGoal {
+export class BuildingContainer extends FulfillableGoal {
 
     public readonly details: ContainerGoalDetails;
     public readonly registration: ContainerRegistration;
@@ -59,7 +61,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
     constructor(details: ContainerGoalDetails = {},
                 registration: ContainerRegistration,
                 ...dependsOn: Goal[]) {
-        const prefix = "self-building-container" + (details.displayName ? `-${details.displayName}` : "");
+        const prefix = "building-container" + (details.displayName ? `-${details.displayName}` : "");
         super(getGoalDefinitionFrom(details, DefaultGoalNameGenerator.generateName(prefix)), ...dependsOn);
         this.details = details;
         this.registration = registration;
@@ -77,9 +79,10 @@ export class SelfBuildingContainer extends FulfillableGoal {
                 (c as any).withProjectListener = () => c;
                 c.with(reg);
 
+                // TODO cd add support for k8s
                 return executeDockerJob(c, reg)(gi);
             },
-            name: DefaultGoalNameGenerator.generateName(`self-building-container-docker-${this.definition.displayName}`),
+            name: DefaultGoalNameGenerator.generateName(`building-container-docker-${this.definition.displayName}`),
         });
 
         this.withProjectListener({
@@ -106,8 +109,8 @@ export class SelfBuildingContainer extends FulfillableGoal {
 
     public async plan(pli: PushListenerInvocation, goals: Goals): Promise<PlannedGoals> {
         const images: Array<{ registry: string, owner: string, repo: string, ref: string, image: string }> = [];
-        for (const container of this.registration.containers.filter((c: any) => !!c.git)) {
-            const git = (container as any).git;
+        for (const container of this.registration.containers.filter(isBuildingContainer)) {
+            const git = container.image.slice(GitImagePrefix.length);
             let owner;
             let repo;
             let ref = "master";
@@ -154,7 +157,7 @@ export class SelfBuildingContainer extends FulfillableGoal {
                         name: `build-${i.repo}`,
                         image: "gcr.io/kaniko-project/executor",
                         args: [
-                            `--context=git://github.com/${i.owner}/${i.repo}.git#${isValidSHA1(i.ref) ? i.ref : `refs/heads/${i.ref}`}`,
+                            `--context=git://github.com/${i.owner}/${i.repo}.git#refs/heads/${i.ref}`,
                             `--destination=${i.image}`,
                             "--dockerfile=Dockerfile",
                             "--cache=true",
