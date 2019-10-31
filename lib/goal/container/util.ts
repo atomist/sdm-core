@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    LeveledLogMethod,
-} from "@atomist/automation-client";
+import { LeveledLogMethod } from "@atomist/automation-client";
 import {
     GoalInvocation,
     ProgressLog,
@@ -27,7 +25,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
-import { ContainerEventHome } from "./container";
+import { ContainerInput } from "./container";
 
 /**
  * Simple test to see if SDM is running in Kubernetes.  It is called
@@ -76,10 +74,10 @@ export async function containerEnvVars(goalEvent: SdmGoalEvent, ctx: SdmContext)
         value: version,
     }, {
         name: "ATOMIST_GOAL",
-        value: `${ContainerEventHome}/goal.json`,
+        value: `${ContainerInput}/goal.json`,
     }, {
         name: "ATOMIST_SECRETS",
-        value: `${ContainerEventHome}/secrets.json`,
+        value: `${ContainerInput}/secrets.json`,
     }].filter(e => !!e.value);
 }
 
@@ -112,26 +110,32 @@ export async function copyProject(src: string, dest: string): Promise<void> {
     }
 }
 
-export async function writeMetadata(dest: string, gi: GoalInvocation): Promise<void> {
+export async function prepareInputAndOutput(input: string, output: string, gi: GoalInvocation): Promise<void> {
     try {
-        await fs.emptyDir(dest);
+        await fs.emptyDir(input);
     } catch (e) {
-        e.message = `Failed to empty directory '${dest}'`;
+        e.message = `Failed to empty directory '${input}'`;
         throw e;
     }
     try {
-        await fs.writeJson(path.join(dest, "goal.json"), gi.goalEvent, { spaces: 2});
-        await fs.writeJson(path.join(dest, "secrets.json"), {
+        await fs.writeJson(path.join(input, "goal.json"), gi.goalEvent, { spaces: 2});
+        await fs.writeJson(path.join(input, "secrets.json"), {
             apiKey: gi.configuration.apiKey,
             credentials: gi.credentials,
         }, { spaces: 2});
     } catch (e) {
-        e.message = `Failed to write metadata to '${dest}'`;
+        e.message = `Failed to write metadata to '${input}'`;
         try {
-            await fs.remove(dest);
+            await fs.remove(input);
         } catch (err) {
-            e.message += `; Failed to clean up '${dest}': ${err.message}`;
+            e.message += `; Failed to clean up '${input}': ${err.message}`;
         }
+        throw e;
+    }
+    try {
+        await fs.emptyDir(output);
+    } catch (e) {
+        e.message = `Failed to empty directory '${output}'`;
         throw e;
     }
 }
