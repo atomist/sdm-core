@@ -40,6 +40,8 @@ import { DeepPartial } from "ts-essentials";
 import {
     Container,
     ContainerInput,
+    ContainerOutput,
+    ContainerResult,
 } from "../../../lib/goal/container/container";
 import {
     executeK8sJob,
@@ -238,6 +240,18 @@ describe("goal/container/k8s", () => {
                                             name: "ATOMIST_PROJECT_DIR",
                                             value: "/atm/home",
                                         },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT",
+                                            value: ContainerOutput,
+                                        },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
                                     name: "colin-blunstone",
@@ -413,6 +427,18 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
                                             value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT",
+                                            value: ContainerOutput,
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -623,6 +649,18 @@ describe("goal/container/k8s", () => {
                                             value: "/atm/home",
                                         },
                                         {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT",
+                                            value: ContainerOutput,
+                                        },
+                                        {
                                             name: "GENRE",
                                             value: "Baroque pop",
                                         },
@@ -679,6 +717,18 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
                                             value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT",
+                                            value: ContainerOutput,
                                         },
                                         {
                                             name: "INSTRUMENT",
@@ -905,6 +955,18 @@ describe("goal/container/k8s", () => {
                                         {
                                             name: "ATOMIST_PROJECT_DIR",
                                             value: "/atm/home",
+                                        },
+                                        {
+                                            name: "ATOMIST_RESULT",
+                                            value: ContainerResult,
+                                        },
+                                        {
+                                            name: "ATOMIST_INPUT",
+                                            value: ContainerInput,
+                                        },
+                                        {
+                                            name: "ATOMIST_OUTPUT",
+                                            value: ContainerOutput,
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
