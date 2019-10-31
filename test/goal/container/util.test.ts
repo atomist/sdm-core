@@ -26,6 +26,7 @@ import * as assert from "power-assert";
 import {
     ContainerInput,
     ContainerOutput,
+    ContainerProjectHome,
     ContainerResult,
 } from "../../../lib/goal/container/container";
 import {
@@ -97,12 +98,16 @@ describe("goal/container/util", () => {
                     value: ContainerResult,
                 },
                 {
-                    name: "ATOMIST_INPUT",
+                    name: "ATOMIST_INPUT_DIR",
                     value: ContainerInput,
                 },
                 {
-                    name: "ATOMIST_OUTPUT",
+                    name: "ATOMIST_OUTPUT_DIR",
                     value: ContainerOutput,
+                },
+                {
+                    name: "ATOMIST_PROJECT_DIR",
+                    value: ContainerProjectHome,
                 },
             ];
             assert.deepStrictEqual(ge, e);
