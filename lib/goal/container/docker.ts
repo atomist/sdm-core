@@ -33,7 +33,8 @@ import * as os from "os";
 import * as path from "path";
 import {
     Container,
-    ContainerEventHome,
+    ContainerInput,
+    ContainerOutput,
     ContainerProjectHome,
     ContainerRegistration,
     ContainerScheduler,
@@ -44,7 +45,7 @@ import {
     containerEnvVars,
     copyProject,
     loglog,
-    writeMetadata,
+    prepareInputAndOutput,
 } from "./util";
 
 /**
@@ -125,11 +126,12 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         }
 
         // TODO cd add this to k8s support too
-        const metadataDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        const inputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
+        const outputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
         try {
-            await writeMetadata(metadataDir, gi);
+            await prepareInputAndOutput(inputDir, outputDir, gi);
         } catch (e) {
-            const message = `Failed to write metadata for goal ${goalName}: ${e.message}`;
+            const message = `Failed to prepare input and output for goal ${goalName}: ${e.message}`;
             loglog(message, logger.error, progressLog);
             return { code: 1, message };
         }
@@ -146,7 +148,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 ((networkCreateRes.error) ? `: ${networkCreateRes.error.message}` : "");
             loglog(message, logger.error, progressLog);
             try {
-                await dockerCleanup({ containerDir, projectDir, spawnOpts });
+                await dockerCleanup({ containerDir, inputDir, outputDir, projectDir, spawnOpts });
             } catch (e) {
                 networkCreateRes.code++;
                 message += `; ${e.message}`;
@@ -174,7 +176,8 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
                 "--rm",
                 `--name=${containerName}`,
                 `--volume=${containerDir}:${ContainerProjectHome}`,
-                `--volume=${metadataDir}:${ContainerEventHome}`,
+                `--volume=${inputDir}:${ContainerInput}`,
+                `--volume=${outputDir}:${ContainerOutput}`,
                 `--network=${network}`,
                 `--network-alias=${container.name}`,
                 ...containerArgs,
@@ -192,7 +195,15 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         }
         if (failures.length > 0) {
             try {
-                await dockerCleanup({ containerDir, network, projectDir, spawnOpts, containers: spawnedContainers });
+                await dockerCleanup({
+                    containerDir,
+                    inputDir,
+                    outputDir,
+                    network,
+                    projectDir,
+                    spawnOpts,
+                    containers: spawnedContainers,
+                });
             } catch (e) {
                 failures.push(e.message);
             }
@@ -216,17 +227,41 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
             failures.push(message);
         }
 
+        const outputFile = path.join(outputDir, "result.json");
+        let outputResult;
+        if ((await fs.pathExists(outputFile)) && failures.length === 0) {
+            try {
+                outputResult = await fs.readJson(outputFile);
+            } catch (e) {
+                const message = `Failed to read output from Docker container '${main.name}': ${e.message}`;
+                loglog(message, logger.error, progressLog);
+                failures.push(message);
+            }
+        }
+
         const sidecars = spawnedContainers.slice(1);
         try {
-            await dockerCleanup({ containerDir, network, projectDir, spawnOpts, containers: sidecars });
+            await dockerCleanup({
+                containerDir,
+                inputDir,
+                outputDir,
+                network,
+                projectDir,
+                spawnOpts,
+                containers: sidecars,
+            });
         } catch (e) {
             failures.push(e.message);
         }
 
-        return {
-            code: failures.length,
-            message: (failures.length > 0) ? failures.join("; ") : "Successfully completed container job",
-        };
+        if (failures.length === 0 && !!outputResult) {
+            return outputResult
+        } else {
+            return {
+                code: failures.length,
+                message: (failures.length > 0) ? failures.join("; ") : "Successfully completed container job",
+            };
+        }
     }, { readOnly: false });
 }
 
@@ -280,6 +315,14 @@ interface CleanupOptions {
      */
     projectDir: string;
     /**
+     * Directory containing the input of the container goal.
+     */
+    inputDir: string;
+    /**
+     * Directory containing the output of the container goal.
+     */
+    outputDir: string;
+    /**
      * Options to use when calling spawnLog.  Also provides the
      * progress log.
      */
@@ -332,6 +375,22 @@ async function dockerCleanup(opts: CleanupOptions): Promise<void> {
             await fs.remove(opts.containerDir);
         } catch (e) {
             const message = `Failed to remove container directory '${opts.containerDir}': ${e.message}`;
+            loglog(message, logger.error, opts.spawnOpts.log);
+        }
+        try {
+            if (!!opts.inputDir) {
+                await fs.remove(opts.inputDir);
+            }
+        } catch (e) {
+            const message = `Failed to remove container input directory '${opts.inputDir}': ${e.message}`;
+            loglog(message, logger.error, opts.spawnOpts.log);
+        }
+        try {
+            if (!!opts.outputDir) {
+                await fs.remove(opts.outputDir);
+            }
+        } catch (e) {
+            const message = `Failed to remove container output directory '${opts.outputDir}': ${e.message}`;
             loglog(message, logger.error, opts.spawnOpts.log);
         }
     }

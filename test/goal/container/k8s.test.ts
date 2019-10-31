@@ -39,7 +39,7 @@ import * as assert from "power-assert";
 import { DeepPartial } from "ts-essentials";
 import {
     Container,
-    ContainerEventHome,
+    ContainerInput,
 } from "../../../lib/goal/container/container";
 import {
     executeK8sJob,
@@ -223,11 +223,11 @@ describe("goal/container/k8s", () => {
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: `${ContainerEventHome}/goal.json`,
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
                                             name: "ATOMIST_SECRETS",
-                                            value: `${ContainerEventHome}/secrets.json`,
+                                            value: `${ContainerInput}/secrets.json`,
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -390,11 +390,11 @@ describe("goal/container/k8s", () => {
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: `${ContainerEventHome}/goal.json`,
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
                                             name: "ATOMIST_SECRETS",
-                                            value: `${ContainerEventHome}/secrets.json`,
+                                            value: `${ContainerInput}/secrets.json`,
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
@@ -589,11 +589,11 @@ describe("goal/container/k8s", () => {
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: `${ContainerEventHome}/goal.json`,
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
                                             name: "ATOMIST_SECRETS",
-                                            value: `${ContainerEventHome}/secrets.json`,
+                                            value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
                                             name: "GENRE",
@@ -643,11 +643,11 @@ describe("goal/container/k8s", () => {
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: `${ContainerEventHome}/goal.json`,
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
                                             name: "ATOMIST_SECRETS",
-                                            value: `${ContainerEventHome}/secrets.json`,
+                                            value: `${ContainerInput}/secrets.json`,
                                         },
                                         {
                                             name: "INSTRUMENT",
@@ -860,11 +860,11 @@ describe("goal/container/k8s", () => {
                                         },
                                         {
                                             name: "ATOMIST_GOAL",
-                                            value: `${ContainerEventHome}/goal.json`,
+                                            value: `${ContainerInput}/goal.json`,
                                         },
                                         {
                                             name: "ATOMIST_SECRETS",
-                                            value: `${ContainerEventHome}/secrets.json`,
+                                            value: `${ContainerInput}/secrets.json`,
                                         },
                                     ],
                                     image: "colin/blunstone:1945.6.24",
