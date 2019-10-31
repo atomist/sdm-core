@@ -46,6 +46,7 @@ import {
     DockerContainerRegistration,
     executeDockerJob,
 } from "./docker";
+import * as _ from "lodash";
 
 export const GitImagePrefix = "git://";
 
@@ -108,8 +109,9 @@ export class BuildingContainer extends FulfillableGoal {
     }
 
     public async plan(pli: PushListenerInvocation, goals: Goals): Promise<PlannedGoals> {
+        const reg = _.cloneDeep(this.registration);
         const images: Array<{ registry: string, owner: string, repo: string, ref: string, image: string }> = [];
-        for (const container of this.registration.containers.filter(isBuildingContainer)) {
+        for (const container of reg.containers.filter(isBuildingContainer)) {
             const git = container.image.slice(GitImagePrefix.length);
             let owner;
             let repo;
@@ -194,7 +196,7 @@ export class BuildingContainer extends FulfillableGoal {
                             ...this.details,
                         },
                         parameters: {
-                            registration: this.registration,
+                            registration: reg,
                         },
                     }],
                     dependsOn: `${this.details.displayName}_build`,
@@ -209,7 +211,7 @@ export class BuildingContainer extends FulfillableGoal {
                             ...this.details,
                         },
                         parameters: {
-                            registration: this.registration,
+                            registration: reg,
                         },
                     }],
                 },
