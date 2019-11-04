@@ -172,6 +172,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                     SdmGoalState.skipped,
                     SdmGoalState.stopped,
                     SdmGoalState.success,
+                    SdmGoalState.waiting_for_approval,
                 ];
                 if (!result || !result.state || terminatingStates.includes(result.state)) {
                     await reportEndAndClose(result, start, progressLog);
