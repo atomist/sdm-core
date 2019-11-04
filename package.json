@@ -26,6 +26,7 @@
   "dependencies": {
     "@kubernetes/client-node": "^0.10.2",
     "@octokit/rest": "^16.34.1",
+    "@types/change-case": "^2.3.1",
     "@types/flat": "0.0.28",
     "@types/glob": "^7.1.1",
     "@types/proper-lockfile": "^4.1.0",
@@ -35,6 +36,7 @@
     "axios": "^0.19.0",
     "camelcase-keys": "^6.1.0",
     "chalk": "^2.4.2",
+    "change-case": "^3.1.0",
     "fast-glob": "^3.1.0",
     "fast-json-stable-stringify": "^2.0.0",
     "flat": "^4.1.0",
@@ -62,7 +64,7 @@
   "devDependencies": {
     "@atomist/automation-client": "1.8.0-master.20191018181918",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "1.8.0-dynamic-goals.20191023001720",
+    "@atomist/sdm": "1.8.0-dynamic-goals.20191103181155",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.144",
