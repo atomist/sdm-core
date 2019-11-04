@@ -228,7 +228,11 @@ export {
 export {
     configureYaml,
     ConfigureYamlOptions,
-    GoalDataProcessor,
+    GoalMaker,
+    PushTestMaker,
+    ConfigurationMaker,
+    CommandMaker,
+    EventMaker,
 } from "./lib/machine/configureYaml";
 export {
     UniversalTransform,
