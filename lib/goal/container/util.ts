@@ -16,21 +16,30 @@
 
 import { LeveledLogMethod } from "@atomist/automation-client";
 import {
+    Build,
+    ExecuteGoalResult,
     GoalInvocation,
     ProgressLog,
     SdmContext,
     SdmGoalEvent,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
+import * as _ from "lodash";
 import * as path from "path";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
+import { PushFields } from "../../typings/types";
+import {
+    postBuildWebhook,
+    postLinkImageWebhook,
+} from "../../util/webhook/ImageLink";
 import {
     ContainerInput,
     ContainerOutput,
     ContainerProjectHome,
     ContainerResult,
 } from "./container";
+import Images = PushFields.Images;
 
 /**
  * Simple test to see if SDM is running in Kubernetes.  It is called
@@ -170,4 +179,59 @@ export async function prepareInputAndOutput(input: string, output: string, gi: G
 export function loglog(msg: string, l: LeveledLogMethod, p: ProgressLog): void {
     l(msg);
     p.write(msg + "\n");
+}
+
+export async function processResult(result: any,
+                                    gi: GoalInvocation): Promise<ExecuteGoalResult | undefined> {
+    const { goalEvent, context } = gi;
+    if (!!result) {
+        if (result.SdmGoal) {
+            const goal = result.SdmGoal as SdmGoalEvent;
+            const r = {
+                state: goal.state,
+                phase: goal.phase,
+                description: goal.description,
+                externalUrls: goal.externalUrls,
+                data: convertData(goal.data),
+            };
+
+            const builds = _.get(goal, "builds") as Build[];
+            if (!!builds) {
+                for (const build of builds) {
+                    await postBuildWebhook(
+                        goalEvent.repo.owner,
+                        goalEvent.repo.name,
+                        goalEvent.branch,
+                        goalEvent.sha,
+                        build.status as any,
+                        context.workspaceId);
+                }
+            }
+
+            const images = _.get(goal, "after.images") as Images[];
+            if (!!images) {
+                for (const image of images) {
+                    await postLinkImageWebhook(
+                        goalEvent.repo.owner,
+                        goalEvent.repo.name,
+                        goalEvent.sha,
+                        image.imageName,
+                        context.workspaceId,
+                    );
+                }
+            }
+
+            return r;
+        } else {
+            return {
+                ...result,
+                data: convertData(result.data),
+            };
+        }
+    }
+    return undefined;
+}
+
+function convertData(data: any): string {
+    return !!data && typeof data !== "string" ? JSON.stringify(data) : data;
 }

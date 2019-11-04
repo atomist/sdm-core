@@ -76,6 +76,9 @@ export const ContainerProgressReporter = testProgressReporter({
 }, {
     test: /docker 'run' .* '--workdir=[a-zA-Z\/]*' .* '--network-alias=([a-zA-Z \-_]*)'/i,
     phase: "running $1",
+}, {
+    test: /atm:phase=(.*)/i,
+    phase: "$1",
 });
 
 /**

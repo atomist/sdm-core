@@ -46,6 +46,7 @@ import {
     copyProject,
     loglog,
     prepareInputAndOutput,
+    processResult,
 } from "./util";
 
 /**
@@ -231,10 +232,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         let outputResult;
         if ((await fs.pathExists(outputFile)) && failures.length === 0) {
             try {
-                outputResult = await fs.readJson(outputFile);
-                if (!!outputResult && typeof outputResult.data !== "string") {
-                    outputResult.data = JSON.stringify(outputResult.data);
-                }
+                outputResult = await processResult(await fs.readJson(outputFile), gi);
             } catch (e) {
                 const message = `Failed to read output from Docker container '${main.name}': ${e.message}`;
                 loglog(message, logger.error, progressLog);
