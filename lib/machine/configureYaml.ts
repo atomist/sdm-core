@@ -18,6 +18,7 @@ import {
     Configuration,
     GitProject,
     HandlerContext,
+    NoParameters,
 } from "@atomist/automation-client";
 import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import {
@@ -30,11 +31,11 @@ import {
     Locking,
     not,
     or,
-    PushListenerInvocation,
     pushTest,
     PushTest,
     SdmGoalEvent,
     SoftwareDeliveryMachine,
+    StatefulPushListenerInvocation,
     ToDefaultBranch,
 } from "@atomist/sdm";
 import * as camelcaseKeys from "camelcase-keys";
@@ -46,7 +47,6 @@ import * as os from "os";
 import * as path from "path";
 import * as trace from "stack-trace";
 import * as util from "util";
-import { CompressingGoalCache } from "../goal/cache/CompressingGoalCache";
 import {
     container,
     Container,
@@ -64,10 +64,15 @@ import {
     GoalData,
 } from "./configure";
 
-/**
- * Modify the passed GoalData instance or register commands, events with the SDM
- */
-export type GoalDataProcessor = (goals: GoalData, sdm: SoftwareDeliveryMachine) => Promise<GoalData>;
+export type CommandHandler<PARAMS = NoParameters> = Omit<CommandHandlerRegistration<PARAMS>, "name">;
+export type CommandMaker<PARAMS = NoParameters> = (sdm: SoftwareDeliveryMachine) => Promise<CommandHandler<PARAMS>> | CommandHandler<PARAMS>;
+export type EventHandler<PARAMS = NoParameters> = Omit<EventHandlerRegistration<PARAMS>, "name">;
+export type EventMaker<PARAMS = NoParameters> = (sdm: SoftwareDeliveryMachine) => Promise<EventHandler<PARAMS>> | EventHandler<PARAMS>;
+
+export type PushTestMaker = (params: any) => ((pli: StatefulPushListenerInvocation) => Promise<boolean>) | Promise<PushTest> | PushTest;
+export type GoalMaker = (sdm: SoftwareDeliveryMachine) => Promise<Goal> | Goal;
+
+export type ConfigurationMaker = (cfg: Configuration) => Promise<Configuration> | Configuration;
 
 /**
  * Configuration options for the yaml support
@@ -95,17 +100,20 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
         .filter(t => !!t.getFileName())[0];
     const cwd = path.dirname(callerCallSite.getFileName());
 
+    const cfg: any = {};
+    await awaitIterable(await createConfiguration(cwd), async v => _.defaultsDeep(cfg, v));
+    _.update(options, "options.preProcessors",
+        old => !!old ? old : []);
+    options.options.preProcessors = [async () => cfg, ...toArray(options.options.preProcessors)];
+
     return configure<G>(async sdm => {
 
-        // TODO cd this shouldn't be here
-        sdm.configuration.sdm.cache = {
-            enabled: true,
-            path: path.join(os.homedir(), ".atomist", "cache", "container"),
-            store: new CompressingGoalCache(),
-        };
-
-        _.forEach(await createCommands(cwd), (c, k) => sdm.addCommand({ name: k, ...c(sdm) }));
-        _.forEach(await createEvents(cwd), (e, k) => sdm.addEvent({ name: k, ...e(sdm) }));
+        await awaitIterable(
+            await createCommands(cwd),
+            async (c, k) => sdm.addCommand({ name: k, ...(await c(sdm)) }));
+        await awaitIterable(
+            await createEvents(cwd),
+            async (e, k) => sdm.addEvent({ name: k, ...(await e(sdm)) }));
 
         const additionalGoals = options.goals ? await sdm.createGoals(options.goals, options.configurers) : {};
         const goalMakers = await createGoals(cwd);
@@ -132,45 +140,47 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
                     _.merge(sdm.configuration, config.configuration);
                 }
 
-                _.forEach(config, (value: any, k) => {
+                for (const k in config) {
+                    if (config.hasOwnProperty(k)) {
+                        const value = config[k];
 
-                    // Ignore two special keys used to set up the SDM
-                    if (k === "name" || k === "configuration") {
-                        return;
+                        // Ignore two special keys used to set up the SDM
+                        if (k === "name" || k === "configuration") {
+                            continue;
+                        }
+
+                        const v = camelcaseKeys(value, { deep: true }) as any;
+                        const test = await mapTests(v.test, options.tests || {}, testMakers);
+                        const goals = await mapGoals(sdm, v.goals, additionalGoals, goalMakers, cwd);
+                        const dependsOn = v.dependsOn;
+
+                        goalData[k] = {
+                            test: toArray(test).length > 0 ? test : undefined,
+                            dependsOn,
+                            goals,
+                        };
                     }
-
-                    const v = camelcaseKeys(value, { deep: true }) as any;
-                    const test = mapTests(v.test, options.tests || {}, testMakers);
-                    const goals = mapGoals(sdm, v.goals, additionalGoals, goalMakers, cwd);
-                    const dependsOn = v.dependsOn;
-
-                    goalData[k] = {
-                        test: toArray(test).length > 0 ? test : undefined,
-                        dependsOn,
-                        goals,
-                    };
-                });
+                }
             }
         }
-
-        // If provided, call the callback so that GoalData can be further configured in code
-        /* if (!!options.process) {
-            return options.process(goalData, sdm);
-        } */
 
         return goalData;
     }, options.options || {});
 }
 
-export function mapTests(tests: any,
+export async function mapTests(tests: any,
                          additionalTests: Record<string, PushTest>,
-                         extensionTests: Record<string, (params: any) => (pli: PushListenerInvocation) => Promise<boolean>>): PushTest | PushTest[] {
-    return toArray(tests || []).map(t => mapTest(t, additionalTests, extensionTests));
+                         extensionTests: Record<string, PushTestMaker>): Promise<PushTest | PushTest[]> {
+    const newTests = [];
+    for (const t of toArray(tests)) {
+        newTests.push(await mapTest(t, additionalTests, extensionTests));
+    }
+    return newTests;
 }
 
-export function mapTest(test: any,
+export async function mapTest(test: any,
                         additionalTests: Record<string, PushTest>,
-                        extensionTests: Record<string, (params: any) => (pli: PushListenerInvocation) => Promise<boolean>>): PushTest {
+                        extensionTests: Record<string, PushTestMaker>): Promise<PushTest> {
     if (test.hasFile) {
         return hasFile(test.hasFile);
     } else if (test === "isDefaultBranch" || test === "ToDefaultBranch") {
@@ -178,17 +188,17 @@ export function mapTest(test: any,
     } else if (typeof test === "function") {
         return pushTest(test.toString(), test);
     } else if (test.not) {
-        return not(mapTest(test.not, additionalTests, extensionTests));
+        return not(await mapTest(test.not, additionalTests, extensionTests));
     } else if (test.and) {
-        return and(...toArray(mapTests(test.and, additionalTests, extensionTests)));
+        return and(...toArray(await mapTests(test.and, additionalTests, extensionTests)));
     } else if (test.or) {
-        return or(...toArray(mapTests(test.or, additionalTests, extensionTests)));
+        return or(...toArray(await mapTests(test.or, additionalTests, extensionTests)));
     } else if (typeof test === "string" && !!additionalTests[test]) {
         return additionalTests[test];
     } else {
         for (const extTestName in extensionTests) {
             if (!!test[extTestName] || extTestName === test) {
-                const extTest = extensionTests[extTestName](test[extTestName]) as any;
+                const extTest = await extensionTests[extTestName](test[extTestName]) as any;
                 if (!!extTest.name && !!extTest.mapping) {
                     return extTest;
                 } else {
@@ -200,57 +210,17 @@ export function mapTest(test: any,
     throw new Error(`Unable to construct push test from '${JSON.stringify(test)}'`);
 }
 
-async function createTests(cwd: string, pattern: string[] = ["tests/**.js", "lib/tests/**.js"])
-    : Promise<Record<string, (params: any) => (pli: PushListenerInvocation) => Promise<boolean>>> {
-    const tests: Record<string, (params: any) => (pli: PushListenerInvocation) => Promise<boolean>> = {};
-    const files = await resolveFiles(cwd, pattern);
-    for (const file of files) {
-        const testJs = require(`${cwd}/${file}`);
-        _.forEach(testJs, (v, k) => tests[k] = v);
-    }
-    return tests;
-}
-
-async function createGoals(cwd: string, pattern: string[] = ["goals/**.js", "lib/goals/**.js"])
-    : Promise<Record<string, (sdm: SoftwareDeliveryMachine) => Goal>> {
-    const goals: Record<string,  (sdm: SoftwareDeliveryMachine) => Goal> = {};
-    const files = await resolveFiles(cwd, pattern);
-    for (const file of files) {
-        const testJs = require(`${cwd}/${file}`);
-        _.forEach(testJs, (v, k) => goals[k] = v);
-    }
-    return goals;
-}
-
-async function createCommands(cwd: string, pattern: string[] = ["commands/**.js", "lib/commands/**.js"])
-    : Promise<Record<string, (sdm: SoftwareDeliveryMachine) => Omit<CommandHandlerRegistration, "name">>> {
-    const cmds: Record<string,  (sdm: SoftwareDeliveryMachine) => Omit<CommandHandlerRegistration, "name">> = {};
-    const files = await resolveFiles(cwd, pattern);
-    for (const file of files) {
-        const testJs = require(`${cwd}/${file}`);
-        _.forEach(testJs, (v, k) => cmds[k] = v);
-    }
-    return cmds;
-}
-
-async function createEvents(cwd: string, pattern: string[] = ["events/**.js", "lib/events/**.js"])
-    : Promise<Record<string, (sdm: SoftwareDeliveryMachine) => Omit<EventHandlerRegistration, "name">>> {
-    const events: Record<string,  (sdm: SoftwareDeliveryMachine) => Omit<EventHandlerRegistration, "name">> = {};
-    const files = await resolveFiles(cwd, pattern);
-    for (const file of files) {
-        const testJs = require(`${cwd}/${file}`);
-        _.forEach(testJs, (v, k) => events[k] = v);
-    }
-    return events;
-}
-
-function mapGoals(sdm: SoftwareDeliveryMachine,
-                  goals: any,
-                  additionalGoals: DeliveryGoals,
-                  goalMakers: Record<string, (sdm: SoftwareDeliveryMachine) => Goal>,
-                  cwd: string): Goal | Goal[] {
+async function mapGoals(sdm: SoftwareDeliveryMachine,
+                        goals: any,
+                        additionalGoals: DeliveryGoals,
+                        goalMakers: Record<string, GoalMaker>,
+                        cwd: string): Promise<Goal | Goal[]> {
     if (Array.isArray(goals)) {
-        return toArray(goals).map(g => mapGoals(sdm, g, additionalGoals, goalMakers, cwd)) as Goal[];
+        const newGoals: any[] = [];
+        for (const g of toArray(goals)) {
+            newGoals.push(await mapGoals(sdm, g, additionalGoals, goalMakers, cwd));
+        }
+        return newGoals;
     } else {
         if (!!goals.containers) {
             return container(
@@ -280,38 +250,6 @@ function mapGoals(sdm: SoftwareDeliveryMachine,
                     output: goals.output,
                     progressReporter: ContainerProgressReporter,
                 });
-            /* } else if (goals.aspect) {
-                const aspect = goals.aspect;
-                return container(
-                    aspect.name,
-                    {
-                        containers: [{
-                            name: aspect.name,
-                            image: aspect.image ? aspect.image : "ubuntu:latest",
-                            command: !!aspect.extract ? ["sh", "-c"] : undefined,
-                            args: !!aspect.extract ? ["/atm/home/extract.sh"] : undefined,
-                        }],
-                    })
-                    .withProjectListener({
-                        name: "aspect-extract",
-                        listener: async p => {
-                            if (!!aspect.extract) {
-                                const extractSh = (await fs.readFile(path.join(cwd, aspect.extract || "extract.sh"))).toString();
-                                await p.addFile("extract.sh", extractSh);
-                                await p.makeExecutable("extract.sh");
-                            }
-                        },
-                        events: [GoalProjectListenerEvent.before],
-                    })
-                    .withProjectListener({
-                        name: "aspect-upload",
-                        listener: async (p, r) => {
-                            const fingerprints = await p.getFile("fingerprints.json");
-                            const fps = JSON.parse(await fingerprints.getContent()) as FP[];
-                            await sendFingerprintsToAtomistFor(r, [], r.id as any, fps, {});
-                        },
-                        events: [GoalProjectListenerEvent.after],
-                    }); */
         } else if (goals === "immaterial") {
             return ImmaterialGoals.andLock().goals;
         } else if (goals === "lock") {
@@ -319,10 +257,54 @@ function mapGoals(sdm: SoftwareDeliveryMachine,
         } else if (!!additionalGoals[goals]) {
             return additionalGoals[goals];
         } else if (!!goalMakers[goals]) {
-            return goalMakers[goals](sdm);
+            return await goalMakers[goals](sdm);
         }
     }
     throw new Error(`Unable to construct goal from '${JSON.stringify(goals)}'`);
+}
+
+async function requireExtensions<EXT>(cwd: string, pattern: string[]): Promise<Record<string, EXT>> {
+    const extensions: Record<string, EXT> = {};
+    const files = await resolveFiles(cwd, pattern);
+    for (const file of files) {
+        const testJs = require(`${cwd}/${file}`);
+        _.forEach(testJs, (v, k) => extensions[k] = v);
+    }
+    return extensions;
+}
+
+async function createTests(cwd: string, pattern: string[] = ["tests/**.js", "lib/tests/**.js"])
+    : Promise<Record<string, PushTestMaker>> {
+    return requireExtensions<PushTestMaker>(cwd, pattern);
+}
+
+async function createGoals(cwd: string, pattern: string[] = ["goals/**.js", "lib/goals/**.js"])
+    : Promise<Record<string, GoalMaker>> {
+    return requireExtensions<GoalMaker>(cwd, pattern);
+}
+
+async function createCommands(cwd: string, pattern: string[] = ["commands/**.js", "lib/commands/**.js"])
+    : Promise<Record<string, CommandMaker>> {
+    return requireExtensions<CommandMaker>(cwd, pattern);
+}
+
+async function createEvents(cwd: string, pattern: string[] = ["events/**.js", "lib/events/**.js"])
+    : Promise<Record<string, EventMaker>> {
+    return requireExtensions<EventMaker>(cwd, pattern);
+}
+
+async function createConfiguration(cwd: string, pattern: string[] = ["config.js", "lib/config.js"])
+    : Promise<Record<string, ConfigurationMaker>> {
+    return requireExtensions<ConfigurationMaker>(cwd, pattern);
+}
+
+async function awaitIterable<G>(elems: Record<string, G>, cb: (v, k) => Promise<any>): Promise<void> {
+    for (const k in elems) {
+        if (elems.hasOwnProperty(k)) {
+            const v = elems[k];
+            await cb(v, k);
+        }
+    }
 }
 
 async function resolveFiles(cwd: string, patterns: string | string[]): Promise<string[]> {
