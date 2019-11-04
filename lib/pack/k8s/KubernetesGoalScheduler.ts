@@ -321,8 +321,7 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
             }
             if (!!data[ServiceRegistrationGoalDataKey]) {
                 _.forEach(data[ServiceRegistrationGoalDataKey], (v, k) => {
-                    logger.debug(
-                        `Service with name '${k}' and type '${v.type}' found for goal '${goalEvent.uniqueName}'`);
+                    logger.debug(`Service with name '${k}' and type '${v.type}' found for goal '${goalEvent.uniqueName}'`);
                     if (v.type === K8sServiceRegistrationType.K8sService) {
                         const spec = v.spec as K8sServiceSpec;
                         if (!!spec.container) {

@@ -242,7 +242,7 @@ describe("goal/container/docker", () => {
                 return;
             }
             try {
-                await execPromise("docker", ["pull", "alpine:3.9.4"]);
+                await execPromise("docker", ["pull", "alpine:3.9.4"], { timeout: 18000 });
             } catch (e) {
                 // tslint:disable-next-line:no-invalid-this
                 this.skip();

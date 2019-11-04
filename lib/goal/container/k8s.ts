@@ -180,7 +180,7 @@ export function k8sFulfillmentCallback(
         if (!k8sScheduler.podSpec) {
             throw new Error("KubernetesGoalScheduler has no podSpec defined");
         }
-        const initContainer: k8s.V1Container = _.cloneDeep(k8sScheduler.podSpec.spec.containers[0]);
+        const initContainer = _.cloneDeep(k8sScheduler.podSpec.spec.containers[0]);
         delete initContainer.lifecycle;
         delete initContainer.livenessProbe;
         delete initContainer.readinessProbe;
