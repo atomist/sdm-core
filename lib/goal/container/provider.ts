@@ -257,8 +257,9 @@ async function decryptSecret(secret: string, gi: GoalInvocation): Promise<string
     if (!encryptionCfp) {
         throw new Error("Encryption configuration missing to decrypt secret");
     }
-    const decipher = crypto.createDecipher(encryptionCfp.algorithm, encryptionCfp.privateKey);
-    let dec = decipher.update(secret, "base64", "utf8");
-    dec += decipher.final("utf8");
-    return dec;
+    const decrypted = crypto.privateDecrypt({
+        key: encryptionCfp.privateKey,
+        passphrase: encryptionCfp.passphrase,
+    }, Buffer.from(secret, "base64"));
+    return decrypted.toString("utf8");
 }
