@@ -121,6 +121,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         }
 
         try {
+            logger.debug(`Job spec for ${jobDesc}: ${JSON.stringify(jobSpec)}`)
             // Previous deletion might not have completed; hence the retry here
             const jobResult = (await doWithRetry<{ body: k8s.V1Job }>(
                 () => batch.createNamespacedJob(jobSpec.metadata.namespace, jobSpec),
