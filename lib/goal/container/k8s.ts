@@ -235,30 +235,43 @@ export function k8sFulfillmentCallback(
                 ...(c.env || []),
             ];
         });
-        const secretsVolumes = [];
+        const secretVolumes = [];
         if (!!secrets?.files) {
-            const ns = await readNamespace();
             for (const file of secrets.files) {
                 const fileName = path.basename(file.mountPath);
-                const secretName = `secret-${guid().split("-")[0]}`;
-                await createOrUpdateSecret(ns, fileName, secretName, file.value);
-                initContainer.volumeMounts = [
-                    ...(initContainer.volumeMounts || []),
-                    {
-                        mountPath: file.mountPath,
-                        name: secretName,
-                    },
-                ];
-                spec.containers.forEach(c => {
-                    c.volumeMounts = [
-                        ...(c.volumeMounts || []),
+                const dirname = path.dirname(file.mountPath);
+                let secretName = `secret-${guid().split("-")[0]}`;
+
+                const vm = (initContainer.volumeMounts || [])
+                    .find(vm => vm.mountPath === dirname);
+                if (!!vm) {
+                   secretName = vm.name;
+                } else {
+                    initContainer.volumeMounts = [
+                        ...(initContainer.volumeMounts || []),
                         {
-                            mountPath: file.mountPath,
+                            mountPath: dirname,
                             name: secretName,
                         },
                     ];
+                    spec.volumes = [
+                        ...(spec.volumes || []),
+                        {
+                            name: secretName,
+                            emptyDir: {},
+                        } as any,
+                    ];
+                }
+                spec.containers.forEach((c: k8s.V1Container) => {
+                    c.volumeMounts = [
+                        ...(c.volumeMounts || []),
+                        {
+                            mountPath: dirname,
+                            name: secretName,
+                            subPath: fileName,
+                        },
+                    ];
                 });
-                secretsVolumes.push(secretName);
             }
         }
 
@@ -280,7 +293,8 @@ export function k8sFulfillmentCallback(
                         name: outputVolume,
                         emptyDir: {},
                     },
-                    ...(secretsVolumes.map(s => ({
+                    ...(spec.volumes || []),
+                    ...(secretVolumes.map(s => ({
                         name: s,
                         secret: {
                             secretName: s,
@@ -352,6 +366,12 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
                 const message = `Failed to prepare input and output for goal ${goalEvent.name}: ${e.message}`;
                 loglog(message, logger.error, progressLog);
                 return { code: 1, message };
+            }
+            const secrets = await prepareSecrets(registration.containers[0], gi);
+            if (!!secrets?.files) {
+                for (const file of secrets.files) {
+                    await fs.writeFile(file.mountPath, file.value);
+                }
             }
             goalEvent.state = SdmGoalState.in_process;
             return goalEvent;
@@ -561,31 +581,4 @@ function followK8sLog(container: K8sContainer): request.Request {
     };
     const logOptions: k8s.LogOptions = { follow: true };
     return k8sLog.log(container.ns, container.pod, container.name, logStream, doneCallback, logOptions);
-}
-
-async function createOrUpdateSecret(ns: string,
-                                    key: string,
-                                    name: string,
-                                    data: any): Promise<void> {
-    const secret: DeepPartial<k8s.V1Secret> = {
-        apiVersion: "v1",
-        kind: "Secret",
-        metadata: {
-            name,
-        },
-        type: "Opaque",
-        stringData: {
-            [key]: typeof data !== "string" ? JSON.stringify(data) : data,
-        },
-    };
-
-    const kc = loadKubeConfig();
-    const core = kc.makeApiClient(k8s.CoreV1Api);
-
-    try {
-        await core.readNamespacedSecret(name, ns);
-        await core.replaceNamespacedSecret(name, ns, secret as any);
-    } catch (e) {
-        await core.createNamespacedSecret(ns, secret as any);
-    }
 }
