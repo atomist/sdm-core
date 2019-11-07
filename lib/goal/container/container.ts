@@ -295,7 +295,15 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
             this.withProjectListener(cacheRestore({ entries: registration.input.map(c => ({ classifier: c })) }));
         }
         if (registration.output && registration.output.length > 0) {
-            this.withProjectListener(cachePut({ entries: registration.output }));
+            const cp = cachePut({ entries: registration.output });
+            this.withProjectListener({
+                ...cp,
+                listener: async (p, r, event) => {
+                    if (!process.env.ATOMIST_ISOLATED_GOAL_INIT) {
+                        return cp.listener(p, r, event);
+                    }
+                }
+            });
         }
         return this;
     }

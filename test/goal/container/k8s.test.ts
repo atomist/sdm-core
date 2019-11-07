@@ -850,6 +850,12 @@ describe("goal/container/k8s", () => {
                                     name: ov,
                                     emptyDir: {},
                                 },
+                                {
+                                    hostPath: {
+                                        path: "/william/shakespeare",
+                                    },
+                                    name: "tempest",
+                                },
                             ],
                             volumeMount: [
                                 {
@@ -1188,7 +1194,9 @@ describe("goal/container/k8s", () => {
             },
             id: fakeId,
             progressLog: {
-                write: d => { logData += d; },
+                write: d => {
+                    logData += d;
+                },
             },
         } as any;
 
@@ -1327,7 +1335,8 @@ describe("goal/container/k8s", () => {
                 try {
                     const body: k8s.V1DeleteOptions = { gracePeriodSeconds: 0, propagationPolicy: "Background" };
                     await k8sCore.deleteNamespacedPod(p.metadata.name, ns, undefined, undefined, undefined, undefined, undefined, body);
-                } catch (e) { /* ignore */ }
+                } catch (e) { /* ignore */
+                }
                 return egr;
             }
 
