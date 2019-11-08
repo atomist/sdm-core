@@ -38,7 +38,6 @@ import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
-import { DeepPartial } from "ts-essentials";
 import { toArray } from "../../util/misc/array";
 import {
     loadKubeClusterConfig,
@@ -248,7 +247,7 @@ export function k8sJobName(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent): string 
 export function k8sJobEnv(podSpec: k8s.V1Pod, goalEvent: SdmGoalEvent, context: HandlerContext): k8s.V1EnvVar[] {
     const goalName = k8sJobGoalName(goalEvent);
     const jobName = k8sJobName(podSpec, goalEvent);
-    const envVars: Array<DeepPartial<k8s.V1EnvVar>> = [
+    const envVars: k8s.V1EnvVar[] = [
         {
             name: "ATOMIST_JOB_NAME",
             value: jobName,
@@ -348,7 +347,7 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
 
                         if (!!spec.volumeMount) {
                             const vm = toArray<k8s.V1VolumeMount>(spec.volumeMount as any);
-                            jobSpec.spec.template.spec.containers.forEach(c => {
+                            [...jobSpec.spec.template.spec.containers, ...jobSpec.spec.template.spec.initContainers].forEach(c => {
                                 c.volumeMounts = [
                                     ...(c.volumeMounts || []),
                                     ...vm,
