@@ -15,7 +15,6 @@
  */
 
 import {
-    GitCommandGitProject,
     GitProject,
     guid,
     logger,
@@ -155,11 +154,12 @@ export function k8sFulfillmentCallback(
     return async (goalEvent, repoContext) => {
         let spec: K8sContainerRegistration = _.cloneDeep(registration);
         if (registration.callback) {
-            const project = await GitCommandGitProject.cloned(repoContext.credentials, repoContext.id);
-            spec = {
-                ...spec,
-                ...(await registration.callback(_.cloneDeep(registration), project, goal, goalEvent, repoContext)) || {},
-            };
+            spec = await repoContext.configuration.sdm.projectLoader.doWithProject({ ...repoContext }, async p => {
+                return {
+                    ...spec,
+                    ...(await registration.callback(_.cloneDeep(registration), p, goal, goalEvent, repoContext)) || {},
+                };
+            });
         }
 
         if (!spec.containers || spec.containers.length < 1) {

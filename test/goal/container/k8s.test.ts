@@ -22,6 +22,7 @@ import {
     NodeFsLocalProject,
 } from "@atomist/automation-client";
 import {
+    CloningProjectLoader,
     execPromise,
     ExecuteGoalResult,
     fakePush,
@@ -103,6 +104,7 @@ describe("goal/container/k8s", () => {
             configuration: {
                 apiKey: "AT0M15TAP1K3Y",
                 sdm: {
+                    projectLoader: CloningProjectLoader,
                     encryption: {
                         passphrase: "Od3553y",
                         privateKey: `-----BEGIN RSA PRIVATE KEY-----
