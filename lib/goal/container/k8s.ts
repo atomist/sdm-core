@@ -153,10 +153,13 @@ export function k8sFulfillmentCallback(
 ): (sge: SdmGoalEvent, rc: RepoContext) => Promise<SdmGoalEvent> {
 
     return async (goalEvent, repoContext) => {
-        const spec: K8sContainerRegistration = _.merge({}, registration);
+        let spec: K8sContainerRegistration = _.cloneDeep(registration);
         if (registration.callback) {
             const project = await GitCommandGitProject.cloned(repoContext.credentials, repoContext.id);
-            _.merge(spec, await registration.callback(_.cloneDeep(registration), project, goal, goalEvent, repoContext));
+            spec = {
+                ...spec,
+                ...(await registration.callback(_.cloneDeep(registration), project, goal, goalEvent, repoContext)) || {},
+            };
         }
 
         if (!spec.containers || spec.containers.length < 1) {
