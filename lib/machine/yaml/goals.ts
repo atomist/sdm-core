@@ -31,8 +31,8 @@ import * as changeCase from "change-case";
 import * as _ from "lodash";
 import * as os from "os";
 import {
-    Container,
     container,
+    Container,
     ContainerProgressReporter,
     ContainerRegistration,
     ContainerSpecCallback,
