@@ -197,7 +197,7 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                     if (k === "goals") {
                         await mapGoals(
                             sdm,
-                            value.goals || value.goal,
+                            value,
                             additionalGoals,
                             goalMakers,
                             options.tests || {},
