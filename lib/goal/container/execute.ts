@@ -56,7 +56,7 @@ export function execute(name: string,
             const registrationToUse = _.cloneDeep(registration);
             await resolvePlaceholders(
                 registrationToUse,
-                value => resolvePlaceholder(value, gi.goalEvent, gi, {}));
+                value => resolvePlaceholder(value, gi.goalEvent, gi, gi.parameters));
 
             const env = {
                 ...process.env,

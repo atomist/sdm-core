@@ -239,7 +239,7 @@ const MapFulfillment: MapGoal = async (goals: any) => {
         return undefined;
     }
 
-    for (const name of goals) {
+    for (const name in goals) {
         if (goals.hasOwnProperty(name) && !!goals[name].item) {
             const gd = camelCase(goals[name]);
             return item(name, gd.item, gd.uniqueName, gd.parameters);
