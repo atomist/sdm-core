@@ -162,7 +162,7 @@ export function cachePut(options: GoalCacheOptions,
                 // Set outputs on the goal data
                 const { goalEvent } = gi;
                 const data = {
-                    "@atomist/sdm/output": entries.map(e => e.classifier),
+                    "@atomist/sdm/output": entries,
                 };
                 goalEvent.data = JSON.stringify({
                     ...(JSON.parse(goalEvent.data || "{}")),
@@ -260,7 +260,7 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
             // Set inputs on the goal data
             const { goalEvent } = gi;
             const data = {
-                "@atomist/sdm/input": classifiersToBeRestored,
+                "@atomist/sdm/input": { classifiers: classifiersToBeRestored },
             };
             goalEvent.data = JSON.stringify({
                 ...(JSON.parse(goalEvent.data || "{}")),

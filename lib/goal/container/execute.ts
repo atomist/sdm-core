@@ -19,6 +19,7 @@ import { resolvePlaceholders } from "@atomist/automation-client/lib/configuratio
 import {
     doWithProject,
     goal,
+    GoalProjectListenerEvent,
     GoalWithFulfillment,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
@@ -26,6 +27,11 @@ import * as _ from "lodash";
 import * as os from "os";
 import * as path from "path";
 import { resolvePlaceholder } from "../../machine/yaml/mapGoals";
+import {
+    CacheEntry,
+    cachePut,
+    cacheRestore,
+} from "../cache/goalCaching";
 import {
     ContainerProgressReporter,
     ContainerSecrets,
@@ -114,6 +120,26 @@ export function execute(name: string,
         }, {
             readOnly: false,
             detachHead: true,
-        }), { progressReporter: ContainerProgressReporter });
+        }), { progressReporter: ContainerProgressReporter })
+        .withProjectListener({
+            name: "restoring inputs",
+            events: [GoalProjectListenerEvent.before],
+            listener: async (p, r, e) => {
+                const input: string[] = r.parameters?.input?.classifiers;
+                if (!!input && input.length > 0) {
+                    await cacheRestore({ entries: input.map(i => ({ classifier: i })) }).listener(p, r, e);
+                }
+            },
+        })
+        .withProjectListener({
+            name: "caching outputs",
+            events: [GoalProjectListenerEvent.before],
+            listener: async (p, r, e) => {
+                const output: CacheEntry[] = r.parameters?.output;
+                if (!!output && output.length > 0) {
+                    await cachePut({ entries: output }).listener(p, r, e);
+                }
+            },
+        });
     return executeGoal;
 }

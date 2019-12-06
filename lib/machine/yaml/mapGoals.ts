@@ -242,7 +242,9 @@ const MapFulfillment: MapGoal = async (goals: any) => {
             return item(
                 match[3].replace(/_/g, " "),
                 `${match[1]}/${match[2]}`,
-                match[3]);
+                {
+                    uniqueName: match[3],
+                });
         }
     }
 
@@ -254,8 +256,12 @@ const MapFulfillment: MapGoal = async (goals: any) => {
                 return item(
                     match[3].replace(/_/g, " "),
                     `${match[1]}/${match[2]}`,
-                    gd.uniqueName || match[3],
-                    gd.parameters);
+                    {
+                        uniqueName: gd.uniqueName || match[3],
+                        parameters: gd.parameters,
+                        input: gd.input,
+                        output: gd.output,
+                    });
             }
         }
     }

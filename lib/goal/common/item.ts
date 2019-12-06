@@ -19,14 +19,29 @@ import {
     GoalWithFulfillment,
     Parameterized,
 } from "@atomist/sdm";
+import { CacheEntry } from "../cache/goalCaching";
 
-export function item(name: string, registration: string, uniqueName?: string, parameters?: Parameterized): GoalWithFulfillment {
+export function item(name: string,
+                     registration: string,
+                     options: {
+                         uniqueName?: string,
+                         parameters?: Parameterized,
+                         input?: string[],
+                         output?: CacheEntry[],
+                     } = {}): GoalWithFulfillment {
+    const { uniqueName, parameters, input, output } = options;
     const g = goal({ displayName: name, uniqueName: uniqueName || name }).with({
         name: (uniqueName || name).replace(/ /g, "_"),
         registration,
     });
-    if (!!parameters) {
-        g.plan = async () => ({ parameters });
+    if (!!parameters || !!input || !output) {
+        g.plan = async () => ({
+            parameters: {
+                ...(parameters || {}),
+                input,
+                output,
+            },
+        });
     }
     return g;
 }
