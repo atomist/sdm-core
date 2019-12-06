@@ -58,9 +58,9 @@
     "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.8.0-master.20191025130333",
+    "@atomist/automation-client": "^1.8.0",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "1.8.0-master.20191011130951",
+    "@atomist/sdm": "^1.8.0",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/mocha": "^5.2.7",
@@ -74,10 +74,10 @@
     "prettier": "^1.18.2",
     "rimraf": "^3.0.0",
     "supervisor": "^0.12.0",
-    "ts-node": "^8.4.1",
-    "tslint": "^5.20.0",
-    "typedoc": "^0.15.0",
-    "typescript": "^3.6.4"
+    "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "typedoc": "^0.15.3",
+    "typescript": "^3.7.3"
   },
   "directories": {
     "test": "test"
@@ -96,11 +96,11 @@
     "compile:ts": "tsc --project .",
     "doc": "typedoc --mode modules --ignoreCompilerErrors --excludeExternals --exclude \"**/*.d.ts\" --out doc lib",
     "gql:gen": "atm-gql-gen",
-    "lint": "run-s lint:ts lint:gql",
-    "lint:fix": "run-s lint:ts:fix lint:gql:fix",
+    "lint": "run-p lint:ts lint:gql",
+    "lint:fix": "run-p lint:ts:fix lint:gql:fix",
     "lint:gql": "prettier --list-different \"lib/graphql/**/*.graphql\"",
     "lint:gql:fix": "prettier --write \"lib/graphql/**/*.graphql\"",
-    "lint:ts": "tslint --format verbose --project . --exclude \"{build,node_modules}/**\" \"**/*.ts\"",
+    "lint:ts": "tslint --config tslint.json --format verbose --project .",
     "lint:ts:fix": "npm run lint:ts -- --fix",
     "test": "mocha --require espower-typescript/guess \"test/**/*.test.ts\"",
     "test:one": "mocha --require espower-typescript/guess \"test/**/${TEST:-*.test.ts}\"",
