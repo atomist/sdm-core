@@ -1,6 +1,6 @@
 {
   "name": "@atomist/sdm-core",
-  "version": "1.8.1",
+  "version": "2.0.0",
   "description": "Atomist Software Delivery Machine - Implementation",
   "author": {
     "name": "Atomist",
@@ -61,9 +61,9 @@
     "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.8.0-master.20191113185413",
+    "@atomist/automation-client": "2.0.0-master.20191206152722",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "1.8.0-dynamic-goals.20191202154744",
+    "@atomist/sdm": "2.0.0-master.20191206153457",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.144",
