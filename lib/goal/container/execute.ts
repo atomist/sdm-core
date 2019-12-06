@@ -26,7 +26,7 @@ import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as os from "os";
 import * as path from "path";
-import { resolvePlaceholder } from "../../machine/yaml/mapGoals";
+import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import {
     CacheEntry,
     cachePut,

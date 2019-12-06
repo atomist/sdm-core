@@ -28,9 +28,11 @@ import { GoalCacheArchiveStore } from "./CompressingGoalCache";
  * Goal archive store that stores the compressed archives into the SDM cache directory.
  */
 export class FileSystemGoalCacheArchiveStore implements GoalCacheArchiveStore {
+    private static readonly archiveName: string = "cache.tar.gz";
+
     public async store(gi: GoalInvocation, classifier: string, archivePath: string): Promise<void> {
         const cacheDir = await FileSystemGoalCacheArchiveStore.getCacheDirectory(gi, classifier);
-        const archiveName = FileSystemGoalCacheArchiveStore.getArchiveName(gi);
+        const archiveName = FileSystemGoalCacheArchiveStore.archiveName;
         const archiveFileName = path.join(cacheDir, archiveName);
         await spawnLog("mv", [archivePath, archiveFileName], {
             log: gi.progressLog,
@@ -39,7 +41,7 @@ export class FileSystemGoalCacheArchiveStore implements GoalCacheArchiveStore {
 
     public async delete(gi: GoalInvocation, classifier: string): Promise<void> {
         const cacheDir = await FileSystemGoalCacheArchiveStore.getCacheDirectory(gi, classifier);
-        const archiveName = FileSystemGoalCacheArchiveStore.getArchiveName(gi);
+        const archiveName = FileSystemGoalCacheArchiveStore.archiveName;
         const archiveFileName = path.join(cacheDir, archiveName);
         await spawnLog("rm", ["-f", archiveFileName], {
             log: gi.progressLog,
@@ -48,7 +50,7 @@ export class FileSystemGoalCacheArchiveStore implements GoalCacheArchiveStore {
 
     public async retrieve(gi: GoalInvocation, classifier: string, targetArchivePath: string): Promise<void> {
         const cacheDir = await FileSystemGoalCacheArchiveStore.getCacheDirectory(gi, classifier);
-        const archiveName = FileSystemGoalCacheArchiveStore.getArchiveName(gi);
+        const archiveName = FileSystemGoalCacheArchiveStore.archiveName;
         const archiveFileName = path.join(cacheDir, archiveName);
         await spawnLog("cp", [archiveFileName, targetArchivePath], {
             log: gi.progressLog,
@@ -62,9 +64,5 @@ export class FileSystemGoalCacheArchiveStore implements GoalCacheArchiveStore {
         const cacheDir = path.join(sdmCacheDir, classifier);
         await fs.mkdirs(cacheDir);
         return cacheDir;
-    }
-
-    private static getArchiveName(gi: GoalInvocation): string {
-        return `${gi.goalEvent.sha}-cache.tar.gz`;
     }
 }
