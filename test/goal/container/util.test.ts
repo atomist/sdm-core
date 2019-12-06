@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-import { guid } from "@atomist/automation-client";
 import {
     SdmContext,
     SdmGoalEvent,
 } from "@atomist/sdm";
-import * as fs from "fs-extra";
-import * as os from "os";
-import * as path from "path";
 import * as assert from "power-assert";
 import {
+    ContainerInput,
+    ContainerOutput,
+    ContainerProjectHome,
+    ContainerResult,
+} from "../../../lib/goal/container/container";
+import {
     containerEnvVars,
-    copyProject,
 } from "../../../lib/goal/container/util";
 
 describe("goal/container/util", () => {
@@ -80,81 +81,28 @@ describe("goal/container/util", () => {
                     value: "1968.4.19",
                 },
                 {
-                    name: "ATOMIST_GOAL_SET_ID",
-                    value: "0abcdef-123456789-abcdef",
+                    name: "ATOMIST_GOAL",
+                    value: `${ContainerInput}/goal.json`,
                 },
                 {
-                    name: "ATOMIST_GOAL",
-                    value: "BeechwoodPark.ts#L243",
+                    name: "ATOMIST_RESULT",
+                    value: ContainerResult,
+                },
+                {
+                    name: "ATOMIST_INPUT_DIR",
+                    value: ContainerInput,
+                },
+                {
+                    name: "ATOMIST_OUTPUT_DIR",
+                    value: ContainerOutput,
+                },
+                {
+                    name: "ATOMIST_PROJECT_DIR",
+                    value: ContainerProjectHome,
                 },
             ];
             assert.deepStrictEqual(ge, e);
         });
 
     });
-
-    describe("copyProject", () => {
-
-        const tmpDirPrefix = "atomist-sdm-core-container-util-test";
-        const tmpDirs: string[] = [];
-        after(async () => {
-            await Promise.all(tmpDirs.map(t => fs.remove(t)));
-        });
-
-        it("should copy project from one location to another", async () => {
-            const s = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            const d = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            tmpDirs.push(s, d);
-            await fs.ensureDir(s);
-            const sf = path.join(s, "FriendsOfMine.txt");
-            await fs.writeFile(sf, "This Will Be Our Year\n");
-            await copyProject(s, d);
-            const df = path.join(d, "FriendsOfMine.txt");
-            assert(fs.existsSync(df));
-            const dfc = await fs.readFile(df, "utf8");
-            assert(dfc === "This Will Be Our Year\n");
-        });
-
-        it("should copy nested and hidden files", async () => {
-            const s = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            const d = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            tmpDirs.push(s, d);
-            const n = path.join(s, "Time", "of", "the", "Season");
-            await fs.ensureDir(n);
-            const sf = path.join(s, "Time", ".FriendsOfMine.txt");
-            await fs.writeFile(sf, "This Will Be Our Year\n");
-            const sf1 = path.join(n, "Butcher's Tale.ts");
-            await fs.writeFile(sf1, "// Western Front 1914\n");
-            await copyProject(s, d);
-            const df = path.join(d, "Time", ".FriendsOfMine.txt");
-            assert(fs.existsSync(df));
-            const dfc = await fs.readFile(df, "utf8");
-            assert(dfc === "This Will Be Our Year\n");
-            const df1 = path.join(d, "Time", "of", "the", "Season", "Butcher's Tale.ts");
-            assert(fs.existsSync(df1));
-            const dfc1 = await fs.readFile(df1, "utf8");
-            assert(dfc1 === "// Western Front 1914\n");
-        });
-
-        it("should clean destination project", async () => {
-            const s = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            const d = path.join(os.tmpdir(), `${tmpDirPrefix}-${guid()}`);
-            tmpDirs.push(s, d);
-            await fs.ensureDir(s);
-            await fs.ensureDir(d);
-            const sf = path.join(s, "FriendsOfMine.txt");
-            await fs.writeFile(sf, "This Will Be Our Year\n");
-            const dx = path.join(d, "README.md");
-            await fs.writeFile(dx, "# Hung Up on a Dream\n");
-            assert(fs.existsSync(dx));
-            await copyProject(s, d);
-            const df = path.join(d, "FriendsOfMine.txt");
-            assert(fs.existsSync(df));
-            const dfc = await fs.readFile(df, "utf8");
-            assert(dfc === "This Will Be Our Year\n");
-            assert(!fs.existsSync(dx));
-        });
-
-    });
-
 });

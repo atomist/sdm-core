@@ -21,7 +21,7 @@ import {
     CachingProjectLoader,
     commandRequestParameterPromptFactory,
 } from "@atomist/sdm";
-import { NoOpGoalCache } from "../goal/cache/NoOpGoalCache";
+import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
 // tslint:disable-next-line:deprecation
@@ -36,7 +36,7 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
         sdm: {
             // tslint:disable-next-line:deprecation
             artifactStore: new EphemeralLocalArtifactStore(),
-            projectLoader: new CachingProjectLoader(),
+            projectLoader: _.get(configuration, "sdm.projectLoader") || new CachingProjectLoader(),
             logFactory: rolarAndDashboardLogFactory(configuration),
             credentialsResolver: new GitHubCredentialsResolver(),
             repoRefResolver,
@@ -45,7 +45,6 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
             goalScheduler: [],
             preferenceStoreFactory: TeamConfigurationPreferenceStoreFactory,
             parameterPromptFactory: commandRequestParameterPromptFactory,
-            goalCache: new NoOpGoalCache(),
         },
         local: {
             preferLocalSeeds: true,
