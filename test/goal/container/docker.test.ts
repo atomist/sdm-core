@@ -37,6 +37,7 @@ import {
     dockerTmpDir,
     executeDockerJob,
 } from "../../../lib/goal/container/docker";
+import { runningInK8s } from "../../../lib/goal/container/util";
 import { containerTestImage } from "./util";
 
 /* tslint:disable:max-file-line-count */
@@ -249,7 +250,7 @@ describe("goal/container/docker", () => {
         before(async function dockerCheckProjectSetup(): Promise<void> {
             // tslint:disable-next-line:no-invalid-this
             this.timeout(20000);
-            if (!process.env.DOCKER_HOST && !fs.existsSync("/var/run/docker.sock")) {
+            if (runningInK8s() || (!process.env.DOCKER_HOST && !fs.existsSync("/var/run/docker.sock"))) {
                 // tslint:disable-next-line:no-invalid-this
                 this.skip();
                 return;
