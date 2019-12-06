@@ -16,13 +16,14 @@
 
 import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
+import * as _ from "lodash";
 
 /**
  * Watches the provided paths for changes when in watch mode
  */
 export function watchPaths(paths: string[]): void {
     process.env.ATOMIST_WATCH_PATHS =
-        [...(process.env.ATOMIST_WATCH_PATHS?.split(",") || []), ...paths].join(",");
+        _.uniq([...(process.env.ATOMIST_WATCH_PATHS?.split(",") || []), ...paths]).join(",");
 }
 
 export function camelCase(obj: any): any {
