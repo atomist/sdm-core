@@ -113,7 +113,7 @@
     "typedoc": "npm run doc"
   },
   "engines": {
-    "node": ">=8.1.0",
+    "node": ">=8.2.0",
     "npm": ">=5.0.0"
   }
 }

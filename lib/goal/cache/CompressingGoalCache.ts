@@ -15,10 +15,11 @@
  */
 
 import {
+    GitProject,
     guid,
-    LocalProject,
     logger,
 } from "@atomist/automation-client";
+import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import {
     GoalInvocation,
     spawnLog,
@@ -26,6 +27,7 @@ import {
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
+import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import {
     FileSystemGoalCacheArchiveStore,
 } from "./FileSystemGoalCacheArchiveStore";
@@ -65,7 +67,7 @@ export class CompressingGoalCache implements GoalCache {
         this.store = store;
     }
 
-    public async put(gi: GoalInvocation, project: LocalProject, files: string[], classifier?: string): Promise<void> {
+    public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
         const slug = `${gi.id.owner}/${gi.id.repo}`;
@@ -90,17 +92,20 @@ export class CompressingGoalCache implements GoalCache {
             gi.progressLog.write(message);
             return;
         }
-        await this.store.store(gi, this.sanitizeClassifier(classifier), teamArchiveFileName + ".gz");
+        const resolvedClassifier = await resolveClassifier(classifier, gi);
+        await this.store.store(gi, resolvedClassifier, teamArchiveFileName + ".gz");
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
-        await this.store.delete(gi, classifier);
+        const resolvedClassifier = await resolveClassifier(classifier, gi);
+        await this.store.delete(gi, resolvedClassifier);
     }
 
-    public async retrieve(gi: GoalInvocation, project: LocalProject, classifier?: string): Promise<void> {
+    public async retrieve(gi: GoalInvocation, project: GitProject, classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
-        await this.store.retrieve(gi, this.sanitizeClassifier(classifier), teamArchiveFileName);
+        const resolvedClassifier = await resolveClassifier(classifier, gi);
+        await this.store.retrieve(gi, resolvedClassifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
             await spawnLog("tar", ["-xzf", teamArchiveFileName], {
                 log: gi.progressLog,
@@ -111,9 +116,26 @@ export class CompressingGoalCache implements GoalCache {
         }
     }
 
-    private sanitizeClassifier(classifier?: string): string {
-         return !!classifier ?
-             classifier.replace(/\./g, "_")
-                 .replace(/\//g, "_") : classifier;
+}
+
+/**
+ * Interpolate information from goal invocation into the classifier.
+ */
+export async function resolveClassifier(classifier: string | undefined, gi: GoalInvocation): Promise<string | undefined> {
+    if (!classifier) {
+        return classifier;
     }
+    const wrapper = { classifier };
+    await resolvePlaceholders(wrapper, v => resolvePlaceholder(v, gi.goalEvent, gi, {}));
+    return sanitizeClassifier(wrapper.classifier);
+}
+
+/**
+ * Sanitize classifier for use in path.  Replace any characters
+ * which might cause problems on POSIX or MS Windows with "_",
+ * including path separators.  Ensure resulting file is not "hidden".
+ */
+export function sanitizeClassifier(classifier: string): string {
+    return classifier.replace(/[^-.0-9A-Za-z_+]/g, "_")
+        .replace(/^\.+/, ""); // hidden
 }
