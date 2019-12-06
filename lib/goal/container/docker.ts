@@ -44,7 +44,6 @@ import {
 import { prepareSecrets } from "./provider";
 import {
     containerEnvVars,
-    loglog,
     prepareInputAndOutput,
     processResult,
 } from "./util";
@@ -108,7 +107,7 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         const namePrefix = "sdm-";
         const nameSuffix = `-${goalEvent.goalSetId.slice(0, 7)}-${goalName}`;
 
-        const tmpDir = path.join(os.homedir(), ".atomist", "tmp", goalEvent.repo.owner, goalEvent.repo.name, goalEvent.goalSetId);
+        const tmpDir = path.join(dockerTmpDir(), goalEvent.repo.owner, goalEvent.repo.name, goalEvent.goalSetId);
         const containerDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
 
         return configuration.sdm.projectLoader.doWithProject({
@@ -119,164 +118,179 @@ export function executeDockerJob(goal: Container, registration: DockerContainerR
         },
             // tslint:disable-next-line:cyclomatic-complexity
             async project => {
-            const spec: GoalContainerSpec = {
-                ...registration,
-                ...(!!registration.callback ? await registration.callback(_.cloneDeep(registration), project, goal, goalEvent, gi) : {}),
-            };
-
-            if (!spec.containers || spec.containers.length < 1) {
-                throw new Error("No containers defined in GoalContainerSpec");
-            }
-
-            const inputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
-            const outputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
-            try {
-                await prepareInputAndOutput(inputDir, outputDir, gi);
-            } catch (e) {
-                const message = `Failed to prepare input and output for goal ${goalName}: ${e.message}`;
-                loglog(message, logger.error, progressLog);
-                return { code: 1, message };
-            }
-
-            const spawnOpts = {
-                log: progressLog,
-                cwd: containerDir,
-            };
-
-            const network = `${namePrefix}network-${guid()}${nameSuffix}`;
-            const networkCreateRes = await spawnLog("docker", ["network", "create", network], spawnOpts);
-            if (networkCreateRes.code) {
-                let message = `Failed to create Docker network '${network}'` +
-                    ((networkCreateRes.error) ? `: ${networkCreateRes.error.message}` : "");
-                loglog(message, logger.error, progressLog);
-                try {
-                    await dockerCleanup({ spawnOpts });
-                } catch (e) {
-                    networkCreateRes.code++;
-                    message += `; ${e.message}`;
-                }
-                return { code: networkCreateRes.code, message };
-            }
-
-            const atomistEnvs = (await containerEnvVars(gi.goalEvent, gi)).map(env => `--env=${env.name}=${env.value}`);
-
-            const spawnedContainers: SpawnedContainer[] = [];
-            const failures: string[] = [];
-            for (const container of spec.containers) {
-                let secrets = {
-                    env: [],
-                    files: [],
+                const spec: GoalContainerSpec = {
+                    ...registration,
+                    ...(!!registration.callback ? await registration.callback(_.cloneDeep(registration), project, goal, goalEvent, gi) : {}),
                 };
+
+                if (!spec.containers || spec.containers.length < 1) {
+                    throw new Error("No containers defined in GoalContainerSpec");
+                }
+
+                const inputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
+                const outputDir = path.join(tmpDir, `${namePrefix}tmp-${guid()}${nameSuffix}`);
                 try {
-                    secrets = await prepareSecrets(container, gi);
-                    if (!!secrets?.files) {
-                        const secretPath = path.join(inputDir, ".secrets");
-                        await fs.ensureDir(secretPath);
-                        for (const file of secrets.files) {
-                            const secretFile = path.join(secretPath, guid());
-                            file.hostPath = secretFile;
-                            await fs.writeFile(secretFile, file.value);
+                    await prepareInputAndOutput(inputDir, outputDir, gi);
+                } catch (e) {
+                    const message = `Failed to prepare input and output for goal ${goalName}: ${e.message}`;
+                    progressLog.write(message);
+                    return { code: 1, message };
+                }
+
+                const spawnOpts = {
+                    log: progressLog,
+                    cwd: containerDir,
+                };
+
+                const network = `${namePrefix}network-${guid()}${nameSuffix}`;
+                let networkCreateRes: SpawnLogResult;
+                try {
+                    networkCreateRes = await spawnLog("docker", ["network", "create", network], spawnOpts);
+                } catch (e) {
+                    networkCreateRes = {
+                        cmdString: `'docker' 'network' 'create' '${network}'`,
+                        code: 128,
+                        error: e,
+                        output: [undefined, "", e.message],
+                        pid: -1,
+                        signal: undefined,
+                        status: 128,
+                        stdout: "",
+                        stderr: e.message,
+                    };
+                }
+                if (networkCreateRes.code) {
+                    let message = `Failed to create Docker network '${network}'` +
+                        ((networkCreateRes.error) ? `: ${networkCreateRes.error.message}` : "");
+                    progressLog.write(message);
+                    try {
+                        await dockerCleanup({ spawnOpts });
+                    } catch (e) {
+                        networkCreateRes.code++;
+                        message += `; ${e.message}`;
+                    }
+                    return { code: networkCreateRes.code, message };
+                }
+
+                const atomistEnvs = (await containerEnvVars(gi.goalEvent, gi)).map(env => `--env=${env.name}=${env.value}`);
+
+                const spawnedContainers: SpawnedContainer[] = [];
+                const failures: string[] = [];
+                for (const container of spec.containers) {
+                    let secrets = {
+                        env: [],
+                        files: [],
+                    };
+                    try {
+                        secrets = await prepareSecrets(container, gi);
+                        if (!!secrets?.files) {
+                            const secretPath = path.join(inputDir, ".secrets");
+                            await fs.ensureDir(secretPath);
+                            for (const file of secrets.files) {
+                                const secretFile = path.join(secretPath, guid());
+                                file.hostPath = secretFile;
+                                await fs.writeFile(secretFile, file.value);
+                            }
                         }
+                    } catch (e) {
+                        failures.push(e.message);
+                    }
+                    const containerName = `${namePrefix}${container.name}${nameSuffix}`;
+                    let containerArgs: string[];
+                    try {
+                        containerArgs = containerDockerOptions(container, registration);
+                    } catch (e) {
+                        progressLog.write(e.message);
+                        failures.push(e.message);
+                        break;
+                    }
+                    const dockerArgs = [
+                        "run",
+                        "--tty",
+                        "--rm",
+                        `--name=${containerName}`,
+                        `--volume=${containerDir}:${ContainerProjectHome}`,
+                        `--volume=${inputDir}:${ContainerInput}`,
+                        `--volume=${outputDir}:${ContainerOutput}`,
+                        ...secrets.files.map(f => `--volume=${f.hostPath}:${f.mountPath}`),
+                        `--network=${network}`,
+                        `--network-alias=${container.name}`,
+                        ...containerArgs,
+                        ...(registration.dockerOptions || []),
+                        ...((container as DockerGoalContainer).dockerOptions || []),
+                        ...atomistEnvs,
+                        ...secrets.env.map(e => `--env=${e.name}=${e.value}`),
+                        container.image,
+                        ...(container.args || []),
+                    ];
+                    if (spawnedContainers.length < 1) {
+                        dockerArgs.splice(5, 0, `--workdir=${ContainerProjectHome}`);
+                    }
+                    const promise = spawnLog("docker", dockerArgs, spawnOpts);
+                    spawnedContainers.push({ name: containerName, promise });
+                }
+                if (failures.length > 0) {
+                    try {
+                        await dockerCleanup({
+                            network,
+                            spawnOpts,
+                            containers: spawnedContainers,
+                        });
+                    } catch (e) {
+                        failures.push(e.message);
+                    }
+                    return {
+                        code: failures.length,
+                        message: `Failed to spawn Docker containers: ${failures.join("; ")}`,
+                    };
+                }
+
+                const main = spawnedContainers[0];
+                try {
+                    const result = await main.promise;
+                    if (result.code) {
+                        const msg = `Docker container '${main.name}' failed` + ((result.error) ? `: ${result.error.message}` : "");
+                        progressLog.write(msg);
+                        failures.push(msg);
                     }
                 } catch (e) {
-                    failures.push(e.message);
+                    const message = `Failed to execute main Docker container '${main.name}': ${e.message}`;
+                    progressLog.write(message);
+                    failures.push(message);
                 }
-                const containerName = `${namePrefix}${container.name}${nameSuffix}`;
-                let containerArgs: string[];
-                try {
-                    containerArgs = containerDockerOptions(container, registration);
-                } catch (e) {
-                    loglog(e.message, logger.error, progressLog);
-                    failures.push(e.message);
-                    break;
+
+                const outputFile = path.join(outputDir, "result.json");
+                let outputResult;
+                if ((await fs.pathExists(outputFile)) && failures.length === 0) {
+                    try {
+                        outputResult = await processResult(await fs.readJson(outputFile), gi);
+                    } catch (e) {
+                        const message = `Failed to read output from Docker container '${main.name}': ${e.message}`;
+                        progressLog.write(message);
+                        failures.push(message);
+                    }
                 }
-                const dockerArgs = [
-                    "run",
-                    "--tty",
-                    "--rm",
-                    `--name=${containerName}`,
-                    `--volume=${containerDir}:${ContainerProjectHome}`,
-                    `--volume=${inputDir}:${ContainerInput}`,
-                    `--volume=${outputDir}:${ContainerOutput}`,
-                    ...secrets.files.map(f => `--volume=${f.hostPath}:${f.mountPath}`),
-                    `--network=${network}`,
-                    `--network-alias=${container.name}`,
-                    ...containerArgs,
-                    ...(registration.dockerOptions || []),
-                    ...((container as DockerGoalContainer).dockerOptions || []),
-                    ...atomistEnvs,
-                    ...secrets.env.map(e => `--env=${e.name}=${e.value}`),
-                    container.image,
-                    ...(container.args || []),
-                ];
-                if (spawnedContainers.length < 1) {
-                    dockerArgs.splice(5, 0, `--workdir=${ContainerProjectHome}`);
-                }
-                const promise = spawnLog("docker", dockerArgs, spawnOpts);
-                spawnedContainers.push({ name: containerName, promise });
-            }
-            if (failures.length > 0) {
+
+                const sidecars = spawnedContainers.slice(1);
                 try {
                     await dockerCleanup({
                         network,
                         spawnOpts,
-                        containers: spawnedContainers,
+                        containers: sidecars,
                     });
                 } catch (e) {
                     failures.push(e.message);
                 }
-                return {
-                    code: failures.length,
-                    message: `Failed to spawn Docker containers: ${failures.join("; ")}`,
-                };
-            }
 
-            const main = spawnedContainers[0];
-            try {
-                const result = await main.promise;
-                if (result.code) {
-                    const msg = `Docker container '${main.name}' failed` + ((result.error) ? `: ${result.error.message}` : "");
-                    loglog(msg, logger.error, progressLog);
-                    failures.push(msg);
+                if (failures.length === 0 && !!outputResult) {
+                    return outputResult;
+                } else {
+                    return {
+                        code: failures.length,
+                        message: (failures.length > 0) ? failures.join("; ") : "Successfully completed container job",
+                    };
                 }
-            } catch (e) {
-                const message = `Failed to execute main Docker container '${main.name}': ${e.message}`;
-                loglog(message, logger.error, progressLog);
-                failures.push(message);
-            }
-
-            const outputFile = path.join(outputDir, "result.json");
-            let outputResult;
-            if ((await fs.pathExists(outputFile)) && failures.length === 0) {
-                try {
-                    outputResult = await processResult(await fs.readJson(outputFile), gi);
-                } catch (e) {
-                    const message = `Failed to read output from Docker container '${main.name}': ${e.message}`;
-                    loglog(message, logger.error, progressLog);
-                    failures.push(message);
-                }
-            }
-
-            const sidecars = spawnedContainers.slice(1);
-            try {
-                await dockerCleanup({
-                    network,
-                    spawnOpts,
-                    containers: sidecars,
-                });
-            } catch (e) {
-                failures.push(e.message);
-            }
-
-            if (failures.length === 0 && !!outputResult) {
-                return outputResult;
-            } else {
-                return {
-                    code: failures.length,
-                    message: (failures.length > 0) ? failures.join("; ") : "Successfully completed container job",
-                };
-            }
-        });
+            });
     };
 }
 
@@ -321,6 +335,14 @@ export function containerDockerOptions(container: GoalContainer, registration: C
 }
 
 /**
+ * Use a temporary under the home directory so Docker can use it as a
+ * volume mount.
+ */
+export function dockerTmpDir(): string {
+    return path.join(os.homedir(), ".atomist", "tmp");
+}
+
+/**
  * Docker elements to cleanup after execution.
  */
 interface CleanupOptions {
@@ -354,7 +376,7 @@ async function dockerCleanup(opts: CleanupOptions): Promise<void> {
         if (networkDeleteRes.code) {
             const msg = `Failed to delete Docker network '${opts.network}'` +
                 ((networkDeleteRes.error) ? `: ${networkDeleteRes.error.message}` : "");
-            loglog(msg, logger.error, opts.spawnOpts.log);
+            opts.spawnOpts.log.write(msg);
         }
     }
 }
@@ -375,6 +397,6 @@ async function dockerKill(containers: SpawnedContainer[], opts: SpawnLogOptions)
         await Promise.all(killPromises);
     } catch (e) {
         const message = `Failed to kill Docker containers: ${e.message}`;
-        loglog(message, logger.error, opts.log);
+        opts.log.write(message);
     }
 }

@@ -15,7 +15,6 @@
  */
 
 import {
-    GitProject,
     guid,
     NodeFsLocalProject,
 } from "@atomist/automation-client";
@@ -35,9 +34,9 @@ import {
 } from "../../../lib/goal/container/container";
 import {
     containerDockerOptions,
+    dockerTmpDir,
     executeDockerJob,
 } from "../../../lib/goal/container/docker";
-import { runningInK8s } from "../../../lib/goal/container/util";
 import { containerTestImage } from "./util";
 
 /* tslint:disable:max-file-line-count */
@@ -198,10 +197,11 @@ describe("goal/container/docker", () => {
 
         const fakeId = fakePush().id;
         const goal = new Container();
-        const projectDir = path.join(os.tmpdir(), "atomist-sdm-core-docker-test-" + guid());
-        let project: GitProject;
+        const projectDir = path.join(dockerTmpDir(), "atomist-sdm-core-docker-test-" + guid());
+        let project: NodeFsLocalProject;
         const tmpDirs: string[] = [];
         let logData = "";
+        const logWrite = (d: string): void => { logData += d; };
         const goalInvocation: GoalInvocation = {
             context: {
                 graphClient: {
@@ -211,7 +211,17 @@ describe("goal/container/docker", () => {
             configuration: {
                 sdm: {
                     projectLoader: {
-                        doWithProject: (o, a) => a(project),
+                        doWithProject: async (o, a) => {
+                            let p: NodeFsLocalProject;
+                            if (o && o.cloneDir) {
+                                await fs.ensureDir(o.cloneDir);
+                                tmpDirs.push(o.cloneDir);
+                                p = await NodeFsLocalProject.copy(project, o.cloneDir) as NodeFsLocalProject;
+                            } else {
+                                p = project;
+                            }
+                            return a(p);
+                        },
                     },
                 },
             },
@@ -219,6 +229,9 @@ describe("goal/container/docker", () => {
             goalEvent: {
                 branch: fakeId.branch,
                 goalSetId: "27c20de4-2c88-480a-b4e7-f6c6d5a1d623",
+                push: {
+                    commits: [],
+                },
                 repo: {
                     name: fakeId.repo,
                     owner: fakeId.owner,
@@ -229,20 +242,20 @@ describe("goal/container/docker", () => {
             },
             id: fakeId,
             progressLog: {
-                write: d => { logData += d; },
+                write: logWrite,
             },
         } as any;
 
         before(async function dockerCheckProjectSetup(): Promise<void> {
             // tslint:disable-next-line:no-invalid-this
             this.timeout(20000);
-            if (runningInK8s() || (!process.env.DOCKER_HOST && !fs.existsSync("/var/run/docker.sock"))) {
+            if (!process.env.DOCKER_HOST && !fs.existsSync("/var/run/docker.sock")) {
                 // tslint:disable-next-line:no-invalid-this
                 this.skip();
                 return;
             }
             try {
-                await execPromise("docker", ["pull", "alpine:3.9.4"], { timeout: 18000 });
+                await execPromise("docker", ["pull", containerTestImage], { timeout: 18000 });
             } catch (e) {
                 // tslint:disable-next-line:no-invalid-this
                 this.skip();
@@ -463,16 +476,18 @@ describe("goal/container/docker", () => {
             await fs.ensureDir(tmpDir);
             tmpDirs.push(tmpDir);
             const existingFile = `README.${guid()}`;
-            const existingFilePath = path.join(tmpDir, existingFile);
+            let existingFilePath = path.join(tmpDir, existingFile);
             await fs.writeFile(existingFilePath, "# After Hours\n");
             const changeFile = `pigeonCamera.${guid()}`;
-            const changeFilePath = path.join(tmpDir, changeFile);
+            let changeFilePath = path.join(tmpDir, changeFile);
             await fs.writeFile(changeFilePath, "Where's my pigeon camera?\n");
             const deleteFile = `ifyouclosethedoor_${guid()}`;
-            const deleteFilePath = path.join(tmpDir, deleteFile);
+            let deleteFilePath = path.join(tmpDir, deleteFile);
             await fs.writeFile(deleteFilePath, "you won't see me\nyou won't see me\n");
+            const newFile = `project-test-0-${guid()}`;
+            let newFilePath = path.join(tmpDir, newFile);
             const lid = fakePush().id;
-            const lp: GitProject = await NodeFsLocalProject.fromExistingDirectory(lid, tmpDir) as any;
+            let lp = await NodeFsLocalProject.fromExistingDirectory(lid, tmpDir) as NodeFsLocalProject;
             const lgi: GoalInvocation = {
                 context: {
                     graphClient: {
@@ -482,7 +497,18 @@ describe("goal/container/docker", () => {
                 configuration: {
                     sdm: {
                         projectLoader: {
-                            doWithProject: (o, a) => a(lp),
+                            doWithProject: async (o, a) => {
+                                if (o && o.cloneDir) {
+                                    await fs.ensureDir(o.cloneDir);
+                                    tmpDirs.push(o.cloneDir);
+                                    lp = await NodeFsLocalProject.copy(lp, o.cloneDir) as NodeFsLocalProject;
+                                    existingFilePath = existingFilePath.replace(tmpDir, o.cloneDir);
+                                    changeFilePath = changeFilePath.replace(tmpDir, o.cloneDir);
+                                    deleteFilePath = deleteFilePath.replace(tmpDir, o.cloneDir);
+                                    newFilePath = newFilePath.replace(tmpDir, o.cloneDir);
+                                }
+                                return a(lp);
+                            },
                         },
                     },
                 },
@@ -490,6 +516,9 @@ describe("goal/container/docker", () => {
                 goalEvent: {
                     branch: lid.branch,
                     goalSetId: "27c20de4-2c88-480a-b4e7-f6c6d5a1d623",
+                    push: {
+                        commits: [],
+                    },
                     repo: {
                         name: lid.repo,
                         owner: lid.owner,
@@ -500,11 +529,9 @@ describe("goal/container/docker", () => {
                 },
                 id: lid,
                 progressLog: {
-                    write: () => { },
+                    write: logWrite,
                 },
             } as any;
-            const newFile = `project-test-0-${guid()}`;
-            const newFilePath = path.join(tmpDir, newFile);
             const r = {
                 containers: [
                     {
