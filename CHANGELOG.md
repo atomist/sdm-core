@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-core/compare/1.8.0...HEAD)
 
+### Added
+
+-   Updates to goal planning and scheduling. [#216](https://github.com/atomist/sdm-core/issues/216)
+
 ## [1.8.0](https://github.com/atomist/sdm-core/compare/1.7.0...1.8.0) - 2019-12-06
 
 ### Added
