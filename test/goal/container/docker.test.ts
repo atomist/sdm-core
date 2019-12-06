@@ -219,6 +219,9 @@ describe("goal/container/docker", () => {
             goalEvent: {
                 branch: fakeId.branch,
                 goalSetId: "27c20de4-2c88-480a-b4e7-f6c6d5a1d623",
+                push: {
+                    commits: [],
+                },
                 repo: {
                     name: fakeId.repo,
                     owner: fakeId.owner,
@@ -490,6 +493,9 @@ describe("goal/container/docker", () => {
                 goalEvent: {
                     branch: lid.branch,
                     goalSetId: "27c20de4-2c88-480a-b4e7-f6c6d5a1d623",
+                    push: {
+                        commits: [],
+                    },
                     repo: {
                         name: lid.repo,
                         owner: lid.owner,

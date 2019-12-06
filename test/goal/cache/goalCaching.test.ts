@@ -38,7 +38,7 @@ import {
     cacheRestore,
     GoalCache,
     GoalCacheOptions,
-} from "../../../index";
+} from "../../../lib/goal/cache/goalCaching";
 
 class TestGoalArtifactCache implements GoalCache {
     private id: RepoRef;

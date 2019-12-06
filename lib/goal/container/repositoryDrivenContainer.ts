@@ -31,7 +31,6 @@ import {
 import * as camelcaseKeys from "camelcase-keys";
 import * as yaml from "js-yaml";
 import * as _ from "lodash";
-import * as os from "os";
 import { DeliveryGoals } from "../../machine/configure";
 import { mapTests } from "../../machine/yaml/mapPushTests";
 import { toArray } from "../../util/misc/array";
@@ -39,6 +38,7 @@ import {
     cachePut,
     cacheRestore,
 } from "../cache/goalCaching";
+import { resolvePlaceholder } from "../resolvePlaceholder";
 import {
     Container,
     ContainerProgressReporter,
@@ -190,34 +190,4 @@ function mapPlannedGoal(name: string, details: any, containers: GoalContainer[],
             },
         },
     };
-}
-
-const PlaceholderExpression = /\$\{([.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
-
-async function resolvePlaceholder(value: string, pli: PushListenerInvocation): Promise<string> {
-    if (!PlaceholderExpression.test(value)) {
-        return value;
-    }
-    PlaceholderExpression.lastIndex = 0;
-    let currentValue = value;
-    let result: RegExpExecArray;
-    // tslint:disable-next-line:no-conditional-assignment
-    while (result = PlaceholderExpression.exec(currentValue)) {
-        const fm = result[0];
-        let envValue = _.get(pli, result[1]);
-        if (result[1] === "home") {
-            envValue = os.userInfo().homedir;
-        }
-        const defaultValue = result[2] ? result[2].trim().slice(1) : undefined;
-
-        if (envValue) {
-            currentValue = currentValue.split(fm).join(envValue);
-        } else if (defaultValue) {
-            currentValue = currentValue.split(fm).join(defaultValue);
-        } else {
-            throw new Error(`Placeholder '${result[1]}' can't be resolved`);
-        }
-        PlaceholderExpression.lastIndex = 0;
-    }
-    return currentValue;
 }
