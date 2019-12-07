@@ -18,6 +18,7 @@ import {
     addressEvent,
     GitProject,
     HandlerContext,
+    QueryNoCacheOptions,
     Success,
 } from "@atomist/automation-client";
 import {
@@ -121,6 +122,7 @@ export async function getGoalVersion(args: GetGoalVersionArguments): Promise<str
             sha: [args.sha],
             branch: [branch],
         },
+        options: QueryNoCacheOptions,
     });
     return _.get(version, "SdmVersion[0].version");
 }
