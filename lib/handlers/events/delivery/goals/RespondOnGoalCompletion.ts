@@ -49,7 +49,7 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 @EventHandler("Run a listener on goal failure or success",
     () => GraphQL.subscription({
         name: "OnAnyCompletedSdmGoal",
-        variables: { registration: () => automationClientInstance()?.configuration?.name },
+        variables: { registration: () => [automationClientInstance()?.configuration?.name] },
     }))
 export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
