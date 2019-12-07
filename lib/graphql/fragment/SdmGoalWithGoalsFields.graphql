@@ -85,6 +85,7 @@ fragment SdmGoalWithGoalsFields on SdmGoal {
       phase
       externalKey
       goalSet
+      registration
       goalSetId
       ts
       error
