@@ -15,6 +15,7 @@
  */
 
 import {
+    automationClientInstance,
     EventFired,
     GraphQL,
     HandlerContext,
@@ -42,9 +43,7 @@ import {
     UnanimousGoalApprovalRequestVoteDecisionManager,
     updateGoal,
 } from "@atomist/sdm";
-import {
-    shouldHandle,
-} from "../../../../internal/delivery/goals/support/validateGoal";
+import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 
@@ -58,7 +57,10 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
  * configured instance of GoalApprovalRequestVoteDecisionManager.
  */
 @EventHandler("Vote on started or approved goals",
-    GraphQL.subscription("OnAnyApprovedSdmGoal"))
+    GraphQL.subscription({
+        name: "OnAnyApprovedSdmGoal",
+        variables: { registration: automationClientInstance()?.configuration?.name },
+    }))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
     @Value("")

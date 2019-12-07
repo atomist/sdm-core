@@ -15,6 +15,7 @@
  */
 
 import {
+    automationClientInstance,
     EventFired,
     GraphQL,
     HandlerContext,
@@ -42,7 +43,10 @@ import { OnAnyFailedSdmGoal } from "../../../../typings/types";
  * Skip downstream goals on failed or stopped goal
  */
 @EventHandler("Skip downstream goals on failed, stopped or canceled goal",
-    GraphQL.subscription("OnAnyFailedSdmGoal"))
+    GraphQL.subscription({
+        name: "OnAnyFailedSdmGoal",
+        variables: { registration: automationClientInstance()?.configuration?.name },
+    }))
 export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailedSdmGoal.Subscription> {
 
     @Value("")
@@ -83,7 +87,7 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
         await Promise.all(goalsToSkip.map(g => updateGoal(context, g, {
             state: failedGoalState,
             description: `${failedGoalState === SdmGoalState.skipped ? "Skipped" : "Canceled"
-                } ${g.name} because ${failedGoal.name} ${failedGoalDescription}`,
+            } ${g.name} because ${failedGoal.name} ${failedGoalDescription}`,
         })));
 
         return Success;
