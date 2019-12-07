@@ -38,7 +38,7 @@ import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
 
 @EventHandler("Cancel the currently executing goal",
-    GraphQL.subscription({
+    () => GraphQL.subscription({
         name: "OnSpecificCanceledSdmGoal",
         variables: {
             goalSetId: process.env.ATOMIST_GOAL_SET_ID || "n/a",

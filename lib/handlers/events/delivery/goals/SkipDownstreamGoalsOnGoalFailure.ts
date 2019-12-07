@@ -43,7 +43,7 @@ import { OnAnyFailedSdmGoal } from "../../../../typings/types";
  * Skip downstream goals on failed or stopped goal
  */
 @EventHandler("Skip downstream goals on failed, stopped or canceled goal",
-    GraphQL.subscription({
+    () => GraphQL.subscription({
         name: "OnAnyFailedSdmGoal",
         variables: { registration: () => automationClientInstance()?.configuration?.name },
     }))

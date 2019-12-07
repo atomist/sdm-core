@@ -57,7 +57,7 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
  * configured instance of GoalApprovalRequestVoteDecisionManager.
  */
 @EventHandler("Vote on started or approved goals",
-    GraphQL.subscription({
+    () => GraphQL.subscription({
         name: "OnAnyApprovedSdmGoal",
         variables: { registration: () => automationClientInstance()?.configuration?.name },
     }))
