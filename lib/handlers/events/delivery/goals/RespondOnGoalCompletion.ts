@@ -38,7 +38,7 @@ import {
     SoftwareDeliveryMachineConfiguration,
 } from "@atomist/sdm";
 import * as stringify from "json-stringify-safe";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
 
@@ -62,8 +62,8 @@ export class RespondOnGoalCompletion implements HandleEvent<OnAnyCompletedSdmGoa
                         context: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
-        if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
+        if (!shouldHandle(sdmGoal)) {
+            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not managed by this SDM`);
             return Success;
         }
 

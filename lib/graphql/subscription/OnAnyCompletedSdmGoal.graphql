@@ -1,4 +1,4 @@
-subscription OnAnyCompletedSdmGoal {
+subscription OnAnyCompletedSdmGoal($registration: [String]) {
   SdmGoal(
     state: [
       in_process
@@ -8,7 +8,8 @@ subscription OnAnyCompletedSdmGoal {
       canceled
       waiting_for_pre_approval
       waiting_for_approval
-    ]
+    ],
+    registration: $registration
   ) {
     ...SdmGoalWithGoalsFields
     ...SdmGoalRepo

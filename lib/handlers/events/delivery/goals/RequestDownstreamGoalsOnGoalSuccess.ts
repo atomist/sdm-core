@@ -43,7 +43,7 @@ import {
     SdmGoalFulfillmentMethod,
     SdmGoalKey,
 } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import {
     OnAnySuccessfulSdmGoal,
@@ -71,8 +71,8 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                         context: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
-        if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
+        if (!shouldHandle(sdmGoal)) {
+            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not managed by this SDM`);
             return Success;
         }
 

@@ -202,6 +202,7 @@ export function normalizeGoal(goal: SdmGoalMessage | SdmGoalEvent): string {
             providerId: normalizeValue(goal.repo.providerId),
         },
         goalSet: normalizeValue(goal.goalSet),
+        registration: normalizeValue(goal.registration),
         goalSetId: normalizeValue(goal.goalSetId),
         externalKey: normalizeValue(goal.externalKey),
         sha: normalizeValue(goal.sha),

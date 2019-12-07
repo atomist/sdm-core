@@ -43,7 +43,7 @@ import {
     updateGoal,
 } from "@atomist/sdm";
 import {
-    isGoalRelevant,
+    shouldHandle,
 } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
@@ -82,8 +82,8 @@ export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGo
                         context: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
-        if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.name} skipped because not relevant for this SDM`);
+        if (!shouldHandle(sdmGoal)) {
+            logger.debug(`Goal ${sdmGoal.name} skipped because not managed by this SDM`);
             return Success;
         }
 

@@ -26,7 +26,7 @@ import {
 import { SdmGoalEvent } from "@atomist/sdm";
 import * as cluster from "cluster";
 import * as _ from "lodash";
-import { isGoalRelevant } from "../delivery/goals/support/validateGoal";
+import { shouldHandle } from "../delivery/goals/support/validateGoal";
 
 /**
  * Automation listener that reports goal round trip metrics to StatsD.
@@ -46,7 +46,7 @@ export class SdmGoalMetricReportingAutomationEventListener extends AutomationEve
         if (cluster.isMaster && !!this.statsd && process.env.ATOMIST_ISOLATED_GOAL !== "forked") {
             const goal = _.get(payload.data, "SdmGoal[0]") as SdmGoalEvent;
 
-            if (!!goal && isGoalRelevant(goal)) {
+            if (!!goal && shouldHandle(goal)) {
                 this.statsd.increment(
                     `counter.goal`,
                     1,

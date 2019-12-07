@@ -58,6 +58,7 @@ describe("goalSigning", () => {
         phase: "npm compile",
         externalKey: "sdm/atomist/0-code/build#goals.ts:42",
         goalSet: "Build with Release",
+        registration: "@atomist/test",
         goalSetId: "61d31727-3006-4979-b846-9f20d4e16cdd",
         ts: 1550839105466,
         retryFeasible: true,

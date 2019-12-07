@@ -34,7 +34,7 @@ import {
     updateGoal,
 } from "@atomist/sdm";
 import { SdmGoalKey } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
-import { isGoalRelevant } from "../../../../internal/delivery/goals/support/validateGoal";
+import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyFailedSdmGoal } from "../../../../typings/types";
 
@@ -52,8 +52,8 @@ export class SkipDownstreamGoalsOnGoalFailure implements HandleEvent<OnAnyFailed
                         context: HandlerContext): Promise<HandlerResult> {
         const failedGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
-        if (!isGoalRelevant(failedGoal)) {
-            logger.debug(`Goal ${failedGoal.uniqueName} skipped because not relevant for this SDM`);
+        if (!shouldHandle(failedGoal)) {
+            logger.debug(`Goal ${failedGoal.uniqueName} skipped because not managed by this SDM`);
             return Success;
         }
 

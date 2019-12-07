@@ -16,35 +16,29 @@
 
 import { SdmGoalEvent } from "@atomist/sdm";
 import * as assert from "power-assert";
-import { isGoalRelevant } from "../../../../../lib/internal/delivery/goals/support/validateGoal";
+import { shouldHandle } from "../../../../../lib/internal/delivery/goals/support/validateGoal";
 
-describe("isGoalRelevant", () => {
+describe("shouldHandle", () => {
 
     it("should handle own goal", () => {
         const goal = {
-            fulfillment: {
-                registration: "my-super-sdm",
-            },
+            registration: "my-super-sdm",
         } as any as SdmGoalEvent;
-        assert.equal(isGoalRelevant(goal, "my-super-sdm"), true);
+        assert.equal(shouldHandle(goal, "my-super-sdm"), true);
     });
 
     it("should not handle goal of different SDM", () => {
         const goal = {
-            fulfillment: {
-                registration: "some-super-sdm",
-            },
+            registration: "some-super-sdm",
         } as any as SdmGoalEvent;
-        assert.equal(isGoalRelevant(goal, "my-super-sdm"), false);
+        assert.equal(shouldHandle(goal, "my-super-sdm"), false);
     });
 
     it("should handle own goal in a SDM job", () => {
         const goal = {
-            fulfillment: {
-                registration: "my-super-sdm",
-            },
+            registration: "my-super-sdm",
         } as any as SdmGoalEvent;
-        assert.equal(isGoalRelevant(goal, "my-super-sdm-job-4342234-build"), true);
+        assert.equal(shouldHandle(goal, "my-super-sdm-job-4342234-build"), true);
     });
 
 });

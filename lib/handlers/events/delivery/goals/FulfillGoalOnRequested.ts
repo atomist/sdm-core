@@ -49,9 +49,7 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
-import {
-    isGoalRelevant,
-} from "../../../../internal/delivery/goals/support/validateGoal";
+import { shouldFulfill } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
 import { formatDuration } from "../../../../util/misc/time";
@@ -75,8 +73,8 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                         ctx: HandlerContext): Promise<HandlerResult> {
         const sdmGoal = event.data.SdmGoal[0] as SdmGoalEvent;
 
-        if (!isGoalRelevant(sdmGoal)) {
-            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not relevant for this SDM`);
+        if (!shouldFulfill(sdmGoal)) {
+            logger.debug(`Goal ${sdmGoal.uniqueName} skipped because not fulfilled by this SDM`);
             return Success;
         }
 

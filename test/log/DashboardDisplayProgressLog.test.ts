@@ -37,6 +37,7 @@ describe("DashboardDisplayProgressLog", () => {
         sha: "SHA1",
         environment: "ENV",
         uniqueName: "autofix#machine.ts:141",
+        registration: "@atomist/test",
         goalSetId: "2362da01-121c-4637-970c-a5ae7dbf6067",
         branch: undefined,
         name: undefined,

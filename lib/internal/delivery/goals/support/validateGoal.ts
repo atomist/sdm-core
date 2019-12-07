@@ -17,8 +17,14 @@
 import { automationClientInstance } from "@atomist/automation-client";
 import { SdmGoalEvent } from "@atomist/sdm";
 
-export function isGoalRelevant(sdmGoal: SdmGoalEvent,
-                               registration: string = automationClientInstance().configuration.name): boolean {
+export function shouldHandle(sdmGoal: SdmGoalEvent,
+                             registration: string = automationClientInstance().configuration.name): boolean {
+    const provenance = sdmGoal.registration;
+    return provenance === registration || registration.startsWith(`${provenance}-job`);
+}
+
+export function shouldFulfill(sdmGoal: SdmGoalEvent,
+                              registration: string = automationClientInstance().configuration.name): boolean {
     const provenance = sdmGoal.fulfillment.registration;
     return provenance === registration || registration.startsWith(`${provenance}-job`);
 }
