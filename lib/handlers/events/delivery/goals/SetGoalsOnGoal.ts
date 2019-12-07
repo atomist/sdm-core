@@ -49,7 +49,10 @@ import {
 /**
  * Set up goalSet on a goal (e.g. for delivery).
  */
-@EventHandler("Set up goalSet on Goal", GraphQL.subscription("OnAnyCompletedSdmGoal"))
+@EventHandler("Set up goalSet on Goal", GraphQL.subscription({
+    name: "OnAnyCompletedSdmGoal",
+    variables: { registration: undefined },
+}))
 export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
 
     /**

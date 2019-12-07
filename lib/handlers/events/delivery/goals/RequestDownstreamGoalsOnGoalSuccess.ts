@@ -57,7 +57,7 @@ import {
 @EventHandler("Move downstream goals from 'planned' to 'requested' when preconditions are met",
     GraphQL.subscription({
         name: "OnAnySuccessfulSdmGoal",
-        variables: { registration: automationClientInstance()?.configuration?.name },
+        variables: { registration: () => automationClientInstance()?.configuration?.name },
     }))
 export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuccessfulSdmGoal.Subscription> {
 

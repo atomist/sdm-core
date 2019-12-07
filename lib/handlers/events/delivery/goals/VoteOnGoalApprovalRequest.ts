@@ -59,7 +59,7 @@ import { OnAnyApprovedSdmGoal } from "../../../../typings/types";
 @EventHandler("Vote on started or approved goals",
     GraphQL.subscription({
         name: "OnAnyApprovedSdmGoal",
-        variables: { registration: automationClientInstance()?.configuration?.name },
+        variables: { registration: () => automationClientInstance()?.configuration?.name },
     }))
 export class VoteOnGoalApprovalRequest implements HandleEvent<OnAnyApprovedSdmGoal.Subscription> {
 
