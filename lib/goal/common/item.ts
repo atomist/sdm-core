@@ -31,7 +31,7 @@ export function item(name: string,
                      } = {}): GoalWithFulfillment {
     const { uniqueName, parameters, input, output } = options;
     const g = goal({ displayName: name, uniqueName: uniqueName || name }).with({
-        name: (uniqueName || name).replace(/ /g, "_"),
+        name: name.replace(/ /g, "_"),
         registration,
     });
     if (!!parameters || !!input || !output) {
