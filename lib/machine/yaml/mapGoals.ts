@@ -252,7 +252,7 @@ const MapFulfillment: MapGoal = async (goals: any) => {
             const match = regexp.exec(name);
             if (!!match && name.startsWith("@")) {
                 const gd = camelCase(goals[name]);
-                return item(
+                const g = item(
                     match[3].replace(/_/g, " "),
                     `${match[1]}/${match[2]}`,
                     {
@@ -261,6 +261,7 @@ const MapFulfillment: MapGoal = async (goals: any) => {
                         input: !!gd.input ? toArray(gd.input).map(c => ({ classifier: c })) : undefined,
                         output: mapOutput(goals[name]),
                     });
+                return addDetails(g, goals[name]);
             }
         }
     }
