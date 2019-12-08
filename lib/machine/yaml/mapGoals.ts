@@ -316,9 +316,15 @@ export async function mapGoals(sdm: SoftwareDeliveryMachine,
 
 function addDetails(goal: Goal, goals: any): Goal {
     (goal as any).definition = _.cloneDeep(goal.definition);
-    goal.definition.approvalRequired = goals.approval;
-    goal.definition.preApprovalRequired = goals.preApproval || goals.pre_approval;
-    goal.definition.retryFeasible = goals.retry;
+    if (goals.approval !== undefined) {
+        goal.definition.approvalRequired = goals.approval;
+    }
+    if (goals.preApproval !== undefined || goals.pre_approval !== undefined) {
+        goal.definition.preApprovalRequired = goals.preApproval || goals.pre_approval;
+    }
+    if (goals.retry !== undefined) {
+        goal.definition.retryFeasible = goals.retry;
+    }
     if (!!goals.descriptions) {
         const descriptions = camelCase(goals.descriptions);
         goal.definition.canceledDescription = descriptions.canceled;
