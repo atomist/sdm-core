@@ -258,7 +258,7 @@ const MapFulfillment: MapGoal = async (goals: any) => {
                     {
                         uniqueName: gd.uniqueName || match[3],
                         parameters: gd.parameters,
-                        input: !!gd.input ? toArray(goals.input).map(c => ({ classifier: c })) : undefined,
+                        input: !!gd.input ? toArray(gd.input).map(c => ({ classifier: c })) : undefined,
                         output: mapOutput(gd),
                     });
             }
