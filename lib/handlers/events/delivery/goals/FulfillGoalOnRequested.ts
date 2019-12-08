@@ -49,6 +49,7 @@ import {
     WriteToAllProgressLog,
 } from "@atomist/sdm";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import * as os from "os";
 import { shouldFulfill } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
@@ -224,6 +225,7 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog): Pro
     progressLog.write(`Goal: ${sdmGoal.name} (${sdmGoal.uniqueName})`);
     progressLog.write(`Environment: ${sdmGoal.environment.slice(2)}`);
     progressLog.write(`GoalSet: ${sdmGoal.goalSet} - ${sdmGoal.goalSetId}`);
+    progressLog.write(`Host: ${os.hostname()}`);
     progressLog.write(
         `SDM: ${automationClientInstance().configuration.name}:${automationClientInstance().configuration.version}`);
     progressLog.write("\\--");
