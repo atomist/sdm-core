@@ -37,7 +37,7 @@ import * as rimraf from "rimraf";
 import { promisify } from "util";
 import {
     CompressingGoalCache,
-    resolveClassifier,
+    resolveClassifierPath,
     sanitizeClassifier,
 } from "../../../lib/goal/cache/CompressingGoalCache";
 import {
@@ -137,7 +137,7 @@ describe("goal/cache/CompressingGoalCache", () => {
 
     });
 
-    describe("resolveClassifier", () => {
+    describe("resolveClassifierPath", () => {
 
         const gi: any = {
             configuration: {
@@ -161,42 +161,49 @@ describe("goal/cache/CompressingGoalCache", () => {
             },
         };
 
-        it("should do nothing successfully", async () => {
-            for (const c of [undefined, "", "simple", "foo.bar", "foo..bar"]) {
-                const r = await resolveClassifier(c, gi);
-                assert(r === c);
+        it("should return the workspace ID", async () => {
+            for (const c of [undefined, ""]) {
+                const r = await resolveClassifierPath(c, gi);
+                assert(r === "TH3K1NK5");
+            }
+        });
+
+        it("should prepend the workspace ID", async () => {
+            for (const c of ["simple", "foo.bar", "foo..bar"]) {
+                const r = await resolveClassifierPath(c, gi);
+                assert(r === `TH3K1NK5/${c}`);
             }
         });
 
         it("should replace placeholders", async () => {
             // tslint:disable-next-line:no-invalid-template-strings
             const c = "star-struck_${repo.providerId}_${repo.owner}_${repo.name}_${sha}_PhenomenalCat";
-            const r = await resolveClassifier(c, gi);
-            const e = "star-struck_PyeReprise_TheKinks_village-green_9932791f7adfd854b576125b058e9eb45b3da8b9_PhenomenalCat";
+            const r = await resolveClassifierPath(c, gi);
+            const e = "TH3K1NK5/star-struck_PyeReprise_TheKinks_village-green_9932791f7adfd854b576125b058e9eb45b3da8b9_PhenomenalCat";
             assert(r === e);
         });
 
         it("should replace placeholders and provide defaults", async () => {
             // tslint:disable-next-line:no-invalid-template-strings
             const c = "star-struck_${repo.providerId}_${repo.owner}_${repo.name}_${brunch:hunch}_PhenomenalCat";
-            const r = await resolveClassifier(c, gi);
-            const e = "star-struck_PyeReprise_TheKinks_village-green_hunch_PhenomenalCat";
+            const r = await resolveClassifierPath(c, gi);
+            const e = "TH3K1NK5/star-struck_PyeReprise_TheKinks_village-green_hunch_PhenomenalCat";
             assert(r === e);
         });
 
         it("should replace nested placeholders", async () => {
             // tslint:disable-next-line:no-invalid-template-strings
             const c = "star-struck_${repo.providerId}_${repo.owner}_${repo.name}_${brunch:${sha}}_PhenomenalCat";
-            const r = await resolveClassifier(c, gi);
-            const e = "star-struck_PyeReprise_TheKinks_village-green_9932791f7adfd854b576125b058e9eb45b3da8b9_PhenomenalCat";
+            const r = await resolveClassifierPath(c, gi);
+            const e = "TH3K1NK5/star-struck_PyeReprise_TheKinks_village-green_9932791f7adfd854b576125b058e9eb45b3da8b9_PhenomenalCat";
             assert(r === e);
         });
 
         it("should replace and sanitize placeholders", async () => {
             // tslint:disable-next-line:no-invalid-template-strings
             const c = "star-struck_${sdm.docker.registry}_${repo.owner}_${repo.name}_${branch}_PhenomenalCat";
-            const r = await resolveClassifier(c, gi);
-            const e = "star-struck_kinks_bigsky_TheKinks_village-green_preservation_society_PhenomenalCat";
+            const r = await resolveClassifierPath(c, gi);
+            const e = "TH3K1NK5/star-struck_kinks_bigsky_TheKinks_village-green_preservation_society_PhenomenalCat";
             assert(r === e);
         });
 

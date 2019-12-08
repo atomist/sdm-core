@@ -92,19 +92,19 @@ export class CompressingGoalCache implements GoalCache {
             gi.progressLog.write(message);
             return;
         }
-        const resolvedClassifier = await resolveClassifier(classifier, gi);
+        const resolvedClassifier = await resolveClassifierPath(classifier, gi);
         await this.store.store(gi, resolvedClassifier, teamArchiveFileName + ".gz");
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
-        const resolvedClassifier = await resolveClassifier(classifier, gi);
+        const resolvedClassifier = await resolveClassifierPath(classifier, gi);
         await this.store.delete(gi, resolvedClassifier);
     }
 
     public async retrieve(gi: GoalInvocation, project: GitProject, classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
-        const resolvedClassifier = await resolveClassifier(classifier, gi);
+        const resolvedClassifier = await resolveClassifierPath(classifier, gi);
         await this.store.retrieve(gi, resolvedClassifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
             await spawnLog("tar", ["-xzf", teamArchiveFileName], {
@@ -121,13 +121,13 @@ export class CompressingGoalCache implements GoalCache {
 /**
  * Interpolate information from goal invocation into the classifier.
  */
-export async function resolveClassifier(classifier: string | undefined, gi: GoalInvocation): Promise<string | undefined> {
+export async function resolveClassifierPath(classifier: string | undefined, gi: GoalInvocation): Promise<string> {
     if (!classifier) {
-        return classifier;
+        return gi.context.workspaceId;
     }
     const wrapper = { classifier };
     await resolvePlaceholders(wrapper, v => resolvePlaceholder(v, gi.goalEvent, gi, {}));
-    return sanitizeClassifier(wrapper.classifier);
+    return gi.context.workspaceId + "/" + sanitizeClassifier(wrapper.classifier);
 }
 
 /**
