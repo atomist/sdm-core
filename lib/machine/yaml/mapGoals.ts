@@ -317,7 +317,7 @@ export async function mapGoals(sdm: SoftwareDeliveryMachine,
 function addDetails(goal: Goal, goals: any): Goal {
     (goal as any).definition = _.cloneDeep(goal.definition);
     goal.definition.approvalRequired = goals.approval;
-    goal.definition.preApprovalRequired = goals.preApproval;
+    goal.definition.preApprovalRequired = goals.preApproval || goals.pre_approval;
     goal.definition.retryFeasible = goals.retry;
     if (!!goals.descriptions) {
         const descriptions = camelCase(goals.descriptions);
