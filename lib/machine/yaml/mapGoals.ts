@@ -256,10 +256,10 @@ const MapFulfillment: MapGoal = async (goals: any) => {
                     match[3].replace(/_/g, " "),
                     `${match[1]}/${match[2]}`,
                     {
-                        uniqueName: gd.uniqueName || match[3],
+                        uniqueName: gd.name || match[3],
                         parameters: gd.parameters,
                         input: !!gd.input ? toArray(gd.input).map(c => ({ classifier: c })) : undefined,
-                        output: mapOutput(gd),
+                        output: mapOutput(goals[name]),
                     });
             }
         }

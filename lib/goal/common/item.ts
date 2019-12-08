@@ -34,7 +34,7 @@ export function item(name: string,
         name: name.replace(/ /g, "_"),
         registration,
     });
-    if (!!parameters || !!input || !output) {
+    if (!!parameters || !!input || !!output) {
         g.plan = async () => ({
             parameters: {
                 ...(parameters || {}),
