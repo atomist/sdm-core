@@ -30,7 +30,7 @@ export function item(name: string,
                          output?: CacheEntry[],
                      } = {}): GoalWithFulfillment {
     const { uniqueName, parameters, input, output } = options;
-    const g = goal({ displayName: name, uniqueName: uniqueName || name }).with({
+    const g = goal({ displayName: uniqueName, uniqueName: uniqueName || name }).with({
         name: name.replace(/ /g, "_"),
         registration,
     });
