@@ -185,14 +185,19 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                 _.merge(sdm.configuration, camelcaseKeys(config.configuration, { deep: true }));
             }
 
+            if (!!config.item) {
+                _.merge(sdm.configuration, camelcaseKeys(config.item, { deep: true }));
+            }
+
             for (const k in config) {
                 if (config.hasOwnProperty(k)) {
                     const value = config[k];
 
                     // Ignore two special keys used to set up the SDM
-                    if (k === "name" || k === "configuration") {
+                    if (k === "name" || k === "configuration" || k === "item") {
                         continue;
                     }
+
                     // Just create goals and register with SDM
                     if (k === "goals") {
                         await mapGoals(
