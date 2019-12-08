@@ -125,15 +125,15 @@ export function execute(name: string,
             name: "restoring inputs",
             events: [GoalProjectListenerEvent.before],
             listener: async (p, r, e) => {
-                const input: string[] = r.parameters?.input?.classifiers;
+                const input: Array<{ classifier: string }> = r.parameters?.input;
                 if (!!input && input.length > 0) {
-                    await cacheRestore({ entries: input.map(i => ({ classifier: i })) }).listener(p, r, e);
+                    await cacheRestore({ entries: input }).listener(p, r, e);
                 }
             },
         })
         .withProjectListener({
             name: "caching outputs",
-            events: [GoalProjectListenerEvent.before],
+            events: [GoalProjectListenerEvent.after],
             listener: async (p, r, e) => {
                 const output: CacheEntry[] = r.parameters?.output;
                 if (!!output && output.length > 0) {

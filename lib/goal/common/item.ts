@@ -26,7 +26,7 @@ export function item(name: string,
                      options: {
                          uniqueName?: string,
                          parameters?: Parameterized,
-                         input?: string[],
+                         input?:  Array<{ classifier: string }>,
                          output?: CacheEntry[],
                      } = {}): GoalWithFulfillment {
     const { uniqueName, parameters, input, output } = options;
