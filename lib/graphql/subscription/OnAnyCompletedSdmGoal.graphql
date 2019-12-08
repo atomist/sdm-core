@@ -8,7 +8,7 @@ subscription OnAnyCompletedSdmGoal($registration: [String]) {
       canceled
       waiting_for_pre_approval
       waiting_for_approval
-    ],
+    ]
     registration: $registration
   ) {
     ...SdmGoalWithGoalsFields

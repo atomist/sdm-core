@@ -154,6 +154,7 @@ async function createExtensions(cwd: string,
     ]));
 }
 
+// tslint:disable-next-line:cyclomatic-complexity
 async function createGoalData<G extends DeliveryGoals>(patterns: string | string[],
                                                        cwd: string,
                                                        options: ConfigureYamlOptions<G>,
