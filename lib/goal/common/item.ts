@@ -38,10 +38,15 @@ export function item(name: string,
     });
     if (!!parameters || !!input || !!output) {
         g.plan = async (pli) => {
-
+            const { push } = pli;
             await resolvePlaceholders(parameters, v => resolvePlaceholder(v, {
                 sha: pli.push.after.sha,
                 branch: pli.push.branch,
+                repo: {
+                    owner: push.repo.owner,
+                    name: push.repo.name,
+                    providerId: push.repo.org.provider.providerId,
+                },
                 push: pli.push,
             } as any, pli, {}, true));
 
