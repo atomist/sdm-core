@@ -99,7 +99,9 @@ export function execute(name: string,
                         return await processResult(await fs.readJson(outputFile), gi);
                     }
                 } else {
-                    return result;
+                    return {
+                        code: result.code,
+                    };
                 }
             } finally {
                 // Cleanup secrets;
