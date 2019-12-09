@@ -146,7 +146,7 @@ export async function prepareDockerProviderSecret(names: string[],
                         auth: Buffer.from(credential.Password[0].owner.login + ":" + credential.Password[0].secret).toString("base64"),
                     };
                 } else if (!!dockerRegistry.url) {
-                    const url = /^https?:\/\/(.*?)\/?$/.exec(dockerRegistry.url);
+                    const url = /^(?:https?:\/\/)?(.*?)\/?$/.exec(dockerRegistry.url);
                     dockerConfig.auths[url[1]] = {
                         auth: Buffer.from(credential.Password[0].owner.login + ":" + credential.Password[0].secret).toString("base64"),
                     };
