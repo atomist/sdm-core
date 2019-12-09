@@ -91,7 +91,15 @@ describe("machine/yaml/resolvePlaceholder", () => {
                     }
                 }
             } as any, { image: "test/test" });
-            assert.deepStrictEqual(result, "docker build . -f lib/Dockerfile -t atomist/sdm:latest &&");
+            assert.deepStrictEqual(result, "          echo \"atm:phase=kaniko build\" &&\n" +
+                "          /sdm/kaniko/executor\n" +
+                "          --context=dir://$ATOMIST_PROJECT_DIR\n" +
+                "          --destination=docker.pkg.github.com/test/test:sfsfsafdsf\n" +
+                "          --dockerfile=Dockerfile\n" +
+                "          --cache=false\n" +
+                "          --cache-repo=docker.pkg.github.com/test/test-cache\n" +
+                "          --force &&\n" +
+                "          echo '{ \"SdmGoal\": { \"push\": { \"after\": { \"images\" :[{ \"imageName\": \"docker.pkg.github.com/test/test:sfsfsafdsf\" }] } } } }' > $ATOMIST_RESULT");
         });
 
     });
