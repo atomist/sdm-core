@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import {
     goal,
     GoalWithFulfillment,
     Parameterized,
 } from "@atomist/sdm";
+import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { CacheEntry } from "../cache/goalCaching";
 
 export function item(name: string,
@@ -35,13 +37,22 @@ export function item(name: string,
         registration,
     });
     if (!!parameters || !!input || !!output) {
-        g.plan = async () => ({
-            parameters: {
-                ...(parameters || {}),
-                input,
-                output,
-            },
-        });
+        g.plan = async (pli) => {
+
+            await resolvePlaceholders(parameters, v => resolvePlaceholder(v, {
+                sha: pli.push.after.sha,
+                branch: pli.push.branch,
+                push: pli.push,
+            } as any, pli, {}, true));
+
+            return {
+                parameters: {
+                    ...(parameters || {}),
+                    input,
+                    output,
+                },
+            };
+        };
     }
     return g;
 }
