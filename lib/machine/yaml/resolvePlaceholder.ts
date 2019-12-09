@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import {
     RepoContext,
     SdmGoalEvent,
@@ -67,6 +68,8 @@ export async function resolvePlaceholder(value: string,
             currentValue = currentValue.split(fm).join(defaultValue);
             PlaceholderExpression.lastIndex = 0;
         } else if (raiseError) {
+            logger.warn(`Placeholder replacement failed for '%s', value: '%j', goal: '%j', parameters: '%j'`,
+                result[1], value, goal, parameters);
             throw new Error(`Placeholder '${result[1]}' can't be resolved`);
         }
     }

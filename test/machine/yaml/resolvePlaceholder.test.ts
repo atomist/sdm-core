@@ -51,9 +51,46 @@ describe("machine/yaml/resolvePlaceholder", () => {
             // tslint:disable
             const value = "docker build . -f ${parameters.dockerfile:Dockerfile} -t ${parameters.registry:${push.repo.owner}}/${push.repo.name}:latest &&";
             // tslint:enable
-            const result = await resolvePlaceholder(value, { push: { repo: { owner: "atomist", name: "sdm" } } } as any, {
+            const result = await resolvePlaceholder(value, {
+                push: {
+                    repo: {
+                        owner: "atomist",
+                        name: "sdm",
+                    },
+                },
+            } as any, {
                 configuration: {},
             } as any, { dockerfile: "lib/Dockerfile" });
+            assert.deepStrictEqual(result, "docker build . -f lib/Dockerfile -t atomist/sdm:latest &&");
+        });
+
+        it("should replace very nested placeholders", async () => {
+            // tslint:disable
+            const value = "          echo \"atm:phase=kaniko build\" &&\n" +
+                "          /sdm/kaniko/executor\n" +
+                "          --context=dir://$ATOMIST_PROJECT_DIR\n" +
+                "          --destination=${parameters.registry:docker.pkg.github.com}/${parameters.image}:${parameters.tag:${push.after.version:${push.after.sha}}}\n" +
+                "          --dockerfile=${parameters.dockerfile:Dockerfile}\n" +
+                "          --cache=${parameters.cache:false}\n" +
+                "          --cache-repo=${parameters.registry:docker.pkg.github.com}/${parameters.image}-cache\n" +
+                "          --force &&\n" +
+                "          echo '{ \"SdmGoal\": { \"push\": { \"after\": { \"images\" :[{ \"imageName\": \"${parameters.registry:docker.pkg.github.com}/${parameters.image}:${parameters.tag:${push.after.version:${push.after.sha}}}\" }] } } } }' > $ATOMIST_RESULT";
+            // tslint:enable
+            const result = await resolvePlaceholder(value, {
+                sha: "sfsfsafdsf",
+                branch: "master",
+                repo: { owner: "foo", name: "bla" },
+                push: { after: { sha: "sfsfsafdsf" }, repo: { owner: "atomist", name: "sdm" } },
+            } as any, {
+                configuration: {},
+                context: {
+                    graphClient: {
+                        query: async () => {
+                            return {};
+                        },
+                    }
+                }
+            } as any, { image: "test/test" });
             assert.deepStrictEqual(result, "docker build . -f lib/Dockerfile -t atomist/sdm:latest &&");
         });
 
