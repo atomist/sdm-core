@@ -217,7 +217,7 @@ async function findGoalScheduler(gi: GoalInvocation, configuration: SoftwareDeli
     return undefined;
 }
 
-async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog): Promise<void> {
+export async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog): Promise<void> {
     progressLog.write(`/--`);
     progressLog.write(`Start: ${formatDate(new Date(), "yyyy-mm-dd HH:MM:ss.l")}`);
     progressLog.write(`Repository: ${sdmGoal.push.repo.owner}/${sdmGoal.push.repo.name}/${sdmGoal.branch}`);
@@ -232,7 +232,7 @@ async function reportStart(sdmGoal: SdmGoalEvent, progressLog: ProgressLog): Pro
     await progressLog.flush();
 }
 
-async function reportEndAndClose(result: ExecuteGoalResult, start: number, progressLog: ProgressLog): Promise<void> {
+export async function reportEndAndClose(result: ExecuteGoalResult, start: number, progressLog: ProgressLog): Promise<void> {
     progressLog.write(`/--`);
     progressLog.write(`Result: ${serializeResult(result)}`);
     progressLog.write(`Duration: ${formatDuration(Date.now() - start)}`);
