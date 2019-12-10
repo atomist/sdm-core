@@ -19,7 +19,6 @@ import { resolvePlaceholders } from "@atomist/automation-client/lib/configuratio
 import {
     doWithProject,
     goal,
-    GoalProjectListenerEvent,
     GoalWithFulfillment,
 } from "@atomist/sdm";
 import * as fs from "fs-extra";
@@ -27,11 +26,6 @@ import * as _ from "lodash";
 import * as os from "os";
 import * as path from "path";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
-import {
-    CacheEntry,
-    cachePut,
-    cacheRestore,
-} from "../cache/goalCaching";
 import {
     ContainerProgressReporter,
     ContainerSecrets,
