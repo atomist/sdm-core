@@ -50,9 +50,15 @@ import {
 } from "@atomist/sdm";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import * as os from "os";
+import {
+    CacheEntry,
+    cachePut,
+    cacheRestore,
+} from "../../../../goal/cache/goalCaching";
 import { shouldFulfill } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
+import { toArray } from "../../../../util/misc/array";
 import { formatDuration } from "../../../../util/misc/time";
 
 /**
@@ -158,6 +164,24 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
         } else {
             delete (sdmGoal as any).id;
 
+            const listeners = [];
+
+            // Prepare cache project listeners for parameters
+            if (!!goalInvocation.parameters) {
+                if (!!goalInvocation.parameters["@atomist/sdm/input"]) {
+                    const input: Array<{ classifier: string }> = goalInvocation.parameters["@atomist/sdm/input"];
+                    if (!!input && input.length > 0) {
+                        listeners.push(cacheRestore({ entries: input }));
+                    }
+                }
+                if (!!goalInvocation.parameters["@atomist/sdm/output"]) {
+                    const output: CacheEntry[] = goalInvocation.parameters["@atomist/sdm/output"];
+                    if (!!output && output.length > 0) {
+                        listeners.push(cachePut({ entries: output }));
+                    }
+                }
+            }
+
             await reportStart(sdmGoal, progressLog);
             const start = Date.now();
 
@@ -167,7 +191,10 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
                         projectLoader: this.configuration.sdm.projectLoader,
                         goalExecutionListeners: this.goalExecutionListeners,
                     },
-                    implementation,
+                    {
+                        ...implementation,
+                        projectListeners: [...toArray(implementation.projectListeners || []), ...listeners],
+                    },
                     goalInvocation);
                 const terminatingStates = [
                     SdmGoalState.canceled,

@@ -103,6 +103,7 @@ export function execute(name: string,
                         code: result.code,
                     };
                 }
+            // TODO catch
             } finally {
                 // Cleanup secrets;
                 if (!!secrets) {
@@ -123,25 +124,5 @@ export function execute(name: string,
             readOnly: false,
             detachHead: true,
         }), { progressReporter: ContainerProgressReporter })
-        .withProjectListener({
-            name: "restoring inputs",
-            events: [GoalProjectListenerEvent.before],
-            listener: async (p, r, e) => {
-                const input: Array<{ classifier: string }> = r.parameters?.input;
-                if (!!input && input.length > 0) {
-                    await cacheRestore({ entries: input }).listener(p, r, e);
-                }
-            },
-        })
-        .withProjectListener({
-            name: "caching outputs",
-            events: [GoalProjectListenerEvent.after],
-            listener: async (p, r, e) => {
-                const output: CacheEntry[] = r.parameters?.output;
-                if (!!output && output.length > 0) {
-                    await cachePut({ entries: output }).listener(p, r, e);
-                }
-            },
-        });
     return executeGoal;
 }

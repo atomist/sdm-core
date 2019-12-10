@@ -139,7 +139,7 @@ export function cachePut(options: GoalCacheOptions,
         options.entries.filter(pattern => allClassifiers.includes(pattern.classifier)) :
         options.entries;
 
-    const listenerName = `caching ${entries.map(e => e.classifier).join(", ")}`;
+    const listenerName = `caching outputs`;
 
     return {
         name: listenerName,
@@ -237,7 +237,7 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
         classifiersToBeRestored.push(...optsToUse.entries.map(entry => entry.classifier));
     }
 
-    const listenerName = `restoring ${classifiersToBeRestored.join(", ")}`;
+    const listenerName = `restoring inputs`;
 
     return {
         name: listenerName,
@@ -294,7 +294,7 @@ export function cacheRemove(options: GoalCacheOptions,
         classifiersToBeRemoved.push(...options.entries.map(entry => entry.classifier));
     }
 
-    const listenerName = `removing ${classifiersToBeRemoved.join(", ")}`;
+    const listenerName = `removing outputs`;
 
     return {
         name: listenerName,

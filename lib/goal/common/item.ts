@@ -53,8 +53,8 @@ export function item(name: string,
             return {
                 parameters: {
                     ...(parameters || {}),
-                    input,
-                    output,
+                    "@atomist/sdm/input": input,
+                    "@atomist/sdm/output": output,
                 },
             };
         };
