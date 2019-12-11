@@ -117,6 +117,6 @@ export function execute(name: string,
         }, {
             readOnly: false,
             detachHead: true,
-        }), { progressReporter: ContainerProgressReporter })
+        }), { progressReporter: ContainerProgressReporter });
     return executeGoal;
 }

@@ -37,7 +37,7 @@ export function item(name: string,
         registration,
     });
     if (!!parameters || !!input || !!output) {
-        g.plan = async (pli) => {
+        g.plan = async pli => {
             const { push } = pli;
             await resolvePlaceholders(parameters, v => resolvePlaceholder(v, {
                 sha: pli.push.after.sha,

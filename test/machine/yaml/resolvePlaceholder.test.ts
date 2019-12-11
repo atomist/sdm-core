@@ -88,8 +88,8 @@ describe("machine/yaml/resolvePlaceholder", () => {
                         query: async () => {
                             return {};
                         },
-                    }
-                }
+                    },
+                },
             } as any, { image: "test/test" });
             assert.deepStrictEqual(result, "          echo \"atm:phase=kaniko build\" &&\n" +
                 "          /sdm/kaniko/executor\n" +
