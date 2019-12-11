@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Add placeholder replacement in cache classifier. [#219](https://github.com/atomist/sdm-core/issues/219)
 -   Allow goal planning contribute to goal caches. [#220](https://github.com/atomist/sdm-core/issues/220)
 -   Split out goal planning and goal execution. [#215](https://github.com/atomist/sdm-core/issues/215)
+-   Provide more context when requiring fails. [#224](https://github.com/atomist/sdm-core/issues/224)
 
 ### Changed
 
