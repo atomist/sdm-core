@@ -205,9 +205,14 @@ const MapGoalMakers: MapGoal = async (goals: any,
                                       goalMakers: Record<string, GoalMaker>) => {
 
     const Mapper = async (goalMakerName: string, goalMaker: GoalMaker) => {
-        let g;
+        let g: GoalWithFulfillment;
         if (!!goals[goalMakerName] || goalMakerName === goals) {
-            g = await goalMaker(sdm, camelCase(goals[goalMakerName] || {})) as any;
+            try {
+                g = await goalMaker(sdm, camelCase(goals[goalMakerName] || {})) as any;
+            } catch (e) {
+                e.message = `Failed to make goal using ${goalMakerName}: ${e.message}`;
+                throw e;
+            }
             if (!!g) {
                 g = addCaching(g, goals[goalMakerName] || {});
             }
