@@ -32,6 +32,7 @@ import * as changeCase from "change-case";
 import * as fs from "fs-extra";
 import * as glob from "glob";
 import * as yaml from "js-yaml";
+import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as path from "path";
 import * as trace from "stack-trace";
@@ -139,10 +140,40 @@ async function createExtensions(cwd: string,
                                 sdm: SoftwareDeliveryMachine): Promise<void> {
     await awaitIterable(
         await requireCommands(cwd, _.get(cfg, "extensions.commands")),
-        async (c, k) => sdm.addCommand({ name: k, ...(await c(sdm)) }));
+        async (c, k) => {
+            let registration: CommandHandlerRegistration;
+            try {
+                const makerResult = await c(sdm);
+                registration = { name: k, ...makerResult };
+            } catch (e) {
+                e.message = `Failed to make command using CommandMaker ${k}: ${e.message}`;
+                throw e;
+            }
+            try {
+                sdm.addCommand(registration);
+            } catch (e) {
+                e.message = `Failed to add command ${k} '${stringify(registration)}': ${e.message}`;
+                throw e;
+            }
+        });
     await awaitIterable(
         await requireEvents(cwd, _.get(cfg, "extensions.events")),
-        async (e, k) => sdm.addEvent({ name: k, ...(await e(sdm)) }));
+        async (e, k) => {
+            let registration: EventHandlerRegistration;
+            try {
+                const makerResult = await e(sdm);
+                registration = { name: k, ...makerResult };
+            } catch (e) {
+                e.message = `Failed to make event using EventMaker ${k}: ${e.message}`;
+                throw e;
+            }
+            try {
+                sdm.addEvent(registration);
+            } catch (e) {
+                e.message = `Failed to add event ${k} '${stringify(registration)}': ${e.message}`;
+                throw e;
+            }
+        });
     await requireIngesters(cwd, _.get(cfg, "extensions.ingesters"));
     sdm.addExtensionPacks(...(sdm.configuration.sdm?.extensionPacks || [
         goalStateSupport({
@@ -240,8 +271,8 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
 
 async function requireExtensions<EXT>(cwd: string,
                                       pattern: string[],
-                                      cb: (v: EXT, k: string, e: Record<string, EXT>) => void = () => {
-                                      }): Promise<Record<string, EXT>> {
+                                      cb: (v: EXT, k: string, e: Record<string, EXT>) => void = () => { },
+): Promise<Record<string, EXT>> {
     const extensions: Record<string, EXT> = {};
     const files = await resolvePaths(cwd, pattern);
     for (const file of files) {
@@ -291,8 +322,7 @@ async function requireIngesters(cwd: string, pattern: string[] = ["ingesters/**.
     return ingesters;
 }
 
-async function awaitIterable<G>(elems: Record<string, G>,
-                                cb: (v: G, k: string) => Promise<any>): Promise<void> {
+async function awaitIterable<G>(elems: Record<string, G>, cb: (v: G, k: string) => Promise<any>): Promise<void> {
     for (const k in elems) {
         if (elems.hasOwnProperty(k)) {
             const v = elems[k];
