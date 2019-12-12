@@ -37,6 +37,7 @@ import {
 } from "@atomist/sdm";
 import * as changeCase from "change-case";
 import * as yaml from "js-yaml";
+import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import {
     CacheEntry,
@@ -316,7 +317,7 @@ export async function mapGoals(sdm: SoftwareDeliveryMachine,
         }
     }
 
-    throw new Error(`Unable to construct goal from '${JSON.stringify(goals)}'`);
+    throw new Error(`Unable to construct goal from '${stringify(goals)}'`);
 }
 
 function addDetails(goal: Goal, goals: any): Goal {
@@ -324,8 +325,10 @@ function addDetails(goal: Goal, goals: any): Goal {
     if (goals.approval !== undefined) {
         goal.definition.approvalRequired = goals.approval;
     }
-    if (goals.preApproval !== undefined || goals.pre_approval !== undefined) {
-        goal.definition.preApprovalRequired = goals.preApproval || goals.pre_approval;
+    if (goals.preApproval !== undefined) {
+        goal.definition.preApprovalRequired = goals.preApproval;
+    } else if (goals.pre_approval !== undefined) {
+        goal.definition.preApprovalRequired = goals.pre_approval;
     }
     if (goals.retry !== undefined) {
         goal.definition.retryFeasible = goals.retry;
