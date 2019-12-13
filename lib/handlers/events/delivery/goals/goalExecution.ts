@@ -16,11 +16,21 @@
 
 import {
     AutomationClient,
+    AutomationContextAware,
+    AutomationEventListener,
     AutomationEventListenerSupport,
+    CommandIncoming,
+    Configuration,
+    Destination,
     EventIncoming,
+    GraphClient,
+    GraphClientFactory,
     guid,
+    HandlerContext,
     logger,
     Maker,
+    MessageClient,
+    MessageOptions,
     QueryNoCacheOptions,
     safeExit,
     Secrets,
@@ -33,7 +43,10 @@ import {
     isEventHandlerMetadata,
 } from "@atomist/automation-client/lib/internal/metadata/metadata";
 import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
+import { AbstractRequestProcessor } from "@atomist/automation-client/lib/internal/transport/AbstractRequestProcessor";
+import { workspaceId } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
 import { AutomationMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
+import { AutomationServer } from "@atomist/automation-client/lib/server/AutomationServer";
 import { AutomationMetadataProcessor } from "@atomist/automation-client/lib/spi/env/MetadataProcessor";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import { SoftwareDeliveryMachine } from "@atomist/sdm";
@@ -42,7 +55,7 @@ import * as _ from "lodash";
 import { SdmGoalsByGoalSetIdAndUniqueName } from "../../../../typings/types";
 import { FulfillGoalOnRequested } from "./FulfillGoalOnRequested";
 
-export class GoalAutomationEventListener extends AutomationEventListenerSupport {
+export class GoalExecutionAutomationEventListener extends AutomationEventListenerSupport {
 
     constructor(private readonly sdm: SoftwareDeliveryMachine) {
         super();
@@ -122,5 +135,46 @@ export class FilteringMetadataProcessor implements AutomationMetadataProcessor {
             metadata.expose = false;
         }
         return metadata;
+    }
+}
+
+export class GoalExecutionRequestProcessor extends AbstractRequestProcessor {
+
+    private readonly graphClients: GraphClientFactory;
+
+    constructor(protected automations: AutomationServer,
+                protected configuration: Configuration,
+                protected listeners: AutomationEventListener[] = []) {
+        super(automations, configuration, listeners);
+        this.graphClients = configuration.graphql.client.factory;
+    }
+
+    protected createGraphClient(event: CommandIncoming | EventIncoming): GraphClient {
+        return this.graphClients.create(
+            workspaceId(event),
+            this.configuration);
+    }
+
+    protected createMessageClient(event: EventIncoming | CommandIncoming, context: AutomationContextAware): MessageClient {
+        return new NoOpMessageClient();
+    }
+
+    protected async sendStatusMessage(payload: any, ctx: HandlerContext & AutomationContextAware): Promise<any> {
+        // Intentionally left empty
+    }
+}
+
+class NoOpMessageClient implements MessageClient {
+
+    public async delete(destinations: Destination | Destination[], options: Pick<MessageOptions, "id" | "thread"> & { id: string }): Promise<void> {
+        logger.debug(`Ignoring delete message '${JSON.stringify(options)}'`);
+    }
+
+    public async respond(msg: any, options?: MessageOptions): Promise<any> {
+        logger.debug(`Ignoring respond message '${JSON.stringify(msg)}'`);
+    }
+
+    public async send(msg: any, destinations: Destination | Destination[], options?: MessageOptions): Promise<any> {
+        logger.debug(`Ignoring send message '${JSON.stringify(msg)}'`);
     }
 }

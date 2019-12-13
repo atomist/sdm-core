@@ -16,7 +16,7 @@
 
 import {
     configurationValue,
-    DefaultHttpClientFactory,
+    defaultHttpClientFactory,
     HttpMethod,
     logger,
     RetryOptions,
@@ -163,7 +163,7 @@ export async function postWebhook(
     const baseUrl = process.env.ATOMIST_WEBHOOK_BASEURL || "https://webhook.atomist.com";
     const url = `${baseUrl}/atomist/${webhook}/teams/${teamId}`;
 
-    const httpClient = configurationValue("http.client.factory", DefaultHttpClientFactory).create(url);
+    const httpClient = configurationValue("http.client.factory", defaultHttpClientFactory()).create(url);
 
     try {
         await httpClient.exchange(

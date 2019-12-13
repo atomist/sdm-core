@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { MessageClient } from "@atomist/automation-client";
+import {
+    GraphClient,
+    MutationOptions,
+} from "@atomist/automation-client";
 import {
     GoalSigningConfiguration,
     GoalSigningScope,
@@ -140,7 +143,7 @@ describe("goalSigning", () => {
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
         };
-        const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc);
+        const signedGoal = signGoal(_.cloneDeep(goalMessage) as any, gsc);
         assert(!!signedGoal.signature);
         await verifyGoal(signedGoal as any, gsc, {} as any);
     });
@@ -152,7 +155,7 @@ describe("goalSigning", () => {
             signingKey: { passphrase, publicKey, privateKey, name: "atomist.com/test" },
             verificationKeys: [{ publicKey, name: "atomist.com/test" }],
         };
-        const signedGoal = await signGoal(_.cloneDeep(goalMessage) as any, gsc) as any;
+        const signedGoal = signGoal(_.cloneDeep(goalMessage) as any, gsc) as any;
         assert(!!signedGoal.signature);
 
         signedGoal.externalUrls = [{ url: "https://google.com", label: "Google" }];
@@ -169,18 +172,16 @@ describe("goalSigning", () => {
             },
         };
 
-        const messageClient: MessageClient = {
-            send: async (msg: any) => {
-                assert.strictEqual(msg.state, SdmGoalState.failure);
-                assert.strictEqual(msg.description, "Rejected: build");
-                assert.strictEqual(msg.phase, "signature invalid");
+        const graphClient: GraphClient = {
+            mutate: async (options: MutationOptions<any>) => {
+                assert.strictEqual(options.variables.goal.state, SdmGoalState.failure);
+                assert.strictEqual(options.variables.goal.description, "Rejected: build");
+                assert.strictEqual(options.variables.goal.phase, "signature invalid");
             },
-            respond: async (msg: any) => {
-            },
-        };
+        } as any;
 
         try {
-            await verifyGoal(signedGoal, gsc, { context: { name: "Test SDM" }, messageClient } as any);
+            await verifyGoal(signedGoal, gsc, { context: { name: "Test SDM" }, graphClient } as any);
         } catch (e) {
             assert.strictEqual(e.message, "SDM goal signature invalid. Rejecting goal!");
         }
@@ -199,13 +200,13 @@ describe("goalSigning", () => {
             , goalSetId: "mwah-ahah-ahhh\n        environment:dev\n        goalSetId:aaaa-bbbb",
         };
 
-        const signedGoalMalOne = await signGoal(_.cloneDeep(maliciousOne) as any, gsc) as any;
+        const signedGoalMalOne = signGoal(_.cloneDeep(maliciousOne) as any, gsc) as any;
         assert(!!signedGoal.signature);
 
         const signedGoalMalTwo = { ..._.cloneDeep(maliciousTwo), signature: signedGoalMalOne.signature };
 
         try {
-            await verifyGoal(signedGoalMalTwo as any, gsc, { context: { name: "Test SDM" }, messageClient } as any);
+            await verifyGoal(signedGoalMalTwo as any, gsc, { context: { name: "Test SDM" }, graphClient } as any);
             assert.fail();
         } catch (e) {
             assert.strictEqual(e.message, "SDM goal signature invalid. Rejecting goal!");
