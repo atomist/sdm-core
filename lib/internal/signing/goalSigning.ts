@@ -16,12 +16,9 @@
 
 import {
     AutomationContextAware,
-    AutomationEventListenerSupport,
-    CustomEventDestination,
-    Destination,
     HandlerContext,
+    GraphClientListener,
     logger,
-    MessageOptions,
 } from "@atomist/automation-client";
 import {
     GoalSigningAlgorithm,
@@ -34,6 +31,7 @@ import {
     updateGoal,
 } from "@atomist/sdm";
 import { SdmGoalMessage } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import { Operation } from "apollo-link";
 import * as stringify from "fast-json-stable-stringify";
 import * as fs from "fs-extra";
 import * as path from "path";
@@ -54,32 +52,22 @@ export const DefaultGoalSigningAlgorithm = RsaGoalSigningAlgorithm;
  * Optionally a private key can be specified to sign outgoing goals. Setting this is strongly
  * recommended to prevent executing untrusted and/or tampered SDM goals.
  */
-export class GoalSigningAutomationEventListener extends AutomationEventListenerSupport {
+export class GoalSigningAutomationEventListener implements GraphClientListener {
 
     constructor(private readonly gsc: GoalSigningConfiguration) {
-        super();
         this.initVerificationKeys();
     }
 
-    public async messageSending(message: any,
-                                destinations: Destination | Destination[],
-                                options: MessageOptions,
-                                ctx: HandlerContext): Promise<{
-        message: any;
-        destinations: Destination | Destination[];
-        options: MessageOptions;
-    }> {
-        const dests = Array.isArray(destinations) ? destinations : [destinations];
+    public operationStarting(operation: Operation): Operation {
 
-        if (dests.some(d => d.userAgent === "ingester" && (d as CustomEventDestination).rootType === "SdmGoal")) {
-            return {
-                message: await signGoal(message as SdmGoalMessage & SignatureMixin, this.gsc),
-                destinations,
-                options,
-            };
+        if (operation.operationName === "UpdateSdmGoal") {
+            const goal = operation.variables?.goal;
+            if (!!goal) {
+                operation.variables.goal = signGoal(goal as SdmGoalMessage & SignatureMixin, this.gsc);
+            }
         }
 
-        return super.messageSending(message, destinations, options, ctx);
+        return operation;
     }
 
     private initVerificationKeys(): void {
@@ -113,7 +101,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
 
             let verifiedWith: GoalVerificationKey<any>;
             for (const key of toArray(gsc.verificationKeys)) {
-                if (await findAlgorithm(key, gsc).verify(message, goal.signature, key)) {
+                if (findAlgorithm(key, gsc).verify(message, goal.signature, key)) {
                     verifiedWith = key;
                     break;
                 }
@@ -140,10 +128,10 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
  * @param goal
  * @param gsc
  */
-export async function signGoal(goal: SdmGoalMessage,
-                               gsc: GoalSigningConfiguration): Promise<SdmGoalMessage & SignatureMixin> {
+export function signGoal(goal: SdmGoalMessage,
+                         gsc: GoalSigningConfiguration): SdmGoalMessage & SignatureMixin {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
-        (goal as any).signature = await findAlgorithm(gsc.signingKey, gsc).sign(normalizeGoal(goal), gsc.signingKey);
+        (goal as any).signature = findAlgorithm(gsc.signingKey, gsc).sign(normalizeGoal(goal), gsc.signingKey);
         logger.debug(`Signed goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
         return goal as any;
     } else {

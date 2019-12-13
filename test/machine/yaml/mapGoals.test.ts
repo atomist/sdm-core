@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DefaultHttpClientFactory } from "@atomist/automation-client";
+import { defaultHttpClientFactory } from "@atomist/automation-client";
 import {
     goal,
     ImmaterialGoals,
@@ -137,14 +137,14 @@ describe("machine/yaml/mapGoals", () => {
 
         it("should map referenced goal with parameters", async () => {
             const yaml = [{ "atomist/npm-goal/publish@master": { parameters: { command: "build" } } }, "atomist/npm-goal/install@master"];
-            const goals = await mapGoals({ configuration: { http: { client: { factory: DefaultHttpClientFactory } } } } as any, yaml, {}, {}, {}, {});
+            const goals = await mapGoals({ configuration: { http: { client: { factory: defaultHttpClientFactory() } } } } as any, yaml, {}, {}, {}, {});
             assert(!!goals);
         }).timeout(10000);
 
         it("should map referenced goal", async () => {
             const yaml = "atomist/npm-goal/i-dont-exist@0.0.1";
             try {
-                await mapGoals({ configuration: { http: { client: { factory: DefaultHttpClientFactory } } } } as any, yaml, {}, {}, {}, {});
+                await mapGoals({ configuration: { http: { client: { factory: defaultHttpClientFactory() } } } } as any, yaml, {}, {}, {}, {});
                 assert.fail();
             } catch (e) {
                 assert.deepStrictEqual(e.message, "Unable to construct goal from '\"atomist/npm-goal/i-dont-exist@0.0.1\"'");

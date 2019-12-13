@@ -189,7 +189,9 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
  */
 function configureGoalSigning(mergedConfig: SoftwareDeliveryMachineConfiguration): void {
     if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled === true) {
-        mergedConfig.listeners.push(
+        _.update(mergedConfig, "graphql.listeners",
+            old => !!old ? old : []);
+        mergedConfig.graphql.listeners.push(
             new GoalSigningAutomationEventListener(mergedConfig.sdm.goalSigning));
     }
 }
