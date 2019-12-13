@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-export const SdmVersionRootType = "SdmVersion";
-
 export interface SdmVersion {
     sha: string;
     branch: string;

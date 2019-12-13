@@ -15,7 +15,6 @@
  */
 
 import {
-    addressEvent,
     AutomationContextAware,
     guid,
     MappedParameters,
@@ -28,6 +27,7 @@ import {
     SdmGoalState,
     slackErrorMessage,
     slackSuccessMessage,
+    storeGoal,
 } from "@atomist/sdm";
 import {
     bold,
@@ -119,7 +119,7 @@ export function updateGoalStateCommand(): CommandHandlerRegistration<UpdateGoalS
             goal.version = (goal.version || 0) + 1;
             delete (goal as any).id;
 
-            await ci.context.messageClient.send(goal, addressEvent("SdmGoal"));
+            await storeGoal(ci.context, goal as any);
             return ci.context.messageClient.respond(
                 slackSuccessMessage(
                     "Set Goal State",

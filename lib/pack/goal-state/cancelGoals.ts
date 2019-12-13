@@ -15,7 +15,6 @@
  */
 
 import {
-    addressEvent,
     buttonForCommand,
     configurationValue,
     guid,
@@ -25,12 +24,12 @@ import {
 import {
     CommandHandlerRegistration,
     fetchGoalsForCommit,
-    GoalSetRootType,
     slackFooter,
     slackInfoMessage,
     slackSuccessMessage,
     slackTs,
     SoftwareDeliveryMachine,
+    storeGoalSet,
     updateGoal,
 } from "@atomist/sdm";
 import {
@@ -204,11 +203,11 @@ async function cancelGoalSet(goalSetId: string, ctx: HandlerContext, id?: string
 
     if (result && result.SdmGoalSet && result.SdmGoalSet.length === 1) {
         const gs = result.SdmGoalSet[0];
-        const newGoalSet = {
+        const newGoalSet: any = {
             ...gs,
             state: SdmGoalState.canceled,
         };
-        await ctx.messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
+        await storeGoalSet(ctx, newGoalSet);
     }
 
     await ctx.messageClient.respond(

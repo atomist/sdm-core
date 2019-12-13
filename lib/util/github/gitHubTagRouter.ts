@@ -16,7 +16,7 @@
 
 import {
     configurationValue,
-    DefaultHttpClientFactory,
+    defaultHttpClientFactory,
     GitHubRepoRef,
     HttpClientFactory,
     HttpMethod,
@@ -40,7 +40,7 @@ export const GitHubTagRouter: TagRouter = async (tags, params) => {
     const grr = isGitHubRepoRef(tags.repoId) ? tags.repoId : new GitHubRepoRef(tags.repoId.owner, tags.repoId.repo, tags.repoId.sha);
     const url = `${grr.scheme}${grr.apiBase}/repos/${grr.owner}/${grr.repo}/topics`;
     const names = _.uniq(tags.tags);
-    const httpClient = configurationValue<HttpClientFactory>("http.client.factory", DefaultHttpClientFactory).create();
+    const httpClient = configurationValue<HttpClientFactory>("http.client.factory", defaultHttpClientFactory()).create();
     logger.debug(`Request to '${url}' to raise tags: [${names.join()}]`);
     try {
         await httpClient.exchange(url, {

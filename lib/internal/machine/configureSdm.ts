@@ -27,12 +27,8 @@ import {
     validateConfigurationValues,
 } from "@atomist/sdm";
 import * as _ from "lodash";
-import { CancelGoalOnCanceled } from "../../handlers/events/delivery/goals/CancelGoalOnCanceled";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
-import {
-    FilteringMetadataProcessor,
-    GoalAutomationEventListener,
-} from "../../handlers/events/delivery/goals/GoalAutomationEventListener";
+import { GoalExecutionAutomationEventListener, GoalExecutionRequestProcessor } from "../../handlers/events/delivery/goals/goalExecution";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import { toArray } from "../../util/misc/array";
@@ -163,24 +159,21 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
     mergedConfig.policy = "ephemeral";
     mergedConfig.commands = [];
     mergedConfig.events = [
-        () => new CancelGoalOnCanceled(),
         () => new FulfillGoalOnRequested(
             sdm.goalFulfillmentMapper,
             [...sdm.goalExecutionListeners])];
     mergedConfig.ingesters = [];
-    mergedConfig.metadataProcessor = new FilteringMetadataProcessor(
-        [],
-        [() => new CancelGoalOnCanceled()]);
+    mergedConfig.ws.enabled = false;
+    mergedConfig.cluster.enabled = false;
 
     mergedConfig.listeners.push(
-        new GoalAutomationEventListener(sdm),
+        new GoalExecutionAutomationEventListener(sdm),
         new CacheCleanupAutomationEventListener(sdm));
+    mergedConfig.requestProcessorFactory =
+        (automations, cfg, listeners) => new GoalExecutionRequestProcessor(automations, cfg, listeners);
 
     // Disable app events for forked clients
     mergedConfig.applicationEvents.enabled = false;
-
-    // Set workers to one but leave enablement unset so that it can be defined elsewhere.
-    mergedConfig.cluster.workers = 1;
 }
 
 /**
@@ -189,7 +182,9 @@ function configureSdmToRunExactlyOneGoal(mergedConfig: SoftwareDeliveryMachineCo
  */
 function configureGoalSigning(mergedConfig: SoftwareDeliveryMachineConfiguration): void {
     if (!!mergedConfig.sdm.goalSigning && mergedConfig.sdm.goalSigning.enabled === true) {
-        mergedConfig.listeners.push(
+        _.update(mergedConfig, "graphql.listeners",
+            old => !!old ? old : []);
+        mergedConfig.graphql.listeners.push(
             new GoalSigningAutomationEventListener(mergedConfig.sdm.goalSigning));
     }
 }

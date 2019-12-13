@@ -16,7 +16,7 @@
 
 import {
     Configuration,
-    DefaultHttpClientFactory,
+    defaultHttpClientFactory,
     HttpClient,
     HttpMethod,
     logger,
@@ -59,7 +59,7 @@ export class RolarProgressLog implements ProgressLog {
         if (this.timerInterval > 0) {
             this.timer = setInterval(() => this.flush(), this.timerInterval).unref();
         }
-        this.httpClient = _.get(configuration, "http.client.factory", DefaultHttpClientFactory).create(this.rolarBaseUrl);
+        this.httpClient = _.get(configuration, "http.client.factory", defaultHttpClientFactory()).create(this.rolarBaseUrl);
     }
 
     get name(): string {
