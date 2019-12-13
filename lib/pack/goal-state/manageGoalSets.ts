@@ -15,7 +15,6 @@
  */
 
 import {
-    addressEvent,
     AutomationContextAware,
     Configuration,
     configurationValue,
@@ -29,10 +28,10 @@ import { AbstractWebSocketMessageClient } from "@atomist/automation-client/lib/i
 import * as namespace from "@atomist/automation-client/lib/internal/util/cls";
 import {
     fetchGoalsForCommit,
-    GoalSetRootType,
     goalSetState,
     SdmGoalState,
     SoftwareDeliveryMachine,
+    storeGoalSet,
     TriggeredListener,
     updateGoal,
 } from "@atomist/sdm";
@@ -115,13 +114,13 @@ export async function manageGoalSets(sdm: SoftwareDeliveryMachine,
         const state = goalSetState(goals || []);
 
         if (state !== goalSet.state) {
-            const newGoalSet = {
+            const newGoalSet: any = {
                 ...goalSet,
                 state,
             };
 
             logger.debug(`Goal set '${goalSet.goalSetId}' now in state '${state}'`);
-            await ctx.messageClient.send(newGoalSet, addressEvent(GoalSetRootType));
+            await storeGoalSet(ctx, newGoalSet);
         }
     }
 }
