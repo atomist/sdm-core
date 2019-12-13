@@ -28,7 +28,10 @@ import {
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
-import { GoalExecutionAutomationEventListener, GoalExecutionRequestProcessor } from "../../handlers/events/delivery/goals/goalExecution";
+import {
+    GoalExecutionAutomationEventListener,
+    GoalExecutionRequestProcessor,
+} from "../../handlers/events/delivery/goals/goalExecution";
 import { CacheCleanupAutomationEventListener } from "../../handlers/events/delivery/goals/k8s/CacheCleanupAutomationEventListener";
 import { defaultSoftwareDeliveryMachineConfiguration } from "../../machine/defaultSoftwareDeliveryMachineConfiguration";
 import { toArray } from "../../util/misc/array";

@@ -21,6 +21,7 @@ import {
     AutomationEventListenerSupport,
     CommandIncoming,
     Configuration,
+    Destination,
     EventIncoming,
     GraphClient,
     GraphClientFactory,
@@ -29,11 +30,10 @@ import {
     logger,
     Maker,
     MessageClient,
+    MessageOptions,
     QueryNoCacheOptions,
     safeExit,
     Secrets,
-    Destination,
-    MessageOptions,
 } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
