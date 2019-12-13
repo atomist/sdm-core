@@ -16,8 +16,8 @@
 
 import {
     AutomationContextAware,
-    HandlerContext,
     GraphClientListener,
+    HandlerContext,
     logger,
 } from "@atomist/automation-client";
 import {
