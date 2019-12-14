@@ -15,9 +15,9 @@
  */
 
 import {
-    addressEvent,
     GitProject,
     HandlerContext,
+    MutationNoCacheOptions,
     QueryNoCacheOptions,
     Success,
 } from "@atomist/automation-client";
@@ -32,9 +32,12 @@ import { codeLine } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {
     SdmVersion,
-    SdmVersionRootType,
 } from "../../../../ingesters/sdmVersionIngester";
-import { SdmVersionForCommit } from "../../../../typings/types";
+import {
+    SdmVersionForCommit,
+    UpdateSdmVersionMutation,
+    UpdateSdmVersionMutationVariables,
+} from "../../../../typings/types";
 
 export type ProjectVersioner =
     (status: SdmGoalEvent, p: GitProject, log: ProgressLog) => Promise<string>;
@@ -60,7 +63,13 @@ export function executeVersioner(projectVersioner: ProjectVersioner): ExecuteGoa
                     providerId: goalEvent.repo.providerId,
                 },
             };
-            await context.messageClient.send(sdmVersion, addressEvent(SdmVersionRootType));
+            await context.graphClient.mutate<UpdateSdmVersionMutation, UpdateSdmVersionMutationVariables>({
+                name: "UpdateSdmVersion",
+                variables: {
+                    version: sdmVersion,
+                },
+                options: MutationNoCacheOptions,
+            });
             return {
                 ...Success,
                 description: `Versioned ${codeLine(version)}`,

@@ -15,8 +15,8 @@
  */
 
 import {
-    addressEvent,
     LeveledLogMethod,
+    MutationNoCacheOptions,
 } from "@atomist/automation-client";
 import {
     Build,
@@ -29,13 +29,14 @@ import {
 import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as path from "path";
-import {
-    SdmVersion,
-    SdmVersionRootType,
-} from "../../ingesters/sdmVersionIngester";
+import { SdmVersion } from "../../ingesters/sdmVersionIngester";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/KubernetesGoalScheduler";
-import { PushFields } from "../../typings/types";
+import {
+    PushFields,
+    UpdateSdmVersionMutation,
+    UpdateSdmVersionMutationVariables,
+} from "../../typings/types";
 import {
     postBuildWebhook,
     postLinkImageWebhook,
@@ -210,7 +211,13 @@ export async function processResult(result: any,
                         providerId: goalEvent.repo.providerId,
                     },
                 };
-                await gi.context.messageClient.send(sdmVersion, addressEvent(SdmVersionRootType));
+                await gi.context.graphClient.mutate<UpdateSdmVersionMutation, UpdateSdmVersionMutationVariables>({
+                    name: "UpdateSdmVersion",
+                    variables: {
+                        version: sdmVersion,
+                    },
+                    options: MutationNoCacheOptions,
+                });
             }
 
             return r;

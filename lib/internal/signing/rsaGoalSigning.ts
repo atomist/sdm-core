@@ -28,7 +28,7 @@ export const RsaGoalSigningAlgorithm: GoalSigningAlgorithm<string> = {
 
     name: "rsa-sha512",
 
-    sign: async (goal: string, key: GoalSigningKey<string>) => {
+    sign: (goal: string, key: GoalSigningKey<string>) => {
         const signer = crypto.createSign("RSA-SHA512");
         signer.update(goal);
         signer.end();
@@ -41,7 +41,7 @@ export const RsaGoalSigningAlgorithm: GoalSigningAlgorithm<string> = {
         return signature.toString("base64");
     },
 
-    verify: async (goal: string, signatureString: string, key: GoalVerificationKey<string>) => {
+    verify: (goal: string, signatureString: string, key: GoalVerificationKey<string>) => {
         const signature = Buffer.from(signatureString, "base64");
         const verifier = crypto.createVerify("RSA-SHA512");
         verifier.update(goal);

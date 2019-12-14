@@ -85,19 +85,6 @@ export {
     readSdmVersion,
 } from "./lib/internal/delivery/build/local/projectVersioner";
 export {
-    DefaultLocalDeployerOptions,
-    LocalDeployerOptions,
-    SpawnedDeployment,
-    StartupInfo,
-} from "./lib/internal/delivery/deploy/local/LocalDeployerOptions";
-export {
-    DeployedApp,
-    LookupStrategy,
-    ManagedDeployments,
-    ManagedDeploymentTargeter,
-    ManagedDeploymentTargetInfo,
-} from "./lib/internal/delivery/deploy/local/ManagedDeployments";
-export {
     ConfigureOptions,
     configureSdm,
     SoftwareDeliveryMachineMaker,
