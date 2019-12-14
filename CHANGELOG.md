@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   Scope cache by workspace. [#222](https://github.com/atomist/sdm-core/issues/222)
+-   Move to using GraphQL mutations for SdmGoal and SdmGoalSet. [#226](https://github.com/atomist/sdm-core/issues/226)
 
 ### Fixed
 
