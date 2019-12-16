@@ -20,6 +20,7 @@ import {
     ImmaterialGoals,
     Locking,
 } from "@atomist/sdm";
+import * as _ from "lodash";
 import * as assert from "power-assert";
 import { Container } from "../../../lib/goal/container/container";
 import { DockerContainerRegistration } from "../../../lib/goal/container/docker";
@@ -110,7 +111,7 @@ describe("machine/yaml/mapGoals", () => {
                         path: "/tmp/cache",
                     },
                 }],
-                input: ["dependencies"],
+                input: [{ classifier: "dependencies" }],
                 output: [{
                     classifier: "scripts",
                     pattern: {
@@ -124,7 +125,7 @@ describe("machine/yaml/mapGoals", () => {
                     completed: "What am awesome mongo goal",
                 },
             } as any;
-            const goals = await mapGoals(undefined, yaml, {}, {}, {}, {}) as Container;
+            const goals = await mapGoals(undefined, _.cloneDeep(yaml), {}, {}, {}, {}) as Container;
             assert.deepStrictEqual(goals.definition.retryFeasible, true);
             assert.deepStrictEqual(goals.definition.approvalRequired, true);
             assert.deepStrictEqual(goals.definition.preApprovalRequired, true);

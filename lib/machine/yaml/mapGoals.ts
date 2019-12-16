@@ -94,7 +94,7 @@ const MapContainer: MapGoal = async (goals: any,
                 test: !!gc.test ? await mapTests(gc.test, additionalTests, extensionTests) : undefined,
             });
         }
-        return container(
+        const g = container(
             goals.name,
             {
                 callback: containerCallback(),
@@ -105,6 +105,10 @@ const MapContainer: MapGoal = async (goals: any,
                 progressReporter: ContainerProgressReporter,
                 parameters: goals.parameters,
             });
+        // Container goals handle their own inputs and ouputs
+        delete goals.input;
+        delete goals.output;
+        return g;
     }
 
     return undefined;

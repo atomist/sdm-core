@@ -124,7 +124,7 @@ export class BuildingContainer extends FulfillableGoal {
             listener: async (p, gi, e) => {
                 const reg = gi.parameters.registration as ContainerRegistration;
                 if (reg.input && reg.input.length > 0) {
-                    await cacheRestore({ entries: reg.input.map(c => ({ classifier: c })) }).listener(p, gi, e);
+                    await cacheRestore({ entries: reg.input }).listener(p, gi, e);
                 }
             },
         }).withProjectListener({
