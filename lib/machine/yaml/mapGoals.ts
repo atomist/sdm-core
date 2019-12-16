@@ -225,6 +225,7 @@ const MapFulfillment: MapGoal = async (goals: any) => {
                     parameters: goals.parameters,
                     input: goals.input,
                     output: mapOutput(goals),
+                    secrets: goals.secrets,
                 });
         }
     }
