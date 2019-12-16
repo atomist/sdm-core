@@ -154,7 +154,7 @@ export function k8sFulfillmentCallback(
     goal: Container,
     registration: K8sContainerRegistration,
 ): (sge: SdmGoalEvent, rc: RepoContext) => Promise<SdmGoalEvent> {
-
+    // tslint:disable-next-line:cyclomatic-complexity
     return async (goalEvent, repoContext) => {
         let spec: K8sContainerRegistration = _.cloneDeep(registration);
         if (registration.callback) {
@@ -396,7 +396,6 @@ export function executeK8sJob(): ExecuteGoal {
             loglog(msg, logger.warn, progressLog);
             let svcSpec: K8sServiceSpec;
             try {
-                const data = JSON.parse(goalEvent.data || "{}");
                 svcSpec = _.get(data, `${ServiceRegistrationGoalDataKey}.${registration.name}.spec`);
             } catch (e) {
                 const message = `Failed to parse Kubernetes spec from goal data '${goalEvent.data}': ${e.message}`;
