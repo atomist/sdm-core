@@ -41,10 +41,6 @@ import {
     cachePut,
     cacheRestore,
 } from "../cache/goalCaching";
-import {
-    BuildingContainer,
-    isBuildingContainer,
-} from "./buildingContainer";
 import { dockerContainerScheduler } from "./docker";
 import { k8sContainerScheduler } from "./k8s";
 import { runningInK8s } from "./util";
@@ -58,11 +54,7 @@ import { runningInK8s } from "./util";
  * @return SDM container goal
  */
 export function container<T extends ContainerRegistration>(displayName: string, registration: T): FulfillableGoal {
-    if (registration.containers.some(isBuildingContainer)) {
-        return new BuildingContainer({ displayName }, registration);
-    } else {
-        return new Container({ displayName }).with(registration);
-    }
+    return new Container({ displayName }).with(registration);
 }
 
 export const ContainerProgressReporter = testProgressReporter({
@@ -228,7 +220,7 @@ export interface ContainerRegistration extends Partial<ImplementationRegistratio
      * execution.  The values must correspond to output classifiers
      * from previously executed container goals in the same goal set.
      */
-    input?: Array<{classifier: string}>;
+    input?: Array<{ classifier: string }>;
     /**
      * File path globs to store in cache after goal execution.
      * They values should be glob paths relative to the root of
