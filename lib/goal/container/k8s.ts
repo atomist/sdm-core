@@ -136,7 +136,7 @@ export interface K8sContainerRegistration extends ContainerRegistration {
 
 export const k8sContainerScheduler: ContainerScheduler = (goal, registration: K8sContainerRegistration) => {
     goal.addFulfillment({
-        goalExecutor: executeK8sJob(goal, registration),
+        goalExecutor: executeK8sJob(),
         ...registration as ImplementationRegistration,
     });
 
@@ -249,7 +249,9 @@ export function k8sFulfillmentCallback(
         ];
         spec.initContainers = spec.initContainers || [];
 
-        const secrets = await prepareSecrets(registration.containers[0], repoContext);
+        const parameters = JSON.parse((goalEvent as any).parameters || "{}");
+        const secrets = await prepareSecrets(
+            _.merge({}, registration.containers[0], (parameters["@atomist/sdm/secrets"] || {})), repoContext);
         delete spec.containers[0].secrets;
         [...spec.containers, ...spec.initContainers].forEach(c => {
             c.env = [
@@ -315,9 +317,14 @@ export function k8sFulfillmentCallback(
         };
 
         const data: any = JSON.parse(goalEvent.data || "{}");
-        const servicesData: any = {};
-        _.set<any>(servicesData, `${ServiceRegistrationGoalDataKey}.${registration.name}`, serviceSpec);
-        goalEvent.data = JSON.stringify(_.merge(data, servicesData));
+        const newData: any = {};
+        _.set<any>(newData, `${ServiceRegistrationGoalDataKey}.${registration.name}`, serviceSpec);
+
+        // Preserve the registration in the goal data
+        delete spec.callback;
+        _.set<any>(newData, "@atomist/sdm/container", spec);
+
+        goalEvent.data = JSON.stringify(_.merge(data, newData));
         return goalEvent;
     };
 }
@@ -340,7 +347,7 @@ interface K8sContainer {
  * Wait for first container to exit and stream its logs to the
  * progress log.
  */
-export function executeK8sJob(goal: Container, registration: K8sContainerRegistration): ExecuteGoal {
+export function executeK8sJob(): ExecuteGoal {
     // tslint:disable-next-line:cyclomatic-complexity
     return async gi => {
         const { goalEvent, progressLog, configuration, id, credentials } = gi;
@@ -348,6 +355,12 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
         const projectDir = process.env.ATOMIST_PROJECT_DIR || ContainerProjectHome;
         const inputDir = process.env.ATOMIST_INPUT_DIR || ContainerInput;
         const outputDir = process.env.ATOMIST_OUTPUT_DIR || ContainerOutput;
+
+        const data = JSON.parse(goalEvent.data || "{}");
+        if (!data["@atomist/sdm/container"]) {
+            throw new Error("Failed to read k8s ContainerRegistration from goal data");
+        }
+        const registration: K8sContainerRegistration = data["@atomist/sdm/container"];
 
         if (process.env.ATOMIST_ISOLATED_GOAL_INIT === "true") {
             return configuration.sdm.projectLoader.doWithProject({
@@ -363,33 +376,23 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
                     loglog(message, logger.error, progressLog);
                     return { code: 1, message };
                 }
-                const secrets = await prepareSecrets(registration.containers[0], gi);
+                const secrets = await prepareSecrets(
+                    _.merge({}, registration.containers[0], ((gi.parameters || {})["@atomist/sdm/secrets"] || {})), gi);
                 if (!!secrets?.files) {
                     for (const file of secrets.files) {
                         await fs.writeFile(file.mountPath, file.value);
                     }
                 }
+
                 goalEvent.state = SdmGoalState.in_process;
                 return goalEvent;
 
             });
         }
 
-        const project = GitCommandGitProject.fromBaseDir(id, projectDir, credentials, async () => {
-        });
-        const spec: K8sContainerRegistration = {
-            ...registration,
-            ...(!!registration.callback ? await registration.callback(
-                registration,
-                project,
-                goal,
-                goalEvent,
-                gi) : {}),
-        };
-
-        let containerName: string = _.get(spec, "containers[0].name");
+        let containerName: string = _.get(registration, "containers[0].name");
         if (!containerName) {
-            const msg = `Failed to get main container name from goal registration: ${stringify(spec)}`;
+            const msg = `Failed to get main container name from goal registration: ${stringify(registration)}`;
             loglog(msg, logger.warn, progressLog);
             let svcSpec: K8sServiceSpec;
             try {
@@ -464,9 +467,11 @@ export function executeK8sJob(goal: Container, registration: K8sContainerRegistr
             }
         }
 
-        if (!!registration.output) {
+        if (!!registration.output || !!(gi.parameters || {})["@atomist/sdm/output"]) {
             try {
-                const cp = cachePut({ entries: registration.output });
+                const project = GitCommandGitProject.fromBaseDir(id, projectDir, credentials, async () => {
+                });
+                const cp = cachePut({ entries: [...registration.output, ...gi.parameters["@atomist/sdm/output"]] });
                 await cp.listener(project, gi, GoalProjectListenerEvent.after);
             } catch (e) {
                 const message = `Failed to put cache output from container: ${e.message}`;
