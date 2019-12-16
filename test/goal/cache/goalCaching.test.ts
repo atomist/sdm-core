@@ -122,7 +122,7 @@ describe("goalCaching", () => {
             .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
         assert(await emptyProject.hasFile("test.txt"));
         const data = JSON.parse(fakeGoal.goalEvent.data);
-        assert.deepStrictEqual(data["@atomist/sdm/input"], { classifiers: ["default"] });
+        assert.deepStrictEqual(data["@atomist/sdm/input"], [{ classifier: "default" }]);
         assert.deepStrictEqual(data["@atomist/sdm/output"], options.entries);
         assert.deepStrictEqual(data.foo, "bar");
     });
