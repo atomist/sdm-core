@@ -272,7 +272,7 @@ describe("mapPushTests", () => {
         it("should find test", async () => {
             const alwaysTrue = pushTest("always true", async () => true);
             const alwaysFalse = pushTest("always false", async () => false);
-            const yaml = "alwaysTrue";
+            const yaml = { use: "alwaysTrue" };
             const test = (await mapTests(yaml, { alwaysTrue, alwaysFalse }, {}))[0];
             assert(await test.mapping({} as any));
         });
@@ -284,9 +284,8 @@ describe("mapPushTests", () => {
         it("should find test with parameters", async () => {
             const sometimesTrue: PushTestMaker = (params: any) => pushTest("always true", async () => params.shouldbeTrue);
             const yaml = {
-                sometimesTrue: {
-                    shouldbeTrue: true,
-                },
+                use: "sometimesTrue",
+                parameters: { shouldbeTrue: true },
             };
             const test = (await mapTests(yaml, {}, { sometimesTrue }))[0];
             assert(await test.mapping({} as any));
@@ -295,9 +294,8 @@ describe("mapPushTests", () => {
         it("should find test with parameters and only push predicate", async () => {
             const sometimesTrue: PushTestMaker = (params: any) => async () => params.shouldbeTrue;
             const yaml = {
-                sometimesTrue: {
-                    shouldbeTrue: true,
-                },
+                use: "sometimesTrue",
+                parameters: { shouldbeTrue: true },
             };
             const test = (await mapTests(yaml, {}, { sometimesTrue }))[0];
             assert(await test.mapping({} as any));
@@ -306,7 +304,7 @@ describe("mapPushTests", () => {
         it("should find test without parameters", async () => {
             const alwaysTrue = () => pushTest("always true", async () => true);
             const alwaysFalse = () => pushTest("always false", async () => false);
-            const yaml = "alwaysFalse";
+            const yaml = { use: "alwaysFalse" };
             const test = (await mapTests(yaml, {}, { alwaysTrue, alwaysFalse }))[0];
             assert(!await test.mapping({} as any));
         });
@@ -319,7 +317,7 @@ describe("mapPushTests", () => {
             const alwaysTrue = pushTest("always true", async () => true);
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
-                and: ["alwaysTrue", "alwaysFalse"],
+                and: [{ use: "alwaysTrue" }, { use: "alwaysFalse" }],
             };
             const test = (await mapTests(yaml, { alwaysTrue, alwaysFalse }, {}))[0];
             assert(!await test.mapping({} as any));
@@ -329,7 +327,7 @@ describe("mapPushTests", () => {
             const alwaysTrue = pushTest("always true", async () => true);
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
-                and: ["alwaysTrue", "alwaysTrue"],
+                and: [{ use: "alwaysTrue" }, { use: "alwaysTrue" }],
             };
             const test = (await mapTests(yaml, { alwaysTrue, alwaysFalse }, {}))[0];
             assert(await test.mapping({} as any));
@@ -342,7 +340,7 @@ describe("mapPushTests", () => {
             const alwaysTrue = pushTest("always true", async () => true);
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
-                or: ["alwaysTrue", "alwaysFalse"],
+                or: [{ use: "alwaysTrue" }, { use: "alwaysFalse" }],
             };
             const test = (await mapTests(yaml, { alwaysTrue, alwaysFalse }, {}))[0];
             assert(await test.mapping({} as any));
@@ -352,7 +350,7 @@ describe("mapPushTests", () => {
             const alwaysTrue = pushTest("always true", async () => true);
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
-                or: ["alwaysTrue", "alwaysTrue"],
+                or: [{ use: "alwaysTrue" }, { use: "alwaysTrue" }],
             };
             const test = (await mapTests(yaml, { alwaysTrue, alwaysFalse }, {}))[0];
             assert(await test.mapping({} as any));
@@ -364,7 +362,7 @@ describe("mapPushTests", () => {
         it("should correctly evaluate true", async () => {
             const alwaysTrue = pushTest("always true", async () => true);
             const yaml = {
-                not: "alwaysTrue",
+                not: { use: "alwaysTrue" },
             };
             const test = (await mapTests(yaml, { alwaysTrue }, {}))[0];
             assert(!await test.mapping({} as any));
@@ -373,7 +371,7 @@ describe("mapPushTests", () => {
         it("should correctly evaluate true and true", async () => {
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
-                not: "alwaysFalse",
+                not: { use: "alwaysFalse" },
             };
             const test = (await mapTests(yaml, { alwaysFalse }, {}))[0];
             assert(await test.mapping({} as any));
@@ -387,9 +385,9 @@ describe("mapPushTests", () => {
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
                 and: [
-                    "alwaysTrue",
+                    { use: "alwaysTrue" },
                     {
-                        not: "alwaysFalse",
+                        not: { use: "alwaysFalse" },
                     },
                 ],
             };
@@ -402,11 +400,11 @@ describe("mapPushTests", () => {
             const alwaysFalse = pushTest("always false", async () => false);
             const yaml = {
                 and: [
-                    "alwaysTrue",
+                    { use: "alwaysTrue" },
                     {
                         or: [
-                            "alwaysFalse",
-                            "alwaysTrue",
+                            { use: "alwaysFalse" },
+                            { use: "alwaysTrue" },
                         ],
                     },
                 ],

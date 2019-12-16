@@ -145,7 +145,7 @@ export function cachePut(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
-            if (!!isCacheEnabled(gi)) {
+            if (!!isCacheEnabled(gi) && !process.env.ATOMIST_ISOLATED_GOAL_INIT) {
                 const goalCache = cacheStore(gi);
                 for (const entry of entries) {
                     const files = [];
@@ -161,12 +161,16 @@ export function cachePut(options: GoalCacheOptions,
 
                 // Set outputs on the goal data
                 const { goalEvent } = gi;
-                const data = {
-                    "@atomist/sdm/output": entries,
+                const data = JSON.parse(goalEvent.data || "{}");
+                const newData = {
+                    "@atomist/sdm/output": [
+                        ...(data["@atomist/sdm/output"] || []),
+                        ...entries,
+                    ],
                 };
                 goalEvent.data = JSON.stringify({
                     ...(JSON.parse(goalEvent.data || "{}")),
-                    ...data,
+                    ...newData,
                 });
             }
         },
@@ -175,8 +179,13 @@ export function cachePut(options: GoalCacheOptions,
     };
 }
 
-function isGlobFilePattern(toBeDetermined: any): toBeDetermined is GlobFilePattern { return toBeDetermined.globPattern !== undefined; }
-function isDirectoryPattern(toBeDetermined: any): toBeDetermined is DirectoryPattern { return toBeDetermined.directory !== undefined; }
+function isGlobFilePattern(toBeDetermined: any): toBeDetermined is GlobFilePattern {
+    return toBeDetermined.globPattern !== undefined;
+}
+
+function isDirectoryPattern(toBeDetermined: any): toBeDetermined is DirectoryPattern {
+    return toBeDetermined.directory !== undefined;
+}
 
 async function pushTestSucceeds(pushTest: PushTest, gi: GoalInvocation, p: GitProject): Promise<boolean> {
     return (pushTest || AnyPush).mapping({
@@ -206,7 +215,8 @@ async function invokeCacheMissListeners(optsToUse: GoalCacheOptions | GoalCacheR
 
 export const NoOpGoalProjectListenerRegistration: GoalProjectListenerRegistration = {
     name: "NoOpListener",
-    listener: async () => { },
+    listener: async () => {
+    },
     pushTest: AnyPush,
 };
 
@@ -259,12 +269,18 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
 
             // Set inputs on the goal data
             const { goalEvent } = gi;
-            const data = {
-                "@atomist/sdm/input": { classifiers: classifiersToBeRestored },
+            const data = JSON.parse(goalEvent.data || "{}");
+            const newData = {
+                "@atomist/sdm/input": [
+                    ...(data["@atomist/sdm/input"] || []),
+                    ...classifiersToBeRestored.map(c => ({
+                        classifier: c,
+                    })),
+                ],
             };
             goalEvent.data = JSON.stringify({
                 ...(JSON.parse(goalEvent.data || "{}")),
-                ...data,
+                ...newData,
             });
         },
         pushTest: optsToUse.pushTest,

@@ -151,8 +151,8 @@ const Or: CreatePushTest = async (test, additionalTests, extensionTests) => {
 };
 
 const AdditionalTest: CreatePushTest = async (test, additionalTests) => {
-    if (typeof test === "string" && !!additionalTests[test]) {
-        return additionalTests[test];
+    if (!!test.use && !!additionalTests[test.use]) {
+        return additionalTests[test.use];
     }
     return undefined;
 };
@@ -166,8 +166,8 @@ const FunctionTest: CreatePushTest = async test => {
 
 const ExtensionTest = async (test, additionalTests, extensionTests) => {
     for (const extTestName in extensionTests) {
-        if (!!test[extTestName] || extTestName === test) {
-            const extTest = await extensionTests[extTestName](test[extTestName] || {});
+        if (test.use === extTestName) {
+            const extTest = await extensionTests[extTestName](test.parameters || {});
             if (!!extTest.name && !!extTest.mapping) {
                 return extTest;
             } else {

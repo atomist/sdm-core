@@ -21,7 +21,9 @@ import {
     Parameterized,
 } from "@atomist/sdm";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
+import { toArray } from "../../util/misc/array";
 import { CacheEntry } from "../cache/goalCaching";
+import { ContainerSecrets } from "../container/container";
 
 export function item(name: string,
                      registration: string,
@@ -30,13 +32,14 @@ export function item(name: string,
                          parameters?: Parameterized,
                          input?: Array<{ classifier: string }>,
                          output?: CacheEntry[],
+                         secrets?: ContainerSecrets,
                      } = {}): GoalWithFulfillment {
-    const { uniqueName, parameters, input, output } = options;
+    const { uniqueName, parameters, input, output, secrets } = options;
     const g = goal({ displayName: uniqueName, uniqueName: uniqueName || name }).with({
         name: name.replace(/ /g, "_"),
         registration,
     });
-    if (!!parameters || !!input || !!output) {
+    if (!!parameters || !!input || !!output || !!secrets) {
         g.plan = async pli => {
             const { push } = pli;
             await resolvePlaceholders(parameters, v => resolvePlaceholder(v, {
@@ -53,8 +56,9 @@ export function item(name: string,
             return {
                 parameters: {
                     ...(parameters || {}),
-                    "@atomist/sdm/input": input,
-                    "@atomist/sdm/output": output,
+                    "@atomist/sdm/input": toArray(input),
+                    "@atomist/sdm/output": toArray(output),
+                    "@atomist/sdm/secrets": secrets,
                 },
             };
         };

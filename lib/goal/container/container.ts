@@ -228,7 +228,7 @@ export interface ContainerRegistration extends Partial<ImplementationRegistratio
      * execution.  The values must correspond to output classifiers
      * from previously executed container goals in the same goal set.
      */
-    input?: string[];
+    input?: Array<{classifier: string}>;
     /**
      * File path globs to store in cache after goal execution.
      * They values should be glob paths relative to the root of
@@ -294,7 +294,7 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
         }
         this.details.scheduler(this, registration);
         if (registration.input && registration.input.length > 0) {
-            this.withProjectListener(cacheRestore({ entries: registration.input.map(c => ({ classifier: c })) }));
+            this.withProjectListener(cacheRestore({ entries: registration.input }));
         }
         if (registration.output && registration.output.length > 0) {
             const cp = cachePut({ entries: registration.output });

@@ -85,7 +85,7 @@ export class RepositoryDrivenContainer extends FulfillableGoal {
             listener: async (p, gi, e) => {
                 const registration = gi.parameters.registration as ContainerRegistration;
                 if (registration.input && registration.input.length > 0) {
-                    await cacheRestore({ entries: registration.input.map(c => ({ classifier: c })) }).listener(p, gi, e);
+                    await cacheRestore({ entries: registration.input }).listener(p, gi, e);
                 }
             },
         }).withProjectListener({
