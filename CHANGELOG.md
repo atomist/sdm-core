@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Updates to goal planning and scheduling. [#216](https://github.com/atomist/sdm-core/issues/216)
+-   YAML goal set specification. [#216](https://github.com/atomist/sdm-core/issues/216)
 -   Add placeholder replacement in cache classifier. [#219](https://github.com/atomist/sdm-core/issues/219)
 -   Allow goal planning contribute to goal caches. [#220](https://github.com/atomist/sdm-core/issues/220)
 -   Split out goal planning and goal execution. [#215](https://github.com/atomist/sdm-core/issues/215)
@@ -19,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Scope cache by workspace. [#222](https://github.com/atomist/sdm-core/issues/222)
 -   Move to using GraphQL mutations for SdmGoal and SdmGoalSet. [#226](https://github.com/atomist/sdm-core/issues/226)
--   **BREAKING** Better YAML format. [#227](https://github.com/atomist/sdm-core/issues/227)
+-   Better YAML format. [#227](https://github.com/atomist/sdm-core/issues/227)
 
 ### Fixed
 
