@@ -145,7 +145,7 @@ export function cachePut(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
-            if (!!isCacheEnabled(gi)) {
+            if (!!isCacheEnabled(gi) && !process.env.ATOMIST_ISOLATED_GOAL_INIT) {
                 const goalCache = cacheStore(gi);
                 for (const entry of entries) {
                     const files = [];

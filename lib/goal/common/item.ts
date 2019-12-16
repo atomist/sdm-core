@@ -21,6 +21,7 @@ import {
     Parameterized,
 } from "@atomist/sdm";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
+import { toArray } from "../../util/misc/array";
 import { CacheEntry } from "../cache/goalCaching";
 import { ContainerSecrets } from "../container/container";
 
@@ -55,8 +56,8 @@ export function item(name: string,
             return {
                 parameters: {
                     ...(parameters || {}),
-                    "@atomist/sdm/input": input,
-                    "@atomist/sdm/output": output,
+                    "@atomist/sdm/input": toArray(input),
+                    "@atomist/sdm/output": toArray(output),
                     "@atomist/sdm/secrets": secrets,
                 },
             };

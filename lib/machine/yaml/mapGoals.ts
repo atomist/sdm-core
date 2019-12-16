@@ -39,7 +39,6 @@ import * as yaml from "js-yaml";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import {
-    CacheEntry,
     cachePut,
     cacheRestore,
 } from "../../goal/cache/goalCaching";
@@ -60,7 +59,6 @@ import {
     PushTestMaker,
 } from "./mapPushTests";
 import { resolvePlaceholder } from "./resolvePlaceholder";
-import { camelCase } from "./util";
 
 // tslint:disable:max-file-line-count
 
@@ -100,14 +98,9 @@ const MapContainer: MapGoal = async (goals: any,
                 callback: containerCallback(),
                 containers,
                 volumes: toArray(goals.volumes),
-                input: toArray(goals.input),
-                output: mapOutput(goals),
                 progressReporter: ContainerProgressReporter,
                 parameters: goals.parameters,
             });
-        // Container goals handle their own inputs and ouputs
-        delete goals.input;
-        delete goals.output;
         return g;
     }
 
@@ -228,7 +221,7 @@ const MapFulfillment: MapGoal = async (goals: any) => {
                     uniqueName: goals.name || match[3],
                     parameters: goals.parameters,
                     input: goals.input,
-                    output: mapOutput(goals),
+                    output: goals.output,
                     secrets: goals.secrets,
                 });
         }
@@ -310,7 +303,7 @@ function addCaching(goal: GoalWithFulfillment, goals: any): GoalWithFulfillment 
         goal.withProjectListener(cacheRestore({ entries: toArray(goals.input) }));
     }
     if (!!goals?.output) {
-        goal.withProjectListener(cachePut({ entries: mapOutput(goals) }));
+        goal.withProjectListener(cachePut({ entries: toArray(goals.output) }));
     }
     return goal;
 }
@@ -340,28 +333,6 @@ function containerCallback(): ContainerSpecCallback {
         };
         return resolvePlaceholderContainerSpecCallback(registration, p, g, e, ctx);
     };
-}
-
-function mapOutput(goals: any): CacheEntry[] {
-    if (Array.isArray(goals?.output)) {
-        const entries: CacheEntry[] = [];
-        for (const entry of goals.output) {
-            if (!!entry.classifier) {
-                entries.push(camelCase(entry));
-            } else {
-                entries.push(..._.map(entry, (v, k) => ({
-                    ...camelCase(v),
-                    classifier: k,
-                })));
-            }
-        }
-        return entries;
-    } else {
-        return _.map(goals?.output || {}, (v, k) => ({
-            classifier: k,
-            pattern: camelCase(v),
-        }));
-    }
 }
 
 async function mapReferencedGoal(sdm: SoftwareDeliveryMachine,

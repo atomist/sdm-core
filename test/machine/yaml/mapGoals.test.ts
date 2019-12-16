@@ -125,14 +125,13 @@ describe("machine/yaml/mapGoals", () => {
                     completed: "What am awesome mongo goal",
                 },
             } as any;
-            const goals = await mapGoals(undefined, _.cloneDeep(yaml), {}, {}, {}, {}) as Container;
+            const goals = await mapGoals(undefined, yaml, {}, {}, {}, {}) as Container;
             assert.deepStrictEqual(goals.definition.retryFeasible, true);
             assert.deepStrictEqual(goals.definition.approvalRequired, true);
             assert.deepStrictEqual(goals.definition.preApprovalRequired, true);
             assert.deepStrictEqual(goals.definition.completedDescription, (yaml as any).descriptions.completed);
             assert.deepStrictEqual(goals.registrations[0].volumes, yaml.volumes);
-            assert.deepStrictEqual(goals.registrations[0].input, yaml.input);
-            assert.deepStrictEqual(goals.registrations[0].output, yaml.output);
+            assert.deepStrictEqual(goals.projectListeners.length, 2);
         });
 
         it("should map goals from array", async () => {
