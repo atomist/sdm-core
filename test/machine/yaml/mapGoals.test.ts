@@ -33,30 +33,30 @@ describe("machine/yaml/mapGoals", () => {
     describe("mapGoals", () => {
 
         it("should error for unknown goal", async () => {
-            const yaml = "unknown-goal";
+            const yaml = { use: "unknown-goal" };
             try {
                 await mapGoals(undefined, yaml, {}, {}, {}, {});
                 assert.fail();
             } catch (e) {
-                assert.deepStrictEqual(e.message, "Unable to construct goal from '\"unknown-goal\"'");
+                assert.deepStrictEqual(e.message, "Unable to construct goal from '{\"use\":\"unknown-goal\"}'");
             }
         });
 
         it("should map immaterial goals", async () => {
-            const yaml = "immaterial";
+            const yaml = { use: "immaterial" };
             const goals = await mapGoals(undefined, yaml, {}, {}, {}, {});
             assert.deepStrictEqual(goals, ImmaterialGoals.andLock().goals);
         });
 
         it("should map locking goal", async () => {
-            const yaml = "lock";
+            const yaml = { use: "lock" };
             const goals = await mapGoals(undefined, yaml, {}, {}, {}, {});
             assert.deepStrictEqual(goals, Locking);
         });
 
         it("should map additional goal", async () => {
             const sampleGoal = goal({ displayName: "Sample Goal" });
-            const yaml = "sample_goal";
+            const yaml = { use: "sampleGoal" };
             const goals = await mapGoals(undefined, yaml, { sampleGoal }, {}, {}, {});
             assert.deepStrictEqual(goals, sampleGoal);
         });
@@ -65,10 +65,10 @@ describe("machine/yaml/mapGoals", () => {
             const sampleGoal = goal({ displayName: "Sample Goal" });
             const sampleGoalMaker: GoalMaker = async () => sampleGoal;
             const yaml = {
-                sample_goal: {
-                    input: "version",
-                    output: { target: { pattern: { directory: "target" } } },
-                },
+                use: "sampleGoal",
+                input: { classifier: "version" },
+                output: { classifier: "target", pattern: { directory: "target" } },
+
             };
             const goals = await mapGoals(undefined, yaml, {}, { sampleGoal: sampleGoalMaker }, {}, {});
             assert.deepStrictEqual(goals, sampleGoal);
@@ -76,13 +76,14 @@ describe("machine/yaml/mapGoals", () => {
 
         it("should map goalMaker goal with parameters", async () => {
             const yaml = {
-                sampleGoal: {
+                use: "sampleGoal",
+                parameters: {
                     foo: "bar",
                 },
             };
             const sampleGoal = goal({ displayName: "Sample Goal" });
             const sampleGoalMaker: GoalMaker = async (sdm, params) => {
-                assert.deepStrictEqual(params, yaml.sampleGoal);
+                assert.deepStrictEqual(params, yaml.parameters);
                 return sampleGoal;
             };
             const goals = await mapGoals(undefined, yaml, {}, { sampleGoal: sampleGoalMaker }, {}, {});
@@ -91,6 +92,7 @@ describe("machine/yaml/mapGoals", () => {
 
         it("should map container goal", async () => {
             const yaml: DockerContainerRegistration = {
+                name: "mongo",
                 containers: [{
                     name: "mongo",
                     image: "mongo:latest",
@@ -135,13 +137,16 @@ describe("machine/yaml/mapGoals", () => {
         it("should map goals from array", async () => {
             const sampleGoal1 = goal({ displayName: "Sample Goal1" });
             const sampleGoal2 = goal({ displayName: "Sample Goal2" });
-            const yaml = ["sampleGoal1", "sampleGoal2"];
+            const yaml = [{ use: "sampleGoal1" }, { use: "sampleGoal2" }];
             const goals = await mapGoals(undefined, yaml, { sampleGoal1, sampleGoal2 }, {}, {}, {});
             assert.deepStrictEqual(goals, [sampleGoal1, sampleGoal2]);
         });
 
         it("should map referenced goal with parameters", async () => {
-            const yaml = [{ "atomist/npm-goal/publish@master": { parameters: { command: "build" } } }, "atomist/npm-goal/install@master"];
+            const yaml = [{
+                use: "atomist/npm-goal/publish@master",
+                parameters: { command: "build" },
+            }, { use: "atomist/npm-goal/install@master" }];
             const goals = await mapGoals({
                 configuration: { http: { client: { factory: defaultHttpClientFactory() } } },
             } as any, yaml, {}, {}, {}, {});
@@ -149,17 +154,17 @@ describe("machine/yaml/mapGoals", () => {
         }).timeout(10000);
 
         it("should map referenced goal", async () => {
-            const yaml = "atomist/npm-goal/i-dont-exist@0.0.1";
+            const yaml = { use: "atomist/npm-goal/i-dont-exist@0.0.1" };
             try {
                 await mapGoals({ configuration: { http: { client: { factory: defaultHttpClientFactory() } } } } as any, yaml, {}, {}, {}, {});
                 assert.fail();
             } catch (e) {
-                assert.deepStrictEqual(e.message, "Unable to construct goal from '\"atomist/npm-goal/i-dont-exist@0.0.1\"'");
+                assert.deepStrictEqual(e.message, "Unable to construct goal from '{\"use\":\"atomist/npm-goal/i-dont-exist@0.0.1\"}'");
             }
         }).timeout(10000);
 
         it("should map item with parameters", async () => {
-            const yaml = [{ "@atomist/npm-goal/publish": { parameters: { command: "build" } } }];
+            const yaml = [{ use: "@atomist/npm-goal/publish", parameters: { command: "build" } }];
             const goals = await mapGoals({} as any, yaml, {}, {}, {}, {});
             assert(!!goals);
         }).timeout(10000);

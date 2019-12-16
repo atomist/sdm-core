@@ -53,10 +53,8 @@ import {
     GoalMaker,
     mapGoals,
 } from "./mapGoals";
-import {
-    mapTests,
-    PushTestMaker,
-} from "./mapPushTests";
+import { PushTestMaker } from "./mapPushTests";
+import { mapRules } from "./mapRules";
 import { watchPaths } from "./util";
 
 export interface YamlSoftwareDeliveryMachineConfiguration {
@@ -226,7 +224,7 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                     const value = config[k];
 
                     // Ignore two special keys used to set up the SDM
-                    if (k === "name" || k === "configuration" || k === "item") {
+                    if (k === "name" || k === "configuration" || k === "skill") {
                         continue;
                     }
 
@@ -241,25 +239,8 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                             testMakers);
                     }
 
-                    if (!!value.goals || !!value.goal) {
-                        const test = await mapTests(
-                            value.test,
-                            options.tests || {},
-                            testMakers);
-                        const goals = await mapGoals(
-                            sdm,
-                            value.goals || value.goal,
-                            additionalGoals,
-                            goalMakers,
-                            options.tests || {},
-                            testMakers);
-                        const dependsOn = value.dependsOn || value.depends_on;
-
-                        goalData[k] = {
-                            test: toArray(test).length > 0 ? test : undefined,
-                            dependsOn,
-                            goals,
-                        };
+                    if (k === "rules") {
+                        await mapRules(value, goalData, sdm, options, additionalGoals, goalMakers, testMakers);
                     }
                 }
             }
@@ -271,7 +252,8 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
 
 async function requireExtensions<EXT>(cwd: string,
                                       pattern: string[],
-                                      cb: (v: EXT, k: string, e: Record<string, EXT>) => void = () => { },
+                                      cb: (v: EXT, k: string, e: Record<string, EXT>) => void = () => {
+                                      },
 ): Promise<Record<string, EXT>> {
     const extensions: Record<string, EXT> = {};
     const files = await resolvePaths(cwd, pattern);

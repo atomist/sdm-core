@@ -35,7 +35,6 @@ import {
     SoftwareDeliveryMachine,
     StatefulPushListenerInvocation,
 } from "@atomist/sdm";
-import * as changeCase from "change-case";
 import * as yaml from "js-yaml";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
@@ -81,70 +80,81 @@ const MapContainer: MapGoal = async (goals: any,
                                      goalMakers: Record<string, GoalMaker>,
                                      additionalTests: Record<string, PushTest>,
                                      extensionTests: Record<string, PushTestMaker>) => {
-    let goal: Goal;
     if (!!goals.containers) {
+
+        if (!goals.name) {
+            throw new Error(`Property 'name' missing on container goal:\n${JSON.stringify(goals, undefined, 2)}`);
+        }
+
         const containers = [];
-        const name = _.get(goals, "containers.name") || _.get(goals, "containers[0].name");
         for (const gc of goals.containers) {
             containers.push({
-                ...camelCase(gc),
+                ...gc,
                 name: gc.name.replace(/ /g, "-"),
                 test: !!gc.test ? await mapTests(gc.test, additionalTests, extensionTests) : undefined,
             });
         }
-        goal = container(
-            name,
+        return container(
+            goals.name,
             {
                 callback: containerCallback(),
                 containers,
-                volumes: camelCase(toArray(goals.volumes)),
+                volumes: toArray(goals.volumes),
                 input: toArray(goals.input),
                 output: mapOutput(goals),
                 progressReporter: ContainerProgressReporter,
-                parameters: camelCase(goals.parameters),
+                parameters: goals.parameters,
             });
     }
-    return goal;
+
+    return undefined;
 };
 
 const MapExecute: MapGoal = async goals => {
-    let goal: GoalWithFulfillment;
     if (!!goals.execute) {
+
+        if (!goals.name) {
+            throw new Error(`Property 'name' missing on execute goal:\n${JSON.stringify(goals, undefined, 2)}`);
+        }
+
         const g = goals.execute;
-        goal = execute(g.name, {
+        return execute(g.name, {
             cmd: g.command || g.cmd,
             args: toArray(g.args),
-            secrets: camelCase(g.secrets),
+            secrets: g.secrets,
         });
-        goal = addCaching(goal, g);
     }
-    return goal;
+
+    return undefined;
 };
 
 const MapImmaterial: MapGoal = async goals => {
-    if (goals === "immaterial") {
+    if (goals.use === "immaterial") {
         return ImmaterialGoals.andLock().goals;
     }
     return undefined;
 };
 
 const MapLock: MapGoal = async goals => {
-    if (goals === "lock") {
+    if (goals.use === "lock") {
         return Locking;
     }
     return undefined;
 };
 
 const MapQueue: MapGoal = async goals => {
-    if (goals === "queue" || goals.queue) {
-        return new Queue(typeof goals !== "string" ? goals.queue : undefined);
+    if (goals.use === "queue") {
+        return new Queue({
+            fetch: goals.fetch,
+            concurrent: goals.concurrent,
+        });
     }
     return undefined;
 };
 
 const MapCancel: MapGoal = async goals => {
-    if (goals.cancel) {
-        return new Cancel({ goals: [], goalNames: toArray(goals.cancel) });
+    if (goals.use === "cancel") {
+        return new Cancel({ goals: [], goalNames: toArray(goals.goals) });
     }
     return undefined;
 };
@@ -152,12 +162,8 @@ const MapCancel: MapGoal = async goals => {
 const MapAdditional: MapGoal = async (goals: any,
                                       sdm: SoftwareDeliveryMachine,
                                       additionalGoals: DeliveryGoals) => {
-    if (!!additionalGoals[goals]) {
-        return additionalGoals[goals];
-    }
-    const camelGoals = changeCase.camel(goals);
-    if (!!additionalGoals[camelGoals]) {
-        return additionalGoals[camelGoals];
+    if (!!additionalGoals[goals.use]) {
+        return additionalGoals[goals.use];
     }
     return undefined;
 };
@@ -168,32 +174,18 @@ const MapReferenced: MapGoal = async (goals: any,
                                       goalMakers: Record<string, GoalMaker>,
                                       additionalTests: Record<string, PushTest>,
                                       extensionTests: Record<string, PushTestMaker>) => {
-    if (typeof goals === "string" && goals.includes("/") && !goals.startsWith("@")) {
-        const referencedGoal = await mapReferencedGoal(sdm, goals, {});
+    const use = goals.use;
+    if (!!use && use.includes("/") && !use.startsWith("@")) {
+        const parameters = goals.parameters || {};
+        const referencedGoal = await mapReferencedGoal(sdm, use, parameters);
         if (!!referencedGoal) {
             return mapGoals(
                 sdm,
-                referencedGoal,
+                _.merge({}, referencedGoal, (goals || {})),
                 additionalGoals,
                 goalMakers,
                 additionalTests,
                 extensionTests);
-        }
-    }
-
-    for (const goalName in goals) {
-        if (goals.hasOwnProperty(goalName) && goalName.includes("/") && !goalName.startsWith("@")) {
-            const parameters = camelCase(goals[goalName].parameters || {});
-            const referencedGoal = await mapReferencedGoal(sdm, goalName, parameters);
-            if (!!referencedGoal) {
-                return mapGoals(
-                    sdm,
-                    _.merge({}, referencedGoal, camelCase(goals[goalName] || {})),
-                    additionalGoals,
-                    goalMakers,
-                    additionalTests,
-                    extensionTests);
-            }
         }
     }
 
@@ -205,70 +197,35 @@ const MapGoalMakers: MapGoal = async (goals: any,
                                       additionalGoals: DeliveryGoals,
                                       goalMakers: Record<string, GoalMaker>) => {
 
-    const Mapper = async (goalMakerName: string, goalMaker: GoalMaker) => {
-        let g: GoalWithFulfillment;
-        if (!!goals[goalMakerName] || goalMakerName === goals) {
-            try {
-                g = await goalMaker(sdm, camelCase(goals[goalMakerName] || {})) as any;
-            } catch (e) {
-                e.message = `Failed to make goal using ${goalMakerName}: ${e.message}`;
-                throw e;
-            }
-            if (!!g) {
-                g = addCaching(g, goals[goalMakerName] || {});
-            }
-        }
-        return g;
-    };
-
-    let goal: GoalWithFulfillment;
-    for (const goalMakerName in goalMakers) {
-        if (goalMakers.hasOwnProperty(goalMakerName)) {
-            const goalMaker = goalMakers[goalMakerName];
-            goal = await Mapper(goalMakerName, goalMaker);
-            if (!!goal) {
-                break;
-            } else {
-                goal = await Mapper(changeCase.snake(goalMakerName), goalMaker);
-                if (!!goal) {
-                    break;
-                }
-            }
+    const use = goals.use;
+    if (!!use && !!goalMakers[use]) {
+        const goalMaker = goalMakers[use];
+        try {
+            return goalMaker(sdm, (goals.parameters || {})) as any;
+        } catch (e) {
+            e.message = `Failed to make goal using ${use}: ${e.message}`;
+            throw e;
         }
     }
-    return goal;
+    return undefined;
 };
 
 const MapFulfillment: MapGoal = async (goals: any) => {
     const regexp = /([@a-zA-Z-_]*)\/([a-zA-Z-_]*)(?:\/([a-zA-Z-_]*))?@?([a-zA-Z-_0-9\.]*)/i;
-    if (typeof goals === "string" && goals.startsWith("@")) {
-        const match = regexp.exec(goals);
-        if (!!match) {
+    const use = goals.use;
+
+    if (!!use) {
+        const match = regexp.exec(use);
+        if (!!match && use.startsWith("@")) {
             return item(
                 match[3].replace(/_/g, " "),
                 `${match[1]}/${match[2]}`,
                 {
-                    uniqueName: match[3],
+                    uniqueName: goals.name || match[3],
+                    parameters: goals.parameters,
+                    input: goals.input,
+                    output: mapOutput(goals),
                 });
-        }
-    }
-
-    for (const name in goals) {
-        if (goals.hasOwnProperty(name)) {
-            const match = regexp.exec(name);
-            if (!!match && name.startsWith("@")) {
-                const gd = camelCase(goals[name]);
-                const g = item(
-                    match[3].replace(/_/g, " "),
-                    `${match[1]}/${match[2]}`,
-                    {
-                        uniqueName: gd.name || match[3],
-                        parameters: gd.parameters,
-                        input: !!gd.input ? toArray(gd.input).map(c => ({ classifier: c })) : undefined,
-                        output: mapOutput(goals[name]),
-                    });
-                return addDetails(g, goals[name]);
-            }
         }
     }
 
@@ -305,13 +262,10 @@ export async function mapGoals(sdm: SoftwareDeliveryMachine,
         for (const mapGoal of MapGoals) {
             goal = await mapGoal(goals, sdm, additionalGoals, goalMakers, additionalTests, extensionTests);
             if (!!goal) {
-                break;
-            }
-        }
-        if (!!goal) {
-            if (!Array.isArray(goal)) {
-                return addDetails(goal, goals);
-            } else {
+                if (!Array.isArray(goal)) {
+                    addDetails(goal, goals);
+                    addCaching(goal, goals);
+                }
                 return goal;
             }
         }
@@ -327,14 +281,12 @@ function addDetails(goal: Goal, goals: any): Goal {
     }
     if (goals.preApproval !== undefined) {
         goal.definition.preApprovalRequired = goals.preApproval;
-    } else if (goals.pre_approval !== undefined) {
-        goal.definition.preApprovalRequired = goals.pre_approval;
     }
     if (goals.retry !== undefined) {
         goal.definition.retryFeasible = goals.retry;
     }
     if (!!goals.descriptions) {
-        const descriptions = camelCase(goals.descriptions);
+        const descriptions = goals.descriptions;
         goal.definition.canceledDescription = descriptions.canceled;
         goal.definition.completedDescription = descriptions.completed;
         goal.definition.failedDescription = descriptions.failed;
@@ -350,7 +302,7 @@ function addDetails(goal: Goal, goals: any): Goal {
 
 function addCaching(goal: GoalWithFulfillment, goals: any): GoalWithFulfillment {
     if (!!goals?.input) {
-        goal.withProjectListener(cacheRestore({ entries: toArray(goals.input).map(c => ({ classifier: c })) }));
+        goal.withProjectListener(cacheRestore({ entries: toArray(goals.input) }));
     }
     if (!!goals?.output) {
         goal.withProjectListener(cachePut({ entries: mapOutput(goals) }));
