@@ -470,7 +470,7 @@ export function executeK8sJob(): ExecuteGoal {
             try {
                 const project = GitCommandGitProject.fromBaseDir(id, projectDir, credentials, async () => {
                 });
-                const cp = cachePut({ entries: [...registration.output, ...gi.parameters["@atomist/sdm/output"]] });
+                const cp = cachePut({ entries: [...registration.output, ...((gi.parameters || {})["@atomist/sdm/output"] || [])] });
                 await cp.listener(project, gi, GoalProjectListenerEvent.after);
             } catch (e) {
                 const message = `Failed to put cache output from container: ${e.message}`;

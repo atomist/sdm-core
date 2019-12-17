@@ -131,6 +131,8 @@ describe("machine/yaml/mapGoals", () => {
             assert.deepStrictEqual(goals.definition.preApprovalRequired, true);
             assert.deepStrictEqual(goals.definition.completedDescription, (yaml as any).descriptions.completed);
             assert.deepStrictEqual(goals.registrations[0].volumes, yaml.volumes);
+            assert.deepStrictEqual(goals.registrations[0].input, yaml.input);
+            assert.deepStrictEqual(goals.registrations[0].output, yaml.output);
             assert.deepStrictEqual(goals.projectListeners.length, 2);
         });
 
