@@ -4,6 +4,7 @@ query InProcessSdmGoals($registration: [String!]!) {
     _first: 100
     _orderBy: "ts"
     _ordering: asc
+    registration: $registration
   ) {
     environment
     uniqueName
@@ -26,6 +27,7 @@ query InProcessSdmGoals($registration: [String!]!) {
     phase
     externalKey
     goalSet
+    registration
     goalSetId
     ts
     error
@@ -55,7 +57,7 @@ query InProcessSdmGoals($registration: [String!]!) {
       channelId
     }
     preApprovalRequired
-    provenance(registration: $registration) @required {
+    provenance {
       correlationId
       registration
       name
