@@ -378,7 +378,7 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
 function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.V1Job {
     const { goalEvent, configuration, context } = gi;
 
-    podSpec.spec.affinity = {
+    _.defaultsDeep(podSpec.spec.affinity, {
         podAffinity: {
             preferredDuringSchedulingIgnoredDuringExecution: [
                 {
@@ -400,7 +400,7 @@ function createJobSpecWithAffinity(podSpec: k8s.V1Pod, gi: GoalInvocation): k8s.
                 },
             ],
         },
-    } as any;
+    });
 
     // Clean up podSpec
     // See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#pod-v1-core note on nodeName
