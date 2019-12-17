@@ -100,6 +100,7 @@ const MapContainer: MapGoal = async (goals: any,
                 volumes: toArray(goals.volumes),
                 progressReporter: ContainerProgressReporter,
                 parameters: goals.parameters,
+                fulfillment: goals.fulfillment,
             });
         return g;
     }
