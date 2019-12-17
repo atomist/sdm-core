@@ -31,6 +31,10 @@ import {
     testProgressReporter,
 } from "@atomist/sdm";
 import {
+    KubernetesFulfillmentGoalScheduler,
+    KubernetesFulfillmentOptions,
+} from "../../pack/k8s/KubernetesFulfillmentGoalScheduler";
+import {
     isConfiguredInEnv,
     KubernetesGoalScheduler,
 } from "../../pack/k8s/KubernetesGoalScheduler";
@@ -43,7 +47,10 @@ import {
 } from "../cache/goalCaching";
 import { dockerContainerScheduler } from "./docker";
 import { k8sContainerScheduler } from "./k8s";
-import { runningInK8s } from "./util";
+import {
+    runningAsGoogleCloudFunction,
+    runningInK8s,
+} from "./util";
 
 /**
  * Create and return a container goal with the provided container
@@ -127,7 +134,9 @@ export interface GoalContainer {
      * Volumes to mount in container.
      */
     volumeMounts?: ContainerVolumeMount[];
-
+    /**
+     * Provider secrets that should be made available to the container
+     */
     secrets?: ContainerSecrets;
 }
 
@@ -261,14 +270,22 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
     public register(sdm: SoftwareDeliveryMachine): void {
         super.register(sdm);
 
+        const goalSchedulers = toArray(sdm.configuration.sdm.goalScheduler) || [];
         if (runningInK8s()) {
             // Make sure that the KubernetesGoalScheduler gets added if needed
-            const goalSchedulers = toArray(sdm.configuration.sdm.goalScheduler) || [];
             if (!goalSchedulers.some(gs => gs instanceof KubernetesGoalScheduler)) {
                 if (!process.env.ATOMIST_ISOLATED_GOAL && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
                     sdm.configuration.sdm.goalScheduler = [...goalSchedulers, new KubernetesGoalScheduler()];
                     sdm.addGoalCompletionListener(new KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
                 }
+            }
+        } else if (runningAsGoogleCloudFunction()) {
+            const options: KubernetesFulfillmentOptions = sdm.configuration.sdm?.k8s?.fulfillment;
+            if (!goalSchedulers.some(gs => gs instanceof KubernetesFulfillmentGoalScheduler)) {
+                sdm.configuration.sdm.goalScheduler = [
+                    ...goalSchedulers,
+                    new KubernetesFulfillmentGoalScheduler(options),
+                ];
             }
         }
     }
@@ -278,7 +295,7 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
 
         registration.name = (registration.name || `container-${this.definition.displayName}`).replace(/\.+/g, "-");
         if (!this.details.scheduler) {
-            if (runningInK8s()) {
+            if (runningInK8s() || runningAsGoogleCloudFunction()) {
                 this.details.scheduler = k8sContainerScheduler;
             } else {
                 this.details.scheduler = dockerContainerScheduler;
