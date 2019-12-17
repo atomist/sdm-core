@@ -1,0 +1,89 @@
+/*
+ * Copyright © 2019 Atomist, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { guid } from "@atomist/automation-client";
+import {
+    goal,
+    SdmGoalEvent,
+} from "@atomist/sdm";
+import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import * as assert from "assert";
+import { container } from "../../../lib/goal/container/container";
+import { KubernetesFulfillmentGoalScheduler } from "../../../lib/pack/k8s/KubernetesFulfillmentGoalScheduler";
+import { SdmGoalState } from "../../../lib/typings/types";
+
+describe("KubernetesFulfillmentGoalScheduler", () => {
+
+    describe("supports", () => {
+
+        it("should support Container goal", async () => {
+            const ks = new KubernetesFulfillmentGoalScheduler();
+            const c = container("foo", { containers: [{ name: "node", image: "atomist/node" }] });
+            assert(await ks.supports({ goal: c } as any));
+        });
+
+        it("should not support any goal", async () => {
+            const ks = new KubernetesFulfillmentGoalScheduler();
+            const c = goal({ displayName: "foo" });
+            assert(!await ks.supports({ goal: c } as any));
+        });
+
+    });
+
+    describe("schedule", () => {
+
+        it("should schedule a container goal without fulfillment", async () => {
+            const ks = new KubernetesFulfillmentGoalScheduler();
+            const ge: SdmGoalEvent = {
+                fulfillment: {},
+            } as any;
+            const c = container(guid(), { containers: [{ name: "node", image: "atomist/node" }] });
+            const g = await ks.schedule({ goal: c, goalEvent: ge } as any);
+
+            assert.deepStrictEqual(g.state, SdmGoalState.requested);
+            assert.deepStrictEqual(ge.fulfillment, {
+                registration: "@atomist/k8s-sdm",
+                name: "container-deploy",
+                method: SdmGoalFulfillmentMethod.Sdm,
+            });
+            assert(!!ge.data);
+        });
+
+        it("should schedule a container goal with fulfillment", async () => {
+            const ks = new KubernetesFulfillmentGoalScheduler();
+            const ge: SdmGoalEvent = {
+                fulfillment: {},
+            } as any;
+            const fulfillment = {
+                registration: "@atomist/foo",
+                name: "job-deploy",
+            };
+            const registration = { containers: [{ name: "node", image: "atomist/node" }], fulfillment };
+            const c = container(guid(), registration);
+            const g = await ks.schedule({ goal: c, goalEvent: ge } as any);
+
+            assert.deepStrictEqual(g.state, SdmGoalState.requested);
+            assert.deepStrictEqual(ge.fulfillment, {
+                ...fulfillment,
+                method: SdmGoalFulfillmentMethod.Sdm,
+            });
+            assert(!!ge.data);
+            assert.deepStrictEqual(JSON.parse(ge.data)["@atomist/sdm/container"], registration);
+        });
+
+    });
+
+});
