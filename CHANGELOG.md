@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Scope cache by workspace. [#222](https://github.com/atomist/sdm-core/issues/222)
 -   Move to using GraphQL mutations for SdmGoal and SdmGoalSet. [#226](https://github.com/atomist/sdm-core/issues/226)
 -   Better YAML format. [#227](https://github.com/atomist/sdm-core/issues/227)
+-   Merge pod affinity rather than overwrite. [#229](https://github.com/atomist/sdm-core/issues/229)
 
 ### Fixed
 
