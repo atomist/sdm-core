@@ -59,6 +59,16 @@ export function runningInK8s(): boolean {
 }
 
 /**
+ * Simple test to see if SDM is running as a Google Cloud Function.
+ *
+ * @return `true` if process is running as Google Cloud Function,
+ * `false` otherwise.
+ */
+export function runningAsGoogleCloudFunction(): boolean {
+    return !!process.env.K_SERVICE && !!process.env.K_REVISION;
+}
+
+/**
  * Return environment variables required by the container goal
  * execution machinery.
  *
