@@ -31,6 +31,10 @@ import {
     testProgressReporter,
 } from "@atomist/sdm";
 import {
+    KubernetesFulfillmentGoalScheduler,
+    KubernetesFulfillmentOptions,
+} from "../../pack/k8s/KubernetesFulfillmentGoalScheduler";
+import {
     isConfiguredInEnv,
     KubernetesGoalScheduler,
 } from "../../pack/k8s/KubernetesGoalScheduler";
@@ -41,13 +45,12 @@ import {
     cachePut,
     cacheRestore,
 } from "../cache/goalCaching";
-import {
-    BuildingContainer,
-    isBuildingContainer,
-} from "./buildingContainer";
 import { dockerContainerScheduler } from "./docker";
 import { k8sContainerScheduler } from "./k8s";
-import { runningInK8s } from "./util";
+import {
+    runningAsGoogleCloudFunction,
+    runningInK8s,
+} from "./util";
 
 /**
  * Create and return a container goal with the provided container
@@ -58,11 +61,7 @@ import { runningInK8s } from "./util";
  * @return SDM container goal
  */
 export function container<T extends ContainerRegistration>(displayName: string, registration: T): FulfillableGoal {
-    if (registration.containers.some(isBuildingContainer)) {
-        return new BuildingContainer({ displayName }, registration);
-    } else {
-        return new Container({ displayName }).with(registration);
-    }
+    return new Container({ displayName }).with(registration);
 }
 
 export const ContainerProgressReporter = testProgressReporter({
@@ -135,7 +134,9 @@ export interface GoalContainer {
      * Volumes to mount in container.
      */
     volumeMounts?: ContainerVolumeMount[];
-
+    /**
+     * Provider secrets that should be made available to the container
+     */
     secrets?: ContainerSecrets;
 }
 
@@ -228,7 +229,7 @@ export interface ContainerRegistration extends Partial<ImplementationRegistratio
      * execution.  The values must correspond to output classifiers
      * from previously executed container goals in the same goal set.
      */
-    input?: Array<{classifier: string}>;
+    input?: Array<{ classifier: string }>;
     /**
      * File path globs to store in cache after goal execution.
      * They values should be glob paths relative to the root of
@@ -269,14 +270,22 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
     public register(sdm: SoftwareDeliveryMachine): void {
         super.register(sdm);
 
+        const goalSchedulers = toArray(sdm.configuration.sdm.goalScheduler) || [];
         if (runningInK8s()) {
             // Make sure that the KubernetesGoalScheduler gets added if needed
-            const goalSchedulers = toArray(sdm.configuration.sdm.goalScheduler) || [];
             if (!goalSchedulers.some(gs => gs instanceof KubernetesGoalScheduler)) {
                 if (!process.env.ATOMIST_ISOLATED_GOAL && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
                     sdm.configuration.sdm.goalScheduler = [...goalSchedulers, new KubernetesGoalScheduler()];
                     sdm.addGoalCompletionListener(new KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
                 }
+            }
+        } else if (runningAsGoogleCloudFunction()) {
+            const options: KubernetesFulfillmentOptions = sdm.configuration.sdm?.k8s?.fulfillment;
+            if (!goalSchedulers.some(gs => gs instanceof KubernetesFulfillmentGoalScheduler)) {
+                sdm.configuration.sdm.goalScheduler = [
+                    ...goalSchedulers,
+                    new KubernetesFulfillmentGoalScheduler(options),
+                ];
             }
         }
     }
@@ -286,7 +295,7 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
 
         registration.name = (registration.name || `container-${this.definition.displayName}`).replace(/\.+/g, "-");
         if (!this.details.scheduler) {
-            if (runningInK8s()) {
+            if (runningInK8s() || runningAsGoogleCloudFunction()) {
                 this.details.scheduler = k8sContainerScheduler;
             } else {
                 this.details.scheduler = dockerContainerScheduler;
@@ -297,15 +306,7 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
             this.withProjectListener(cacheRestore({ entries: registration.input }));
         }
         if (registration.output && registration.output.length > 0) {
-            const cp = cachePut({ entries: registration.output });
-            this.withProjectListener({
-                ...cp,
-                listener: async (p, r, event) => {
-                    if (!process.env.ATOMIST_ISOLATED_GOAL_INIT) {
-                        return cp.listener(p, r, event);
-                    }
-                },
-            });
+            this.withProjectListener(cachePut({ entries: registration.output }));
         }
         return this;
     }

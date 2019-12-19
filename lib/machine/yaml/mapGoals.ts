@@ -99,7 +99,10 @@ const MapContainer: MapGoal = async (goals: any,
                 containers,
                 volumes: toArray(goals.volumes),
                 progressReporter: ContainerProgressReporter,
+                input: goals.input,
+                output: goals.output,
                 parameters: goals.parameters,
+                fulfillment: goals.fulfillment,
             });
         return g;
     }
@@ -262,7 +265,11 @@ export async function mapGoals(sdm: SoftwareDeliveryMachine,
             if (!!goal) {
                 if (!Array.isArray(goal)) {
                     addDetails(goal, goals);
-                    addCaching(goal, goals);
+
+                    // Container goal handle their own caching
+                    if (!(goal instanceof Container)) {
+                        addCaching(goal, goals);
+                    }
                 }
                 return goal;
             }

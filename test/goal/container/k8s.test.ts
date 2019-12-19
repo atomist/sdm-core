@@ -381,6 +381,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                     },
                 },
             };
+            delete p["@atomist/sdm/container"];
             assert.deepStrictEqual(p, d);
             delete ge.data;
             const e = {
@@ -640,6 +641,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                     },
                 },
             };
+            delete p["@atomist/sdm/container"];
             assert.deepStrictEqual(p, d);
             delete ge.data;
             const e = {
@@ -1018,6 +1020,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                     },
                 },
             };
+            delete p["@atomist/sdm/container"];
             assert.deepStrictEqual(p, d);
             delete ge.data;
             const e = {
@@ -1383,6 +1386,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                     },
                 },
             };
+            delete p["@atomist/sdm/container"];
             assert.deepStrictEqual(p, d);
             delete ge.data;
             const e = {
@@ -1604,6 +1608,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                     },
                 },
             };
+            delete p["@atomist/sdm/container"];
             assert.deepStrictEqual(p, d);
             delete ge.data;
             const e = {
@@ -1668,6 +1673,17 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                         sha: "7ee1af8ee2f80ad1e718dbb2028120b3a2984892",
                     }],
                 },
+                data: JSON.stringify({
+                    "@atomist/sdm/container": {
+                        containers: [
+                            {
+                                args: ["true"],
+                                image: containerTestImage,
+                                name: "alpine",
+                            },
+                        ],
+                    },
+                }),
             },
             id: fakeId,
             progressLog: {
@@ -1715,16 +1731,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
         });
 
         it("should run in init mode", async () => {
-            const r = {
-                containers: [
-                    {
-                        args: ["true"],
-                        image: containerTestImage,
-                        name: "alpine",
-                    },
-                ],
-            };
-            const e = executeK8sJob(goal, r);
+            const e = executeK8sJob();
             const f = `JUNK-${guid()}.md`;
             const fp = path.join(project.baseDir, f);
             await fs.writeFile(fp, "Counting the days until they set you free again\n");
@@ -1752,6 +1759,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                     }],
                 },
             };
+            delete x.data;
             assert.deepStrictEqual(x, eg, logData);
             const ec = await fs.readFile(fp, "utf8");
             assert(ec === "Counting the days until they set you free again\n");
@@ -1812,7 +1820,8 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
             async function execK8sJobTest(r: K8sContainerRegistration): Promise<ExecuteGoalResult | void> {
                 const p: k8s.V1Pod = _.merge({}, partialPodSpec, { spec: r });
                 await k8sCore.createNamespacedPod(ns, p);
-                const e = executeK8sJob(goal, r);
+                goalInvocation.goalEvent.data = JSON.stringify({ "@atomist/sdm/container": r });
+                const e = executeK8sJob();
                 const egr = await e(goalInvocation);
                 try {
                     const body: k8s.V1DeleteOptions = { gracePeriodSeconds: 0, propagationPolicy: "Background" };
