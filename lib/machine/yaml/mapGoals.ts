@@ -59,6 +59,7 @@ import {
     PushTestMaker,
 } from "./mapPushTests";
 import { resolvePlaceholder } from "./resolvePlaceholder";
+import { camelCase } from "./util";
 
 // tslint:disable:max-file-line-count
 
@@ -407,7 +408,7 @@ async function mapReferencedGoal(sdm: SoftwareDeliveryMachine,
                     const pdg = document[key];
                     await resolvePlaceholders(pdg,
                         value => resolvePlaceholder(value, undefined, {} as any, parameters, false));
-                    return pdg;
+                    return camelCase(pdg);
                 }
             }
         }
