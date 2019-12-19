@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Move to using GraphQL mutations for SdmGoal and SdmGoalSet. [#226](https://github.com/atomist/sdm-core/issues/226)
 -   Better YAML format. [#227](https://github.com/atomist/sdm-core/issues/227)
 -   Merge pod affinity rather than overwrite. [#229](https://github.com/atomist/sdm-core/issues/229)
+-   Prepare for GCF to k8s goal scheduling. [#230](https://github.com/atomist/sdm-core/issues/230)
 
 ### Fixed
 
