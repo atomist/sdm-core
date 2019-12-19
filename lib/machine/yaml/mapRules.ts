@@ -50,7 +50,7 @@ export async function mapRules(rules: any,
         const test = !!rule.tests || !!rule.test ? await mapTests(
             rule.tests || rule.test,
             options.tests || {},
-            testMakers) : undefined;
+            testMakers) : [];
 
         const goals = await mapGoals(
             sdm,
