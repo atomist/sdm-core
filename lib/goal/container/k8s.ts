@@ -174,6 +174,13 @@ export function k8sFulfillmentCallback(
             throw new Error("No containers defined in K8sGoalContainerSpec");
         }
 
+        // Preserve the container registration in the goal data before it gets munged with internals
+        let data: any = JSON.parse(goalEvent.data || "{}");
+        let newData: any = {};
+        delete spec.callback;
+        _.set<any>(newData, "@atomist/sdm/container", spec);
+        goalEvent.data = JSON.stringify(_.merge(data, newData));
+
         if (spec.containers[0].workingDir === "") {
             delete spec.containers[0].workingDir;
         } else if (!spec.containers[0].workingDir) {
@@ -316,14 +323,10 @@ export function k8sFulfillmentCallback(
             },
         };
 
-        const data: any = JSON.parse(goalEvent.data || "{}");
-        const newData: any = {};
+        // Store k8s service registration in goal data
+        data = JSON.parse(goalEvent.data || "{}");
+        newData = {};
         _.set<any>(newData, `${ServiceRegistrationGoalDataKey}.${registration.name}`, serviceSpec);
-
-        // Preserve the registration in the goal data
-        delete spec.callback;
-        _.set<any>(newData, "@atomist/sdm/container", spec);
-
         goalEvent.data = JSON.stringify(_.merge(data, newData));
         return goalEvent;
     };
