@@ -43,6 +43,8 @@ export async function resolvePlaceholder(value: string,
         let envValue = _.get(goal, result[1]) ||
             _.get(ctx.configuration, result[1]) ||
             _.get(ctx.configuration, camelCase(result[1])) ||
+            _.get(ctx.context, result[1]) ||
+            _.get(ctx.context, camelCase(result[1])) ||
             _.get({ parameters }, result[1]) ||
             _.get({ parameters }, camelCase(result[1]));
         if (result[1] === "home") {
