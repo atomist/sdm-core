@@ -22,7 +22,11 @@ import {
 } from "@atomist/sdm";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { toArray } from "../../util/misc/array";
-import { CacheEntry } from "../cache/goalCaching";
+import {
+    CacheEntry,
+    CacheInputGoalDataKey,
+    CacheOutputGoalDataKey,
+} from "../cache/goalCaching";
 import { ContainerSecrets } from "../container/container";
 
 export function item(name: string,
@@ -56,8 +60,8 @@ export function item(name: string,
             return {
                 parameters: {
                     ...(parameters || {}),
-                    "@atomist/sdm/input": toArray(input),
-                    "@atomist/sdm/output": toArray(output),
+                    [CacheInputGoalDataKey]: toArray(input),
+                    [CacheOutputGoalDataKey]: toArray(output),
                     "@atomist/sdm/secrets": secrets,
                 },
             };
