@@ -32,6 +32,9 @@ import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
 import { CompressingGoalCache } from "./CompressingGoalCache";
 
+export const CacheInputGoalDataKey = "@atomist/sdm/input";
+export const CacheOutputGoalDataKey = "@atomist/sdm/output";
+
 /**
  * Goal cache interface for storing and retrieving arbitrary files produced
  * by the execution of a goal.
@@ -163,8 +166,8 @@ export function cachePut(options: GoalCacheOptions,
                 const { goalEvent } = gi;
                 const data = JSON.parse(goalEvent.data || "{}");
                 const newData = {
-                    "@atomist/sdm/output": [
-                        ...(data["@atomist/sdm/output"] || []),
+                    [CacheOutputGoalDataKey]: [
+                        ...(data[CacheOutputGoalDataKey] || []),
                         ...entries,
                     ],
                 };
@@ -271,8 +274,8 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
             const { goalEvent } = gi;
             const data = JSON.parse(goalEvent.data || "{}");
             const newData = {
-                "@atomist/sdm/input": [
-                    ...(data["@atomist/sdm/input"] || []),
+                [CacheInputGoalDataKey]: [
+                    ...(data[CacheInputGoalDataKey] || []),
                     ...classifiersToBeRestored.map(c => ({
                         classifier: c,
                     })),

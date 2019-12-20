@@ -27,12 +27,18 @@ import * as _ from "lodash";
 import {
     Container,
     ContainerRegistration,
+    ContainerRegistrationGoalDataKey,
 } from "../../goal/container/container";
 
 export interface KubernetesFulfillmentOptions {
     registration?: string | ((gi: GoalInvocation) => Promise<string>);
     name?: string | ((gi: GoalInvocation) => Promise<string>);
 }
+
+export const DefaultKubernetesFulfillmentOptions = {
+    registration: "@atomist/k8s-sdm",
+    name: "kubernetes-container-fulfill",
+};
 
 /**
  * GoalScheduler implementation that redirects goals to a registered k8s-sdm for
@@ -43,10 +49,7 @@ export interface KubernetesFulfillmentOptions {
  */
 export class KubernetesFulfillmentGoalScheduler implements GoalScheduler {
 
-    constructor(private readonly options: KubernetesFulfillmentOptions = {
-        registration: "@atomist/k8s-sdm",
-        name: "container-deploy",
-    }) {
+    constructor(private readonly options: KubernetesFulfillmentOptions = DefaultKubernetesFulfillmentOptions) {
     }
 
     public async schedule(gi: GoalInvocation): Promise<ExecuteGoalResult> {
@@ -82,7 +85,7 @@ export class KubernetesFulfillmentGoalScheduler implements GoalScheduler {
         const data: any = JSON.parse(goalEvent.data || "{}");
         const newData: any = {};
         delete registration.callback;
-        _.set<any>(newData, "@atomist/sdm/container", registration);
+        _.set<any>(newData, ContainerRegistrationGoalDataKey, registration);
 
         goalEvent.data = JSON.stringify(_.merge(data, newData));
 

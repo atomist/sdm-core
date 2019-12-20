@@ -56,7 +56,7 @@ describe("KubernetesFulfillmentGoalScheduler", () => {
             assert.deepStrictEqual(g.state, SdmGoalState.requested);
             assert.deepStrictEqual(ge.fulfillment, {
                 registration: "@atomist/k8s-sdm",
-                name: "container-deploy",
+                name: "kubernetes-container-fulfill",
                 method: SdmGoalFulfillmentMethod.Sdm,
             });
             assert(!!ge.data);
