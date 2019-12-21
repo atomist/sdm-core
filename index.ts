@@ -43,6 +43,7 @@ export {
     DockerContainerRegistration,
 } from "./lib/goal/container/docker";
 export {
+    K8sContainerFulfiller,
     K8sContainerRegistration,
     K8sContainerSpecCallback,
     K8sGoalContainerSpec,

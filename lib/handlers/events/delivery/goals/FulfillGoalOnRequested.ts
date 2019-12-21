@@ -52,6 +52,8 @@ import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessa
 import * as os from "os";
 import {
     CacheEntry,
+    CacheInputGoalDataKey,
+    CacheOutputGoalDataKey,
     cachePut,
     cacheRestore,
 } from "../../../../goal/cache/goalCaching";
@@ -168,14 +170,14 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
 
             // Prepare cache project listeners for parameters
             if (!!goalInvocation.parameters) {
-                if (!!goalInvocation.parameters["@atomist/sdm/input"]) {
-                    const input: Array<{ classifier: string }> = goalInvocation.parameters["@atomist/sdm/input"];
+                if (!!goalInvocation.parameters[CacheInputGoalDataKey]) {
+                    const input: Array<{ classifier: string }> = goalInvocation.parameters[CacheInputGoalDataKey];
                     if (!!input && input.length > 0) {
                         listeners.push(cacheRestore({ entries: input }));
                     }
                 }
-                if (!!goalInvocation.parameters["@atomist/sdm/output"]) {
-                    const output: CacheEntry[] = goalInvocation.parameters["@atomist/sdm/output"];
+                if (!!goalInvocation.parameters[CacheOutputGoalDataKey]) {
+                    const output: CacheEntry[] = goalInvocation.parameters[CacheOutputGoalDataKey];
                     if (!!output && output.length > 0) {
                         listeners.push(cachePut({ entries: output }));
                     }

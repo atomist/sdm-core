@@ -52,6 +52,8 @@ import {
     runningInK8s,
 } from "./util";
 
+export const ContainerRegistrationGoalDataKey = "@atomist/sdm/container";
+
 /**
  * Create and return a container goal with the provided container
  * specification.

@@ -18,13 +18,14 @@ import {
     GitCommandGitProject,
     GitProject,
     guid,
-    logger,
 } from "@atomist/automation-client";
 import { sleep } from "@atomist/automation-client/lib/internal/util/poll";
 import {
     ExecuteGoal,
     GoalProjectListenerEvent,
+    GoalProjectListenerRegistration,
     GoalScheduler,
+    GoalWithFulfillment,
     ImplementationRegistration,
     minimalClone,
     ProgressLog,
@@ -46,6 +47,7 @@ import {
     Merge,
 } from "ts-essentials";
 import { loadKubeConfig } from "../../pack/k8s/config";
+import { DefaultKubernetesFulfillmentOptions } from "../../pack/k8s/KubernetesFulfillmentGoalScheduler";
 import {
     k8sJobEnv,
     KubernetesGoalScheduler,
@@ -56,13 +58,18 @@ import {
     K8sServiceSpec,
 } from "../../pack/k8s/service";
 import { toArray } from "../../util/misc/array";
-import { cachePut } from "../cache/goalCaching";
+import {
+    CacheOutputGoalDataKey,
+    cachePut,
+    cacheRestore,
+} from "../cache/goalCaching";
 import {
     Container,
     ContainerInput,
     ContainerOutput,
     ContainerProjectHome,
     ContainerRegistration,
+    ContainerRegistrationGoalDataKey,
     ContainerScheduler,
     GoalContainer,
     GoalContainerVolume,
@@ -70,7 +77,6 @@ import {
 import { prepareSecrets } from "./provider";
 import {
     containerEnvVars,
-    loglog,
     prepareInputAndOutput,
     processResult,
 } from "./util";
@@ -175,10 +181,10 @@ export function k8sFulfillmentCallback(
         }
 
         // Preserve the container registration in the goal data before it gets munged with internals
-        let data: any = JSON.parse(goalEvent.data || "{}");
+        let data = parseGoalEventData(goalEvent);
         let newData: any = {};
         delete spec.callback;
-        _.set<any>(newData, "@atomist/sdm/container", spec);
+        _.set<any>(newData, ContainerRegistrationGoalDataKey, spec);
         goalEvent.data = JSON.stringify(_.merge(data, newData));
 
         if (spec.containers[0].workingDir === "") {
@@ -332,6 +338,46 @@ export function k8sFulfillmentCallback(
     };
 }
 
+/**
+ * Get container registration from goal event data, use
+ * [[k8sFulfillmentcallback]] to get a goal event schedulable by a
+ * [[KubernetesGoalScheduler]], then schedule the goal using that
+ * scheduler.
+ */
+export const scheduleK8sJob: ExecuteGoal = async gi => {
+    const { goalEvent } = gi;
+    const { uniqueName } = goalEvent;
+    const data = parseGoalEventData(goalEvent);
+    const containerReg: K8sContainerRegistration = data["@atomist/sdm/container"];
+    if (!containerReg) {
+        throw new Error(`Goal ${uniqueName} event data has no container spec: ${goalEvent.data}`);
+    }
+
+    const goalSchedulers: GoalScheduler[] = toArray(gi.configuration.sdm.goalScheduler) || [];
+    const k8sScheduler = goalSchedulers.find(gs => gs instanceof KubernetesGoalScheduler) as KubernetesGoalScheduler;
+    if (!k8sScheduler) {
+        throw new Error(`Failed to find KubernetesGoalScheduler in goal schedulers: ${stringify(goalSchedulers)}`);
+    }
+
+    // the k8sFulfillmentCallback may already have been called, so wipe it out
+    delete data[ServiceRegistrationGoalDataKey];
+    goalEvent.data = JSON.stringify(data);
+
+    try {
+        const schedulableGoalEvent = await k8sFulfillmentCallback(gi.goal as Container, containerReg)(goalEvent, gi);
+        const scheduleResult = await k8sScheduler.schedule({ ...gi, goalEvent: schedulableGoalEvent });
+        if (scheduleResult.code) {
+            return { ...scheduleResult, message: `Failed to schedule container goal ${uniqueName}: ${scheduleResult.message}` };
+        }
+        schedulableGoalEvent.state = SdmGoalState.in_process;
+        return schedulableGoalEvent;
+    } catch (e) {
+        const message = `Failed to schedule container goal ${uniqueName} as Kubernetes job: ${e.message}`;
+        gi.progressLog.write(message);
+        return { code: 1, message };
+    }
+};
+
 /** Container information useful the various functions. */
 interface K8sContainer {
     /** Kubernetes configuration to use when creating API clients */
@@ -359,11 +405,14 @@ export function executeK8sJob(): ExecuteGoal {
         const inputDir = process.env.ATOMIST_INPUT_DIR || ContainerInput;
         const outputDir = process.env.ATOMIST_OUTPUT_DIR || ContainerOutput;
 
-        const data = JSON.parse(goalEvent.data || "{}");
-        if (!data["@atomist/sdm/container"]) {
+        const data = parseGoalEventData(goalEvent);
+        if (!data[ContainerRegistrationGoalDataKey]) {
             throw new Error("Failed to read k8s ContainerRegistration from goal data");
         }
-        const registration: K8sContainerRegistration = data["@atomist/sdm/container"];
+        if (!data[ContainerRegistrationGoalDataKey]) {
+            throw new Error(`Goal ${gi.goal.uniqueName} has no Kubernetes container registration: ${gi.goalEvent.data}`);
+        }
+        const registration: K8sContainerRegistration = data[ContainerRegistrationGoalDataKey];
 
         if (process.env.ATOMIST_ISOLATED_GOAL_INIT === "true") {
             return configuration.sdm.projectLoader.doWithProject({
@@ -371,12 +420,12 @@ export function executeK8sJob(): ExecuteGoal {
                 readOnly: false,
                 cloneDir: projectDir,
                 cloneOptions: minimalClone(goalEvent.push, { detachHead: true }),
-            }, async () => {
+            }, async project => {
                 try {
                     await prepareInputAndOutput(inputDir, outputDir, gi);
                 } catch (e) {
                     const message = `Failed to prepare input and output for goal ${goalEvent.name}: ${e.message}`;
-                    loglog(message, logger.error, progressLog);
+                    progressLog.write(message);
                     return { code: 1, message };
                 }
                 const secrets = await prepareSecrets(
@@ -396,19 +445,19 @@ export function executeK8sJob(): ExecuteGoal {
         let containerName: string = _.get(registration, "containers[0].name");
         if (!containerName) {
             const msg = `Failed to get main container name from goal registration: ${stringify(registration)}`;
-            loglog(msg, logger.warn, progressLog);
+            progressLog.write(msg);
             let svcSpec: K8sServiceSpec;
             try {
                 svcSpec = _.get(data, `${ServiceRegistrationGoalDataKey}.${registration.name}.spec`);
             } catch (e) {
                 const message = `Failed to parse Kubernetes spec from goal data '${goalEvent.data}': ${e.message}`;
-                loglog(message, logger.error, progressLog);
+                progressLog.write(message);
                 return { code: 1, message };
             }
             containerName = _.get(svcSpec, "container[1].name");
             if (!containerName) {
                 const message = `Failed to get main container name from either goal registration or data: '${goalEvent.data}'`;
-                loglog(message, logger.error, progressLog);
+                progressLog.write(message);
                 return { code: 1, message };
             }
         }
@@ -420,7 +469,7 @@ export function executeK8sJob(): ExecuteGoal {
             kc = loadKubeConfig();
         } catch (e) {
             const message = `Failed to load Kubernetes configuration: ${e.message}`;
-            loglog(message, logger.error, progressLog);
+            progressLog.write(message);
             return { code: 1, message };
         }
 
@@ -435,7 +484,7 @@ export function executeK8sJob(): ExecuteGoal {
         try {
             await containerStarted(container);
         } catch (e) {
-            loglog(e.message, logger.error, progressLog);
+            progressLog.write(e.message);
             return { code: 1, message: e.message };
         }
 
@@ -444,10 +493,10 @@ export function executeK8sJob(): ExecuteGoal {
         const status = { code: 0, message: `Container '${containerName}' completed successfully` };
         try {
             const podStatus = await containerWatch(container);
-            loglog(`Container '${containerName}' exited: ${stringify(podStatus)}`, logger.debug, progressLog);
+            progressLog.write(`Container '${containerName}' exited: ${stringify(podStatus)}`);
         } catch (e) {
             const message = `Container '${containerName}' failed: ${e.message}`;
-            loglog(message, logger.error, progressLog);
+            progressLog.write(message);
             status.code++;
             status.message = message;
         } finally {
@@ -463,21 +512,25 @@ export function executeK8sJob(): ExecuteGoal {
                 outputResult = await processResult(await fs.readJson(outputFile), gi);
             } catch (e) {
                 const message = `Failed to read output from container: ${e.message}`;
-                loglog(message, logger.error, progressLog);
+                progressLog.write(message);
                 status.code++;
                 status.message += ` but f${message.slice(1)}`;
             }
         }
 
-        if (!!registration.output || !!(gi.parameters || {})["@atomist/sdm/output"]) {
+        const cacheEntriesToPut = [
+            ...(registration.output || []),
+            ...((gi.parameters || {})[CacheOutputGoalDataKey] || []),
+        ];
+        if (cacheEntriesToPut.length > 0) {
             try {
                 const project = GitCommandGitProject.fromBaseDir(id, projectDir, credentials, async () => {
                 });
-                const cp = cachePut({ entries: [...registration.output, ...((gi.parameters || {})["@atomist/sdm/output"] || [])] });
+                const cp = cachePut({ entries: cacheEntriesToPut });
                 await cp.listener(project, gi, GoalProjectListenerEvent.after);
             } catch (e) {
                 const message = `Failed to put cache output from container: ${e.message}`;
-                loglog(message, logger.error, progressLog);
+                progressLog.write(message);
                 status.code++;
                 status.message += ` but f${message.slice(1)}`;
             }
@@ -486,6 +539,72 @@ export function executeK8sJob(): ExecuteGoal {
         return outputResult || status;
     };
 }
+
+/**
+ * Read and parse container goal registration from goal event data.
+ */
+function parseGoalEventData(goalEvent: SdmGoalEvent): any {
+    const goalName = goalEvent.uniqueName;
+    if (!goalEvent || !goalEvent.data) {
+        return {};
+    }
+    let data: any;
+    try {
+        data = JSON.parse(goalEvent.data);
+    } catch (e) {
+        e.message = `Failed to parse goal event data for ${goalName} as JSON '${goalEvent.data}': ${e.message}`;
+        throw e;
+    }
+    return data;
+}
+
+/**
+ * If running as isolated goal, use [[executeK8sJob]] to execute the
+ * goal.  Otherwise, schedule the goal execution as a Kubernetes job
+ * using [[scheduleK8sjob]].
+ */
+const containerExecutor: ExecuteGoal = gi => (process.env.ATOMIST_ISOLATED_GOAL) ? executeK8sJob()(gi) : scheduleK8sJob(gi);
+
+/**
+ * Restore cache input entries before fulfilling goal.
+ */
+const containerFulfillerCacheRestore: GoalProjectListenerRegistration = {
+    name: "ContainerFulfillerCacheRestore",
+    events: [GoalProjectListenerEvent.before],
+    listener: async (project, gi, event) => {
+        const data = parseGoalEventData(gi.goalEvent);
+        if (!data[ContainerRegistrationGoalDataKey]) {
+            throw new Error(`Goal ${gi.goal.uniqueName} has no Kubernetes container registration: ${gi.goalEvent.data}`);
+        }
+        const registration: K8sContainerRegistration = data[ContainerRegistrationGoalDataKey];
+        if (registration.input && registration.input.length > 0) {
+            try {
+                const cp = cacheRestore({ entries: registration.input });
+                return cp.listener(project, gi, GoalProjectListenerEvent.before);
+            } catch (e) {
+                const message = `Failed to restore cache input to container for goal ${gi.goal.uniqueName}: ${e.message}`;
+                gi.progressLog.write(message);
+                return { code: 1, message };
+            }
+        } else {
+            return { code: 0, message: "No container input cache entries to restore" };
+        }
+    },
+};
+
+/**
+ * Goal that fulfills requested container goals by scheduling them as
+ * Kubernetes jobs.
+ */
+export const K8sContainerFulfiller = new GoalWithFulfillment({
+    displayName: "Kubernetes Container Goal Fulfiller",
+    uniqueName: DefaultKubernetesFulfillmentOptions.name,
+})
+    .with({
+        goalExecutor: containerExecutor,
+        name: `${DefaultKubernetesFulfillmentOptions.name}-executor`,
+    })
+    .withProjectListener(containerFulfillerCacheRestore);
 
 /**
  * Wait for container in pod to start, return when it does.
@@ -499,7 +618,7 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
         core = container.config.makeApiClient(k8s.CoreV1Api);
     } catch (e) {
         e.message = `Failed to create Kubernetes core API client: ${e.message}`;
-        loglog(e.message, logger.error, container.log);
+        container.log.write(e.message);
         throw e;
     }
 
@@ -516,7 +635,7 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
     }
 
     const errMsg = `Container '${container.name}' failed to start within ${attempts * sleepTime} ms`;
-    loglog(errMsg, logger.error, container.log);
+    container.log.write(errMsg);
     throw new Error(errMsg);
 }
 
@@ -536,7 +655,7 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
             watch = new k8s.Watch(container.config);
         } catch (e) {
             e.message = `Failed to create Kubernetes watch client: ${e.message}`;
-            loglog(e.message, logger.error, container.log);
+            container.log.write(e.message);
             reject(e);
         }
         const watchPath = `/api/v1/watch/namespaces/${container.ns}/pods/${container.pod}`;
@@ -553,7 +672,7 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
                         resolve(pod.status);
                     } else {
                         const msg = `Container '${container.name}' exited with status ${exitCode}`;
-                        loglog(msg, logger.error, container.log);
+                        container.log.write(msg);
                         const err = new Error(msg);
                         (err as any).podStatus = pod.status;
                         reject(err);
@@ -567,7 +686,7 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
             container.log.write(`Container '${container.name}' still running`);
         }, err => {
             err.message = `Container watcher failed: ${err.message}`;
-            loglog(err.message, logger.error, container.log);
+            container.log.write(err.message);
             reject(err);
         });
     });
@@ -587,9 +706,9 @@ function followK8sLog(container: K8sContainer): request.Request {
     const doneCallback = e => {
         if (e) {
             if (e.message) {
-                loglog(e.message, logger.error, container.log);
+                container.log.write(e.message);
             } else {
-                loglog(stringify(e), logger.error, container.log);
+                container.log.write(stringify(e));
             }
         }
     };
