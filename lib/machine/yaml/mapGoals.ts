@@ -43,6 +43,7 @@ import {
     cacheRestore,
 } from "../../goal/cache/goalCaching";
 import { item } from "../../goal/common/item";
+import { action } from "../../goal/container/action";
 import {
     container,
     Container,
@@ -234,6 +235,24 @@ const MapFulfillment: MapGoal = async (goals: any) => {
     return undefined;
 };
 
+const MapAction: MapGoal = async (goals: any) => {
+
+    if (!!goals.action) {
+
+        return action({
+            name: goals.name,
+            image: goals.action,
+            input: goals.input,
+            output: goals.output,
+            parameters: goals.parameters,
+            secrets: goals.secrets,
+        });
+
+    }
+
+    return undefined;
+};
+
 const MapGoals = [
     MapContainer,
     MapExecute,
@@ -245,6 +264,7 @@ const MapGoals = [
     MapGoalMakers,
     MapReferenced,
     MapFulfillment,
+    MapAction,
 ];
 
 export async function mapGoals(sdm: SoftwareDeliveryMachine,
