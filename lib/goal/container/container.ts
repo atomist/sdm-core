@@ -34,11 +34,6 @@ import {
     KubernetesFulfillmentGoalScheduler,
     KubernetesFulfillmentOptions,
 } from "../../pack/k8s/KubernetesFulfillmentGoalScheduler";
-import {
-    isConfiguredInEnv,
-    KubernetesGoalScheduler,
-} from "../../pack/k8s/KubernetesGoalScheduler";
-import { KubernetesJobDeletingGoalCompletionListenerFactory } from "../../pack/k8s/KubernetesJobDeletingGoalCompletionListener";
 import { toArray } from "../../util/misc/array";
 import {
     CacheEntry,
@@ -46,7 +41,6 @@ import {
     cacheRestore,
 } from "../cache/goalCaching";
 import { dockerContainerScheduler } from "./docker";
-import { k8sContainerScheduler } from "./k8s";
 import {
     runningAsGoogleCloudFunction,
     runningInK8s,
@@ -274,11 +268,14 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
 
         const goalSchedulers = toArray(sdm.configuration.sdm.goalScheduler) || [];
         if (runningInK8s()) {
+            // load lazily to prevent early and unwanted initialization of expensive K8s api
+            const kgs = require("../../pack/k8s/KubernetesGoalScheduler");
             // Make sure that the KubernetesGoalScheduler gets added if needed
-            if (!goalSchedulers.some(gs => gs instanceof KubernetesGoalScheduler)) {
-                if (!process.env.ATOMIST_ISOLATED_GOAL && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
-                    sdm.configuration.sdm.goalScheduler = [...goalSchedulers, new KubernetesGoalScheduler()];
-                    sdm.addGoalCompletionListener(new KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
+            if (!goalSchedulers.some(gs => gs instanceof kgs.KubernetesGoalScheduler)) {
+                if (!process.env.ATOMIST_ISOLATED_GOAL && kgs.isConfiguredInEnv("kubernetes", "kubernetes-all")) {
+                    sdm.configuration.sdm.goalScheduler = [...goalSchedulers, new kgs.KubernetesGoalScheduler()];
+                    const kjdgcl = require("../../pack/k8s/KubernetesJobDeletingGoalCompletionListener");
+                    sdm.addGoalCompletionListener(new kjdgcl.KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
                 }
             }
         } else if (runningAsGoogleCloudFunction()) {
@@ -298,6 +295,7 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
         registration.name = (registration.name || `container-${this.definition.displayName}`).replace(/\.+/g, "-");
         if (!this.details.scheduler) {
             if (runningInK8s() || runningAsGoogleCloudFunction()) {
+                const k8sContainerScheduler = require("./k8s").k8sContainerScheduler;
                 this.details.scheduler = k8sContainerScheduler;
             } else {
                 this.details.scheduler = dockerContainerScheduler;

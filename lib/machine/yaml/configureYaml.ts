@@ -21,7 +21,6 @@ import {
 import { deepMergeConfigs } from "@atomist/automation-client/lib/configuration";
 import {
     CommandHandlerRegistration,
-    CommandListener,
     EventHandlerRegistration,
     ExtensionPack,
     PushTest,
@@ -70,12 +69,14 @@ export interface YamlSoftwareDeliveryMachineConfiguration {
     };
 }
 
+export type YamlCommandHandlerRegistration =
+    Omit<CommandHandlerRegistration, "name" | "paramsMaker">;
 export type CommandMaker<PARAMS = NoParameters> =
-    (sdm: SoftwareDeliveryMachine) => Promise<CommandListener> | CommandListener;
-export type EventHandler<PARAMS = NoParameters> =
+    (sdm: SoftwareDeliveryMachine) => Promise<YamlCommandHandlerRegistration> | YamlCommandHandlerRegistration;
+export type YamlEventHandler<PARAMS = NoParameters> =
     Omit<EventHandlerRegistration<PARAMS>, "name">;
 export type EventMaker<PARAMS = NoParameters> =
-    (sdm: SoftwareDeliveryMachine) => Promise<EventHandler<PARAMS>> | EventHandler<PARAMS>;
+    (sdm: SoftwareDeliveryMachine) => Promise<YamlEventHandler<PARAMS>> | YamlEventHandler<PARAMS>;
 
 export type ConfigurationMaker = (cfg: Configuration) =>
     Promise<SoftwareDeliveryMachineConfiguration<YamlSoftwareDeliveryMachineConfiguration>> |
@@ -141,7 +142,7 @@ async function createExtensions(cwd: string,
             let registration: CommandHandlerRegistration;
             try {
                 const makerResult = await c(sdm);
-                registration = { name: k, listener: makerResult };
+                registration = { name: k, ...makerResult };
             } catch (e) {
                 e.message = `Failed to make command using CommandMaker ${k}: ${e.message}`;
                 throw e;
