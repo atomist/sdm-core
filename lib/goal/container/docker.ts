@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { minimalClone } from "@atomist/sdm/lib/api-helper/goal/minimalClone";
 import {
-    guid,
-    logger,
-} from "@atomist/automation-client";
-import {
-    ExecuteGoal,
-    ImplementationRegistration,
-    minimalClone,
     spawnLog,
     SpawnLogOptions,
     SpawnLogResult,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/child_process";
+import { ExecuteGoal } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { ImplementationRegistration } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";

@@ -15,24 +15,28 @@
  */
 
 import {
-    GitHubRepoRef,
-    HandlerContext,
     MappedParameter,
     MappedParameters,
-    OnCommand,
     Parameter,
     Parameters,
     Secret,
     Secrets,
+} from "@atomist/automation-client/lib/decorators";
+import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
     success,
     Success,
-} from "@atomist/automation-client";
-import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
-import { commandHandlerFrom } from "@atomist/automation-client/lib/onCommand";
+} from "@atomist/automation-client/lib/HandlerResult";
+import {
+    commandHandlerFrom,
+    OnCommand,
+} from "@atomist/automation-client/lib/onCommand";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {
     chooseAndSetGoals,
     ChooseAndSetGoalsRules,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
 import {
     fetchBranchTips,
     fetchPushForCommit,

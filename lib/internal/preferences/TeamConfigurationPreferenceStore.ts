@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
 import {
-    HandlerContext,
     MutationNoCacheOptions,
     QueryNoCacheOptions,
-} from "@atomist/automation-client";
-import { PreferenceStoreFactory } from "@atomist/sdm";
+} from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
 import {
     DeleteTeamConfiguration,
     SetTeamConfiguration,

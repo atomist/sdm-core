@@ -15,17 +15,15 @@
  */
 
 import {
-    buttonForCommand,
     failure,
-    guid,
-    RepoRef,
     Success,
-} from "@atomist/automation-client";
-import {
-    CommandHandlerRegistration,
-    CommandListener,
-    isDeployEnabled,
-} from "@atomist/sdm";
+} from "@atomist/automation-client/lib/HandlerResult";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { RepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { buttonForCommand } from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { CommandListener } from "@atomist/sdm/lib/api/listener/CommandListener";
+import { isDeployEnabled } from "@atomist/sdm/lib/api/mapping/support/deployPushTests";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     bold,
     SlackMessage,

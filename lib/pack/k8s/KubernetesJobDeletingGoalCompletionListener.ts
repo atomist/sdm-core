@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import {
-    cancelableGoal,
-    GoalCompletionListener,
-    SdmGoalState,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { cancelableGoal } from "@atomist/sdm/lib/api-helper/listener/cancelGoals";
+import { GoalCompletionListener } from "@atomist/sdm/lib/api/listener/GoalCompletionListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import * as _ from "lodash";
+import { SdmGoalState } from "../../typings/types";
 import {
     deleteJob,
     deletePods,

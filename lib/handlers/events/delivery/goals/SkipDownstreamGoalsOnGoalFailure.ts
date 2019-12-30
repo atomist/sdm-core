@@ -15,35 +15,39 @@
  */
 
 import {
-    automationClientInstance,
-    EventFired,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    logger,
-    Success,
+    EventHandler,
     Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/decorators";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
 import {
-    fetchGoalsFromPush,
-    mapKeyToGoal,
-    SdmGoalEvent,
-    SdmGoalState,
-    SoftwareDeliveryMachineConfiguration,
-    updateGoal,
-} from "@atomist/sdm";
+    EventFired,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { fetchGoalsFromPush } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { mapKeyToGoal } from "@atomist/sdm/lib/api-helper/goal/sdmGoal";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import { SdmGoalKey } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
-import { OnAnyFailedSdmGoal } from "../../../../typings/types";
+import {
+    OnAnyFailedSdmGoal,
+    SdmGoalState,
+} from "../../../../typings/types";
 
 /**
  * Skip downstream goals on failed or stopped goal
  */
 @EventHandler("Skip downstream goals on failed, stopped or canceled goal",
-    () => GraphQL.subscription({
+    () => subscription({
         name: "OnAnyFailedSdmGoal",
         variables: { registration: () => [automationClientInstance()?.configuration?.name] },
     }))

@@ -17,16 +17,15 @@
 import {
     GraphClient,
     MutationOptions,
-} from "@atomist/automation-client";
-import {
-    GoalSigningConfiguration,
-    GoalSigningScope,
-    SdmGoalState,
-} from "@atomist/sdm";
+} from "@atomist/automation-client/lib/spi/graph/GraphClient";
 import {
     SdmGoalFulfillmentMethod,
     SdmGoalMessage,
 } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import {
+    GoalSigningConfiguration,
+    GoalSigningScope,
+} from "@atomist/sdm/lib/api/machine/SigningKeys";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as path from "path";
@@ -35,6 +34,7 @@ import {
     signGoal,
     verifyGoal,
 } from "../../../lib/internal/signing/goalSigning";
+import { SdmGoalState } from "../../../lib/typings/types";
 
 describe("goalSigning", () => {
 

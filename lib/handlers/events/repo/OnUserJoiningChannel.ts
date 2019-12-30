@@ -14,31 +14,35 @@
  * limitations under the License.
  */
 
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import {
-    Configuration,
+    EventHandler,
+    Value,
+} from "@atomist/automation-client/lib/decorators";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
+import {
     EventFired,
-    GraphQL,
-    HandlerContext,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
     HandlerResult,
     Success,
-    Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/HandlerResult";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
 import {
-    CredentialsResolver,
-    PreferenceStoreFactory,
-    RepoRefResolver,
-    resolveCredentialsPromise,
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/listener/UserJoiningChannelListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as schema from "../../../typings/types";
 
 /**
  * A user joined a channel
  */
-@EventHandler("On user joining channel", GraphQL.subscription("OnUserJoiningChannel"))
+@EventHandler("On user joining channel", subscription("OnUserJoiningChannel"))
 export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningChannel.Subscription> {
 
     @Value("")

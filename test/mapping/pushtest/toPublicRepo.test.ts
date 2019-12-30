@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { GitHubRepoRef } from "@atomist/automation-client";
-
-import { PushListenerInvocation } from "@atomist/sdm";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
 import * as assert from "power-assert";
 import { ToPublicRepo } from "../../../lib/mapping/pushtest/toPublicRepo";
 

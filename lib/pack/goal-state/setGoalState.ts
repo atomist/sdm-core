@@ -15,30 +15,31 @@
  */
 
 import {
-    buttonForCommand,
-    GitHubRepoRef,
-    guid,
-    Maker,
     MappedParameter,
     MappedParameters,
-    menuForCommand,
     Parameter,
     Parameters,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/decorators";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {
-    CommandHandlerRegistration,
-    fetchGoalsForCommit,
-    GitHubRepoTargets,
-    RepoTargetingParameters,
-    RepoTargets,
-    SdmGoalState,
+    buttonForCommand,
+    menuForCommand,
+} from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
+import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { toRepoTargetingParametersMaker } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { RepoTargetingParameters } from "@atomist/sdm/lib/api-helper/machine/RepoTargetingParameters";
+import {
     slackFooter,
     slackSuccessMessage,
     slackWarningMessage,
-    SoftwareDeliveryMachine,
-    toRepoTargetingParametersMaker,
-    updateGoal,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import { GitHubRepoTargets } from "@atomist/sdm/lib/api/command/target/GitHubRepoTargets";
+import { RepoTargets } from "@atomist/sdm/lib/api/machine/RepoTargets";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     bold,
     codeLine,
@@ -46,6 +47,7 @@ import {
     SlackMessage,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
+import { SdmGoalState } from "../../typings/types";
 import {
     fetchBranchTips,
     tipOfBranch,

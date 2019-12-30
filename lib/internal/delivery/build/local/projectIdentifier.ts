@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Project } from "@atomist/automation-client";
+import { Project } from "@atomist/automation-client/lib/project/Project";
 
 export interface ProjectIdentification {
     name: string;

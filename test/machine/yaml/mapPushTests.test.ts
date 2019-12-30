@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    GitCommandGitProject,
-    GitHubRepoRef,
-    InMemoryProject,
-} from "@atomist/automation-client";
-import { pushTest } from "@atomist/sdm";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { pushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import * as assert from "power-assert";
 import {
     mapTests,

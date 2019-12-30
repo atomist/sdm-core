@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    ExtensionPack,
-    metadata,
-} from "@atomist/sdm";
+import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
 import { executeTask } from "./executeTask";
 
 /**

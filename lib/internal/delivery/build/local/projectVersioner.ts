@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { Success } from "@atomist/automation-client/lib/HandlerResult";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import {
-    GitProject,
-    HandlerContext,
     MutationNoCacheOptions,
     QueryNoCacheOptions,
-    Success,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoal,
-    ExecuteGoalResult,
     GoalInvocation,
-    ProgressLog,
-    SdmGoalEvent,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import { codeLine } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {

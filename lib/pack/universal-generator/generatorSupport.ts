@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { Project } from "@atomist/automation-client";
-import {
-    CodeTransform,
-    ExtensionPack,
-    GeneratorRegistration,
-    metadata,
-    ParametersObject,
-} from "@atomist/sdm";
+import { Project } from "@atomist/automation-client/lib/project/Project";
+import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
+import { CodeTransform } from "@atomist/sdm/lib/api/registration/CodeTransform";
+import { GeneratorRegistration } from "@atomist/sdm/lib/api/registration/GeneratorRegistration";
+import { ParametersObject } from "@atomist/sdm/lib/api/registration/ParametersDefinition";
 import { toArray } from "../../util/misc/array";
 import { universalGenerator } from "./generator";
 

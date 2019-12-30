@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-import {
-    guid,
-    HandlerContext,
-    Maker,
-    MessageClient,
-    Project,
-    ProjectOperationCredentials,
-    RepoId,
-} from "@atomist/automation-client";
 import { successOn } from "@atomist/automation-client/lib/action/ActionResult";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { RepoId } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { Project } from "@atomist/automation-client/lib/project/Project";
 import { BuildableAutomationServer } from "@atomist/automation-client/lib/server/BuildableAutomationServer";
-import {
-    AbstractSoftwareDeliveryMachine,
-    GeneratorRegistration,
-    generatorRegistrationToCommand,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+import { MessageClient } from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
+import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/lib/api-helper/machine/AbstractSoftwareDeliveryMachine";
+import { generatorRegistrationToCommand } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { GeneratorRegistration } from "@atomist/sdm/lib/api/registration/GeneratorRegistration";
 import * as assert from "assert";
 import * as flatten from "flat";
 import * as _ from "lodash";

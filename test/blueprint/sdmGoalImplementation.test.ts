@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { Success } from "@atomist/automation-client/lib/HandlerResult";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { determineGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { SingleProjectLoader } from "@atomist/sdm/lib/api-helper/testsupport/SingleProjectLoader";
+import { NoPreferenceStore } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
+import { Autofix } from "@atomist/sdm/lib/api/goal/common/Autofix";
+import { Goals } from "@atomist/sdm/lib/api/goal/Goals";
+import { GoalWithFulfillment } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { resetRegistrableManager } from "@atomist/sdm/lib/api/machine/Registerable";
 import {
-    GitHubRepoRef,
-    guid,
-    HandlerContext,
-    InMemoryProject,
-    ProjectOperationCredentials,
-    Success,
-} from "@atomist/automation-client";
-import {
-    AnyPush,
-    Autofix,
-    determineGoals,
-    Goals,
-    GoalWithFulfillment,
-    NoPreferenceStore,
-    PushFields,
-    resetRegistrableManager,
-    SdmGoalEvent,
-    SingleProjectLoader,
     SoftwareDeliveryMachineConfiguration,
     SoftwareDeliveryMachineOptions,
-    whenPushSatisfies,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as assert from "power-assert";
 import { DefaultRepoRefResolver } from "../../lib/handlers/common/DefaultRepoRefResolver";
 import { createSoftwareDeliveryMachine } from "../../lib/machine/machineFactory";
+import { PushFields } from "../../lib/typings/types";
 
 const favoriteRepoRef = GitHubRepoRef.from({
     owner: "jess",

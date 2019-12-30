@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { HandlerContext } from "@atomist/automation-client";
-import { SdmGoalEvent } from "@atomist/sdm";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as assert from "power-assert";
 import { DashboardDisplayProgressLog } from "../../lib/log/DashboardDisplayProgressLog";
 

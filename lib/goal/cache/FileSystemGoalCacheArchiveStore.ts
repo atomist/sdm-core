@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import {
-    CacheConfiguration,
-    GoalInvocation,
-    spawnLog,
-} from "@atomist/sdm";
+import { spawnLog } from "@atomist/sdm/lib/api-helper/misc/child_process";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { CacheConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";

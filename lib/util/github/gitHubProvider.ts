@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { HandlerContext } from "@atomist/automation-client";
-import { ScmProvider } from "@atomist/sdm";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { ScmProvider } from "../../typings/types";
 
 export const GitHubDotComProviderId = "zjlmxjzwhurspem";
 

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-import {
-    automationClientInstance,
-    GraphQL,
-    HandlerContext,
-    logger,
-    OnEvent,
-    Success,
-} from "@atomist/automation-client";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { Success } from "@atomist/automation-client/lib/HandlerResult";
+import { OnEvent } from "@atomist/automation-client/lib/onEvent";
+import { logger } from "@atomist/automation-client/lib/util/logger";
 import { redact } from "@atomist/automation-client/lib/util/redact";
 import {
-    EventHandlerRegistration,
     JobTask,
     JobTaskType,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/job/createJob";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { EventHandlerRegistration } from "@atomist/sdm/lib/api/registration/EventHandlerRegistration";
 import {
     AtmJobTaskState,
     OnAnyJobTask,
@@ -46,7 +44,7 @@ export function executeTask(sdm: SoftwareDeliveryMachine): EventHandlerRegistrat
     return {
         name: "ExecuteTask",
         description: "Execute a job task",
-        subscription: GraphQL.subscription({
+        subscription: subscription({
             name: "OnAnyJobTask",
             variables: {
                 registration: sdm.configuration.name,

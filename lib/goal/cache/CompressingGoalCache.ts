@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-import {
-    GitProject,
-    guid,
-    logger,
-} from "@atomist/automation-client";
 import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
-import {
-    GoalInvocation,
-    spawnLog,
-} from "@atomist/sdm";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { spawnLog } from "@atomist/sdm/lib/api-helper/misc/child_process";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";

@@ -15,27 +15,29 @@
  */
 
 import {
-    GitHubRepoRef,
-    Maker,
     MappedParameter,
     MappedParameters,
     Parameters,
-    Success,
     Value,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/decorators";
+import { Success } from "@atomist/automation-client/lib/HandlerResult";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
+import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { toRepoTargetingParametersMaker } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { RepoTargetingParameters } from "@atomist/sdm/lib/api-helper/machine/RepoTargetingParameters";
 import {
-    chooseAndSetGoals,
-    CommandHandlerRegistration,
-    CommandListener,
-    CommandListenerInvocation,
-    GitHubRepoTargets,
-    RepoTargetingParameters,
-    RepoTargets,
     slackSuccessMessage,
     slackWarningMessage,
-    SoftwareDeliveryMachine,
-    toRepoTargetingParametersMaker,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import { GitHubRepoTargets } from "@atomist/sdm/lib/api/command/target/GitHubRepoTargets";
+import {
+    CommandListener,
+    CommandListenerInvocation,
+} from "@atomist/sdm/lib/api/listener/CommandListener";
+import { RepoTargets } from "@atomist/sdm/lib/api/machine/RepoTargets";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     bold,
     codeLine,

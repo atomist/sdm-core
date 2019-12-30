@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { AnyOptions } from "@atomist/automation-client";
-import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm";
+import { AnyOptions } from "@atomist/automation-client/lib/configuration";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 
 /**
  * Configuration determining how to run in local mode

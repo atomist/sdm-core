@@ -17,23 +17,23 @@
 import {
     Configuration,
     ConfigurationPostProcessor,
-    logger,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/configuration";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { SdmContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { GoalContribution } from "@atomist/sdm/lib/api/dsl/goalContribution";
+import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
 import {
-    allSatisfied,
-    AnyPush,
-    Goal,
-    GoalContribution,
-    goals,
     Goals,
-    GoalWithFulfillment,
-    notGoalTest,
-    PushListenerInvocation,
-    PushTest,
-    SdmContext,
-    SoftwareDeliveryMachine,
-    whenPushSatisfies,
-} from "@atomist/sdm";
+    goals,
+} from "@atomist/sdm/lib/api/goal/Goals";
+import { GoalWithFulfillment } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { notGoalTest } from "@atomist/sdm/lib/api/mapping/goalTest";
+import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
+import { allSatisfied } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
 import * as _ from "lodash";
 import {
     ConfigureOptions,

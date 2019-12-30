@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
+import { RepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { File } from "@atomist/automation-client/lib/project/File";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { Project } from "@atomist/automation-client/lib/project/Project";
+import { LoggingProgressLog } from "@atomist/sdm/lib/api-helper/log/LoggingProgressLog";
+import { fakeGoalInvocation } from "@atomist/sdm/lib/api-helper/testsupport/fakeGoalInvocation";
+import { fakePush } from "@atomist/sdm/lib/api-helper/testsupport/fakePush";
 import {
-    GitProject,
-    InMemoryProject,
-    Project,
-    ProjectFile,
-    RepoRef,
-} from "@atomist/automation-client";
-import {
-    AnyPush,
-    fakeGoalInvocation,
-    fakePush,
     GoalInvocation,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
-    LoggingProgressLog,
-    pushTest,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { pushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as assert from "power-assert";
 import {
     cachePut,
@@ -42,7 +40,7 @@ import {
 
 class TestGoalArtifactCache implements GoalCache {
     private id: RepoRef;
-    private cacheFiles: ProjectFile[];
+    private cacheFiles: File[];
     private classifier: string;
 
     public async put(gi: GoalInvocation, project: Project, files: string[], classifier: string = "default"): Promise<void> {

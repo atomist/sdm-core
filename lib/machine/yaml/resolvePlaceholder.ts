@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import {
-    RepoContext,
-    SdmGoalEvent,
-} from "@atomist/sdm";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as _ from "lodash";
 import * as os from "os";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";

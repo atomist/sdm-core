@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PushTest } from "@atomist/sdm";
+import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 
 /**
  * Is this SDM in local mode?

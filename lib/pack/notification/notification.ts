@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import {
     addressSlackUsers,
-    guid,
+    Destination,
     MessageOptions,
-} from "@atomist/automation-client";
-import { Destination } from "@atomist/automation-client/lib/spi/message/MessageClient";
+} from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
 import {
-    actionableButton,
-    CommandHandlerRegistration,
-    ExtensionPack,
-    GoalCompletionListener,
-    GoalCompletionListenerInvocation,
-    metadata,
-    SdmContext,
-    SdmGoalEvent,
-    SdmGoalState,
     slackErrorMessage,
     slackFooter,
     slackInfoMessage,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import { actionableButton } from "@atomist/sdm/lib/api/command/support/buttons";
+import { SdmContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import {
+    GoalCompletionListener,
+    GoalCompletionListenerInvocation,
+} from "@atomist/sdm/lib/api/listener/GoalCompletionListener";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     bold,
     channel,
@@ -44,7 +45,10 @@ import {
     url,
 } from "@atomist/slack-messages";
 import * as _ from "lodash";
-import { CoreRepoFieldsAndChannels } from "../../typings/types";
+import {
+    CoreRepoFieldsAndChannels,
+    SdmGoalState,
+} from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import { updateGoalStateCommand } from "../goal-state/updateGoal";
 

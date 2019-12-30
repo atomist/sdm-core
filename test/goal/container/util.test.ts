@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    SdmContext,
-    SdmGoalEvent,
-} from "@atomist/sdm";
+import { SdmContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as assert from "power-assert";
 import {
     ContainerInput,

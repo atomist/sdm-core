@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    GitProject,
-    logger,
-    Project,
-} from "@atomist/automation-client";
-import { GoalInvocation } from "@atomist/sdm";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { Project } from "@atomist/automation-client/lib/project/Project";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import { GoalCache } from "./goalCaching";
 
 /**

@@ -14,42 +14,52 @@
  * limitations under the License.
  */
 
-import {
-    AutomationClient,
-    AutomationContextAware,
-    AutomationEventListener,
-    AutomationEventListenerSupport,
-    CommandIncoming,
-    Configuration,
-    Destination,
-    EventIncoming,
-    GraphClient,
-    GraphClientFactory,
-    guid,
-    HandlerContext,
-    logger,
-    Maker,
-    MessageClient,
-    MessageOptions,
-    QueryNoCacheOptions,
-    safeExit,
-    Secrets,
-} from "@atomist/automation-client";
+import { AutomationClient } from "@atomist/automation-client/lib/automationClient";
+import { Configuration } from "@atomist/automation-client/lib/configuration";
+import { Secrets } from "@atomist/automation-client/lib/decorators";
 import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+import {
+    AutomationContextAware,
+    HandlerContext,
+} from "@atomist/automation-client/lib/HandlerContext";
 import {
     isCommandHandlerMetadata,
     isEventHandlerMetadata,
 } from "@atomist/automation-client/lib/internal/metadata/metadata";
 import { metadataFromInstance } from "@atomist/automation-client/lib/internal/metadata/metadataReading";
 import { AbstractRequestProcessor } from "@atomist/automation-client/lib/internal/transport/AbstractRequestProcessor";
-import { workspaceId } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import {
+    CommandIncoming,
+    EventIncoming,
+    workspaceId,
+} from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import { safeExit } from "@atomist/automation-client/lib/internal/util/shutdown";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import { AutomationMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
+import {
+    AutomationEventListener,
+    AutomationEventListenerSupport,
+} from "@atomist/automation-client/lib/server/AutomationEventListener";
 import { AutomationServer } from "@atomist/automation-client/lib/server/AutomationServer";
 import { AutomationMetadataProcessor } from "@atomist/automation-client/lib/spi/env/MetadataProcessor";
-import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import {
+    GraphClient,
+    QueryNoCacheOptions,
+} from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { GraphClientFactory } from "@atomist/automation-client/lib/spi/graph/GraphClientFactory";
+import {
+    Destination,
+    MessageClient,
+    MessageOptions,
+} from "@atomist/automation-client/lib/spi/message/MessageClient";
+import {
+    Maker,
+    toFactory,
+} from "@atomist/automation-client/lib/util/constructionUtils";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { SdmGoalsByGoalSetIdAndUniqueName } from "../../../../typings/types";

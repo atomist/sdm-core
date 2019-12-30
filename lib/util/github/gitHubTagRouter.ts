@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
+import { successOn } from "@atomist/automation-client/lib/action/ActionResult";
+import { configurationValue } from "@atomist/automation-client/lib/configuration";
 import {
-    configurationValue,
-    defaultHttpClientFactory,
     GitHubRepoRef,
+    isGitHubRepoRef,
+} from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { TagRouter } from "@atomist/automation-client/lib/operations/tagger/Tagger";
+import {
+    defaultHttpClientFactory,
     HttpClientFactory,
     HttpMethod,
-    logger,
-} from "@atomist/automation-client";
-import { successOn } from "@atomist/automation-client/lib/action/ActionResult";
-import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { TagRouter } from "@atomist/automation-client/lib/operations/tagger/Tagger";
-import { toToken } from "@atomist/sdm";
+} from "@atomist/automation-client/lib/spi/http/httpClient";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { toToken } from "@atomist/sdm/lib/api-helper/misc/credentials/toToken";
 import * as _ from "lodash";
 import { authHeaders } from "./ghub";
 

@@ -17,7 +17,7 @@
 import {
     PreferenceScope,
     PreferenceStore,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/context/preferenceStore";
 import * as assert from "power-assert";
 
 function sleep(ms: number): Promise<void> {

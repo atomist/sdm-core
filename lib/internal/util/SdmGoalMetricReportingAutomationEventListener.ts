@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-import {
-    AutomationClient,
-    AutomationEventListenerSupport,
-    EventIncoming,
-} from "@atomist/automation-client";
+import { AutomationClient } from "@atomist/automation-client/lib/automationClient";
+import { EventIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import { AutomationEventListenerSupport } from "@atomist/automation-client/lib/server/AutomationEventListener";
 import {
     defaultStatsDClientOptions,
     StatsDClient,
 } from "@atomist/automation-client/lib/spi/statsd/statsdClient";
-import { SdmGoalEvent } from "@atomist/sdm";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { shouldHandle } from "../delivery/goals/support/validateGoal";
