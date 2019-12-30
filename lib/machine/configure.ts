@@ -24,8 +24,8 @@ import { GoalContribution } from "@atomist/sdm/lib/api/dsl/goalContribution";
 import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
 import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
 import {
-    Goals,
     goals,
+    Goals,
 } from "@atomist/sdm/lib/api/goal/Goals";
 import { GoalWithFulfillment } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
