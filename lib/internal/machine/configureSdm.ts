@@ -17,15 +17,15 @@
 import {
     Configuration,
     ConfigurationPostProcessor,
-    guid,
-    logger,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/configuration";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { logger } from "@atomist/automation-client/lib/util/logger";
 import {
     ConfigurationValues,
-    SoftwareDeliveryMachine,
-    SoftwareDeliveryMachineConfiguration,
     validateConfigurationValues,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/machine/ConfigurationValues";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import * as _ from "lodash";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import {

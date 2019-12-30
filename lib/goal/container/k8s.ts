@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-import {
-    GitCommandGitProject,
-    GitProject,
-    guid,
-} from "@atomist/automation-client";
 import { sleep } from "@atomist/automation-client/lib/internal/util/poll";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { minimalClone } from "@atomist/sdm/lib/api-helper/goal/minimalClone";
+import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
 import {
     ExecuteGoal,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
-    GoalScheduler,
+} from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import {
     GoalWithFulfillment,
     ImplementationRegistration,
-    minimalClone,
-    ProgressLog,
-    RepoContext,
-    SdmGoalEvent,
-    SdmGoalState,
-    ServiceRegistrationGoalDataKey,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { GoalScheduler } from "@atomist/sdm/lib/api/goal/support/GoalScheduler";
+import { ServiceRegistrationGoalDataKey } from "@atomist/sdm/lib/api/registration/ServiceRegistration";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import * as k8s from "@kubernetes/client-node";
 import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
@@ -57,6 +56,7 @@ import {
     K8sServiceRegistrationType,
     K8sServiceSpec,
 } from "../../pack/k8s/service";
+import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import {
     CacheOutputGoalDataKey,

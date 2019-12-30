@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import {
-    ExtensionPack,
-    metadata,
-    SdmGoalState,
-} from "@atomist/sdm";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { metadata } from "@atomist/sdm/lib/api-helper/misc/extensionPack";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
 import * as cluster from "cluster";
 import * as _ from "lodash";
 import { isInLocalMode } from "../../internal/machine/modes";
+import { SdmGoalState } from "../../typings/types";
 import {
     cancelGoalSetsCommand,
     listPendingGoalSetsCommand,

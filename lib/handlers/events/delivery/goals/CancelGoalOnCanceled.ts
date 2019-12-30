@@ -15,30 +15,32 @@
  */
 
 import {
-    automationClientInstance,
-    EventFired,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    logger,
-    safeExit,
-    Success,
+    EventHandler,
     Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
-import { ClusterWorkerRequestProcessor } from "@atomist/automation-client/lib/internal/transport/cluster/ClusterWorkerRequestProcessor";
+} from "@atomist/automation-client/lib/decorators";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
 import {
-    cancelableGoal,
-    SdmGoalEvent,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+    EventFired,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { ClusterWorkerRequestProcessor } from "@atomist/automation-client/lib/internal/transport/cluster/ClusterWorkerRequestProcessor";
+import { safeExit } from "@atomist/automation-client/lib/internal/util/shutdown";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { cancelableGoal } from "@atomist/sdm/lib/api-helper/listener/cancelGoals";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import * as cluster from "cluster";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import { OnSpecificCanceledSdmGoal } from "../../../../typings/types";
 
 @EventHandler("Cancel the currently executing goal",
-    () => GraphQL.subscription({
+    () => subscription({
         name: "OnSpecificCanceledSdmGoal",
         variables: {
             goalSetId: process.env.ATOMIST_GOAL_SET_ID || "n/a",

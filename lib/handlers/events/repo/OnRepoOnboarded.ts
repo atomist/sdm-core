@@ -14,34 +14,40 @@
  * limitations under the License.
  */
 
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import {
-    Configuration,
+    EventHandler,
+    Value,
+} from "@atomist/automation-client/lib/decorators";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
+import {
     EventFired,
-    GitCommandGitProject,
-    GraphQL,
-    HandlerContext,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
     HandlerResult,
     Success,
-    Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/HandlerResult";
+import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import {
     AddressChannels,
     addressChannelsFor,
-    CredentialsResolver,
-    PreferenceStoreFactory,
+} from "@atomist/sdm/lib/api/context/addressChannels";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import {
     ProjectListener,
     ProjectListenerInvocation,
-    RepoRefResolver,
-    resolveCredentialsPromise,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/listener/ProjectListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as schema from "../../../typings/types";
 
 /**
  * A repo has been onboarded
  */
-@EventHandler("On repo onboarding", GraphQL.subscription("OnRepoOnboarded"))
+@EventHandler("On repo onboarding", subscription("OnRepoOnboarded"))
 export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subscription> {
 
     @Value("")

@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-import {
-    LeveledLogMethod,
-    MutationNoCacheOptions,
-} from "@atomist/automation-client";
-import {
-    Build,
-    ExecuteGoalResult,
-    GoalInvocation,
-    ProgressLog,
-    SdmContext,
-    SdmGoalEvent,
-} from "@atomist/sdm";
+import { MutationNoCacheOptions } from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { LeveledLogMethod } from "@atomist/automation-client/lib/util/logger";
+import { SdmContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as path from "path";
@@ -33,6 +28,7 @@ import { SdmVersion } from "../../ingesters/sdmVersionIngester";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { K8sNamespaceFile } from "../../pack/k8s/util";
 import {
+    OnBuildCompleteForDryRun,
     PushFields,
     UpdateSdmVersionMutation,
     UpdateSdmVersionMutationVariables,
@@ -47,6 +43,7 @@ import {
     ContainerProjectHome,
 } from "./container";
 import Images = PushFields.Images;
+import Build = OnBuildCompleteForDryRun.Build;
 
 /**
  * Simple test to see if SDM is running in Kubernetes.  It is called

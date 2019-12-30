@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 
-import {
-    GitHubRepoRef,
-    GitProject,
-    HttpMethod,
-    isTokenCredentials,
-} from "@atomist/automation-client";
 import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
-import {
-    allSatisfied,
-    Cancel,
-    Goal,
-    GoalWithFulfillment,
-    ImmaterialGoals,
-    Locking,
-    PushTest,
-    Queue,
-    RepoContext,
-    SdmGoalEvent,
-    SoftwareDeliveryMachine,
-    StatefulPushListenerInvocation,
-} from "@atomist/sdm";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { isTokenCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { HttpMethod } from "@atomist/automation-client/lib/spi/http/httpClient";
+import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { StatefulPushListenerInvocation } from "@atomist/sdm/lib/api/dsl/goalContribution";
+import { Cancel } from "@atomist/sdm/lib/api/goal/common/Cancel";
+import { ImmaterialGoals } from "@atomist/sdm/lib/api/goal/common/Immaterial";
+import { Locking } from "@atomist/sdm/lib/api/goal/common/Locking";
+import { Queue } from "@atomist/sdm/lib/api/goal/common/Queue";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { GoalWithFulfillment } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
+import { allSatisfied } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
 import * as yaml from "js-yaml";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
@@ -443,6 +439,6 @@ async function resolvePlaceholderContainerSpecCallback(r: ContainerRegistration,
                                                        g: Container,
                                                        e: SdmGoalEvent,
                                                        ctx: RepoContext): Promise<GoalContainerSpec> {
-    await resolvePlaceholders(r as any, value => resolvePlaceholder(value, e, ctx, (r as any).parameters));
+    await resolvePlaceholders(r as any, value => resolvePlaceholder(value, e, ctx, (ctx as any).parameters));
     return r;
 }

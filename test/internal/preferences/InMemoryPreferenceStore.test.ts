@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PreferenceScope } from "@atomist/sdm";
+import { PreferenceScope } from "@atomist/sdm/lib/api/context/preferenceStore";
 import { InMemoryPreferenceStore } from "../../../lib/internal/preferences/InMemoryPreferenceStore";
 import { assertPreferences } from "./preferences";
 

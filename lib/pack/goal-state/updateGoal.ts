@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
+import { MappedParameters } from "@atomist/automation-client/lib/decorators";
+import { AutomationContextAware } from "@atomist/automation-client/lib/HandlerContext";
+import { Success } from "@atomist/automation-client/lib/HandlerResult";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { QueryNoCacheOptions } from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { storeGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
 import {
-    AutomationContextAware,
-    guid,
-    MappedParameters,
-    QueryNoCacheOptions,
-    Success,
-} from "@atomist/automation-client";
-import {
-    CommandHandlerRegistration,
-    DeclarationType,
-    SdmGoalState,
     slackErrorMessage,
     slackSuccessMessage,
-    storeGoal,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
+import { DeclarationType } from "@atomist/sdm/lib/api/registration/ParametersDefinition";
 import {
     bold,
     codeLine,
@@ -38,6 +35,7 @@ import * as _ from "lodash";
 import {
     SdmGoalFields,
     SdmGoalsByGoalSetIdAndUniqueName,
+    SdmGoalState,
 } from "../../typings/types";
 
 export interface UpdateGoalStateParameters {

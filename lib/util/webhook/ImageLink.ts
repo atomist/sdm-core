@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { configurationValue } from "@atomist/automation-client/lib/configuration";
 import {
-    configurationValue,
     defaultHttpClientFactory,
     HttpMethod,
-    logger,
-    RetryOptions,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/spi/http/httpClient";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { RetryOptions } from "@atomist/automation-client/lib/util/retry";
 
 export interface AtomistBuildRepository {
     owner_name: string;

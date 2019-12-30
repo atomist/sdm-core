@@ -16,9 +16,9 @@
 
 import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import {
-    pushTest,
     PushTest,
-} from "@atomist/sdm";
+    pushTest,
+} from "@atomist/sdm/lib/api/mapping/PushTest";
 import { isPublicRepo } from "../../util/github/ghub";
 
 /**

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { QueryNoCacheOptions } from "@atomist/automation-client";
 import { isTokenCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
-import { SdmContext } from "@atomist/sdm";
+import { QueryNoCacheOptions } from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { SdmContext } from "@atomist/sdm/lib/api/context/SdmContext";
 import * as crypto from "crypto";
 import {
     BinaryRepositoryProvider,

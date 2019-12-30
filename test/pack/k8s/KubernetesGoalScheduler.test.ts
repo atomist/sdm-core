@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as ac from "@atomist/automation-client";
-import { SdmGoalEvent } from "@atomist/sdm";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as k8s from "@kubernetes/client-node";
 import * as assert from "power-assert";
 import {
@@ -170,7 +170,7 @@ describe("KubernetesGoalScheduler", () => {
                 id: "CHANGES",
                 uniqueName: "BeechwoodPark.ts#L243",
             } as any;
-            const c: ac.HandlerContext = {
+            const c: HandlerContext = {
                 context: {
                     workspaceName: "Odessey and Oracle",
                 },

@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
+import { DefaultExcludes } from "@atomist/automation-client/lib/project/fileGlobs";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { Project } from "@atomist/automation-client/lib/project/Project";
+import { gatherFromFiles } from "@atomist/automation-client/lib/project/util/projectUtils";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import {
-    DefaultExcludes,
-    GitProject,
-    Project,
-    projectUtils,
-} from "@atomist/automation-client";
-import {
-    AnyPush,
-    ExecuteGoalResult,
     GoalInvocation,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
-    PushTest,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
 import { CompressingGoalCache } from "./CompressingGoalCache";
@@ -335,7 +333,7 @@ async function getFilePathsThroughPattern(project: Project, globPattern: string 
     const oldExcludes = DefaultExcludes;
     DefaultExcludes.splice(0, DefaultExcludes.length);  // necessary evil
     try {
-        return await projectUtils.gatherFromFiles(project, globPattern, async f => f.path);
+        return await gatherFromFiles(project, globPattern, async f => f.path);
     } finally {
         DefaultExcludes.push(...oldExcludes);
     }

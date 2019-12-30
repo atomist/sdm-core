@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-import {
-    GitHubRepoRef,
-    GitProject,
-    logger,
-    ProjectOperationCredentials,
-    RemoteRepoRef,
-} from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { LoggingProgressLog } from "@atomist/sdm/lib/api-helper/log/LoggingProgressLog";
+import { spawnLog } from "@atomist/sdm/lib/api-helper/misc/child_process";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoal,
-    ExecuteGoalResult,
     GoalInvocation,
-    LoggingProgressLog,
-    ProgressLog,
-    spawnLog,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import {
     createTag,
     createTagReference,

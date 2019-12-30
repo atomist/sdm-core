@@ -16,7 +16,7 @@
 
 // tslint:disable:deprecation
 
-import { PreferenceScope } from "@atomist/sdm";
+import { PreferenceScope } from "@atomist/sdm/lib/api/context/preferenceStore";
 import * as _ from "lodash";
 import { GraphQLPreferenceStore } from "../../../lib/internal/preferences/GraphQLPreferenceStore";
 import { assertPreferences } from "./preferences";

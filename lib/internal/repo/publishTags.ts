@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { EditorOrReviewerParameters } from "@atomist/automation-client/lib/operations/common/params/BaseEditorOrReviewerParameters";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
 import {
-    doWithRetry,
-    GitCommandGitProject,
-    GitHubRepoRef,
-    HandlerContext,
-    ProjectOperationCredentials,
     Tagger,
     TaggerTags,
-} from "@atomist/automation-client";
-import { EditorOrReviewerParameters } from "@atomist/automation-client/lib/operations/common/params/BaseEditorOrReviewerParameters";
-import { AddressChannels } from "@atomist/sdm";
+} from "@atomist/automation-client/lib/operations/tagger/Tagger";
+import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
+import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
+import { AddressChannels } from "@atomist/sdm/lib/api/context/addressChannels";
 import { listTopics } from "../../util/github/ghub";
 import { GitHubTagRouter } from "../../util/github/gitHubTagRouter";
 

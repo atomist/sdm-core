@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-import {
-    automationClientInstance,
-    NoParameters,
-    Success,
-} from "@atomist/automation-client";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { Success } from "@atomist/automation-client/lib/HandlerResult";
 import { info } from "@atomist/automation-client/lib/internal/util/info";
-import {
-    CommandHandlerRegistration,
-    CommandListener,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+import { NoParameters } from "@atomist/automation-client/lib/SmartParameters";
+import { CommandListener } from "@atomist/sdm/lib/api/listener/CommandListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     bold,
     codeLine,

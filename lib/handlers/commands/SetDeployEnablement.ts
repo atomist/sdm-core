@@ -15,22 +15,22 @@
  */
 
 import {
-    addressEvent,
-    failure,
-    HandlerError,
-    HandlerResult,
     MappedParameter,
     MappedParameters,
     Parameter,
     Parameters,
-    Success,
     Value,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/decorators";
 import {
-    CommandHandlerRegistration,
-    CommandListenerInvocation,
-    slackSuccessMessage,
-} from "@atomist/sdm";
+    failure,
+    HandlerError,
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { addressEvent } from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { slackSuccessMessage } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import { CommandListenerInvocation } from "@atomist/sdm/lib/api/listener/CommandListener";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import { bold } from "@atomist/slack-messages";
 import {
     DeployEnablementRootType,

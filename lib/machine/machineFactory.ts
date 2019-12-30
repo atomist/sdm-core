@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    GoalSetter,
-    MachineConfiguration,
-    SoftwareDeliveryMachine,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+import { MachineConfiguration } from "@atomist/sdm/lib/api/machine/MachineConfiguration";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
 import { HandlerBasedSoftwareDeliveryMachine } from "../internal/machine/HandlerBasedSoftwareDeliveryMachine";
 import { infoSupport } from "../pack/info/exposeInfo";
 import { jobSupport } from "../pack/job/job";

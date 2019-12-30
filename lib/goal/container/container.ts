@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import { GitProject } from "@atomist/automation-client";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { testProgressReporter } from "@atomist/sdm/lib/api-helper/goal/progress/progress";
+import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { DefaultGoalNameGenerator } from "@atomist/sdm/lib/api/goal/GoalNameGenerator";
 import {
-    DefaultGoalNameGenerator,
     FulfillableGoal,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
     Fulfillment,
     getGoalDefinitionFrom,
-    Goal,
-    GoalFulfillmentCallback,
     ImplementationRegistration,
-    RepoContext,
-    SdmGoalEvent,
-    SoftwareDeliveryMachine,
-    testProgressReporter,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { GoalFulfillmentCallback } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import {
     KubernetesFulfillmentGoalScheduler,
     KubernetesFulfillmentOptions,

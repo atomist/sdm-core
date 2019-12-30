@@ -14,34 +14,38 @@
  * limitations under the License.
  */
 
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import {
-    Configuration,
+    EventHandler,
+    Value,
+} from "@atomist/automation-client/lib/decorators";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
+import {
     EventFired,
-    GraphQL,
-    HandlerContext,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
     HandlerResult,
     Success,
-    Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/HandlerResult";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
 import {
-    addressChannelsFor,
-    CredentialsResolver,
-    PreferenceStoreFactory,
-    ProjectLoader,
     PullRequestListener,
     PullRequestListenerInvocation,
-    RepoRefResolver,
-    resolveCredentialsPromise,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/listener/PullRequestListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as _ from "lodash";
 import * as schema from "../../../typings/types";
 
 /**
  * A pull request has been raised
  */
-@EventHandler("On pull request", GraphQL.subscription("OnPullRequest"))
+@EventHandler("On pull request", subscription("OnPullRequest"))
 export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscription> {
 
     @Value("")

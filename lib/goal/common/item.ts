@@ -19,7 +19,7 @@ import {
     goal,
     GoalWithFulfillment,
     Parameterized,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { toArray } from "../../util/misc/array";
 import {

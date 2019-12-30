@@ -15,15 +15,15 @@
  */
 
 import {
-    doWithRetry,
     GitHubRepoRef,
-    Issue,
-    logger,
-    ProjectOperationCredentials,
-    RemoteRepoRef,
-} from "@atomist/automation-client";
-import { isGitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
-import { toToken } from "@atomist/sdm";
+    isGitHubRepoRef,
+} from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { Issue } from "@atomist/automation-client/lib/util/gitHub";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
+import { toToken } from "@atomist/sdm/lib/api-helper/misc/credentials/toToken";
 /* tslint:disable:import-blacklist */
 import axios, {
     AxiosPromise,

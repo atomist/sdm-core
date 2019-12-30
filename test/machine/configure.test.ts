@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    goal,
-    hasFile,
-} from "@atomist/sdm";
+import { goal } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { hasFile } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as assert from "power-assert";
 import {
     convertGoalData,

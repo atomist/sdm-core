@@ -15,40 +15,45 @@
  */
 
 import {
-    automationClientInstance,
-    EventFired,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    logger,
-    Success,
+    EventHandler,
     Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/decorators";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
 import {
-    addressChannelsFor,
-    cancelableGoal,
+    EventFired,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { executeGoal } from "@atomist/sdm/lib/api-helper/goal/executeGoal";
+import {
     descriptionFromState,
-    executeGoal,
-    ExecuteGoalResult,
-    formatDate,
-    GoalExecutionListener,
-    GoalImplementationMapper,
-    GoalInvocation,
-    GoalScheduler,
-    isGoalCanceled,
-    LoggingProgressLog,
-    ProgressLog,
-    resolveCredentialsPromise,
-    SdmGoalEvent,
-    SdmGoalState,
-    serializeResult,
-    SoftwareDeliveryMachineConfiguration,
     updateGoal,
-    WriteToAllProgressLog,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import {
+    cancelableGoal,
+    isGoalCanceled,
+} from "@atomist/sdm/lib/api-helper/listener/cancelGoals";
+import { LoggingProgressLog } from "@atomist/sdm/lib/api-helper/log/LoggingProgressLog";
+import { WriteToAllProgressLog } from "@atomist/sdm/lib/api-helper/log/WriteToAllProgressLog";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { formatDate } from "@atomist/sdm/lib/api-helper/misc/dateFormat";
+import { serializeResult } from "@atomist/sdm/lib/api-helper/misc/result";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
+import { GoalScheduler } from "@atomist/sdm/lib/api/goal/support/GoalScheduler";
+import { GoalExecutionListener } from "@atomist/sdm/lib/api/listener/GoalStatusListener";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import * as os from "os";
 import {
     CacheEntry,
@@ -59,7 +64,10 @@ import {
 } from "../../../../goal/cache/goalCaching";
 import { shouldFulfill } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
-import { OnAnyRequestedSdmGoal } from "../../../../typings/types";
+import {
+    OnAnyRequestedSdmGoal,
+    SdmGoalState,
+} from "../../../../typings/types";
 import { toArray } from "../../../../util/misc/array";
 import { formatDuration } from "../../../../util/misc/time";
 
@@ -67,7 +75,7 @@ import { formatDuration } from "../../../../util/misc/time";
  * Handle an SDM request goal. Used for many implementation types.
  */
 @EventHandler("Fulfill a goal when it reaches 'requested' state",
-    GraphQL.subscription("OnAnyRequestedSdmGoal"))
+    subscription("OnAnyRequestedSdmGoal"))
 export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal.Subscription> {
 
     @Value("") // empty path returns the entire configuration

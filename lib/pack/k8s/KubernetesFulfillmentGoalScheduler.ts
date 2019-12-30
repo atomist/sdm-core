@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-import {
-    descriptionFromState,
-    ExecuteGoalResult,
-    GoalInvocation,
-    GoalScheduler,
-    minimalClone,
-    SdmGoalState,
-} from "@atomist/sdm";
+import { minimalClone } from "@atomist/sdm/lib/api-helper/goal/minimalClone";
+import { descriptionFromState } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import { GoalScheduler } from "@atomist/sdm/lib/api/goal/support/GoalScheduler";
 import * as _ from "lodash";
 import {
     Container,
     ContainerRegistration,
     ContainerRegistrationGoalDataKey,
 } from "../../goal/container/container";
+import { SdmGoalState } from "../../typings/types";
 
 export interface KubernetesFulfillmentOptions {
     registration?: string | ((gi: GoalInvocation) => Promise<string>);

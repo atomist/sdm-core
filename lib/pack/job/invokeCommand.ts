@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
 import {
-    automationClientInstance,
     AutomationContextAware,
     HandlerContext,
-    HandlerResult,
-    ParameterType,
-} from "@atomist/automation-client";
-import { CommandRegistration } from "@atomist/sdm";
+} from "@atomist/automation-client/lib/HandlerContext";
+import { HandlerResult } from "@atomist/automation-client/lib/HandlerResult";
+import { ParameterType } from "@atomist/automation-client/lib/SmartParameters";
+import { CommandRegistration } from "@atomist/sdm/lib/api/registration/CommandRegistration";
 import {
     prepareCommandInvocation,
     prepareHandlerContext,

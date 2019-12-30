@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { RepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { LocalProject } from "@atomist/automation-client/lib/project/local/LocalProject";
+import { NodeFsLocalProject } from "@atomist/automation-client/lib/project/local/NodeFsLocalProject";
+import { LoggingProgressLog } from "@atomist/sdm/lib/api-helper/log/LoggingProgressLog";
+import { fakeGoalInvocation } from "@atomist/sdm/lib/api-helper/testsupport/fakeGoalInvocation";
+import { fakePush } from "@atomist/sdm/lib/api-helper/testsupport/fakePush";
 import {
-    GitProject,
-    guid,
-    LocalProject,
-    NodeFsLocalProject,
-    RepoRef,
-} from "@atomist/automation-client";
-import {
-    AnyPush,
-    fakeGoalInvocation,
-    fakePush,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
-    LoggingProgressLog,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";

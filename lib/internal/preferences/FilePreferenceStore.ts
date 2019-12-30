@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import {
-    HandlerContext,
-    logger,
-} from "@atomist/automation-client";
-import { PreferenceStoreFactory } from "@atomist/sdm";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as os from "os";

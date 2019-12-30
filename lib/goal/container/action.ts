@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { FulfillableGoal } from "@atomist/sdm";
+import { FulfillableGoal } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import * as _ from "lodash";
 import { CacheEntry } from "../cache/goalCaching";
 import {
@@ -30,7 +30,7 @@ export function action(registration: {
     parameters: Record<string, any>,
     secrets: ContainerSecrets,
     input: Array<{ classifier: string }>,
-    output: CacheEntry[]
+    output: CacheEntry[],
 }): FulfillableGoal {
 
     const containerRegistration: ContainerRegistration = {
@@ -73,9 +73,9 @@ export function action(registration: {
                 ...env,
             ];
             if (!!r.containers[0]?.secrets?.env) {
-                r.containers[0].secrets.env = r.containers[0].secrets.env.map(e => ({
-                    name: `INPUT_${e.name.toUpperCase()}`,
-                    value: e.value,
+                r.containers[0].secrets.env = r.containers[0].secrets.env.map(ev => ({
+                    name: `INPUT_${ev.name.toUpperCase()}`,
+                    value: ev.value,
                 }));
             }
             return r;

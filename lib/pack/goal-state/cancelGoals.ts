@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
+import { configurationValue } from "@atomist/automation-client/lib/configuration";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { QueryNoCacheOptions } from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { buttonForCommand } from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
 import {
-    buttonForCommand,
-    configurationValue,
-    guid,
-    HandlerContext,
-    QueryNoCacheOptions,
-} from "@atomist/automation-client";
+    storeGoalSet,
+    updateGoal,
+} from "@atomist/sdm/lib/api-helper/goal/storeGoals";
 import {
-    CommandHandlerRegistration,
-    fetchGoalsForCommit,
     slackFooter,
     slackInfoMessage,
     slackSuccessMessage,
     slackTs,
-    SoftwareDeliveryMachine,
-    storeGoalSet,
-    updateGoal,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     Action,
     Attachment,

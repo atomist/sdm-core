@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-import {
-    AutomationClient,
-    AutomationEventListenerSupport,
-    logger,
-} from "@atomist/automation-client";
-import {
-    CacheConfiguration,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+import { AutomationClient } from "@atomist/automation-client/lib/automationClient";
+import { AutomationEventListenerSupport } from "@atomist/automation-client/lib/server/AutomationEventListener";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CacheConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import * as cluster from "cluster";
 import * as fg from "fast-glob";
 import * as fs from "fs-extra";

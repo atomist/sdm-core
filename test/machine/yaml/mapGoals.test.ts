@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import { defaultHttpClientFactory } from "@atomist/automation-client";
-import {
-    goal,
-    ImmaterialGoals,
-    Locking,
-} from "@atomist/sdm";
-import * as _ from "lodash";
+import { defaultHttpClientFactory } from "@atomist/automation-client/lib/spi/http/httpClient";
+import { ImmaterialGoals } from "@atomist/sdm/lib/api/goal/common/Immaterial";
+import { Locking } from "@atomist/sdm/lib/api/goal/common/Locking";
+import { goal } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import * as assert from "power-assert";
 import { Container } from "../../../lib/goal/container/container";
 import { DockerContainerRegistration } from "../../../lib/goal/container/docker";

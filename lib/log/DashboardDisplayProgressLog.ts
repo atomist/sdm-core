@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    Configuration,
-    HandlerContext,
-} from "@atomist/automation-client";
-import {
-    ProgressLog,
-    SdmGoalEvent,
-} from "@atomist/sdm";
+import { Configuration } from "@atomist/automation-client/lib/configuration";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import * as _ from "lodash";
 import { RolarProgressLog } from "./RolarProgressLog";
 

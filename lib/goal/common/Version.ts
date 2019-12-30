@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { DefaultGoalNameGenerator } from "@atomist/sdm/lib/api/goal/GoalNameGenerator";
 import {
-    AnyPush,
-    DefaultGoalNameGenerator,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
     getGoalDefinitionFrom,
-    Goal,
     ImplementationRegistration,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import {
     executeVersioner,
     ProjectVersioner,

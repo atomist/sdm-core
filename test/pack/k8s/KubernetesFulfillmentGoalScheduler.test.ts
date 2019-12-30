@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { guid } from "@atomist/automation-client";
-import {
-    goal,
-    SdmGoalEvent,
-} from "@atomist/sdm";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { goal } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import * as assert from "assert";
 import { container } from "../../../lib/goal/container/container";

@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-import {
-    GitCommandGitProject,
-    GitProject,
-    guid,
-    InMemoryProject,
-    NodeFsLocalProject,
-} from "@atomist/automation-client";
-import {
-    CloningProjectLoader,
-    execPromise,
-    ExecuteGoalResult,
-    fakePush,
-    GoalInvocation,
-    RepoContext,
-    SdmGoalEvent,
-    SdmGoalState,
-} from "@atomist/sdm";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
+import { NodeFsLocalProject } from "@atomist/automation-client/lib/project/local/NodeFsLocalProject";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
+import { execPromise } from "@atomist/sdm/lib/api-helper/misc/child_process";
+import { CloningProjectLoader } from "@atomist/sdm/lib/api-helper/project/cloningProjectLoader";
+import { fakePush } from "@atomist/sdm/lib/api-helper/testsupport/fakePush";
+import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as k8s from "@kubernetes/client-node";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
@@ -51,6 +46,7 @@ import {
 } from "../../../lib/goal/container/k8s";
 import { loadKubeConfig } from "../../../lib/pack/k8s/config";
 import { KubernetesGoalScheduler } from "../../../lib/pack/k8s/KubernetesGoalScheduler";
+import { SdmGoalState } from "../../../lib/typings/types";
 import { containerTestImage } from "./util";
 
 /* tslint:disable:max-file-line-count */

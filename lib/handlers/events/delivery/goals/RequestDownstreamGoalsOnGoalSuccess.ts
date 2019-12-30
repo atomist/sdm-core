@@ -15,35 +15,39 @@
  */
 
 import {
-    automationClientInstance,
-    EventFired,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    logger,
-    Success,
+    EventHandler,
     Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/decorators";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
 import {
-    CredentialsResolver,
-    fetchGoalsFromPush,
-    GoalImplementationMapper,
+    EventFired,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { fetchGoalsFromPush } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { preconditionsAreMet } from "@atomist/sdm/lib/api-helper/goal/goalPreconditions";
+import {
     goalKeyString,
     mapKeyToGoal,
-    preconditionsAreMet,
-    PreferenceStoreFactory,
-    RepoRefResolver,
-    resolveCredentialsPromise,
-    SdmGoalEvent,
-    SoftwareDeliveryMachineConfiguration,
-    updateGoal,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/goal/sdmGoal";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import {
     SdmGoalFulfillmentMethod,
     SdmGoalKey,
 } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
 import {
@@ -55,7 +59,7 @@ import {
  * Move downstream goals from 'planned' to 'requested' when preconditions are met.
  */
 @EventHandler("Move downstream goals from 'planned' to 'requested' when preconditions are met",
-    () => GraphQL.subscription({
+    () => subscription({
         name: "OnAnySuccessfulSdmGoal",
         variables: { registration: () => [automationClientInstance()?.configuration?.name] },
     }))

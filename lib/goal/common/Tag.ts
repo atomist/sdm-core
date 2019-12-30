@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { ExecuteGoal } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { DefaultGoalNameGenerator } from "@atomist/sdm/lib/api/goal/GoalNameGenerator";
 import {
-    DefaultGoalNameGenerator,
-    ExecuteGoal,
     FulfillableGoal,
     FulfillableGoalDetails,
     getGoalDefinitionFrom,
-    Goal,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { executeTag } from "../../internal/delivery/build/executeTag";
 
 /**

@@ -20,7 +20,7 @@ import {
     HttpClientFactory,
     HttpClientOptions,
     HttpResponse,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/spi/http/httpClient";
 // tslint:disable-next-line:import-blacklist
 import axios, { AxiosInstance } from "axios";
 import MockAdapter from "axios-mock-adapter";
