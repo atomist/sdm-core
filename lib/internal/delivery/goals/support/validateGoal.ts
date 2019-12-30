@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { automationClientInstance } from "@atomist/automation-client";
-import { SdmGoalEvent } from "@atomist/sdm";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 
 export function shouldHandle(sdmGoal: SdmGoalEvent,
                              registration: string = automationClientInstance().configuration.name): boolean {

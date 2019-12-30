@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-import { SeedDrivenGeneratorParameters } from "@atomist/automation-client";
-import {
-    CachingProjectLoader,
-    chainTransforms,
-    CommandListenerInvocation,
-    computeStartingPoint,
-    GeneratorRegistration,
-    ParametersObject,
-    projectLoaderRepoLoader,
-    SoftwareDeliveryMachine,
-    toMachineOptions,
-} from "@atomist/sdm";
+import { SeedDrivenGeneratorParameters } from "@atomist/automation-client/lib/operations/generate/SeedDrivenGeneratorParameters";
+import { computeStartingPoint } from "@atomist/sdm/lib/api-helper/command/generator/generatorCommand";
+import { projectLoaderRepoLoader } from "@atomist/sdm/lib/api-helper/machine/projectLoaderRepoLoader";
+import { toMachineOptions } from "@atomist/sdm/lib/api-helper/machine/toMachineOptions";
+import { CachingProjectLoader } from "@atomist/sdm/lib/api-helper/project/CachingProjectLoader";
+import { CommandListenerInvocation } from "@atomist/sdm/lib/api/listener/CommandListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { GeneratorRegistration } from "@atomist/sdm/lib/api/registration/GeneratorRegistration";
+import { ParametersObject } from "@atomist/sdm/lib/api/registration/ParametersDefinition";
+import { chainTransforms } from "@atomist/sdm/lib/api/registration/transformUtils";
 import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
 import { UniversalTransform } from "./generatorSupport";

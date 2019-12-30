@@ -18,7 +18,7 @@ import {
     GoalSigningAlgorithm,
     GoalSigningKey,
     GoalVerificationKey,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/machine/SigningKeys";
 import * as crypto from "crypto";
 
 /**

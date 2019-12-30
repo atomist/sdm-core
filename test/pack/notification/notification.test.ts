@@ -18,11 +18,8 @@ import {
     addressSlackChannels,
     addressSlackUsers,
     SlackDestination,
-} from "@atomist/automation-client";
-import {
-    SdmGoalEvent,
-    SdmGoalState,
-} from "@atomist/sdm";
+} from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as assert from "assert";
 import { fail } from "power-assert";
 import {
@@ -30,6 +27,7 @@ import {
     NotificationOptions,
     notifyGoalCompletionListener,
 } from "../../../lib/pack/notification/notification";
+import { SdmGoalState } from "../../../lib/typings/types";
 import { toArray } from "../../../lib/util/misc/array";
 
 describe("notification", () => {

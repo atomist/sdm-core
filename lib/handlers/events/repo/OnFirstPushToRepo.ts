@@ -14,36 +14,42 @@
  * limitations under the License.
  */
 
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import {
-    Configuration,
-    EventFired,
-    GitCommandGitProject,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    logger,
-    Success,
+    EventHandler,
     Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/decorators";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
+import {
+    EventFired,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git/GitCommandGitProject";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import {
     AddressChannels,
     AddressNoChannels,
-    CredentialsResolver,
-    PreferenceStoreFactory,
+} from "@atomist/sdm/lib/api/context/addressChannels";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import {
     PushListener,
     PushListenerInvocation,
-    RepoRefResolver,
-    resolveCredentialsPromise,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/listener/PushListener";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as _ from "lodash";
 import * as schema from "../../../typings/types";
 
 /**
  * A new repo has been created, and it has some code in it.
  */
-@EventHandler("On repo creation", GraphQL.subscription("OnFirstPushToRepo"))
+@EventHandler("On repo creation", subscription("OnFirstPushToRepo"))
 export class OnFirstPushToRepo
     implements HandleEvent<schema.OnFirstPushToRepo.Subscription> {
 

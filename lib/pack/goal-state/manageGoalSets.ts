@@ -15,28 +15,32 @@
  */
 
 import {
-    AutomationContextAware,
     Configuration,
     configurationValue,
-    guid,
+} from "@atomist/automation-client/lib/configuration";
+import {
+    AutomationContextAware,
     HandlerContext,
-    logger,
-    QueryNoCacheOptions,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/HandlerContext";
 import { WebSocketLifecycle } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketLifecycle";
 import { AbstractWebSocketMessageClient } from "@atomist/automation-client/lib/internal/transport/websocket/WebSocketMessageClient";
 import * as namespace from "@atomist/automation-client/lib/internal/util/cls";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { QueryNoCacheOptions } from "@atomist/automation-client/lib/spi/graph/GraphClient";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
 import {
-    fetchGoalsForCommit,
     goalSetState,
-    SdmGoalState,
-    SoftwareDeliveryMachine,
     storeGoalSet,
-    TriggeredListener,
     updateGoal,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { TriggeredListener } from "@atomist/sdm/lib/api/listener/TriggeredListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import * as _ from "lodash";
-import { InProcessSdmGoals } from "../../typings/types";
+import {
+    InProcessSdmGoals,
+    SdmGoalState,
+} from "../../typings/types";
 import { formatDuration } from "../../util/misc/time";
 import { pendingGoalSets } from "./cancelGoals";
 import { GoalStateOptions } from "./goalState";

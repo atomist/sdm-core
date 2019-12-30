@@ -15,29 +15,33 @@
  */
 
 import {
-    automationClientInstance,
-    EventFired,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    logger,
-    Success,
+    EventHandler,
     Value,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+} from "@atomist/automation-client/lib/decorators";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
 import {
-    addressChannelsFor,
-    CredentialsResolver,
-    fetchGoalsFromPush,
+    EventFired,
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { fetchGoalsFromPush } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
-    PreferenceStoreFactory,
-    RepoRefResolver,
-    resolveCredentialsPromise,
-    SdmGoalEvent,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/listener/GoalCompletionListener";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import * as stringify from "json-stringify-safe";
 import { shouldHandle } from "../../../../internal/delivery/goals/support/validateGoal";
 import { verifyGoal } from "../../../../internal/signing/goalSigning";
@@ -47,7 +51,7 @@ import { OnAnyCompletedSdmGoal } from "../../../../typings/types";
  * Respond to a failure or success status by running listeners
  */
 @EventHandler("Run a listener on goal failure or success",
-    () => GraphQL.subscription({
+    () => subscription({
         name: "OnAnyCompletedSdmGoal",
         variables: { registration: () => [automationClientInstance()?.configuration?.name] },
     }))

@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
+import { GraphClientListener } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import {
     AutomationContextAware,
-    GraphClientListener,
     HandlerContext,
-    logger,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/HandlerContext";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { SdmGoalMessage } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import {
     GoalSigningAlgorithm,
     GoalSigningConfiguration,
     GoalSigningKey,
     GoalSigningScope,
     GoalVerificationKey,
-    SdmGoalEvent,
-    SdmGoalState,
-    updateGoal,
-} from "@atomist/sdm";
-import { SdmGoalMessage } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
+} from "@atomist/sdm/lib/api/machine/SigningKeys";
 import * as stringify from "fast-json-stable-stringify";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { DeepPartial } from "ts-essentials";
+import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import { RsaGoalSigningAlgorithm } from "./rsaGoalSigning";
 

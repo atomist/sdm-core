@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { guid } from "@atomist/automation-client";
 import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { doWithProject } from "@atomist/sdm/lib/api-helper/project/withProject";
 import {
-    doWithProject,
     goal,
     GoalWithFulfillment,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import * as fs from "fs-extra";
 import * as _ from "lodash";
 import * as os from "os";

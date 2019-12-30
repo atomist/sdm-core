@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
+import { BitBucketServerRepoRef } from "@atomist/automation-client/lib/operations/common/BitBucketServerRepoRef";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { GitlabRepoRef } from "@atomist/automation-client/lib/operations/common/GitlabRepoRef";
 import {
-    BitBucketServerRepoRef,
-    GitHubRepoRef,
-    GitlabRepoRef,
     RemoteRepoRef,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/operations/common/RepoId";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import * as _ from "lodash";
 import {
     CoreRepoFieldsAndChannels,
     OnPushToAnyBranch,
     ProviderType,
-    RepoRefResolver,
-    SdmGoalEvent,
-} from "@atomist/sdm";
-import * as _ from "lodash";
+} from "../../typings/types";
 
 export class DefaultRepoRefResolver implements RepoRefResolver {
 

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { AutomationEventListenerSupport } from "@atomist/automation-client";
-import {
-    AbstractSoftwareDeliveryMachine,
-    SoftwareDeliveryMachine,
-} from "@atomist/sdm";
+import { AutomationEventListenerSupport } from "@atomist/automation-client/lib/server/AutomationEventListener";
+import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/lib/api-helper/machine/AbstractSoftwareDeliveryMachine";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 
 /**
  * AutomationEventListener that notifies the SDM StartupListeners that this SDM has been

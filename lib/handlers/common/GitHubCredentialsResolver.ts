@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
+import { configurationValue } from "@atomist/automation-client/lib/configuration";
 import {
-    AutomationContextAware,
-    configurationValue,
-    HandlerContext,
     Parameters,
-    ProjectOperationCredentials,
-    RemoteRepoRef,
     Secret,
     Secrets,
-} from "@atomist/automation-client";
-import { ProviderType as RepoProviderType } from "@atomist/automation-client/lib/operations/common/RepoId";
-import { CredentialsResolver } from "@atomist/sdm";
+} from "@atomist/automation-client/lib/decorators";
+import {
+    AutomationContextAware,
+    HandlerContext,
+} from "@atomist/automation-client/lib/HandlerContext";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import {
+    ProviderType as RepoProviderType,
+    RemoteRepoRef,
+} from "@atomist/automation-client/lib/operations/common/RepoId";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
 import * as _ from "lodash";
 import {
     GitHubAppInstallationByOwner,

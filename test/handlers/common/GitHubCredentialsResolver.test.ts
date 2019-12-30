@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import {
-    GitHubRepoRef,
-    Secrets,
-    TokenCredentials,
-} from "@atomist/automation-client";
+import { Secrets } from "@atomist/automation-client/lib/decorators";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { TokenCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
 import * as assert from "power-assert";
 import { GitHubCredentialsResolver } from "../../../lib/handlers/common/GitHubCredentialsResolver";
 

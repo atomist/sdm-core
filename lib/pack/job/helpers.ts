@@ -16,18 +16,20 @@
 
 import {
     AutomationContextAware,
-    CommandInvocation,
     HandlerContext,
-    mergeParameters,
-    MessageOptions,
-    ParameterType,
-    SourceDestination,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/HandlerContext";
+import { CommandInvocation } from "@atomist/automation-client/lib/internal/invoker/Payload";
 import {
     isCommandIncoming,
     isEventIncoming,
 } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
 import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
+import { ParameterType } from "@atomist/automation-client/lib/SmartParameters";
+import {
+    mergeParameters,
+    MessageOptions,
+    SourceDestination,
+} from "@atomist/automation-client/lib/spi/message/MessageClient";
 
 /**
  * Prepare the CommandInvocation instance to be sent for execution

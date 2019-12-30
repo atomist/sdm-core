@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-import {
-    guid,
-    NodeFsLocalProject,
-} from "@atomist/automation-client";
-import {
-    execPromise,
-    ExecuteGoalResult,
-    fakePush,
-    GoalInvocation,
-} from "@atomist/sdm";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
+import { NodeFsLocalProject } from "@atomist/automation-client/lib/project/local/NodeFsLocalProject";
+import { execPromise } from "@atomist/sdm/lib/api-helper/misc/child_process";
+import { fakePush } from "@atomist/sdm/lib/api-helper/testsupport/fakePush";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";

@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
+import { isMaterialChange } from "@atomist/sdm/lib/api-helper/pushtest/materialChangeTest";
+import { StatefulPushListenerInvocation } from "@atomist/sdm/lib/api/dsl/goalContribution";
+import { isGoal } from "@atomist/sdm/lib/api/mapping/goalTest";
 import {
-    and,
+    PushTest,
+    pushTest,
+} from "@atomist/sdm/lib/api/mapping/PushTest";
+import {
     hasFile,
     hasFileContaining,
     hasResourceProvider,
     isBranch,
-    isGoal,
-    isMaterialChange,
     isRepo,
+    ToDefaultBranch,
+} from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
+import {
+    and,
     not,
     or,
-    pushTest,
-    PushTest,
-    SdmGoalState,
-    StatefulPushListenerInvocation,
-    ToDefaultBranch,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
 import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
+import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 
 export type PushTestMaker<G extends Record<string, any> = any> =

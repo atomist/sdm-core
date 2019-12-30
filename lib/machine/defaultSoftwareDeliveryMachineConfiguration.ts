@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-import { Configuration } from "@atomist/automation-client";
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import { RemoteGitProjectPersister } from "@atomist/automation-client/lib/operations/generate/remoteGitProjectPersister";
-import {
-    allReposInTeam,
-    CachingProjectLoader,
-    commandRequestParameterPromptFactory,
-} from "@atomist/sdm";
+import { allReposInTeam } from "@atomist/sdm/lib/api-helper/command/transform/allReposInTeam";
+import { CachingProjectLoader } from "@atomist/sdm/lib/api-helper/project/CachingProjectLoader";
+import { commandRequestParameterPromptFactory } from "@atomist/sdm/lib/api/context/parameterPrompt";
 import * as _ from "lodash";
 import { DefaultRepoRefResolver } from "../handlers/common/DefaultRepoRefResolver";
 import { GitHubCredentialsResolver } from "../handlers/common/GitHubCredentialsResolver";
-// tslint:disable-next-line:deprecation
-import { EphemeralLocalArtifactStore } from "../internal/artifact/local/EphemeralLocalArtifactStore";
 import { LocalSoftwareDeliveryMachineConfiguration } from "../internal/machine/LocalSoftwareDeliveryMachineOptions";
 import { TeamConfigurationPreferenceStoreFactory } from "../internal/preferences/TeamConfigurationPreferenceStore";
 import { rolarAndDashboardLogFactory } from "../log/rolarAndDashboardLogFactory";
@@ -34,8 +30,6 @@ export function defaultSoftwareDeliveryMachineConfiguration(configuration: Confi
     const repoRefResolver = new DefaultRepoRefResolver();
     return {
         sdm: {
-            // tslint:disable-next-line:deprecation
-            artifactStore: new EphemeralLocalArtifactStore(),
             projectLoader: _.get(configuration, "sdm.projectLoader") || new CachingProjectLoader(),
             logFactory: rolarAndDashboardLogFactory(configuration),
             credentialsResolver: new GitHubCredentialsResolver(),

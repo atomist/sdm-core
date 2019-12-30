@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    formatDate,
-    PreferenceScope,
-} from "@atomist/sdm";
+import { formatDate } from "@atomist/sdm/lib/api-helper/misc/dateFormat";
+import { PreferenceScope } from "@atomist/sdm/lib/api/context/preferenceStore";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";

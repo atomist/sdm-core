@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SdmGoalEvent } from "@atomist/sdm";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import * as assert from "power-assert";
 import { shouldHandle } from "../../../../../lib/internal/delivery/goals/support/validateGoal";
 

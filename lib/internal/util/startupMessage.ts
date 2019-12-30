@@ -17,8 +17,8 @@
 import {
     BannerSection,
     Configuration,
-} from "@atomist/automation-client";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+} from "@atomist/automation-client/lib/configuration";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import chalk from "chalk";
 import {
     isGitHubAction,

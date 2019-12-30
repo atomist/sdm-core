@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { toArray } from "../../util/misc/array";
 import {
     DeliveryGoals,

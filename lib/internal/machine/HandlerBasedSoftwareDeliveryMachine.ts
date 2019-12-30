@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-import {
-    Configuration,
-    Maker,
-} from "@atomist/automation-client";
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
-import {
-    AbstractSoftwareDeliveryMachine,
-    FunctionalUnit,
-    GoalSetter,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
+import { AbstractSoftwareDeliveryMachine } from "@atomist/sdm/lib/api-helper/machine/AbstractSoftwareDeliveryMachine";
+import { FunctionalUnit } from "@atomist/sdm/lib/api/machine/FunctionalUnit";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
 import * as _ from "lodash";
-import { ReactToSemanticDiffsOnPushImpact } from "../../handlers/events/delivery/code/ReactToSemanticDiffsOnPushImpact";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
@@ -66,16 +61,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
         return this.firstPushListeners.length > 0 ?
             () => new OnFirstPushToRepo(
                 this.firstPushListeners,
-                this.configuration.sdm.repoRefResolver,
-                this.configuration.sdm.credentialsResolver,
-                this.configuration.sdm.preferenceStoreFactory) :
-            undefined;
-    }
-
-    private get semanticDiffReactor(): Maker<ReactToSemanticDiffsOnPushImpact> {
-        return this.fingerprintDifferenceListeners.length > 0 ?
-            () => new ReactToSemanticDiffsOnPushImpact(
-                this.fingerprintDifferenceListeners,
                 this.configuration.sdm.repoRefResolver,
                 this.configuration.sdm.credentialsResolver,
                 this.configuration.sdm.preferenceStoreFactory) :
@@ -226,7 +211,6 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                     undefined,
                 this.onRepoCreation,
                 this.onFirstPush,
-                this.semanticDiffReactor,
             ])
             .filter(m => !!m);
     }

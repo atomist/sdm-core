@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-import {
-    InMemoryProject,
-    InMemoryProjectFile,
-} from "@atomist/automation-client";
+import { InMemoryFile } from "@atomist/automation-client/lib/project/mem/InMemoryFile";
+import { InMemoryProject } from "@atomist/automation-client/lib/project/mem/InMemoryProject";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
-import {
-    AnyPush,
-    Autofix,
-    ExtensionPack,
-    fakePush,
-    Goal,
-    Goals,
-    GoalsSetListener,
-    PushImpact,
-    whenPushSatisfies,
-} from "@atomist/sdm";
+import { fakePush } from "@atomist/sdm/lib/api-helper/testsupport/fakePush";
+import { whenPushSatisfies } from "@atomist/sdm/lib/api/dsl/goalDsl";
+import { Autofix } from "@atomist/sdm/lib/api/goal/common/Autofix";
+import { PushImpact } from "@atomist/sdm/lib/api/goal/common/PushImpact";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { Goals } from "@atomist/sdm/lib/api/goal/Goals";
+import { GoalsSetListener } from "@atomist/sdm/lib/api/listener/GoalsSetListener";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
+import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as assert from "power-assert";
 import { SetGoalsOnPush } from "../../../lib/handlers/events/delivery/goals/SetGoalsOnPush";
 import { HandlerBasedSoftwareDeliveryMachine } from "../../../lib/internal/machine/HandlerBasedSoftwareDeliveryMachine";
@@ -116,7 +112,7 @@ describe("SDM handler creation", () => {
         });
 
         it("sets goals on particular push", async () => {
-            const project = InMemoryProject.of(new InMemoryProjectFile("thing", "1"));
+            const project = InMemoryProject.of(new InMemoryFile("thing", "1"));
             const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))
@@ -126,7 +122,7 @@ describe("SDM handler creation", () => {
         });
 
         it("sets goals on particular push with extra goals", async () => {
-            const project = InMemoryProject.of(new InMemoryProjectFile("thing", "1"));
+            const project = InMemoryProject.of(new InMemoryFile("thing", "1"));
             const sdm = new HandlerBasedSoftwareDeliveryMachine("Gustave",
                 fakeSoftwareDeliveryMachineConfiguration,
                 [whenPushSatisfies(async pu => !!await pu.project.getFile("thing"))

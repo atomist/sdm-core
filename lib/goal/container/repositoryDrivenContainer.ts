@@ -15,19 +15,21 @@
  */
 
 import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
+import { Goal } from "@atomist/sdm/lib/api/goal/Goal";
+import { GoalProjectListenerEvent } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { DefaultGoalNameGenerator } from "@atomist/sdm/lib/api/goal/GoalNameGenerator";
+import { Goals } from "@atomist/sdm/lib/api/goal/Goals";
 import {
-    and,
-    DefaultGoalNameGenerator,
     FulfillableGoal,
-    Goal,
-    GoalProjectListenerEvent,
-    Goals,
     PlannedGoal,
     PlannedGoals,
-    PushListenerInvocation,
-    pushTest,
+} from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
+import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
+import {
     PushTest,
-} from "@atomist/sdm";
+    pushTest,
+} from "@atomist/sdm/lib/api/mapping/PushTest";
+import { and } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
 import * as camelcaseKeys from "camelcase-keys";
 import * as yaml from "js-yaml";
 import * as _ from "lodash";

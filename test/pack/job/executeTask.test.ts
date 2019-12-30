@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
+import { defaultConfiguration } from "@atomist/automation-client/lib/configuration";
 import {
-    EventFired,
-    HandlerContext,
-    HandlerResult,
+    CommandHandler,
     MappedParameter,
+    MappedParameters,
     Parameter,
     Parameters,
     Secret,
     Secrets,
-    Success,
-} from "@atomist/automation-client";
-import { defaultConfiguration } from "@atomist/automation-client/lib/configuration";
-import {
-    CommandHandler,
-    MappedParameters,
 } from "@atomist/automation-client/lib/decorators";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
+import { EventFired } from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import {
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
 import { BuildableAutomationServer } from "@atomist/automation-client/lib/server/BuildableAutomationServer";
-import { JobTaskType } from "@atomist/sdm";
+import { JobTaskType } from "@atomist/sdm/lib/api-helper/misc/job/createJob";
 import * as _ from "lodash";
 import * as assert from "power-assert";
 import { ExecuteTaskListener } from "../../../lib/pack/job/executeTask";

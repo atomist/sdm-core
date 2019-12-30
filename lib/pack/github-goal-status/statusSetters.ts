@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-import {
-    GitHubRepoRef,
-    HandlerContext,
-    logger,
-} from "@atomist/automation-client";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import {
     GoalCompletionListener,
     GoalCompletionListenerInvocation,
+} from "@atomist/sdm/lib/api/listener/GoalCompletionListener";
+import {
     GoalsSetListener,
     GoalsSetListenerInvocation,
-    SdmGoalEvent,
-    SoftwareDeliveryMachine,
+} from "@atomist/sdm/lib/api/listener/GoalsSetListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import {
+    SdmGoalState,
     StatusState,
-} from "@atomist/sdm";
-import { SdmGoalState } from "../../typings/types";
+} from "../../typings/types";
 import { createStatus } from "../../util/github/ghub";
 
 export function createPendingGitHubStatusOnGoalSet(sdm: SoftwareDeliveryMachine): GoalsSetListener {

@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import {
-    configurationValue,
-    HandlerContext,
-    Parameters,
-    ProjectOperationCredentials,
-    RemoteRepoRef,
-} from "@atomist/automation-client";
-import { CredentialsResolver } from "@atomist/sdm";
+import { configurationValue } from "@atomist/automation-client/lib/configuration";
+import { Parameters } from "@atomist/automation-client/lib/decorators";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
+import { ProjectOperationCredentials } from "@atomist/automation-client/lib/operations/common/ProjectOperationCredentials";
+import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
 
 /**
  * Resolves to single credentials from the configuration

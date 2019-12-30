@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PreferenceScope } from "@atomist/sdm";
+import { PreferenceScope } from "@atomist/sdm/lib/api/context/preferenceStore";
 import { TeamConfigurationPreferenceStore } from "../../../lib/internal/preferences/TeamConfigurationPreferenceStore";
 import { assertPreferences } from "./preferences";
 

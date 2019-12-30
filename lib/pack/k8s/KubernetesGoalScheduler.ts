@@ -17,21 +17,21 @@
 // tslint:disable:max-file-line-count
 
 import {
-    automationClientInstance,
-    AutomationContextAware,
     Configuration,
     configurationValue,
-    doWithRetry,
-    HandlerContext,
-    logger,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/configuration";
+import { automationClientInstance } from "@atomist/automation-client/lib/globals";
 import {
-    ExecuteGoalResult,
-    GoalInvocation,
-    GoalScheduler,
-    SdmGoalEvent,
-    ServiceRegistrationGoalDataKey,
-} from "@atomist/sdm";
+    AutomationContextAware,
+    HandlerContext,
+} from "@atomist/automation-client/lib/HandlerContext";
+import { logger } from "@atomist/automation-client/lib/util/logger";
+import { doWithRetry } from "@atomist/automation-client/lib/util/retry";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
+import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { GoalScheduler } from "@atomist/sdm/lib/api/goal/support/GoalScheduler";
+import { ServiceRegistrationGoalDataKey } from "@atomist/sdm/lib/api/registration/ServiceRegistration";
 import * as k8s from "@kubernetes/client-node";
 import * as cluster from "cluster";
 import * as fs from "fs-extra";

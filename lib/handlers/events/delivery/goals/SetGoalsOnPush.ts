@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
+import { EventHandler } from "@atomist/automation-client/lib/decorators";
+import { subscription } from "@atomist/automation-client/lib/graph/graphQL";
 import {
     EventFired,
-    GraphQL,
-    HandlerContext,
-    HandlerResult,
-    RemoteRepoRef,
-    Success,
-} from "@atomist/automation-client";
-import { EventHandler } from "@atomist/automation-client/lib/decorators";
-import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
+    HandleEvent,
+} from "@atomist/automation-client/lib/HandleEvent";
+import { HandlerContext } from "@atomist/automation-client/lib/HandlerContext";
 import {
-    chooseAndSetGoals,
-    CredentialsResolver,
-    EnrichGoal,
-    GoalImplementationMapper,
-    GoalSetter,
-    GoalsSetListener,
-    PreferenceStoreFactory,
-    ProjectLoader,
-    RepoRefResolver,
-    resolveCredentialsPromise,
-    TagGoalSet,
-} from "@atomist/sdm";
+    HandlerResult,
+    Success,
+} from "@atomist/automation-client/lib/HandlerResult";
+import { RemoteRepoRef } from "@atomist/automation-client/lib/operations/common/RepoId";
+import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { EnrichGoal } from "@atomist/sdm/lib/api/goal/enrichGoal";
+import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
+import { TagGoalSet } from "@atomist/sdm/lib/api/goal/tagGoalSet";
+import { GoalsSetListener } from "@atomist/sdm/lib/api/listener/GoalsSetListener";
+import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
+import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
+import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
+import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
 import { OnPushToAnyBranch } from "../../../../typings/types";
 
 /**
  * Set up goalSet on a push (e.g. for delivery).
  */
-@EventHandler("Set up goalSet on Push", GraphQL.subscription("OnPushToAnyBranch"))
+@EventHandler("Set up goalSet on Push", subscription("OnPushToAnyBranch"))
 export class SetGoalsOnPush implements HandleEvent<OnPushToAnyBranch.Subscription> {
 
     /**

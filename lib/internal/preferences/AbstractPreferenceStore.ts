@@ -17,11 +17,11 @@
 import {
     ConfigurationAware,
     HandlerContext,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/HandlerContext";
 import {
     PreferenceScope,
     PreferenceStore,
-} from "@atomist/sdm";
+} from "@atomist/sdm/lib/api/context/preferenceStore";
 
 export interface Preference {
     name: string;

@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
+import { Configuration } from "@atomist/automation-client/lib/configuration";
 import {
-    Configuration,
     defaultHttpClientFactory,
     HttpClient,
     HttpMethod,
-    logger,
-} from "@atomist/automation-client";
+} from "@atomist/automation-client/lib/spi/http/httpClient";
+import { logger } from "@atomist/automation-client/lib/util/logger";
 import { redact } from "@atomist/automation-client/lib/util/redact";
-import {
-    format,
-    ProgressLog,
-} from "@atomist/sdm";
+import { format } from "@atomist/sdm/lib/api-helper/log/format";
+import { ProgressLog } from "@atomist/sdm/lib/spi/log/ProgressLog";
 import * as _ from "lodash";
 import os = require("os");
 

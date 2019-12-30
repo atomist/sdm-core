@@ -16,17 +16,15 @@
 
 import {
     Configuration,
-    NoParameters,
-} from "@atomist/automation-client";
-import { deepMergeConfigs } from "@atomist/automation-client/lib/configuration";
-import {
-    CommandHandlerRegistration,
-    EventHandlerRegistration,
-    ExtensionPack,
-    PushTest,
-    SoftwareDeliveryMachine,
-    SoftwareDeliveryMachineConfiguration,
-} from "@atomist/sdm";
+    deepMergeConfigs,
+} from "@atomist/automation-client/lib/configuration";
+import { NoParameters } from "@atomist/automation-client/lib/SmartParameters";
+import { ExtensionPack } from "@atomist/sdm/lib/api/machine/ExtensionPack";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
+import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
+import { EventHandlerRegistration } from "@atomist/sdm/lib/api/registration/EventHandlerRegistration";
 import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
 import * as fs from "fs-extra";

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import {
-    RepoContext,
-    SdmGoalEvent,
-    ServiceRegistration,
-} from "@atomist/sdm";
+import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
+import { ServiceRegistration } from "@atomist/sdm/lib/api/registration/ServiceRegistration";
 import * as k8s from "@kubernetes/client-node";
 import { DeepPartial } from "ts-essentials";
 

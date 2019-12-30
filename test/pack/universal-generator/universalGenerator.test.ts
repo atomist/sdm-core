@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    GitHubRepoRef,
-} from "@atomist/automation-client";
-import { GeneratorRegistration } from "@atomist/sdm";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { GeneratorRegistration } from "@atomist/sdm/lib/api/registration/GeneratorRegistration";
 import * as assert from "assert";
 import { UniversalTransform } from "../../../lib/pack/universal-generator/generatorSupport";
 import {
