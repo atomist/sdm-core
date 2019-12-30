@@ -47,6 +47,7 @@ import {
     K8sServiceRegistrationType,
     K8sServiceSpec,
 } from "./service";
+import { K8sNamespaceFile } from "./util";
 
 /**
  * Options to configure the k8s goal scheduling support
@@ -536,8 +537,6 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
         )).body.items;
     }
 }
-
-export const K8sNamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
 
 /**
  * Read the namespace of the deployment from environment and k8s service account files.
