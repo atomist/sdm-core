@@ -26,8 +26,8 @@ import {
 } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
 import {
-    PushTest,
     pushTest,
+    PushTest,
 } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { and } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
 import * as camelcaseKeys from "camelcase-keys";
