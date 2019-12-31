@@ -217,7 +217,7 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
             }
 
             if (!!config.skill) {
-                _.merge(sdm.configuration, camelcaseKeys(config.item, { deep: true }));
+                _.merge(sdm.configuration, camelcaseKeys(config.skill, { deep: true }));
             }
 
             for (const k in config) {
