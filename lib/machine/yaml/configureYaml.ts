@@ -53,7 +53,10 @@ import {
 } from "./mapGoals";
 import { PushTestMaker } from "./mapPushTests";
 import { mapRules } from "./mapRules";
-import { watchPaths } from "./util";
+import {
+    camelCase,
+    watchPaths,
+} from "./util";
 
 export interface YamlSoftwareDeliveryMachineConfiguration {
     extensionPacks?: ExtensionPack[];
@@ -213,7 +216,7 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                 _.merge(sdm.configuration, camelcaseKeys(config.configuration, { deep: true }));
             }
 
-            if (!!config.item) {
+            if (!!config.skill) {
                 _.merge(sdm.configuration, camelcaseKeys(config.item, { deep: true }));
             }
 
@@ -230,7 +233,7 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                     if (k === "goals") {
                         await mapGoals(
                             sdm,
-                            value,
+                            camelCase(value),
                             additionalGoals,
                             goalMakers,
                             options.tests || {},
