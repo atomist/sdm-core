@@ -18,8 +18,8 @@ import { isMaterialChange } from "@atomist/sdm/lib/api-helper/pushtest/materialC
 import { StatefulPushListenerInvocation } from "@atomist/sdm/lib/api/dsl/goalContribution";
 import { isGoal } from "@atomist/sdm/lib/api/mapping/goalTest";
 import {
-    PushTest,
     pushTest,
+    PushTest,
 } from "@atomist/sdm/lib/api/mapping/PushTest";
 import {
     hasFile,
