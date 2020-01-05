@@ -35,9 +35,11 @@ import * as rimraf from "rimraf";
 import { promisify } from "util";
 import {
     CompressingGoalCache,
+    CompressionMethod,
     resolveClassifierPath,
     sanitizeClassifier,
 } from "../../../lib/goal/cache/CompressingGoalCache";
+import { FileSystemGoalCacheArchiveStore } from "../../../lib/goal/cache/FileSystemGoalCacheArchiveStore";
 import {
     cachePut,
     cacheRemove,
@@ -236,6 +238,56 @@ describe("goal/cache/CompressingGoalCache", () => {
             }
         });
 
+        it("should cache and retrieve with zip", async () => {
+            const fakePushId = fakePush().id;
+            fakePushId.sha = "testing";
+            const fakeGoal = fakeGoalInvocation(fakePushId);
+            const testCache = new CompressingGoalCache(new FileSystemGoalCacheArchiveStore(), CompressionMethod.ZIP);
+            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+            fakeGoal.configuration.sdm.cache = { enabled: true, path: testDir(), store: testCache };
+
+            const options: GoalCacheOptions = {
+                entries: [{ classifier: "default", pattern: { globPattern: "**/*.txt" } }],
+                onCacheMiss: ErrorProjectListenerRegistration,
+            };
+            // when cache something
+            const project = await createTempProject(fakePushId);
+            await project.addFile("test.txt", "test");
+            await cachePut(options)
+                .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+            // it should find it in the cache
+            const emptyProject = await createTempProject(fakePushId);
+            await cacheRestore(options)
+                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+            assert(await emptyProject.hasFile("test.txt"));
+        });
+
+        it("should cache and retrieve, excluding specific directories with zip", async () => {
+            const fakePushId = fakePush().id;
+            fakePushId.sha = "testing";
+            const fakeGoal = fakeGoalInvocation(fakePushId);
+            const testCache = new CompressingGoalCache(new FileSystemGoalCacheArchiveStore(), CompressionMethod.ZIP);
+            fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
+            fakeGoal.configuration.sdm.cache = { enabled: true, path: testDir(), store: testCache };
+
+            const options: GoalCacheOptions = {
+                entries: [{ classifier: "default", pattern: { globPattern: ["**/*.txt", "!excludeme/**/*"] } }],
+                onCacheMiss: ErrorProjectListenerRegistration,
+            };
+            // when cache something
+            const project = await createTempProject(fakePushId);
+            await project.addFile("test.txt", "test");
+            await project.addFile("excludeme/test.txt", "test");
+            await cachePut(options)
+                .listener(project as any as GitProject, fakeGoal, GoalProjectListenerEvent.after);
+            // it should find it in the cache
+            const emptyProject = await createTempProject(fakePushId);
+            await cacheRestore(options)
+                .listener(emptyProject as any as GitProject, fakeGoal, GoalProjectListenerEvent.before);
+            assert(await emptyProject.hasFile("test.txt"));
+            assert(!await emptyProject.hasFile("excludeme/test.txt"));
+        });
+
         it("should cache and retrieve", async () => {
             const fakePushId = fakePush().id;
             fakePushId.sha = "testing";
@@ -266,8 +318,7 @@ describe("goal/cache/CompressingGoalCache", () => {
             const fakeGoal = fakeGoalInvocation(fakePushId);
             const testCache = new CompressingGoalCache();
             fakeGoal.progressLog = new LoggingProgressLog("test", "debug");
-            fakeGoal.configuration.sdm.goalCache = testCache;
-            fakeGoal.configuration.sdm.cache = { enabled: true, path: testDir() };
+            fakeGoal.configuration.sdm.cache = { enabled: true, path: testDir(), store: testCache };
 
             const options: GoalCacheOptions = {
                 entries: [{ classifier: "default", pattern: { globPattern: ["**/*.txt", "!excludeme/**/*"] } }],

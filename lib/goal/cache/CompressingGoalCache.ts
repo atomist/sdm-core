@@ -15,18 +15,18 @@
  */
 
 import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
+import { Deferred } from "@atomist/automation-client/lib/internal/util/Deferred";
 import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import { logger } from "@atomist/automation-client/lib/util/logger";
 import { spawnLog } from "@atomist/sdm/lib/api-helper/misc/child_process";
 import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import * as fs from "fs-extra";
+import * as JSZip from "jszip";
 import * as os from "os";
 import * as path from "path";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
-import {
-    FileSystemGoalCacheArchiveStore,
-} from "./FileSystemGoalCacheArchiveStore";
+import { FileSystemGoalCacheArchiveStore } from "./FileSystemGoalCacheArchiveStore";
 import { GoalCache } from "./goalCaching";
 
 export interface GoalCacheArchiveStore {
@@ -37,12 +37,14 @@ export interface GoalCacheArchiveStore {
      * @param archivePath The path of the archive to be stored.
      */
     store(gi: GoalInvocation, classifier: string, archivePath: string): Promise<void>;
+
     /**
      * Remove a compressed goal archive
      * @param gi The goal invocation thar triggered the cache removal
      * @param classifier The classifier of the cache
      */
     delete(gi: GoalInvocation, classifier: string): Promise<void>;
+
     /**
      * Retrieve a compressed goal archive
      * @param gi The goal invocation thar triggered the cache retrieval
@@ -52,15 +54,19 @@ export interface GoalCacheArchiveStore {
     retrieve(gi: GoalInvocation, classifier: string, targetArchivePath: string): Promise<void>;
 }
 
+export enum CompressionMethod {
+    TAR,
+    ZIP,
+}
+
 /**
  * Cache implementation that caches files produced by goals to an archive that can then be stored,
  * using tar and gzip to create the archives per goal invocation (and classifier if present).
  */
 export class CompressingGoalCache implements GoalCache {
-    private readonly store: GoalCacheArchiveStore;
 
-    public constructor(store: GoalCacheArchiveStore = new FileSystemGoalCacheArchiveStore()) {
-        this.store = store;
+    public constructor(private readonly store: GoalCacheArchiveStore = new FileSystemGoalCacheArchiveStore(),
+                       private readonly method: CompressionMethod = CompressionMethod.TAR) {
     }
 
     public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
@@ -68,28 +74,44 @@ export class CompressingGoalCache implements GoalCache {
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
         const slug = `${gi.id.owner}/${gi.id.repo}`;
 
-        const tarResult = await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
-            log: gi.progressLog,
-            cwd: project.baseDir,
-        });
-        if (tarResult.code) {
-            const message = `Failed to create tar archive '${teamArchiveFileName}' for ${slug}`;
-            logger.error(message);
-            gi.progressLog.write(message);
-            return;
-        }
-        const gzipResult = await spawnLog("gzip", ["-3", teamArchiveFileName], {
-            log: gi.progressLog,
-            cwd: project.baseDir,
-        });
-        if (gzipResult.code) {
-            const message = `Failed to gzip tar archive '${teamArchiveFileName}' for ${slug}`;
-            logger.error(message);
-            gi.progressLog.write(message);
-            return;
+        let teamArchiveFileNameWithSuffix = teamArchiveFileName;
+        if (this.method === CompressionMethod.TAR) {
+            const tarResult = await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
+                log: gi.progressLog,
+                cwd: project.baseDir,
+            });
+            if (tarResult.code) {
+                const message = `Failed to create tar archive '${teamArchiveFileName}' for ${slug}`;
+                logger.error(message);
+                gi.progressLog.write(message);
+                return;
+            }
+            const gzipResult = await spawnLog("gzip", ["-3", teamArchiveFileName], {
+                log: gi.progressLog,
+                cwd: project.baseDir,
+            });
+            if (gzipResult.code) {
+                const message = `Failed to gzip tar archive '${teamArchiveFileName}' for ${slug}`;
+                logger.error(message);
+                gi.progressLog.write(message);
+                return;
+            }
+            teamArchiveFileNameWithSuffix += ".gz";
+        } else if (this.method === CompressionMethod.ZIP) {
+            const zip = new JSZip();
+            for (const file of files) {
+                zip.file(file, (await project.getFile(file)).getContent());
+            }
+            const defer = new Deferred<string>();
+            zip.generateNodeStream({ type: "nodebuffer", streamFiles: true })
+                .pipe(fs.createWriteStream(teamArchiveFileName))
+                .on("finish", () => {
+                    defer.resolve(teamArchiveFileName);
+                });
+            await defer.promise;
         }
         const resolvedClassifier = await resolveClassifierPath(classifier, gi);
-        await this.store.store(gi, resolvedClassifier, teamArchiveFileName + ".gz");
+        await this.store.store(gi, resolvedClassifier, teamArchiveFileNameWithSuffix);
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
@@ -103,10 +125,17 @@ export class CompressingGoalCache implements GoalCache {
         const resolvedClassifier = await resolveClassifierPath(classifier, gi);
         await this.store.retrieve(gi, resolvedClassifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
-            await spawnLog("tar", ["-xzf", teamArchiveFileName], {
-                log: gi.progressLog,
-                cwd: project.baseDir,
-            });
+            if (this.method === CompressionMethod.TAR) {
+                await spawnLog("tar", ["-xzf", teamArchiveFileName], {
+                    log: gi.progressLog,
+                    cwd: project.baseDir,
+                });
+            } else if (this.method === CompressionMethod.ZIP) {
+                const zip = await JSZip.loadAsync(await fs.readFile(teamArchiveFileName));
+                for (const file in zip.files) {
+                    await fs.writeFile(path.join(project.baseDir, file), await zip.file(file).async("text"));
+                }
+            }
         } else {
             throw Error("No cache entry");
         }
