@@ -47,6 +47,8 @@ import {
     GoalCacheOptions,
 } from "../../../lib/goal/cache/goalCaching";
 
+// tslint:disable:max-file-line-count
+
 describe("goal/cache/CompressingGoalCache", () => {
 
     describe("sanitizeClassifier", () => {
