@@ -138,7 +138,7 @@ export class CompressingGoalCache implements GoalCache {
                         if (!!entry) {
                             const p = path.join(project.baseDir, file);
                             await fs.ensureDir(path.dirname(p));
-                            await fs.writeFile(path.join(project.baseDir, file), await zip.file(file).async("text"));
+                            await fs.writeFile(path.join(project.baseDir, file), await zip.file(file).async("nodebuffer"));
                         }
                     }
                 }
