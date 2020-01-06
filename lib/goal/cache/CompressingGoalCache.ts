@@ -135,7 +135,7 @@ export class CompressingGoalCache implements GoalCache {
                 for (const file in zip.files) {
                     if (zip.files.hasOwnProperty(file)) {
                         const entry = zip.file(file);
-                        if (!entry.dir) {
+                        if (!!entry) {
                             await fs.writeFile(path.join(project.baseDir, file), await zip.file(file).async("text"));
                         }
                     }
