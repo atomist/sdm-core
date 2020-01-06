@@ -134,7 +134,10 @@ export class CompressingGoalCache implements GoalCache {
                 const zip = await JSZip.loadAsync(await fs.readFile(teamArchiveFileName));
                 for (const file in zip.files) {
                     if (zip.files.hasOwnProperty(file)) {
-                        await fs.writeFile(path.join(project.baseDir, file), await zip.file(file).async("text"));
+                        const entry = zip.file(file);
+                        if (!entry.dir) {
+                            await fs.writeFile(path.join(project.baseDir, file), await zip.file(file).async("text"));
+                        }
                     }
                 }
             }
