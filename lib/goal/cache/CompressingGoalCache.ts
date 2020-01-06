@@ -103,7 +103,12 @@ export class CompressingGoalCache implements GoalCache {
                 zip.file(file, (await project.getFile(file)).getContent());
             }
             const defer = new Deferred<string>();
-            zip.generateNodeStream({ type: "nodebuffer", streamFiles: true })
+            zip.generateNodeStream({
+                type: "nodebuffer",
+                streamFiles: true,
+                compression: "DEFLATE",
+                compressionOptions: { level: 6 },
+            })
                 .pipe(fs.createWriteStream(teamArchiveFileName))
                 .on("finish", () => {
                     defer.resolve(teamArchiveFileName);
