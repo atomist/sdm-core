@@ -17,7 +17,6 @@
 import { AutomationClient } from "@atomist/automation-client/lib/automationClient";
 import { Configuration } from "@atomist/automation-client/lib/configuration";
 import { Secrets } from "@atomist/automation-client/lib/decorators";
-import { ApolloGraphClient } from "@atomist/automation-client/lib/graph/ApolloGraphClient";
 import { HandleCommand } from "@atomist/automation-client/lib/HandleCommand";
 import { HandleEvent } from "@atomist/automation-client/lib/HandleEvent";
 import {
@@ -80,7 +79,8 @@ export class GoalExecutionAutomationEventListener extends AutomationEventListene
             const correlationId = process.env.ATOMIST_CORRELATION_ID || guid();
 
             // Obtain goal via graphql query
-            const graphClient = new ApolloGraphClient(
+            const agc = await import("@atomist/automation-client/lib/graph/ApolloGraphClient");
+            const graphClient = new agc.ApolloGraphClient(
                 `${this.sdm.configuration.endpoints.graphql}/${teamId}`,
                 { Authorization: `Bearer ${client.configuration.apiKey}` });
 

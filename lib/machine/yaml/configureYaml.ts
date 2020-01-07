@@ -27,14 +27,13 @@ import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/Co
 import { EventHandlerRegistration } from "@atomist/sdm/lib/api/registration/EventHandlerRegistration";
 import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
+import * as fg from "fast-glob";
 import * as fs from "fs-extra";
-import * as glob from "glob";
 import * as yaml from "js-yaml";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as path from "path";
 import * as trace from "stack-trace";
-import * as util from "util";
 import { githubGoalStatusSupport } from "../../pack/github-goal-status/github";
 import { goalStateSupport } from "../../pack/goal-state/goalState";
 import { toArray } from "../../util/misc/array";
@@ -315,10 +314,7 @@ async function awaitIterable<G>(elems: Record<string, G>, cb: (v: G, k: string) 
 }
 
 async function resolvePaths(cwd: string, patterns: string | string[], watch: boolean = false): Promise<string[]> {
-    const paths = [];
-    for (const pattern of toArray(patterns)) {
-        paths.push(...await util.promisify(glob)(pattern, { cwd }));
-    }
+    const paths = await fg(toArray(patterns), { ignore: [`**/{.git,node_modules}/**`], cwd });
     if (watch) {
         watchPaths(paths);
     }
