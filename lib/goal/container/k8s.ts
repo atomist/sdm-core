@@ -598,7 +598,7 @@ export const K8sContainerFulfillerName = "Kubernetes Container Goal Fulfiller";
  * Goal that fulfills requested container goals by scheduling them as
  * Kubernetes jobs.
  */
-export function k8sContainerFulfiller() {
+export function k8sContainerFulfiller(): GoalWithFulfillment {
     return new GoalWithFulfillment({
         displayName: K8sContainerFulfillerName,
         uniqueName: DefaultKubernetesFulfillmentOptions.name,
