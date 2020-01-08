@@ -26,6 +26,7 @@ import {
     ContainerRegistration,
     ContainerRegistrationGoalDataKey,
 } from "../../goal/container/container";
+import { K8sContainerFulfillerName } from "../../goal/container/k8s";
 import { SdmGoalState } from "../../typings/types";
 
 export interface KubernetesFulfillmentOptions {
@@ -34,8 +35,8 @@ export interface KubernetesFulfillmentOptions {
 }
 
 export const DefaultKubernetesFulfillmentOptions = {
-    registration: "@atomist/k8s-sdm",
-    name: "kubernetes-container-fulfill",
+    registration: "@atomist/k8s-sdm-skill",
+    name: K8sContainerFulfillerName,
 };
 
 /**

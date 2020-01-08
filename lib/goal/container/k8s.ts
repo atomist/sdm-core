@@ -592,19 +592,23 @@ const containerFulfillerCacheRestore: GoalProjectListenerRegistration = {
     },
 };
 
+export const K8sContainerFulfillerName = "Kubernetes Container Goal Fulfiller";
+
 /**
  * Goal that fulfills requested container goals by scheduling them as
  * Kubernetes jobs.
  */
-export const K8sContainerFulfiller = new GoalWithFulfillment({
-    displayName: "Kubernetes Container Goal Fulfiller",
-    uniqueName: DefaultKubernetesFulfillmentOptions.name,
-})
-    .with({
-        goalExecutor: containerExecutor,
-        name: `${DefaultKubernetesFulfillmentOptions.name}-executor`,
+export function k8sContainerFulfiller() {
+    return new GoalWithFulfillment({
+        displayName: K8sContainerFulfillerName,
+        uniqueName: DefaultKubernetesFulfillmentOptions.name,
     })
-    .withProjectListener(containerFulfillerCacheRestore);
+        .with({
+            goalExecutor: containerExecutor,
+            name: `${DefaultKubernetesFulfillmentOptions.name}-executor`,
+        })
+        .withProjectListener(containerFulfillerCacheRestore);
+}
 
 /**
  * Wait for container in pod to start, return when it does.
