@@ -46,7 +46,6 @@ import {
     Merge,
 } from "ts-essentials";
 import { loadKubeConfig } from "../../pack/k8s/config";
-import { DefaultKubernetesFulfillmentOptions } from "../../pack/k8s/KubernetesFulfillmentGoalScheduler";
 import {
     k8sJobEnv,
     KubernetesGoalScheduler,
@@ -543,7 +542,7 @@ export function executeK8sJob(): ExecuteGoal {
 /**
  * Read and parse container goal registration from goal event data.
  */
-function parseGoalEventData(goalEvent: SdmGoalEvent): any {
+export function parseGoalEventData(goalEvent: SdmGoalEvent): any {
     const goalName = goalEvent.uniqueName;
     if (!goalEvent || !goalEvent.data) {
         return {};
@@ -561,7 +560,7 @@ function parseGoalEventData(goalEvent: SdmGoalEvent): any {
 /**
  * If running as isolated goal, use [[executeK8sJob]] to execute the
  * goal.  Otherwise, schedule the goal execution as a Kubernetes job
- * using [[scheduleK8sjob]].
+ * using [[scheduleK8sJob]].
  */
 const containerExecutor: ExecuteGoal = gi => (process.env.ATOMIST_ISOLATED_GOAL) ? executeK8sJob()(gi) : scheduleK8sJob(gi);
 
@@ -592,6 +591,7 @@ const containerFulfillerCacheRestore: GoalProjectListenerRegistration = {
     },
 };
 
+/** Deterministic name for Kubernetes container goal fulfiller. */
 export const K8sContainerFulfillerName = "Kubernetes Container Goal Fulfiller";
 
 /**
@@ -601,11 +601,11 @@ export const K8sContainerFulfillerName = "Kubernetes Container Goal Fulfiller";
 export function k8sContainerFulfiller(): GoalWithFulfillment {
     return new GoalWithFulfillment({
         displayName: K8sContainerFulfillerName,
-        uniqueName: DefaultKubernetesFulfillmentOptions.name,
+        uniqueName: K8sContainerFulfillerName,
     })
         .with({
             goalExecutor: containerExecutor,
-            name: `${DefaultKubernetesFulfillmentOptions.name}-executor`,
+            name: `${K8sContainerFulfillerName} Executor`,
         })
         .withProjectListener(containerFulfillerCacheRestore);
 }
