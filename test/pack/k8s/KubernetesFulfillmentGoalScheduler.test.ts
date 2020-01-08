@@ -20,6 +20,7 @@ import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import * as assert from "assert";
 import { container } from "../../../lib/goal/container/container";
+import { K8sContainerFulfillerName } from "../../../lib/goal/container/k8s";
 import { KubernetesFulfillmentGoalScheduler } from "../../../lib/pack/k8s/KubernetesFulfillmentGoalScheduler";
 import { SdmGoalState } from "../../../lib/typings/types";
 
@@ -53,8 +54,8 @@ describe("KubernetesFulfillmentGoalScheduler", () => {
 
             assert.deepStrictEqual(g.state, SdmGoalState.requested);
             assert.deepStrictEqual(ge.fulfillment, {
-                registration: "@atomist/k8s-sdm",
-                name: "kubernetes-container-fulfill",
+                registration: "@atomist/k8s-sdm-skill",
+                name: K8sContainerFulfillerName,
                 method: SdmGoalFulfillmentMethod.Sdm,
             });
             assert(!!ge.data);
