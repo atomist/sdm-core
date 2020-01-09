@@ -109,46 +109,50 @@ async function createExtensions(cwd: string,
                                 options: ConfigureYamlOptions<any>,
                                 cfg: YamlSoftwareDeliveryMachineConfiguration,
                                 sdm: SoftwareDeliveryMachine): Promise<void> {
+    const commandCallback = async (c, k) => {
+        let registration: CommandHandlerRegistration;
+        try {
+            const makerResult = await c(sdm);
+            registration = { name: k, ...makerResult };
+        } catch (e) {
+            e.message = `Failed to make command using CommandMaker ${k}: ${e.message}`;
+            throw e;
+        }
+        try {
+            sdm.addCommand(registration);
+        } catch (e) {
+            e.message = `Failed to add command ${k} '${stringify(registration)}': ${e.message}`;
+            throw e;
+        }
+    };
     if (!options?.makers?.commands) {
-        await awaitIterable(
-            await requireCommands(cwd, options?.patterns?.commands),
-            async (c, k) => {
-                let registration: CommandHandlerRegistration;
-                try {
-                    const makerResult = await c(sdm);
-                    registration = { name: k, ...makerResult };
-                } catch (e) {
-                    e.message = `Failed to make command using CommandMaker ${k}: ${e.message}`;
-                    throw e;
-                }
-                try {
-                    sdm.addCommand(registration);
-                } catch (e) {
-                    e.message = `Failed to add command ${k} '${stringify(registration)}': ${e.message}`;
-                    throw e;
-                }
-            });
+        await awaitIterable(await requireCommands(cwd, options?.patterns?.commands), commandCallback);
+    } else {
+        await awaitIterable(options.makers.commands, commandCallback);
     }
+
+    const eventCallback = async (e, k) => {
+        let registration: EventHandlerRegistration;
+        try {
+            const makerResult = await e(sdm);
+            registration = { name: k, ...makerResult };
+        } catch (e) {
+            e.message = `Failed to make event using EventMaker ${k}: ${e.message}`;
+            throw e;
+        }
+        try {
+            sdm.addEvent(registration);
+        } catch (e) {
+            e.message = `Failed to add event ${k} '${stringify(registration)}': ${e.message}`;
+            throw e;
+        }
+    };
     if (!options.makers?.events) {
-        await awaitIterable(
-            await requireEvents(cwd, options?.patterns?.events),
-            async (e, k) => {
-                let registration: EventHandlerRegistration;
-                try {
-                    const makerResult = await e(sdm);
-                    registration = { name: k, ...makerResult };
-                } catch (e) {
-                    e.message = `Failed to make event using EventMaker ${k}: ${e.message}`;
-                    throw e;
-                }
-                try {
-                    sdm.addEvent(registration);
-                } catch (e) {
-                    e.message = `Failed to add event ${k} '${stringify(registration)}': ${e.message}`;
-                    throw e;
-                }
-            });
+        await awaitIterable(await requireEvents(cwd, options?.patterns?.events), eventCallback);
+    } else {
+        await awaitIterable(options.makers.events, eventCallback);
     }
+
     await requireIngesters(cwd, options?.patterns?.ingesters);
 
     sdm.addExtensionPacks(...(sdm.configuration.sdm?.extensionPacks || [
