@@ -93,9 +93,9 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         const kc = loadKubeConfig();
         const batch = kc.makeApiClient(k8s.BatchV1Api);
 
-        const jobSpec = createJobSpec(_.cloneDeep(this.podSpec), podNs, gi);
+        let jobSpec = createJobSpec(_.cloneDeep(this.podSpec), podNs, gi);
         const jobDesc = `k8s job '${jobSpec.metadata.namespace}:${jobSpec.metadata.name}' for goal '${goalEvent.uniqueName}'`;
-        await this.beforeCreation(gi, jobSpec);
+        jobSpec = await this.beforeCreation(gi, jobSpec);
 
         gi.progressLog.write(`/--`);
         gi.progressLog.write(
@@ -146,14 +146,15 @@ export class KubernetesGoalScheduler implements GoalScheduler {
     }
 
     /**
-     * Extension point for sub classes to modify k8s resources or provided jobSpec before the
-     * Job gets created in k8s.
-     * Note: A potentially existing job with the same name has already been deleted at this point.
-     * @param gi
-     * @param jobSpec
+     * Extension point for sub classes to modify the provided jobSpec
+     * before the Job gets created in k8s.  It should return the
+     * modified jobSpec.
+     * @param gi goal invocation
+     * @param jobSpec Default job spec
+     * @return desired job spec
      */
-    protected async beforeCreation(gi: GoalInvocation, jobSpec: k8s.V1Job): Promise<void> {
-        // Intentionally left empty
+    protected async beforeCreation(gi: GoalInvocation, jobSpec: k8s.V1Job): Promise<k8s.V1Job> {
+        return jobSpec;
     }
 
     /**
@@ -163,7 +164,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
      * @param jobSpec
      */
     protected async afterCreation(gi: GoalInvocation, jobSpec: k8s.V1Job): Promise<void> {
-        // Intentionally left empty
+        return;
     }
 
     public async initialize(configuration: Configuration): Promise<void> {
