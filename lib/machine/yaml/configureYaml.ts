@@ -70,7 +70,7 @@ export interface YamlSoftwareDeliveryMachineConfiguration {
 }
 
 export type YamlCommandHandlerRegistration =
-    Omit<CommandHandlerRegistration, "name" | "paramsMaker">;
+    Omit<CommandHandlerRegistration, "name" | "paramsMaker" | "parameters" >;
 export type CommandMaker<PARAMS = NoParameters> =
     (sdm: SoftwareDeliveryMachine) => Promise<YamlCommandHandlerRegistration> | YamlCommandHandlerRegistration;
 export type YamlEventHandler<PARAMS = NoParameters> =

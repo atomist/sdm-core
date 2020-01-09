@@ -272,7 +272,7 @@ export async function invokeConfigurer(sdm: SoftwareDeliveryMachine,
             return gc;
         };
 
-        return configurer(sdm as any);
+        return await configurer(sdm as any);
     } finally {
         delete (sdm as any).createGoals;
     }
