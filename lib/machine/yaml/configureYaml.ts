@@ -59,18 +59,10 @@ import {
 
 export interface YamlSoftwareDeliveryMachineConfiguration {
     extensionPacks?: ExtensionPack[];
-    extensions?: {
-        commands?: string[];
-        events?: string[];
-        ingesters?: string[];
-
-        goals?: string[];
-        tests?: string[];
-    };
 }
 
 export type YamlCommandHandlerRegistration =
-    Omit<CommandHandlerRegistration, "name" | "paramsMaker" | "parameters" >;
+    Omit<CommandHandlerRegistration, "name" | "paramsMaker" | "parameters">;
 export type CommandMaker<PARAMS = NoParameters> =
     (sdm: SoftwareDeliveryMachine) => Promise<YamlCommandHandlerRegistration> | YamlCommandHandlerRegistration;
 export type YamlEventHandler<PARAMS = NoParameters> =
@@ -94,6 +86,79 @@ export interface ConfigureYamlOptions<G extends DeliveryGoals> {
     configurers?: GoalConfigurer<G> | Array<GoalConfigurer<G>>;
 
     cwd?: string;
+
+    makers?: {
+        commands: Record<string, CommandMaker>,
+        events: Record<string, EventMaker>,
+        goals: Record<string, GoalMaker>,
+        tests: Record<string, PushTestMaker>,
+    };
+
+    patterns?: {
+        commands?: string[];
+        events?: string[];
+        ingesters?: string[];
+
+        goals?: string[];
+        tests?: string[];
+        configs?: string[];
+    };
+}
+
+async function createExtensions(cwd: string,
+                                options: ConfigureYamlOptions<any>,
+                                cfg: YamlSoftwareDeliveryMachineConfiguration,
+                                sdm: SoftwareDeliveryMachine): Promise<void> {
+    if (!options?.makers?.commands) {
+        await awaitIterable(
+            await requireCommands(cwd, options?.patterns?.commands),
+            async (c, k) => {
+                let registration: CommandHandlerRegistration;
+                try {
+                    const makerResult = await c(sdm);
+                    registration = { name: k, ...makerResult };
+                } catch (e) {
+                    e.message = `Failed to make command using CommandMaker ${k}: ${e.message}`;
+                    throw e;
+                }
+                try {
+                    sdm.addCommand(registration);
+                } catch (e) {
+                    e.message = `Failed to add command ${k} '${stringify(registration)}': ${e.message}`;
+                    throw e;
+                }
+            });
+    }
+    if (!options.makers?.events) {
+        await awaitIterable(
+            await requireEvents(cwd, options?.patterns?.events),
+            async (e, k) => {
+                let registration: EventHandlerRegistration;
+                try {
+                    const makerResult = await e(sdm);
+                    registration = { name: k, ...makerResult };
+                } catch (e) {
+                    e.message = `Failed to make event using EventMaker ${k}: ${e.message}`;
+                    throw e;
+                }
+                try {
+                    sdm.addEvent(registration);
+                } catch (e) {
+                    e.message = `Failed to add event ${k} '${stringify(registration)}': ${e.message}`;
+                    throw e;
+                }
+            });
+    }
+    await requireIngesters(cwd, options?.patterns?.ingesters);
+
+    sdm.addExtensionPacks(...(sdm.configuration.sdm?.extensionPacks || [
+        goalStateSupport({
+            cancellation: {
+                enabled: true,
+            },
+        }),
+        githubGoalStatusSupport(),
+    ]));
 }
 
 /**
@@ -112,7 +177,7 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
     const cfg = await createConfiguration(cwd, options);
 
     return configure<G>(async sdm => {
-        await createExtensions(cwd, cfg, sdm);
+        await createExtensions(cwd, options, cfg, sdm);
         return createGoalData(patterns, cwd, options, cfg, sdm);
     }, options.options || {});
 }
@@ -120,7 +185,7 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
 async function createConfiguration(cwd: string, options: ConfigureYamlOptions<any>)
     : Promise<YamlSoftwareDeliveryMachineConfiguration> {
     const cfg: any = {};
-    await awaitIterable(await requireConfiguration(cwd), async v => {
+    await awaitIterable(await requireConfiguration(cwd, options?.patterns?.configs), async v => {
         const c = await v(cfg);
         deepMergeConfigs(cfg, c);
     });
@@ -133,56 +198,6 @@ async function createConfiguration(cwd: string, options: ConfigureYamlOptions<an
     return cfg;
 }
 
-async function createExtensions(cwd: string,
-                                cfg: YamlSoftwareDeliveryMachineConfiguration,
-                                sdm: SoftwareDeliveryMachine): Promise<void> {
-    await awaitIterable(
-        await requireCommands(cwd, _.get(cfg, "extensions.commands")),
-        async (c, k) => {
-            let registration: CommandHandlerRegistration;
-            try {
-                const makerResult = await c(sdm);
-                registration = { name: k, ...makerResult };
-            } catch (e) {
-                e.message = `Failed to make command using CommandMaker ${k}: ${e.message}`;
-                throw e;
-            }
-            try {
-                sdm.addCommand(registration);
-            } catch (e) {
-                e.message = `Failed to add command ${k} '${stringify(registration)}': ${e.message}`;
-                throw e;
-            }
-        });
-    await awaitIterable(
-        await requireEvents(cwd, _.get(cfg, "extensions.events")),
-        async (e, k) => {
-            let registration: EventHandlerRegistration;
-            try {
-                const makerResult = await e(sdm);
-                registration = { name: k, ...makerResult };
-            } catch (e) {
-                e.message = `Failed to make event using EventMaker ${k}: ${e.message}`;
-                throw e;
-            }
-            try {
-                sdm.addEvent(registration);
-            } catch (e) {
-                e.message = `Failed to add event ${k} '${stringify(registration)}': ${e.message}`;
-                throw e;
-            }
-        });
-    await requireIngesters(cwd, _.get(cfg, "extensions.ingesters"));
-    sdm.addExtensionPacks(...(sdm.configuration.sdm?.extensionPacks || [
-        goalStateSupport({
-            cancellation: {
-                enabled: true,
-            },
-        }),
-        githubGoalStatusSupport(),
-    ]));
-}
-
 // tslint:disable-next-line:cyclomatic-complexity
 async function createGoalData<G extends DeliveryGoals>(patterns: string | string[],
                                                        cwd: string,
@@ -191,8 +206,10 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
                                                        sdm: SoftwareDeliveryMachine & { createGoals: CreateGoals<G> })
     : Promise<GoalData> {
     const additionalGoals = options.goals ? await sdm.createGoals(options.goals, options.configurers) : {};
-    const goalMakers = await requireGoals(cwd, _.get(cfg, "extensions.goals"));
-    const testMakers = await requireTests(cwd, _.get(cfg, "extensions.tests"));
+    const goalMakers = !!options.makers?.goals ? options.makers.goals :
+        await requireGoals(cwd, _.get(cfg, "extensions.goals"));
+    const testMakers = !!options.makers?.tests ? options.makers.tests :
+        await requireTests(cwd, _.get(cfg, "extensions.tests"));
 
     const files = await resolvePaths(cwd, patterns, true);
 
