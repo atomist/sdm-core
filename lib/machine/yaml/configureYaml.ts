@@ -255,6 +255,9 @@ async function requireExtensions<EXT>(cwd: string,
                                       cb: (v: EXT, k: string, e: Record<string, EXT>) => void = () => {
                                       },
 ): Promise<Record<string, EXT>> {
+    if (pattern.length === 0) {
+        return {};
+    }
     const extensions: Record<string, EXT> = {};
     const files = await resolvePaths(cwd, pattern);
     for (const file of files) {
