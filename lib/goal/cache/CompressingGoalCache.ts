@@ -100,7 +100,7 @@ export class CompressingGoalCache implements GoalCache {
         } else if (this.method === CompressionMethod.ZIP) {
             const zip = new JSZip();
             for (const file of files) {
-                zip.file(file, (await project.getFile(file)).getContent());
+                zip.file(file, fs.createReadStream(path.join(project.baseDir, file)));
             }
             const defer = new Deferred<string>();
             zip.generateNodeStream({
