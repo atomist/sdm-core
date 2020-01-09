@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Better YAML format. [#227](https://github.com/atomist/sdm-core/issues/227)
 -   Merge pod affinity rather than overwrite. [#229](https://github.com/atomist/sdm-core/issues/229)
 -   Prepare for GCF to k8s goal scheduling. [#230](https://github.com/atomist/sdm-core/issues/230)
+-   Have beforeCreation return job spec. [#234](https://github.com/atomist/sdm-core/issues/234)
 
 ### Fixed
 
