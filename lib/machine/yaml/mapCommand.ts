@@ -57,7 +57,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
 
         const mapIntent = (intent: string) => {
             if (parameterNames.length > 0) {
-                return `^${intent}(\s(?:--)?(?:${parameterNames.join("|")})=(?:["'\s\S]*))*$`;
+                return `^${intent}(\\s--(?:${parameterNames.join("|")})=(?:["'\\s\\S]*))*$`;
             } else {
                 return `^${intent}$`;
             }
@@ -74,12 +74,12 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
                 const instance = toFactory(ch)();
                 const parameterDefinition: ParametersObject<any> = {};
 
-                const intent = ci.matches[0];
+                const intent = ((ci.context as any).trigger as any).raw_message;
                 if (!!intent) {
                     const args = require("yargs-parser")(intent);
                     ((ci.context as any).trigger as CommandIncoming).parameters.push(..._.map(args, (v, k) => ({
                         name: k,
-                        value: v
+                        value: v,
                     })));
                 }
 
@@ -116,6 +116,7 @@ async function populateSecrets(parameters: any, metadata: CommandHandlerMetadata
                         id: chatId,
                     },
                 });
+                // TODO cd properly support different providers
                 const credentialId = _.get(resourceUser, "ChatId[0].person.resourceUsers[0].credential.id");
                 if (!!credentialId) {
                     const credential = await ci.context.graphClient.query<GitHubUserTokenQuery, GitHubUserTokenQueryVariables>({
