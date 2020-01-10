@@ -92,6 +92,7 @@ export interface ConfigureYamlOptions<G extends DeliveryGoals> {
         events: Record<string, EventMaker>,
         goals: Record<string, GoalMaker>,
         tests: Record<string, PushTestMaker>,
+        configurations: Record<string, ConfigurationMaker>,
     };
 
     patterns?: {
@@ -101,7 +102,7 @@ export interface ConfigureYamlOptions<G extends DeliveryGoals> {
 
         goals?: string[];
         tests?: string[];
-        configs?: string[];
+        configurations?: string[];
     };
 }
 
@@ -189,10 +190,17 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
 async function createConfiguration(cwd: string, options: ConfigureYamlOptions<any>)
     : Promise<YamlSoftwareDeliveryMachineConfiguration> {
     const cfg: any = {};
-    await awaitIterable(await requireConfiguration(cwd, options?.patterns?.configs), async v => {
-        const c = await v(cfg);
-        deepMergeConfigs(cfg, c);
-    });
+    if (!options?.makers.configurations) {
+        await awaitIterable(await requireConfiguration(cwd, options?.patterns?.configurations), async v => {
+            const c = await v(cfg);
+            deepMergeConfigs(cfg, c);
+        });
+    } else {
+        await awaitIterable(options.makers.configurations, async v => {
+            const c = await v(cfg);
+            deepMergeConfigs(cfg, c);
+        });
+    }
     _.update(options, "options.preProcessors",
         old => !!old ? old : []);
     options.options.preProcessors = [
