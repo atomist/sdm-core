@@ -1,6 +1,6 @@
 query GitHubUserToken($id: ID!) {
-    OAuthToken(id: $id) {
-        scopes
-        secret
-    }
+  OAuthToken(id: $id) {
+    scopes
+    secret
+  }
 }

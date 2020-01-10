@@ -1,17 +1,17 @@
 query MappedChannels($id: String!) {
-    ChatChannel(channelId: $id) {
-        repos {
-            id
-            name
-            owner
-            org {
-                provider {
-                    providerId
-                    providerType
-                    apiUrl
-                    url
-                }
-            }
+  ChatChannel(channelId: $id) {
+    repos {
+      id
+      name
+      owner
+      org {
+        provider {
+          providerId
+          providerType
+          apiUrl
+          url
         }
+      }
     }
+  }
 }
