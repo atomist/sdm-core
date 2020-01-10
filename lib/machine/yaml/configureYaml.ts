@@ -190,7 +190,7 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
 async function createConfiguration(cwd: string, options: ConfigureYamlOptions<any>)
     : Promise<YamlSoftwareDeliveryMachineConfiguration> {
     const cfg: any = {};
-    if (!options?.makers.configurations) {
+    if (!options?.makers?.configurations) {
         await awaitIterable(await requireConfiguration(cwd, options?.patterns?.configurations), async v => {
             const c = await v(cfg);
             deepMergeConfigs(cfg, c);
