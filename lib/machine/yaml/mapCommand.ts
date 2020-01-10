@@ -55,11 +55,19 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
             ...metadata.mapped_parameters.map(mp => mp.name),
         ];
 
+        const mapIntent = (intent: string) => {
+            if (parameterNames.length > 0) {
+                return `^${intent}(\s(?:--)?(?:${parameterNames.join("|")})=(?:["'\s\S]*))*$`;
+            } else {
+                return `^${intent}$`;
+            }
+        };
+
         return {
 
             name: metadata.name,
             description: metadata.description,
-            intent: toArray(metadata.intent).map(i => `^${i}(\s(?:--)?(?:${parameterNames.join("|")})=(?:["'\s\S]*))*$`),
+            intent: toArray(metadata.intent).map(mapIntent),
             tags: (metadata.tags || []).map(t => t.name),
 
             listener: async ci => {
@@ -67,8 +75,13 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
                 const parameterDefinition: ParametersObject<any> = {};
 
                 const intent = ci.matches[0];
-                const args = require("yargs-parser")(intent);
-                ((ci.context as any).trigger as CommandIncoming).parameters.push(..._.map(args, (v, k) => ({ name: k, value: v})));
+                if (!!intent) {
+                    const args = require("yargs-parser")(intent);
+                    ((ci.context as any).trigger as CommandIncoming).parameters.push(..._.map(args, (v, k) => ({
+                        name: k,
+                        value: v
+                    })));
+                }
 
                 metadata.parameters.forEach(p => {
                     parameterDefinition[p.name] = {
