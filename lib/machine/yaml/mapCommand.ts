@@ -217,8 +217,8 @@ async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation)
                 url: repos[0].org.provider.url,
             };
         } else if (repos.length > 0) {
-            const parameters = await ci.promptFor<{ repo: string }>({
-                repo: {
+            const parameters = await ci.promptFor<{ repo_id: string }>({
+                repo_id: {
                     displayName: "Repository",
                     type: {
                         kind: "single",
@@ -226,7 +226,7 @@ async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation)
                     },
                 },
             });
-            const repo = repos.find(r => r.id === parameters.repo);
+            const repo = repos.find(r => r.id === parameters.repo_id);
             return {
                 name: repo.name,
                 owner: repo.owner,
