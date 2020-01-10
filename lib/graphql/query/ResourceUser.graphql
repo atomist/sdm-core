@@ -3,6 +3,9 @@ query ResourceUser($id: String!) {
         person {
             resourceUsers {
                 id
+                credential {
+                    id
+                }
             }
             gitHubId {
                 login

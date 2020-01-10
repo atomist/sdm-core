@@ -53,7 +53,8 @@
     "request": "^2.88.0",
     "stack-trace": "0.0.10",
     "tmp-promise": "^2.0.2",
-    "ts-essentials": "^2.0.12"
+    "ts-essentials": "^2.0.12",
+    "yargs-parser": "^16.1.0"
   },
   "peerDependencies": {
     "@atomist/automation-client": "^1.8.0",
