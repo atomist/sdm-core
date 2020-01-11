@@ -26,7 +26,6 @@ import {
     ContainerRegistration,
     ContainerRegistrationGoalDataKey,
 } from "../../goal/container/container";
-import { K8sContainerFulfillerName } from "../../goal/container/k8s";
 import { SdmGoalState } from "../../typings/types";
 
 export interface KubernetesFulfillmentOptions {
@@ -34,10 +33,12 @@ export interface KubernetesFulfillmentOptions {
     name?: string | ((gi: GoalInvocation) => Promise<string>);
 }
 
-export const DefaultKubernetesFulfillmentOptions = {
-    registration: "@atomist/k8s-sdm-skill",
-    name: K8sContainerFulfillerName,
-};
+export function defaultKubernetesFulfillmentOptions() {
+    return {
+        registration: "@atomist/k8s-sdm-skill",
+        name: require("../../goal/container/k8s").K8sContainerFulfillerName,
+    };
+}
 
 /**
  * GoalScheduler implementation that redirects goals to a registered k8s-sdm for
@@ -48,7 +49,7 @@ export const DefaultKubernetesFulfillmentOptions = {
  */
 export class KubernetesFulfillmentGoalScheduler implements GoalScheduler {
 
-    constructor(private readonly options: KubernetesFulfillmentOptions = DefaultKubernetesFulfillmentOptions) {
+    constructor(private readonly options: KubernetesFulfillmentOptions = defaultKubernetesFulfillmentOptions()) {
     }
 
     public async schedule(gi: GoalInvocation): Promise<ExecuteGoalResult> {
