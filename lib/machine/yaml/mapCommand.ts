@@ -36,15 +36,15 @@ import * as _ from "lodash";
 import {
     GitHubUserTokenQuery,
     GitHubUserTokenQueryVariables,
-    MappedChannels,
-    MappedChannelsQuery,
-    MappedChannelsQueryVariables,
+    RepositoryMappedChannels,
+    RepositoryMappedChannelsQuery,
+    RepositoryMappedChannelsQueryVariables,
     ResourceUserQuery,
     ResourceUserQueryVariables,
 } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import { CommandMaker } from "./configureYaml";
-import Repos = MappedChannels.Repos;
+import Repos = RepositoryMappedChannels.Repos;
 
 export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
     return sdm => {
@@ -196,8 +196,8 @@ async function populateMappedParameters(parameters: any, metadata: CommandHandle
 async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation)
     : Promise<{ name?: string, owner?: string, providerId?: string, providerType?: string, apiUrl?: string, url?: string }> {
     const channelId = _.get(ci, "context.trigger.source.slack.channel.id");
-    const channels = await ci.context.graphClient.query<MappedChannelsQuery, MappedChannelsQueryVariables>({
-        name: "MappedChannels",
+    const channels = await ci.context.graphClient.query<RepositoryMappedChannelsQuery, RepositoryMappedChannelsQueryVariables>({
+        name: "RepositoryMappedChannels",
         variables: {
             id: channelId,
         },
