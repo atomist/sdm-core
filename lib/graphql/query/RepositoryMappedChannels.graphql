@@ -1,4 +1,4 @@
-query MappedChannels($id: String!) {
+query RepositoryMappedChannels($id: String!) {
   ChatChannel(channelId: $id) {
     repos {
       id
