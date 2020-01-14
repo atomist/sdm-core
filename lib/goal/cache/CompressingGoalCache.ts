@@ -28,6 +28,7 @@ import * as path from "path";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { FileSystemGoalCacheArchiveStore } from "./FileSystemGoalCacheArchiveStore";
 import { GoalCache } from "./goalCaching";
+import * as fg from "fast-glob";
 
 export interface GoalCacheArchiveStore {
     /**
@@ -100,7 +101,15 @@ export class CompressingGoalCache implements GoalCache {
         } else if (this.method === CompressionMethod.ZIP) {
             const zip = new JSZip();
             for (const file of files) {
-                zip.file(file, fs.createReadStream(path.join(project.baseDir, file)));
+                const p = path.join(project.baseDir, file);
+                if ((await fs.stat(p)).isFile()) {
+                    zip.file(file, fs.createReadStream(p));
+                } else {
+                    const dirFiles = await fg(`${file}/**/*`, { cwd: project.baseDir, dot: true });
+                    for (const dirFile of dirFiles) {
+                        zip.file(dirFile, fs.createReadStream(path.join(project.baseDir, dirFile)));
+                    }
+                }
             }
             const defer = new Deferred<string>();
             zip.generateNodeStream({
