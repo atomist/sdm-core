@@ -31,11 +31,11 @@ import { commandHandlerRegistrationToCommand } from "@atomist/sdm/lib/api-helper
 import { slackErrorMessage } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import { CommandListenerInvocation } from "@atomist/sdm/lib/api/listener/CommandListener";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
+import { ParameterStyle } from "@atomist/sdm/lib/api/registration/CommandRegistration";
 import { ParametersObject } from "@atomist/sdm/lib/api/registration/ParametersDefinition";
 import * as _ from "lodash";
 import {
-    GitHubUserTokenQuery,
-    GitHubUserTokenQueryVariables,
+    OAuthToken,
     RepositoryMappedChannels,
     RepositoryMappedChannelsQuery,
     RepositoryMappedChannelsQueryVariables,
@@ -87,7 +87,10 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
                     };
                 });
 
-                const parameters = await ci.promptFor(parameterDefinition);
+                const parameters = await ci.promptFor(parameterDefinition, {
+                    autoSubmit: metadata.auto_submit,
+                    parameterStyle: ParameterStyle.Dialog[metadata.question],
+                });
                 populateParameters(instance, metadata, _.map(parameters, (v, k) => ({ name: k, value: v as any })));
                 populateValues(instance, metadata, ci.configuration);
                 await populateSecrets(parameters, metadata, ci);
@@ -113,18 +116,25 @@ async function populateSecrets(parameters: any, metadata: CommandHandlerMetadata
                         id: chatId,
                     },
                 });
-                // TODO cd properly support different providers
-                const credentialId = _.get(resourceUser, "ChatId[0].person.resourceUsers[0].credential.id");
-                if (!!credentialId) {
-                    const credential = await ci.context.graphClient.query<GitHubUserTokenQuery, GitHubUserTokenQueryVariables>({
-                        name: "GitHubUserToken",
-                        variables: {
-                            id: credentialId,
-                        },
-                    });
-                    const s = _.get(credential, "OAuthToken[0].secret");
+                const credential: OAuthToken = _.get(resourceUser, "ChatId[0].person.gitHubId.credential");
+                if (!!credential) {
+                    const uriParts = secret.uri.split("?scopes=");
+                    if (uriParts.length === 2) {
+                        // Check for scopes
+                        const scopes = uriParts[1].split(",");
+                        if (scopes.some(s => !credential.scopes.includes(s))) {
+                            // TODO cd send redirect to scope increase page
+                            await ci.addressChannels(slackErrorMessage(
+                                "Missing GitHub OAuth Scope",
+                                "The recorded token is missing some requested scopes",
+                                ci.context));
+                        }
+                    }
+                    const s = credential.secret;
                     _.update(parameters, secret.name, () => s);
                 }
+            } else {
+                // TODO cd send redirect to oauth token collection page
             }
         } else if (secret.uri === Secrets.OrgToken) {
             // TODO cd add this
@@ -222,7 +232,7 @@ async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation)
                         options: repos.map(r => ({ description: `${r.owner}/${r.name}`, value: r.id })),
                     },
                 },
-            });
+            }, {});
             const repo = repos.find(r => r.id === parameters.repo_id);
             return {
                 name: repo.name,
