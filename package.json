@@ -64,7 +64,7 @@
     "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "2.0.0-remove-index.20191230145915",
+    "@atomist/automation-client": "2.0.0-remove-index.20200115105959",
     "@atomist/microgrammar": "^1.2.1",
     "@atomist/sdm": "2.0.0-remove-index.20200114085202",
     "@atomist/slack-messages": "^1.1.1",
@@ -86,7 +86,7 @@
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
     "typedoc": "^0.15.3",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.4"
   },
   "directories": {
     "test": "test"
