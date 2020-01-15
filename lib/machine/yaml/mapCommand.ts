@@ -30,6 +30,7 @@ import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils
 import { commandHandlerRegistrationToCommand } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { slackErrorMessage } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import { CommandListenerInvocation } from "@atomist/sdm/lib/api/listener/CommandListener";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import { ParameterStyle } from "@atomist/sdm/lib/api/registration/CommandRegistration";
 import { ParametersObject } from "@atomist/sdm/lib/api/registration/ParametersDefinition";
@@ -43,8 +44,30 @@ import {
     ResourceUserQueryVariables,
 } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
-import { CommandMaker } from "./configureYaml";
+import {
+    CommandMaker,
+    YamlCommandHandlerRegistration,
+} from "./configureYaml";
 import Repos = RepositoryMappedChannels.Repos;
+
+export function decorateSoftwareDeliveryMachine(sdm: SoftwareDeliveryMachine): SoftwareDeliveryMachine {
+    const proxy = new Proxy<SoftwareDeliveryMachine>(sdm, {
+        get: (target, propKey) => {
+            if (propKey === "addCommand") {
+                return (...args) => {
+                    const cmd = args[0] as CommandHandlerRegistration;
+                    target[propKey]({
+                        name: cmd.name,
+                        ...mapCommand(cmd)(sdm) as YamlCommandHandlerRegistration,
+                    });
+                };
+            } else {
+                return target[propKey];
+            }
+        },
+    });
+    return proxy;
+}
 
 export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
     return sdm => {
