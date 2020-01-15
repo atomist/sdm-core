@@ -66,7 +66,7 @@
   "devDependencies": {
     "@atomist/automation-client": "2.0.0-remove-index.20200115105959",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "2.0.0-remove-index.20200114085202",
+    "@atomist/sdm": "2.0.0-remove-index.20200115132157",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.144",
