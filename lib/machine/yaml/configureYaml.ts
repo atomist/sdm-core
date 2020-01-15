@@ -46,6 +46,7 @@ import {
     GoalCreator,
     GoalData,
 } from "../configure";
+import { decorateSoftwareDeliveryMachine } from "./mapCommand";
 import {
     GoalMaker,
     mapGoals,
@@ -73,6 +74,11 @@ export type EventMaker<PARAMS = NoParameters> =
 export type ConfigurationMaker = (cfg: Configuration) =>
     Promise<SoftwareDeliveryMachineConfiguration<YamlSoftwareDeliveryMachineConfiguration>> |
     SoftwareDeliveryMachineConfiguration<YamlSoftwareDeliveryMachineConfiguration>;
+
+export enum Target {
+    SDM = "sdm",
+    Skill = "skill",
+}
 
 /**
  * Configuration options for the yaml support
@@ -104,6 +110,8 @@ export interface ConfigureYamlOptions<G extends DeliveryGoals> {
         tests?: string[];
         configurations?: string[];
     };
+
+    target?: Target;
 }
 
 async function createExtensions(cwd: string,
@@ -182,8 +190,12 @@ export async function configureYaml<G extends DeliveryGoals>(patterns: string | 
     const cfg = await createConfiguration(cwd, options);
 
     return configure<G>(async sdm => {
-        await createExtensions(cwd, options, cfg, sdm);
-        return createGoalData(patterns, cwd, options, cfg, sdm);
+        let sdmToUse = sdm;
+        if (options.target === Target.Skill) {
+            sdmToUse = decorateSoftwareDeliveryMachine(sdm);
+        }
+        await createExtensions(cwd, options, cfg, sdmToUse);
+        return createGoalData(patterns, cwd, options, cfg, sdmToUse);
     }, options.options || {});
 }
 

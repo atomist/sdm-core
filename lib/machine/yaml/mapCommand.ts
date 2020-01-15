@@ -45,13 +45,18 @@ import {
 } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import {
+    CreateGoals,
+    DeliveryGoals,
+} from "../configure";
+import {
     CommandMaker,
     YamlCommandHandlerRegistration,
 } from "./configureYaml";
 import Repos = RepositoryMappedChannels.Repos;
 
-export function decorateSoftwareDeliveryMachine(sdm: SoftwareDeliveryMachine): SoftwareDeliveryMachine {
-    const proxy = new Proxy<SoftwareDeliveryMachine>(sdm, {
+export function decorateSoftwareDeliveryMachine<G extends DeliveryGoals>(sdm: SoftwareDeliveryMachine & { createGoals: CreateGoals<G> })
+    : SoftwareDeliveryMachine & { createGoals: CreateGoals<G> } {
+    const proxy = new Proxy<SoftwareDeliveryMachine & { createGoals: CreateGoals<G> }>(sdm, {
         get: (target, propKey) => {
             if (propKey === "addCommand") {
                 return (...args) => {
