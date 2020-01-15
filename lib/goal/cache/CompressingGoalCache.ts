@@ -21,6 +21,7 @@ import { GitProject } from "@atomist/automation-client/lib/project/git/GitProjec
 import { logger } from "@atomist/automation-client/lib/util/logger";
 import { spawnLog } from "@atomist/sdm/lib/api-helper/misc/child_process";
 import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
+import * as fg from "fast-glob";
 import * as fs from "fs-extra";
 import * as JSZip from "jszip";
 import * as os from "os";
@@ -28,7 +29,6 @@ import * as path from "path";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { FileSystemGoalCacheArchiveStore } from "./FileSystemGoalCacheArchiveStore";
 import { GoalCache } from "./goalCaching";
-import * as fg from "fast-glob";
 
 export interface GoalCacheArchiveStore {
     /**

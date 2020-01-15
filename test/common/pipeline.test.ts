@@ -130,7 +130,7 @@ describe("pipeline", () => {
                 name: "step1",
                 run: async (gi, context) => {
                     order.push("1");
-                    context["foo"] = "bar";
+                    context.foo = "bar";
                 },
             };
             const step2: PipelineStep = {

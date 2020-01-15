@@ -70,7 +70,7 @@ export async function runPipeline(gi: ProjectAwareGoalInvocation, ...steps: Pipe
             return {
                 state: SdmGoalState.failure,
                 phase: step.name,
-            }
+            };
         }
     }
 }
