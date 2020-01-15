@@ -80,11 +80,11 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
         const metadata = metadataFromInstance(toFactory(ch)()) as CommandHandlerMetadata;
         const parameterNames = metadata.parameters.map(p => p.name);
 
-        const mapIntent = (intent: string) => {
+        const mapIntent = (intents: string[]) => {
             if (parameterNames.length > 0) {
-                return `^${intent}(\\s--(?:${parameterNames.join("|")})=(?:["'\\s\\S]*))*$`;
+                return `^(?:${intents.join("|")})${parameterNames.map(p => `(?=\\s--${p}='[\\s\\S]*?')*?`).join()}.+$`;
             } else {
-                return `^${intent}$`;
+                return `^(?:${intents.join("|")})$`;
             }
         };
 
@@ -92,7 +92,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
 
             name: metadata.name,
             description: metadata.description,
-            intent: toArray(metadata.intent).map(mapIntent),
+            intent: mapIntent(metadata.intent || []),
             tags: (metadata.tags || []).map(t => t.name),
 
             listener: async ci => {
