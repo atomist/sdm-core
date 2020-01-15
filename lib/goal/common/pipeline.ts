@@ -22,11 +22,11 @@ import {
 } from "@atomist/sdm/lib/api-helper/project/withProject";
 import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import {
+    FulfillableGoalDetails,
     goal,
     GoalWithFulfillment,
 } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import { SdmGoalState } from "@atomist/sdm/lib/typings/types";
-import { FulfillableGoalDetails } from "@atomist/sdm/src/lib/api/goal/GoalWithFulfillment";
 
 const PipelineProgressReporter = testProgressReporter({
     test: /Running step '(.*)'/i,
