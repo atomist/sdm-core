@@ -43,7 +43,6 @@ import {
     ResourceUserQuery,
     ResourceUserQueryVariables,
 } from "../../typings/types";
-import { toArray } from "../../util/misc/array";
 import {
     CreateGoals,
     DeliveryGoals,
