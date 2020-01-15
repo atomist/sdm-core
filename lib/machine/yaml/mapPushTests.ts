@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { hasCommit } from "@atomist/sdm/lib/api-helper/pushtest/commit";
 import { isMaterialChange } from "@atomist/sdm/lib/api-helper/pushtest/materialChangeTest";
 import { StatefulPushListenerInvocation } from "@atomist/sdm/lib/api/dsl/goalContribution";
 import { isGoal } from "@atomist/sdm/lib/api/mapping/goalTest";
@@ -133,6 +134,13 @@ const HasResourceProvider: CreatePushTest = async test => {
     return undefined;
 };
 
+const HasCommit: CreatePushTest = async test => {
+    if (test.hasCommit) {
+        return hasCommit(typeof test.hasCommit === "string" ? new RegExp(test.hasCommit) : test.hasCommit);
+    }
+    return undefined;
+};
+
 const Not: CreatePushTest = async (test, additionalTests, extensionTests) => {
     if (test.not) {
         return not(await mapTest(test.not, additionalTests, extensionTests));
@@ -191,6 +199,7 @@ export const CreatePushTests = [
     IsMaterialChange,
     HasFileContaining,
     HasResourceProvider,
+    HasCommit,
     Not,
     And,
     Or,
