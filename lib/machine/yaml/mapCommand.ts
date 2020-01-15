@@ -80,10 +80,14 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
         const parameterNames = metadata.parameters.map(p => p.name);
 
         const mapIntent = (intents: string[]) => {
-            if (parameterNames.length > 0) {
-                return `^(?:${intents.join("|")})${parameterNames.map(p => `(?=\\s--${p}='[\\s\\S]*?')*?`).join()}.+$`;
+            if (!!intents && intents.length > 0 ) {
+                if (parameterNames.length > 0) {
+                    return `^(?:${intents.join("|")})${parameterNames.map(p => `(?=\\s--${p}='[\\s\\S]*?')*?`).join()}.+$`;
+                } else {
+                    return `^(?:${intents.join("|")})$`;
+                }
             } else {
-                return `^(?:${intents.join("|")})$`;
+                return undefined;
             }
         };
 
