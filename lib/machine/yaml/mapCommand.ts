@@ -71,7 +71,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
                 const instance = toFactory(ch)();
                 const parameterDefinition: ParametersObject<any> = {};
 
-                const intent = ((ci.context as any).trigger as any).raw_message;
+                const intent = ((ci.context as any).trigger).raw_message;
                 if (!!intent) {
                     const args = require("yargs-parser")(intent);
                     ((ci.context as any).trigger as CommandIncoming).parameters.push(..._.map(args, (v, k) => ({
@@ -122,7 +122,7 @@ async function populateSecrets(parameters: any, metadata: CommandHandlerMetadata
                     if (uriParts.length === 2) {
                         // Check for scopes
                         const scopes = uriParts[1].split(",");
-                        if (scopes.some(s => !credential.scopes.includes(s))) {
+                        if (scopes.some(scope => !credential.scopes.includes(scope))) {
                             // TODO cd send redirect to scope increase page
                             await ci.addressChannels(slackErrorMessage(
                                 "Missing GitHub OAuth Scope",

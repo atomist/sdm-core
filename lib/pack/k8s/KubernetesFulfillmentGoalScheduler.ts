@@ -33,7 +33,7 @@ export interface KubernetesFulfillmentOptions {
     name?: string | ((gi: GoalInvocation) => Promise<string>);
 }
 
-export function defaultKubernetesFulfillmentOptions() {
+export function defaultKubernetesFulfillmentOptions(): KubernetesFulfillmentOptions {
     return {
         registration: "@atomist/k8s-sdm-skill",
         name: require("../../goal/container/k8s").K8sContainerFulfillerName,
