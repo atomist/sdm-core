@@ -248,9 +248,6 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
             ));
 
         for (const config of configs) {
-            if (!!config.name) {
-                (sdm as any).name = config.name;
-            }
 
             if (!!config.configuration) {
                 _.merge(sdm.configuration, camelcaseKeys(config.configuration, { deep: true }));
@@ -258,6 +255,9 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
 
             if (!!config.skill) {
                 _.merge(sdm.configuration, camelcaseKeys(config.skill, { deep: true }));
+
+                sdm.configuration.name = config.skill.id || config.skill.name;
+                (sdm as any).name = name;
             }
 
             for (const k in config) {
