@@ -82,9 +82,9 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
         const mapIntent = (intents: string[]) => {
             if (!!intents && intents.length > 0 ) {
                 if (parameterNames.length > 0) {
-                    return `^(?:${intents.join("|")})${parameterNames.map(p => `(?=\\s--${p}='[\\s\\S]*?')*?`).join("")}.+$`;
+                    return `^(?:${intents.map(i => i.replace(/ /g, "\\s+")).join("|")})(?:\\s+--(?:${parameterNames.join("|")})=(?:'[^']*?'|"[^"]*?"|[\\w]*?))*$`;
                 } else {
-                    return `^(?:${intents.join("|")})$`;
+                    return `^(?:${intents.map(i => i.replace(/ /g, "\\s+")).join("|")})$`;
                 }
             } else {
                 return undefined;
