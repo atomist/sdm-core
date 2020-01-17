@@ -35,6 +35,9 @@ export interface AtomistYaml {
 
     subscriptions?: string[];
     ingesters?: string[];
+
+    rules?: any;
+    goals?: any;
 }
 
 export interface PackageUse extends Parameterized {
