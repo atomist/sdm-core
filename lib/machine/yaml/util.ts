@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+import { File } from "@atomist/automation-client/lib/project/File";
+import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
+import * as yaml from "js-yaml";
 import * as _ from "lodash";
 
 /**
@@ -26,6 +29,9 @@ export function watchPaths(paths: string[]): void {
         _.uniq([...(process.env.ATOMIST_WATCH_PATHS?.split(",") || []), ...paths]).join(",");
 }
 
+/**
+ * Recursively camelCase the provide object
+ */
 export function camelCase(obj: any): any {
     if (typeof obj === "string") {
         return camelCaseString(obj);
@@ -35,6 +41,20 @@ export function camelCase(obj: any): any {
         return obj;
     }
     return camelcaseKeys(obj, { deep: true });
+}
+
+export async function getYamlFile(project: GitProject, name: string = "atomist.yaml", parse: boolean = false)
+    : Promise<{ file: File, content: string, docs?: any[] } | undefined> {
+    if (await project.hasFile(name)) {
+        const file = await project.getFile(name);
+        const content = await file.getContent();
+        return {
+            file,
+            content,
+            docs: parse ? yaml.safeLoadAll(content) : undefined,
+        };
+    }
+    return undefined;
 }
 
 function camelCaseString(key: string): string {
