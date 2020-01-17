@@ -20,6 +20,7 @@ import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
 import * as yaml from "js-yaml";
 import * as _ from "lodash";
+import { AtomistYamlFileName } from "./schema";
 
 /**
  * Watches the provided paths for changes when in watch mode
@@ -44,7 +45,7 @@ export function camelCase(obj: any): any {
 }
 
 export async function getYamlFile<D = any>(project: GitProject,
-                                           name: string = "atomist.yaml",
+                                           name: string = AtomistYamlFileName,
                                            options: { parse: boolean, camelCase: boolean } = {
     parse: true,
     camelCase: true,

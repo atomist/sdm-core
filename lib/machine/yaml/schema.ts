@@ -16,6 +16,8 @@
 
 import { Parameterized } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 
+export const AtomistYamlFileName = "atomist.yaml";
+
 export interface AtomistYaml {
 
     skill: {
