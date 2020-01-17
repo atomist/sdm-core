@@ -21,17 +21,17 @@ export const AtomistYamlFileName = "atomist.yaml";
 export interface AtomistYaml {
 
     skill: {
-        name: string;
+        name: string; // defaults to @owner/repo
 
         title: string;
-        displayName: string;
+        displayName: string; // as alternative to title
 
-        version: string;
+        version: string; // defaults to 0.1.0
 
-        description: string;
+        description: string; // short one sentence description of the skill
 
-        documentation: string;
-        longDescription: string;
+        documentation: string; // longish description that provides detailed documentation
+        longDescription: string; // as alternative to documentation
 
         category: string[];
         technology: string[];
