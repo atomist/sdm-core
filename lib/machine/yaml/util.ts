@@ -43,8 +43,8 @@ export function camelCase(obj: any): any {
     return camelcaseKeys(obj, { deep: true });
 }
 
-export async function getYamlFile(project: GitProject, name: string = "atomist.yaml", parse: boolean = false)
-    : Promise<{ file: File, content: string, docs?: any[] } | undefined> {
+export async function getYamlFile<D = any>(project: GitProject, name: string = "atomist.yaml", parse: boolean = false)
+    : Promise<{ file: File, content: string, docs?: D[] } | undefined> {
     if (await project.hasFile(name)) {
         const file = await project.getFile(name);
         const content = await file.getContent();
