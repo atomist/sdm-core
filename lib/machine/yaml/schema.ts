@@ -21,12 +21,18 @@ export const AtomistYamlFileName = "atomist.yaml";
 export interface AtomistYaml {
 
     skill: {
-        id?: string;
         name: string;
-        version: string;
 
         title: string;
+        displayName: string;
+
+        version: string;
+
         description: string;
+
+        documentation: string;
+        longDescription: string;
+
         category: string[];
         technology: string[];
         author: string;
