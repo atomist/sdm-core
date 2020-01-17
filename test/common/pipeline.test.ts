@@ -126,7 +126,7 @@ describe("pipeline", () => {
 
         it("should pass context between steps", async () => {
             const order = [];
-            const step1: PipelineStep = {
+            const step1: PipelineStep<{ foo: string }> = {
                 name: "step1",
                 run: async (gi, context) => {
                     order.push("1");

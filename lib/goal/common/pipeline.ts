@@ -36,11 +36,11 @@ const PipelineProgressReporter = testProgressReporter({
 /**
  * Single step in the Goal pipeline execution
  */
-export interface PipelineStep {
+export interface PipelineStep<G extends Record<string, any> = any> {
     /** Name of the step */
     name: string;
     /** Function that gets called when the step should execute */
-    run: (gi: ProjectAwareGoalInvocation, context: Record<string, any>) => Promise<void | ExecuteGoalResult>;
+    run: (gi: ProjectAwareGoalInvocation, context: G) => Promise<void | ExecuteGoalResult>;
     /** Optional function to indicate if the step should run */
     runWhen?: (gi: ProjectAwareGoalInvocation) => Promise<boolean>;
 }
