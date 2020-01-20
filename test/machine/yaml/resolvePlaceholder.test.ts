@@ -47,13 +47,6 @@ describe("machine/yaml/resolvePlaceholder", () => {
             assert.deepStrictEqual(result, { blue: "yes", orange: "nah" });
         });
 
-        it("should delete optional placeholder", async () => {
-            // tslint:disable-next-line:no-invalid-template-strings
-            const value = "${!colors}";
-            const result = await resolvePlaceholder(value, {} as any, {} as any, {});
-            assert.deepStrictEqual(result, undefined);
-        });
-
         it("should replace nested placeholders", async () => {
             // tslint:disable
             const value = "docker build . -f ${parameters.dockerfile:Dockerfile} -t ${parameters.registry:${push.repo.owner}}/${push.repo.name}:latest &&";
@@ -107,6 +100,13 @@ describe("machine/yaml/resolvePlaceholder", () => {
                 "          --cache-repo=docker.pkg.github.com/test/test-cache\n" +
                 "          --force &&\n" +
                 "          echo '{ \"SdmGoal\": { \"push\": { \"after\": { \"images\" :[{ \"imageName\": \"docker.pkg.github.com/test/test:sfsfsafdsf\" }] } } } }' > $ATOMIST_RESULT");
+        });
+
+        it("should delete optional placeholder", async () => {
+            // tslint:disable-next-line:no-invalid-template-strings
+            const value = "${!colors}";
+            const result = await resolvePlaceholder(value, {} as any, {} as any, {});
+            assert.deepStrictEqual(result, undefined);
         });
 
     });
