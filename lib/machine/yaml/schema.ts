@@ -49,7 +49,7 @@ export interface AtomistYaml {
             entryPoint: string;
             name: "nodejs10" | "python37" | "go113";
         }
-    }
+    };
 
     commands?: Array<{
         name: string;
