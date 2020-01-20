@@ -47,6 +47,13 @@ describe("machine/yaml/resolvePlaceholder", () => {
             assert.deepStrictEqual(result, { blue: "yes", orange: "nah" });
         });
 
+        it("should delete optional placeholder", async () => {
+            // tslint:disable-next-line:no-invalid-template-strings
+            const value = "${!colors}";
+            const result = await resolvePlaceholder(value, {} as any, {} as any, {});
+            assert.deepStrictEqual(result, undefined);
+        });
+
         it("should replace nested placeholders", async () => {
             // tslint:disable
             const value = "docker build . -f ${parameters.dockerfile:Dockerfile} -t ${parameters.registry:${push.repo.owner}}/${push.repo.name}:latest &&";

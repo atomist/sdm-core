@@ -22,7 +22,7 @@ import * as os from "os";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { camelCase } from "./util";
 
-const PlaceholderExpression = /\$\{([.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
+const PlaceholderExpression = /\$\{([!.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
 
 export async function resolvePlaceholder(value: string,
                                          goal: SdmGoalEvent,
@@ -38,16 +38,18 @@ export async function resolvePlaceholder(value: string,
     // tslint:disable-next-line:no-conditional-assignment
     while (result = PlaceholderExpression.exec(currentValue)) {
         const fm = result[0];
-        let envValue = _.get(goal, result[1]) ||
-            _.get(ctx.configuration, result[1]) ||
-            _.get(ctx.configuration, camelCase(result[1])) ||
-            _.get(ctx.context, result[1]) ||
-            _.get(ctx.context, camelCase(result[1])) ||
-            _.get({ parameters }, result[1]) ||
-            _.get({ parameters }, camelCase(result[1]));
-        if (result[1] === "home") {
+        const placeholder = result[1].startsWith("!") ? result[1].slice(1) : result[1];
+        const optional = result[1].startsWith("!");
+        let envValue = _.get(goal, placeholder) ||
+            _.get(ctx.configuration, placeholder) ||
+            _.get(ctx.configuration, camelCase(placeholder)) ||
+            _.get(ctx.context, placeholder) ||
+            _.get(ctx.context, camelCase(placeholder)) ||
+            _.get({ parameters }, placeholder) ||
+            _.get({ parameters }, camelCase(placeholder));
+        if (placeholder === "home") {
             envValue = os.userInfo().homedir;
-        } else if (result[1] === "push.after.version" && !!goal) {
+        } else if (placeholder === "push.after.version" && !!goal) {
             envValue = await getGoalVersion({
                 context: ctx.context,
                 owner: goal.repo.owner,
@@ -66,6 +68,9 @@ export async function resolvePlaceholder(value: string,
             return envValue;
         } else if (defaultValue) {
             currentValue = currentValue.split(fm).join(defaultValue);
+            PlaceholderExpression.lastIndex = 0;
+        } else if (optional) {
+            currentValue = undefined;
             PlaceholderExpression.lastIndex = 0;
         } else if (raiseError) {
             logger.warn(`Placeholder replacement failed for '%s', value: '%j', goal: '%j', parameters: '%j'`,
