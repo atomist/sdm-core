@@ -22,21 +22,20 @@ import * as os from "os";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { camelCase } from "./util";
 
-const PlaceholderExpression = /\$\{([!.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
-
 export async function resolvePlaceholder(value: string,
                                          goal: SdmGoalEvent,
                                          ctx: Pick<RepoContext, "configuration" | "context">,
                                          parameters: Record<string, any>,
                                          raiseError: boolean = true): Promise<string> {
-    if (!PlaceholderExpression.test(value)) {
+    const placeholderExpression = /\$\{([!.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
+    if (!placeholderExpression.test(value)) {
         return value;
     }
-    PlaceholderExpression.lastIndex = 0;
+    placeholderExpression.lastIndex = 0;
     let currentValue = value;
     let result: RegExpExecArray;
     // tslint:disable-next-line:no-conditional-assignment
-    while (result = PlaceholderExpression.exec(currentValue)) {
+    while (result = placeholderExpression.exec(currentValue)) {
         const fm = result[0];
         const placeholder = result[1].startsWith("!") ? result[1].slice(1) : result[1];
         const optional = result[1].startsWith("!");
@@ -63,15 +62,15 @@ export async function resolvePlaceholder(value: string,
 
         if (typeof envValue === "string") {
             currentValue = currentValue.split(fm).join(envValue);
-            PlaceholderExpression.lastIndex = 0;
+            placeholderExpression.lastIndex = 0;
         } else if (typeof envValue === "object" && value === fm) {
             return envValue;
         } else if (defaultValue) {
             currentValue = currentValue.split(fm).join(defaultValue);
-            PlaceholderExpression.lastIndex = 0;
+            placeholderExpression.lastIndex = 0;
         } else if (optional) {
             currentValue = undefined;
-            PlaceholderExpression.lastIndex = 0;
+            placeholderExpression.lastIndex = 0;
         } else if (raiseError) {
             logger.warn(`Placeholder replacement failed for '%s', value: '%j', goal: '%j', parameters: '%j'`,
                 result[1], value, goal, parameters);
