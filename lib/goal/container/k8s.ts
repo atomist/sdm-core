@@ -483,8 +483,9 @@ export function executeK8sJob(): ExecuteGoal {
         try {
             await containerStarted(container);
         } catch (e) {
-            progressLog.write(e.message);
-            return { code: 1, message: e.message };
+            const message = `Failed to determine if container started: ${e.message}`;
+            progressLog.write(message);
+            return { code: 1, message };
         }
 
         const log = followK8sLog(container);
@@ -629,7 +630,13 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
     const sleepTime = 500; // ms
     for (let i = 0; i < attempts; i++) {
         await sleep(500);
-        const pod = (await core.readNamespacedPod(container.pod, container.ns)).body;
+        let pod: k8s.V1Pod;
+        try {
+            pod = (await core.readNamespacedPod(container.pod, container.ns)).body;
+        } catch (e) {
+            container.log.write(`Reading pod ${container.ns}/${container.pod} failed: ${k8sErrMsg(e)}`);
+            continue;
+        }
         const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
         if (containerStatus && (!!_.get(containerStatus, "state.running.startedAt") || !!_.get(containerStatus, "state.terminated"))) {
             const message = `Container '${container.name}' started`;
@@ -718,4 +725,21 @@ function followK8sLog(container: K8sContainer): request.Request {
     };
     const logOptions: k8s.LogOptions = { follow: true };
     return k8sLog.log(container.ns, container.pod, container.name, logStream, doneCallback, logOptions);
+}
+
+/** Try to find a Kubernetes API error message. */
+function k8sErrMsg(e: any): string {
+    if (e.message && typeof e.message === "string") {
+        return e.message;
+    } else if (e.body && typeof e.body === "string") {
+        return e.body;
+    } else if (e.body?.message && typeof e.body.message === "string") {
+        return e.body.message;
+    } else if (e.response?.body && typeof e.response.body === "string") {
+        return e.response.body;
+    } else if (e.response?.body?.message && typeof e.response.body.message === "string") {
+        return e.response.body.message;
+    } else {
+        return "Kubernetes API request error";
+    }
 }
