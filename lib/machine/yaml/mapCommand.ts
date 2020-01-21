@@ -37,6 +37,8 @@ import { ParametersObject } from "@atomist/sdm/lib/api/registration/ParametersDe
 import * as _ from "lodash";
 import {
     OAuthToken,
+    RepositoryByOwnerAndNameQuery,
+    RepositoryByOwnerAndNameQueryVariables,
     RepositoryMappedChannels,
     RepositoryMappedChannelsQuery,
     RepositoryMappedChannelsQueryVariables,
@@ -80,7 +82,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
         const parameterNames = metadata.parameters.filter(p => p.displayable === undefined || !!p.displayable).map(p => p.name);
 
         const mapIntent = (intents: string[]) => {
-            if (!!intents && intents.length > 0 ) {
+            if (!!intents && intents.length > 0) {
                 if (parameterNames.length > 0) {
                     return `^(?:${intents.map(i => i.replace(/ /g, "\\s+")).join("|")})(?:\\s+--(?:${parameterNames.join("|")})=(?:'[^']*?'|"[^"]*?"|[\\w]*?))*$`;
                 } else {
@@ -272,6 +274,27 @@ async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation)
                 providerType: repo.org.provider.providerType,
                 apiUrl: repo.org.provider.apiUrl,
                 url: repo.org.provider.url,
+            };
+        } else {
+            const parameters = await ci.promptFor<{ repo_slug: string }>({
+                repo_slug: {
+                    displayName: "Repository (owner/repository)",
+                },
+            }, {});
+            const repo = await ci.context.graphClient.query<RepositoryByOwnerAndNameQuery, RepositoryByOwnerAndNameQueryVariables>({
+                name: "RepositoryByOwnerAndName",
+                variables: {
+                    owner: parameters.repo_slug.split("/")[0],
+                    name: parameters.repo_slug.split("/")[1],
+                },
+            });
+            return {
+                name: repo?.Repo[0]?.name,
+                owner: repo?.Repo[0]?.owner,
+                providerId: repo?.Repo[0]?.org.provider.providerId,
+                providerType: repo?.Repo[0]?.org.provider.providerType,
+                apiUrl: repo?.Repo[0]?.org.provider.apiUrl,
+                url: repo?.Repo[0]?.org.provider.url,
             };
         }
     }
