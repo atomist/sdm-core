@@ -189,6 +189,7 @@ async function populateMappedParameters(parameters: any, metadata: CommandHandle
                     _.update(parameters, mp.name, () => repo.owner);
                     break;
                 case MappedParameters.GitHubRepository:
+                case MappedParameters.GitHubAllRepositories:
                     _.update(parameters, mp.name, () => repo.name);
                     break;
                 case MappedParameters.GitHubApiUrl:
