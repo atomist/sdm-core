@@ -182,24 +182,28 @@ async function populateMappedParameters(parameters: any, metadata: CommandHandle
         if (value !== undefined) {
             _.update(parameters, mp.name, () => value.value);
         } else {
-            const repo = await loadRepositoryDetailsFromChannel(ci);
             switch (mp.uri) {
                 case MappedParameters.GitHubOwner:
                 case MappedParameters.GitHubOwnerWithUser:
-                    _.update(parameters, mp.name, () => repo.owner);
+                    const ownerDetails = await loadRepositoryDetailsFromChannel(ci);
+                    _.update(parameters, mp.name, () => ownerDetails.owner);
                     break;
                 case MappedParameters.GitHubRepository:
                 case MappedParameters.GitHubAllRepositories:
-                    _.update(parameters, mp.name, () => repo.name);
+                    const repoDetails = await loadRepositoryDetailsFromChannel(ci);
+                    _.update(parameters, mp.name, () => repoDetails.name);
                     break;
                 case MappedParameters.GitHubApiUrl:
-                    _.update(parameters, mp.name, () => repo.apiUrl);
+                    const apiUrlDetails = await loadRepositoryDetailsFromChannel(ci);
+                    _.update(parameters, mp.name, () => apiUrlDetails.apiUrl);
                     break;
                 case MappedParameters.GitHubRepositoryProvider:
-                    _.update(parameters, mp.name, () => repo.providerId);
+                    const providerIdDetails = await loadRepositoryDetailsFromChannel(ci);
+                    _.update(parameters, mp.name, () => providerIdDetails.providerId);
                     break;
                 case MappedParameters.GitHubUrl:
-                    _.update(parameters, mp.name, () => repo.url);
+                    const urlDetails = await loadRepositoryDetailsFromChannel(ci);
+                    _.update(parameters, mp.name, () => urlDetails.url);
                     break;
 
                 case MappedParameters.GitHubUserLogin:
