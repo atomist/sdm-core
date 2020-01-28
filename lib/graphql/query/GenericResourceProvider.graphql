@@ -1,0 +1,9 @@
+query GenericResourceProvider($name: String) {
+    GenericResourceProvider(name: $name) {
+        url
+        name
+        credential {
+            id
+        }
+    }
+}

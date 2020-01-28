@@ -22,6 +22,7 @@ import {
     BinaryRepositoryProvider,
     BinaryRepositoryType,
     DockerRegistryProvider,
+    GenericResourceProvider,
     Password,
 } from "../../typings/types";
 import {
@@ -104,9 +105,47 @@ export async function prepareProviderSecret(secret: GoalContainerProviderSecret,
             case "atomist":
                 return ctx.configuration.apiKey;
             default:
-                return undefined;
+                return prepareGenericProviderSecret(secret.provider.names || [], ctx, secrets, envName);
         }
     }
+    return undefined;
+}
+
+export async function prepareGenericProviderSecret(names: string[],
+                                                   ctx: SdmContext,
+                                                   secrets: Secrets,
+                                                   envName?: string): Promise<string> {
+    if (!envName) {
+        throw new Error("fileMounts are not supported for Generic repository provider secrets");
+    }
+
+    const { context } = ctx;
+    const genericProviders = await context.graphClient.query<GenericResourceProvider.Query, GenericResourceProvider.Variables>({
+        name: "GenericResourceProvider",
+        options: QueryNoCacheOptions,
+    });
+
+    if (genericProviders?.GenericResourceProvider) {
+        const requestedProviders = genericProviders.GenericResourceProvider
+            .filter(d => names.length === 0 || names.includes(d.name));
+        if (!!envName && requestedProviders.length > 1) {
+            throw new Error("More then one matching generic resource provider found for requested env variable");
+        }
+
+        for (const requestedProvider of requestedProviders) {
+
+            const credential = await context.graphClient.query<Password.Query, Password.Variables>({
+                name: "Password",
+                variables: {
+                    id: requestedProvider.credential.id,
+                },
+            });
+
+            secrets.env.push({ name: `${envName}_USER`, value: credential.Password[0].owner.login });
+            return credential.Password[0].secret;
+        }
+    }
+
     return undefined;
 }
 
