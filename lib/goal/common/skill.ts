@@ -29,9 +29,9 @@ import {
 } from "../cache/goalCaching";
 import { ContainerSecrets } from "../container/container";
 
-export function item(name: string,
-                     registration: string,
-                     options: {
+export function skill(name: string,
+                      registration: string,
+                      options: {
                          uniqueName?: string,
                          parameters?: Parameterized,
                          input?: Array<{ classifier: string }>,

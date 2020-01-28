@@ -38,7 +38,7 @@ import {
     cachePut,
     cacheRestore,
 } from "../../goal/cache/goalCaching";
-import { item } from "../../goal/common/item";
+import { skill } from "../../goal/common/skill";
 import { action } from "../../goal/container/action";
 import {
     container,
@@ -172,10 +172,10 @@ const MapReferenced: MapGoal = async (goals: any,
                                       goalMakers: Record<string, GoalMaker>,
                                       additionalTests: Record<string, PushTest>,
                                       extensionTests: Record<string, PushTestMaker>) => {
-    const use = goals.use;
-    if (!!use && use.includes("/") && !use.startsWith("@")) {
+    const ref = goals.ref;
+    if (!!ref && ref.includes("/")) {
         const parameters = goals.parameters || {};
-        const referencedGoal = await mapReferencedGoal(sdm, use, parameters);
+        const referencedGoal = await mapReferencedGoal(sdm, ref, parameters);
         if (!!referencedGoal) {
             return mapGoals(
                 sdm,
@@ -214,8 +214,8 @@ const MapFulfillment: MapGoal = async (goals: any) => {
 
     if (!!use) {
         const match = regexp.exec(use);
-        if (!!match && use.startsWith("@")) {
-            return item(
+        if (!!match) {
+            return skill(
                 match[3].replace(/_/g, " "),
                 `${match[1]}/${match[2]}`,
                 {
