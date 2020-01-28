@@ -21,7 +21,8 @@ export const AtomistYamlFileName = "atomist.yaml";
 export interface AtomistYaml {
 
     skill: {
-        name: string; // defaults to @owner/repo
+        namespace?: string; // defaults to owner name
+        name: string; // defaults to repo name
 
         title: string;
         displayName: string; // as alternative to title
