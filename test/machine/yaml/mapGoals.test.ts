@@ -143,7 +143,7 @@ describe("machine/yaml/mapGoals", () => {
 
         it("should map referenced goal with parameters", async () => {
             const yaml = [{
-                use: "atomist/npm-goal/publish@master",
+                ref: "atomist/npm-goal/publish@master",
                 parameters: { command: "build" },
             }, { use: "atomist/npm-goal/install@master" }];
             const goals = await mapGoals({
@@ -153,17 +153,17 @@ describe("machine/yaml/mapGoals", () => {
         }).timeout(10000);
 
         it("should map referenced goal", async () => {
-            const yaml = { use: "atomist/npm-goal/i-dont-exist@0.0.1" };
+            const yaml = { ref: "atomist/npm-goal/i-dont-exist@0.0.1" };
             try {
                 await mapGoals({ configuration: { http: { client: { factory: defaultHttpClientFactory() } } } } as any, yaml, {}, {}, {}, {});
                 assert.fail();
             } catch (e) {
-                assert.deepStrictEqual(e.message, "Unable to construct goal from '{\"use\":\"atomist/npm-goal/i-dont-exist@0.0.1\"}'");
+                assert.deepStrictEqual(e.message, "Unable to construct goal from '{\"ref\":\"atomist/npm-goal/i-dont-exist@0.0.1\"}'");
             }
         }).timeout(10000);
 
-        it("should map item with parameters", async () => {
-            const yaml = [{ use: "@atomist/npm-goal/publish", parameters: { command: "build" } }];
+        it("should map skill with parameters", async () => {
+            const yaml = [{ use: "atomist/npm-goal/publish", parameters: { command: "build" } }];
             const goals = await mapGoals({} as any, yaml, {}, {}, {}, {});
             assert(!!goals);
         }).timeout(10000);
