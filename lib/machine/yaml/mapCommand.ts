@@ -185,24 +185,24 @@ async function populateMappedParameters(parameters: any, metadata: CommandHandle
             switch (mp.uri) {
                 case MappedParameters.GitHubOwner:
                 case MappedParameters.GitHubOwnerWithUser:
-                    const ownerDetails = await loadRepositoryDetailsFromChannel(ci);
+                    const ownerDetails = await loadRepositoryDetailsFromChannel(ci, metadata);
                     _.update(parameters, mp.name, () => ownerDetails.owner);
                     break;
                 case MappedParameters.GitHubRepository:
                 case MappedParameters.GitHubAllRepositories:
-                    const repoDetails = await loadRepositoryDetailsFromChannel(ci);
+                    const repoDetails = await loadRepositoryDetailsFromChannel(ci, metadata);
                     _.update(parameters, mp.name, () => repoDetails.name);
                     break;
                 case MappedParameters.GitHubApiUrl:
-                    const apiUrlDetails = await loadRepositoryDetailsFromChannel(ci);
+                    const apiUrlDetails = await loadRepositoryDetailsFromChannel(ci, metadata);
                     _.update(parameters, mp.name, () => apiUrlDetails.apiUrl);
                     break;
                 case MappedParameters.GitHubRepositoryProvider:
-                    const providerIdDetails = await loadRepositoryDetailsFromChannel(ci);
+                    const providerIdDetails = await loadRepositoryDetailsFromChannel(ci, metadata);
                     _.update(parameters, mp.name, () => providerIdDetails.providerId);
                     break;
                 case MappedParameters.GitHubUrl:
-                    const urlDetails = await loadRepositoryDetailsFromChannel(ci);
+                    const urlDetails = await loadRepositoryDetailsFromChannel(ci, metadata);
                     _.update(parameters, mp.name, () => urlDetails.url);
                     break;
 
@@ -241,66 +241,95 @@ async function populateMappedParameters(parameters: any, metadata: CommandHandle
     return missing;
 }
 
-async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation)
+async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation,
+                                                metadata: CommandHandlerMetadata)
     : Promise<{ name?: string, owner?: string, providerId?: string, providerType?: string, apiUrl?: string, url?: string }> {
-    const channelId = _.get(ci, "context.trigger.source.slack.channel.id");
-    const channels = await ci.context.graphClient.query<RepositoryMappedChannelsQuery, RepositoryMappedChannelsQueryVariables>({
-        name: "RepositoryMappedChannels",
-        variables: {
-            id: channelId,
-        },
-    });
-    const repos: Repos[] = _.get(channels, "ChatChannel[0].repos") || [];
-    if (!!repos) {
-        if (repos.length === 1) {
-            return {
-                name: repos[0].name,
-                owner: repos[0].owner,
-                providerId: repos[0].org.provider.providerId,
-                providerType: repos[0].org.provider.providerType,
-                apiUrl: repos[0].org.provider.apiUrl,
-                url: repos[0].org.provider.url,
-            };
-        } else if (repos.length > 0) {
-            const parameters = await ci.promptFor<{ repo_id: string }>({
-                repo_id: {
-                    displayName: "Repository",
-                    type: {
-                        kind: "single",
-                        options: repos.map(r => ({ description: `${r.owner}/${r.name}`, value: r.id })),
+
+    // Check if we want a list of repositories
+    if (metadata.mapped_parameters.some(mp => mp.uri === MappedParameters.GitHubAllRepositories
+        || mp.uri === MappedParameters.GitHubOwnerWithUser)) {
+        const parameters = await ci.promptFor<{ repo_slug: string }>({
+            repo_slug: {
+                description: "Slug of repository",
+                displayName: "Repository (owner/repository)",
+            },
+        }, {});
+        const repo = await ci.context.graphClient.query<RepositoryByOwnerAndNameQuery, RepositoryByOwnerAndNameQueryVariables>({
+            name: "RepositoryByOwnerAndName",
+            variables: {
+                owner: parameters.repo_slug.split("/")[0],
+                name: parameters.repo_slug.split("/")[1],
+            },
+        });
+        return {
+            name: repo?.Repo[0]?.name,
+            owner: repo?.Repo[0]?.owner,
+            providerId: repo?.Repo[0]?.org.provider.providerId,
+            providerType: repo?.Repo[0]?.org.provider.providerType,
+            apiUrl: repo?.Repo[0]?.org.provider.apiUrl,
+            url: repo?.Repo[0]?.org.provider.url,
+        };
+    } else {
+        const channelId = _.get(ci, "context.trigger.source.slack.channel.id");
+        const channels = await ci.context.graphClient.query<RepositoryMappedChannelsQuery, RepositoryMappedChannelsQueryVariables>({
+            name: "RepositoryMappedChannels",
+            variables: {
+                id: channelId,
+            },
+        });
+        const repos: Repos[] = _.get(channels, "ChatChannel[0].repos") || [];
+        if (!!repos) {
+            if (repos.length === 1) {
+                return {
+                    name: repos[0].name,
+                    owner: repos[0].owner,
+                    providerId: repos[0].org.provider.providerId,
+                    providerType: repos[0].org.provider.providerType,
+                    apiUrl: repos[0].org.provider.apiUrl,
+                    url: repos[0].org.provider.url,
+                };
+            } else if (repos.length > 0) {
+                const parameters = await ci.promptFor<{ repo_id: string }>({
+                    repo_id: {
+                        displayName: "Repository",
+                        type: {
+                            kind: "single",
+                            options: repos.map(r => ({ description: `${r.owner}/${r.name}`, value: r.id })),
+                        },
                     },
-                },
-            }, {});
-            const repo = repos.find(r => r.id === parameters.repo_id);
-            return {
-                name: repo.name,
-                owner: repo.owner,
-                providerId: repo.org.provider.providerId,
-                providerType: repo.org.provider.providerType,
-                apiUrl: repo.org.provider.apiUrl,
-                url: repo.org.provider.url,
-            };
-        } else {
-            const parameters = await ci.promptFor<{ repo_slug: string }>({
-                repo_slug: {
-                    displayName: "Repository (owner/repository)",
-                },
-            }, {});
-            const repo = await ci.context.graphClient.query<RepositoryByOwnerAndNameQuery, RepositoryByOwnerAndNameQueryVariables>({
-                name: "RepositoryByOwnerAndName",
-                variables: {
-                    owner: parameters.repo_slug.split("/")[0],
-                    name: parameters.repo_slug.split("/")[1],
-                },
-            });
-            return {
-                name: repo?.Repo[0]?.name,
-                owner: repo?.Repo[0]?.owner,
-                providerId: repo?.Repo[0]?.org.provider.providerId,
-                providerType: repo?.Repo[0]?.org.provider.providerType,
-                apiUrl: repo?.Repo[0]?.org.provider.apiUrl,
-                url: repo?.Repo[0]?.org.provider.url,
-            };
+                }, {});
+                const repo = repos.find(r => r.id === parameters.repo_id);
+                return {
+                    name: repo.name,
+                    owner: repo.owner,
+                    providerId: repo.org.provider.providerId,
+                    providerType: repo.org.provider.providerType,
+                    apiUrl: repo.org.provider.apiUrl,
+                    url: repo.org.provider.url,
+                };
+            } else {
+                const parameters = await ci.promptFor<{ repo_slug: string }>({
+                    repo_slug: {
+                        displayName: "Repository (owner/repository)",
+                        description: "Slug of repository",
+                    },
+                }, {});
+                const repo = await ci.context.graphClient.query<RepositoryByOwnerAndNameQuery, RepositoryByOwnerAndNameQueryVariables>({
+                    name: "RepositoryByOwnerAndName",
+                    variables: {
+                        owner: parameters.repo_slug.split("/")[0],
+                        name: parameters.repo_slug.split("/")[1],
+                    },
+                });
+                return {
+                    name: repo?.Repo[0]?.name,
+                    owner: repo?.Repo[0]?.owner,
+                    providerId: repo?.Repo[0]?.org.provider.providerId,
+                    providerType: repo?.Repo[0]?.org.provider.providerType,
+                    apiUrl: repo?.Repo[0]?.org.provider.apiUrl,
+                    url: repo?.Repo[0]?.org.provider.url,
+                };
+            }
         }
     }
     return {};
