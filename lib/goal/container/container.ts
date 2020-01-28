@@ -138,7 +138,7 @@ export interface GoalContainer {
 
 export interface GoalContainerProviderSecret {
     provider: {
-        type: "docker" | "npm" | "maven2" | "scm" | "atomist";
+        type: "docker" | "npm" | "maven2" | "scm" | "atomist" | string;
         names?: string[];
     };
 }

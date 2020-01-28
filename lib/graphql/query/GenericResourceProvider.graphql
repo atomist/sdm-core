@@ -1,5 +1,5 @@
-query GenericResourceProvider($name: String) {
-    GenericResourceProvider(name: $name) {
+query GenericResourceProvider($name: String, $type: String!) {
+    GenericResourceProvider(name: $name, type: $type) {
         url
         name
         credential {

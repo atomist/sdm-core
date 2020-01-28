@@ -105,7 +105,7 @@ export async function prepareProviderSecret(secret: GoalContainerProviderSecret,
             case "atomist":
                 return ctx.configuration.apiKey;
             default:
-                return prepareGenericProviderSecret(secret.provider.names || [], ctx, secrets, envName);
+                return prepareGenericProviderSecret(secret.provider.names || [], ctx, secrets, secret.provider.type, envName);
         }
     }
     return undefined;
@@ -114,6 +114,7 @@ export async function prepareProviderSecret(secret: GoalContainerProviderSecret,
 export async function prepareGenericProviderSecret(names: string[],
                                                    ctx: SdmContext,
                                                    secrets: Secrets,
+                                                   type: string,
                                                    envName?: string): Promise<string> {
     if (!envName) {
         throw new Error("fileMounts are not supported for Generic repository provider secrets");
@@ -123,6 +124,9 @@ export async function prepareGenericProviderSecret(names: string[],
     const genericProviders = await context.graphClient.query<GenericResourceProvider.Query, GenericResourceProvider.Variables>({
         name: "GenericResourceProvider",
         options: QueryNoCacheOptions,
+        variables: {
+            type,
+        },
     });
 
     if (genericProviders?.GenericResourceProvider) {
