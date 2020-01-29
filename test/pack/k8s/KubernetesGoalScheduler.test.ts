@@ -595,7 +595,7 @@ describe("KubernetesGoalScheduler", () => {
                     namespace: "sdm",
                 },
                 spec: {
-                    backoffLimit: 1,
+                    backoffLimit: 0,
                     template: {
                         metadata: {
                             labels: {

@@ -304,7 +304,7 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
     jobSpec.metadata.name = k8sJobName(podSpec, goalEvent);
     jobSpec.metadata.namespace = podNs;
 
-    jobSpec.spec.backoffLimit = 1;
+    jobSpec.spec.backoffLimit = 0;
     jobSpec.spec.template.spec.restartPolicy = "Never";
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
 
