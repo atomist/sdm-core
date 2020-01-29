@@ -151,6 +151,13 @@ export const k8sContainerScheduler: ContainerScheduler = (goal, registration: K8
     });
 };
 
+export const k8sSkillContainerScheduler: ContainerScheduler = (goal, registration: K8sContainerRegistration) => {
+    goal.addFulfillment({
+        goalExecutor: executeK8sJob(),
+        ...registration as ImplementationRegistration,
+    });
+};
+
 /**
  * Add Kubernetes job scheduling information to SDM goal event data
  * for use by the [[KubernetesGoalScheduler]].

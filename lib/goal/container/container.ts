@@ -294,9 +294,12 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
 
         registration.name = (registration.name || `container-${this.definition.displayName}`).replace(/\.+/g, "-");
         if (!this.details.scheduler) {
-            if (runningInK8s() || runningAsGoogleCloudFunction()) {
+            if (runningInK8s()) {
                 const k8sContainerScheduler = require("./k8s").k8sContainerScheduler;
                 this.details.scheduler = k8sContainerScheduler;
+            } else if (runningAsGoogleCloudFunction()) {
+                const k8sSkillContainerScheduler = require("./k8s").k8sSkillContainerScheduler;
+                this.details.scheduler = k8sSkillContainerScheduler;
             } else {
                 this.details.scheduler = dockerContainerScheduler;
             }
