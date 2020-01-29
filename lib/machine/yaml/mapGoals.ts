@@ -95,6 +95,7 @@ const MapContainer: MapGoal = async (goals: any,
             {
                 callback: containerCallback(),
                 containers,
+                initContainers: goals.initContainers,
                 volumes: toArray(goals.volumes),
                 progressReporter: ContainerProgressReporter,
                 input: goals.input,
