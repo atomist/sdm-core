@@ -1,5 +1,5 @@
 query GitHubAppResourceProvider {
-    GitHubAppResourceProvider {
-        providerId
-    }
+  GitHubAppResourceProvider {
+    providerId
+  }
 }
