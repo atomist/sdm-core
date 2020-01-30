@@ -576,7 +576,7 @@ const containerExecutor: ExecuteGoal = gi => (process.env.ATOMIST_ISOLATED_GOAL)
  * Restore cache input entries before fulfilling goal.
  */
 const containerFulfillerCacheRestore: GoalProjectListenerRegistration = {
-    name: "ContainerFulfillerCacheRestore",
+    name: "cache restore",
     events: [GoalProjectListenerEvent.before],
     listener: async (project, gi, event) => {
         const data = parseGoalEventData(gi.goalEvent);
