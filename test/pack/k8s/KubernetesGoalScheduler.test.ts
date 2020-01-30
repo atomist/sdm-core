@@ -704,18 +704,6 @@ describe("KubernetesGoalScheduler", () => {
                                     ],
                                     image: "atomist/demo-sdm:1.0.0-master.20191216211453",
                                     imagePullPolicy: "IfNotPresent",
-                                    livenessProbe: {
-                                        failureThreshold: 3,
-                                        httpGet: {
-                                            path: "/health",
-                                            port: "http",
-                                            scheme: "HTTP",
-                                        },
-                                        initialDelaySeconds: 20,
-                                        periodSeconds: 10,
-                                        successThreshold: 1,
-                                        timeoutSeconds: 1,
-                                    },
                                     name: "demo-sdm-job-3bd7f5e-container-maven-build",
                                     ports: [
                                         {
@@ -724,18 +712,6 @@ describe("KubernetesGoalScheduler", () => {
                                             protocol: "TCP",
                                         },
                                     ],
-                                    readinessProbe: {
-                                        failureThreshold: 3,
-                                        httpGet: {
-                                            path: "/health",
-                                            port: "http",
-                                            scheme: "HTTP",
-                                        },
-                                        initialDelaySeconds: 20,
-                                        periodSeconds: 10,
-                                        successThreshold: 1,
-                                        timeoutSeconds: 1,
-                                    },
                                     resources: {
                                         limits: {
                                             cpu: "1",

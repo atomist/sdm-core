@@ -309,6 +309,8 @@ export function createJobSpec(podSpec: k8s.V1Pod, podNs: string, gi: GoalInvocat
     jobSpec.spec.template.spec.containers[0].name = jobSpec.metadata.name;
 
     jobSpec.spec.template.spec.containers[0].env.push(...k8sJobEnv(podSpec, goalEvent, context));
+    delete jobSpec.spec.template.spec.containers[0].livenessProbe;
+    delete jobSpec.spec.template.spec.containers[0].readinessProbe;
 
     rewriteCachePath(jobSpec, context.workspaceId);
 
