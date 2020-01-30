@@ -18,7 +18,6 @@ import { resolvePlaceholders } from "@atomist/automation-client/lib/configuratio
 import { Deferred } from "@atomist/automation-client/lib/internal/util/Deferred";
 import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
-import { logger } from "@atomist/automation-client/lib/util/logger";
 import { spawnLog } from "@atomist/sdm/lib/api-helper/misc/child_process";
 import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import * as fg from "fast-glob";
@@ -74,55 +73,61 @@ export class CompressingGoalCache implements GoalCache {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
         const slug = `${gi.id.owner}/${gi.id.repo}`;
+        const spawnLogOpts = {
+            log: gi.progressLog,
+            cwd: project.baseDir,
+        };
 
         let teamArchiveFileNameWithSuffix = teamArchiveFileName;
         if (this.method === CompressionMethod.TAR) {
-            const tarResult = await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], {
-                log: gi.progressLog,
-                cwd: project.baseDir,
-            });
+            const tarResult = await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], spawnLogOpts);
             if (tarResult.code) {
-                const message = `Failed to create tar archive '${teamArchiveFileName}' for ${slug}`;
-                logger.error(message);
-                gi.progressLog.write(message);
+                gi.progressLog.write(`Failed to create tar archive '${teamArchiveFileName}' for ${slug}`);
                 return;
             }
-            const gzipResult = await spawnLog("gzip", ["-3", teamArchiveFileName], {
-                log: gi.progressLog,
-                cwd: project.baseDir,
-            });
+            const gzipResult = await spawnLog("gzip", ["-3", teamArchiveFileName], spawnLogOpts);
             if (gzipResult.code) {
-                const message = `Failed to gzip tar archive '${teamArchiveFileName}' for ${slug}`;
-                logger.error(message);
-                gi.progressLog.write(message);
+                gi.progressLog.write(`Failed to gzip tar archive '${teamArchiveFileName}' for ${slug}`);
                 return;
             }
             teamArchiveFileNameWithSuffix += ".gz";
         } else if (this.method === CompressionMethod.ZIP) {
-            const zip = new JSZip();
-            for (const file of files) {
-                const p = path.join(project.baseDir, file);
-                if ((await fs.stat(p)).isFile()) {
-                    zip.file(file, fs.createReadStream(p));
-                } else {
-                    const dirFiles = await fg(`${file}/**/*`, { cwd: project.baseDir, dot: true });
-                    for (const dirFile of dirFiles) {
-                        zip.file(dirFile, fs.createReadStream(path.join(project.baseDir, dirFile)));
+            teamArchiveFileNameWithSuffix += ".zip";
+            try {
+                const zipResult = await spawnLog("zip", ["-qr", teamArchiveFileNameWithSuffix, ...files], spawnLogOpts);
+                if (zipResult.error) {
+                    throw zipResult.error;
+                } else if (zipResult.code || zipResult.signal) {
+                    const msg = `Failed to run zip binary to create ${teamArchiveFileNameWithSuffix}: ${zipResult.code} (${zipResult.signal})`;
+                    gi.progressLog.write(msg);
+                    throw new Error(msg);
+                }
+            } catch (e) {
+                const zip = new JSZip();
+                for (const file of files) {
+                    const p = path.join(project.baseDir, file);
+                    if ((await fs.stat(p)).isFile()) {
+                        zip.file(file, fs.createReadStream(p));
+                    } else {
+                        const dirFiles = await fg(`${file}/**/*`, { cwd: project.baseDir, dot: true });
+                        for (const dirFile of dirFiles) {
+                            zip.file(dirFile, fs.createReadStream(path.join(project.baseDir, dirFile)));
+                        }
                     }
                 }
+                const defer = new Deferred<string>();
+                zip.generateNodeStream({
+                    type: "nodebuffer",
+                    streamFiles: true,
+                    compression: "DEFLATE",
+                    compressionOptions: { level: 6 },
+                })
+                    .pipe(fs.createWriteStream(teamArchiveFileNameWithSuffix))
+                    .on("finish", () => {
+                        defer.resolve(teamArchiveFileNameWithSuffix);
+                    });
+                await defer.promise;
             }
-            const defer = new Deferred<string>();
-            zip.generateNodeStream({
-                type: "nodebuffer",
-                streamFiles: true,
-                compression: "DEFLATE",
-                compressionOptions: { level: 6 },
-            })
-                .pipe(fs.createWriteStream(teamArchiveFileName))
-                .on("finish", () => {
-                    defer.resolve(teamArchiveFileName);
-                });
-            await defer.promise;
         }
         const resolvedClassifier = await resolveClassifierPath(classifier, gi);
         await this.store.store(gi, resolvedClassifier, teamArchiveFileNameWithSuffix);
