@@ -80,7 +80,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
         const ch = commandHandlerRegistrationToCommand(sdm, chr);
         const metadata = metadataFromInstance(toFactory(ch)()) as CommandHandlerMetadata;
         const parameterNames = metadata.parameters.filter(p => p.displayable === undefined || !!p.displayable).map(p => p.name);
-        const mappedParameterNames = metadata.mapped_parameters.filter(p => !!p.required).map(p => p.name);
+        const mappedParameterNames = metadata.mapped_parameters.map(p => p.name);
         const allParameters = [...parameterNames, ...mappedParameterNames];
 
         const mapIntent = (intents: string[]) => {
