@@ -25,17 +25,27 @@ import {
     populateValues,
 } from "@atomist/automation-client/lib/internal/parameterPopulation";
 import { CommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
-import { commandHandlerRegistrationToCommand } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
-import { slackErrorMessage } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
+import {
+    commandHandlerRegistrationToCommand,
+    CommandListenerExecutionInterruptError,
+} from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import {
+    slackErrorMessage,
+    slackInfoMessage,
+} from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import { CommandListenerInvocation } from "@atomist/sdm/lib/api/listener/CommandListener";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import { ParameterStyle } from "@atomist/sdm/lib/api/registration/CommandRegistration";
 import { ParametersObject } from "@atomist/sdm/lib/api/registration/ParametersDefinition";
+import { url } from "@atomist/slack-messages";
 import * as _ from "lodash";
 import {
+    GitHubAppResourceProviderQuery,
+    GitHubAppResourceProviderQueryVariables,
     OAuthToken,
     RepositoryByOwnerAndNameQuery,
     RepositoryByOwnerAndNameQueryVariables,
@@ -86,7 +96,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
         const mapIntent = (intents: string[]) => {
             if (!!intents && intents.length > 0) {
                 if (parameterNames.length > 0) {
-                    return `^(?:${intents.map(i => i.replace(/ /g, "\\s+")).join("|")})(?:\\s+--(?:${allParameters.join("|")})=(?:'[^']*?'|"[^"]*?"|[\\w]*?))*$`;
+                    return `^(?:${intents.map(i => i.replace(/ /g, "\\s+")).join("|")})(?:\\s+--(?:${allParameters.join("|")})=(?:'[^']*?'|"[^"]*?"|[\\w-]*?))*$`;
                 } else {
                     return `^(?:${intents.map(i => i.replace(/ /g, "\\s+")).join("|")})$`;
                 }
@@ -157,23 +167,23 @@ async function populateSecrets(parameters: any, metadata: CommandHandlerMetadata
                 });
                 const credential: OAuthToken = _.get(resourceUser, "ChatId[0].person.gitHubId.credential");
                 if (!!credential) {
-                    const uriParts = secret.uri.split("?scopes=");
-                    if (uriParts.length === 2) {
-                        // Check for scopes
-                        const scopes = uriParts[1].split(",");
-                        if (scopes.some(scope => !credential.scopes.includes(scope))) {
-                            // TODO cd send redirect to scope increase page
-                            await ci.addressChannels(slackErrorMessage(
-                                "Missing GitHub OAuth Scope",
-                                "The recorded token is missing some requested scopes",
-                                ci.context));
-                        }
-                    }
                     const s = credential.secret;
                     _.update(parameters, secret.name, () => s);
+                } else {
+                    // Query GitHubAppResourceProvider to get the resource provider id
+                    const provider = await ci.context.graphClient.query<GitHubAppResourceProviderQuery, GitHubAppResourceProviderQueryVariables>({
+                        name: "GitHubAppResourceProvider",
+                    });
+                    if (!!provider?.GitHubAppResourceProvider[0]?.providerId) {
+                        // Send message when there is a GitHubAppResourceProvider
+                        const orgUrl = `https://api.atomist.com/v2/auth/teams/${ci.context.workspaceId}/resource-providers/${provider.GitHubAppResourceProvider[0].providerId}/token?state=${guid()}&redirect-uri=https://www.atomist.com/success.html`;
+                        await ci.addressChannels(
+                            slackInfoMessage(
+                                "Link GitHub Account",
+                                `In order to run this command Atomist needs to link your GitHub identity to your Slack user\n\n.Please ${url(orgUrl, "click here")} to start link your account.`));
+                        throw new CommandListenerExecutionInterruptError("Sending token collection message");
+                    }
                 }
-            } else {
-                // TODO cd send redirect to oauth token collection page
             }
         } else if (secret.uri === Secrets.OrgToken) {
             // TODO cd add this
@@ -250,6 +260,32 @@ async function populateMappedParameters(parameters: any, metadata: CommandHandle
 async function loadRepositoryDetailsFromChannel(ci: CommandListenerInvocation,
                                                 metadata: CommandHandlerMetadata)
     : Promise<{ name?: string, owner?: string, providerId?: string, providerType?: string, apiUrl?: string, url?: string }> {
+
+    // If owner and repo was provided, find the remaining mapped parameters from that
+    const incomingParameters = ((ci.context as any).trigger as CommandIncoming).parameters;
+    const ownerMp = metadata.mapped_parameters.find(mp => mp.uri === MappedParameters.GitHubOwner);
+    const repoMp = metadata.mapped_parameters.find(mp => mp.uri === MappedParameters.GitHubRepository);
+    const ownerParameter = !!ownerMp ? incomingParameters.find(p => p.name === ownerMp.name) : undefined;
+    const repoParameter = !!repoMp ? incomingParameters.find(p => p.name === repoMp?.name) : undefined;
+    if (!!ownerMp && !!repoMp && !!ownerParameter && !!repoParameter) {
+        const repo = await ci.context.graphClient.query<RepositoryByOwnerAndNameQuery, RepositoryByOwnerAndNameQueryVariables>({
+            name: "RepositoryByOwnerAndName",
+            variables: {
+                owner: ownerParameter.value,
+                name: repoParameter.value,
+            },
+        });
+        if (repo?.Repo?.length === 1) {
+            return {
+                name: repo?.Repo[0]?.name,
+                owner: repo?.Repo[0]?.owner,
+                providerId: repo?.Repo[0]?.org.provider.providerId,
+                providerType: repo?.Repo[0]?.org.provider.providerType,
+                apiUrl: repo?.Repo[0]?.org.provider.apiUrl,
+                url: repo?.Repo[0]?.org.provider.url,
+            };
+        }
+    }
 
     // Check if we want a list of repositories
     if (metadata.mapped_parameters.some(mp => mp.uri === MappedParameters.GitHubAllRepositories
