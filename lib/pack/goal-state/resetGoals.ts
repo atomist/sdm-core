@@ -29,15 +29,15 @@ import {
     slackWarningMessage,
 } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
 import {
+    GitBranchRegExp,
+    GitShaRegExp,
+} from "@atomist/sdm/lib/api/command/support/commonValidationPatterns";
+import {
     CommandListener,
     CommandListenerInvocation,
 } from "@atomist/sdm/lib/api/listener/CommandListener";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
-import {
-    GitBranchRegExp,
-    GitShaRegExp,
-} from "@atomist/sdm/src/lib/api/command/support/commonValidationPatterns";
 import {
     bold,
     codeLine,

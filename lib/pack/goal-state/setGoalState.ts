@@ -33,12 +33,12 @@ import {
     slackSuccessMessage,
     slackWarningMessage,
 } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
-import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
-import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     GitBranchRegExp,
     GitShaRegExp,
-} from "@atomist/sdm/src/lib/api/command/support/commonValidationPatterns";
+} from "@atomist/sdm/lib/api/command/support/commonValidationPatterns";
+import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
+import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
     bold,
     codeLine,
