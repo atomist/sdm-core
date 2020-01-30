@@ -26,7 +26,6 @@ import {
 } from "@atomist/automation-client/lib/internal/parameterPopulation";
 import { CommandIncoming } from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
 import { CommandHandlerMetadata } from "@atomist/automation-client/lib/metadata/automationMetadata";
-import { mergeParameters } from "@atomist/automation-client/lib/spi/message/MessageClient";
 import { toFactory } from "@atomist/automation-client/lib/util/constructionUtils";
 import { commandHandlerRegistrationToCommand } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { slackErrorMessage } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
@@ -108,7 +107,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
 
                 const intent = ((ci.context as any).trigger).raw_message;
                 if (!!intent) {
-                    const args = mergeParameters(require("yargs-parser")(intent), {});
+                    const args = require("yargs-parser")(intent, { configuration: { "dot-notation": false } });
                     ((ci.context as any).trigger as CommandIncoming).parameters.push(..._.map(args, (v, k) => ({
                         name: k,
                         value: v,
@@ -126,7 +125,10 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
                     autoSubmit: metadata.auto_submit,
                     parameterStyle: ParameterStyle.Dialog[metadata.question],
                 });
-                populateParameters(parametersInstance, metadata, _.map(parameters, (v, k) => ({ name: k, value: v as any })));
+                populateParameters(parametersInstance, metadata, _.map(parameters, (v, k) => ({
+                    name: k,
+                    value: v as any,
+                })));
                 populateValues(parametersInstance, metadata, ci.configuration);
                 await populateSecrets(parametersInstance, metadata, ci);
                 const missing = await populateMappedParameters(parametersInstance, metadata, ci);
