@@ -102,6 +102,7 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
 
             listener: async ci => {
                 const instance = toFactory(ch)();
+                const parametersInstance = instance.freshParametersInstance();
                 const parameterDefinition: ParametersObject<any> = {};
 
                 const intent = ((ci.context as any).trigger).raw_message;
@@ -124,15 +125,15 @@ export function mapCommand(chr: CommandHandlerRegistration): CommandMaker {
                     autoSubmit: metadata.auto_submit,
                     parameterStyle: ParameterStyle.Dialog[metadata.question],
                 });
-                populateParameters(instance, metadata, _.map(parameters, (v, k) => ({ name: k, value: v as any })));
-                populateValues(instance, metadata, ci.configuration);
-                await populateSecrets(parameters, metadata, ci);
-                const missing = await populateMappedParameters(parameters, metadata, ci);
+                populateParameters(parametersInstance, metadata, _.map(parameters, (v, k) => ({ name: k, value: v as any })));
+                populateValues(parametersInstance, metadata, ci.configuration);
+                await populateSecrets(parametersInstance, metadata, ci);
+                const missing = await populateMappedParameters(parametersInstance, metadata, ci);
                 if (missing.length > 0) {
                     await ci.addressChannels(slackErrorMessage("Missing Mapped Parameters", missing.join("\n"), ci.context));
                     return Failure;
                 }
-                return instance.handle(ci.context, parameters);
+                return instance.handle(ci.context, parametersInstance);
             },
         };
     };
