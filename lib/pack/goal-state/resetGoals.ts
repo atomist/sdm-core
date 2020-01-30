@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,25 @@
 import {
     MappedParameter,
     MappedParameters,
-    Parameter,
     Parameters,
     Value,
 } from "@atomist/automation-client/lib/decorators";
 import { Success } from "@atomist/automation-client/lib/HandlerResult";
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
+import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
 import { chooseAndSetGoals } from "@atomist/sdm/lib/api-helper/goal/chooseAndSetGoals";
+import { toRepoTargetingParametersMaker } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { RepoTargetingParameters } from "@atomist/sdm/lib/api-helper/machine/RepoTargetingParameters";
 import {
     slackSuccessMessage,
     slackWarningMessage,
 } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
-import {
-    GitBranchRegExp,
-    GitShaRegExp,
-} from "@atomist/sdm/lib/api/command/support/commonValidationPatterns";
+import { GitHubRepoTargets } from "@atomist/sdm/lib/api/command/target/GitHubRepoTargets";
 import {
     CommandListener,
     CommandListenerInvocation,
 } from "@atomist/sdm/lib/api/listener/CommandListener";
+import { RepoTargets } from "@atomist/sdm/lib/api/machine/RepoTargets";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
@@ -52,20 +52,8 @@ import {
 @Parameters()
 export class ResetGoalsParameters {
 
-    @MappedParameter(MappedParameters.GitHubOwner)
-    public owner: string;
-
-    @MappedParameter(MappedParameters.GitHubRepository)
-    public repo: string;
-
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
-
-    @Parameter({ description: "Ref", ...GitShaRegExp, required: false })
-    public sha: string;
-
-    @Parameter({ description: "Branch", ...GitBranchRegExp, required: false })
-    public branch: string;
 
     @Value("name")
     public name: string;
@@ -77,12 +65,13 @@ export class ResetGoalsParameters {
 
 export function resetGoalsCommand(
     sdm: SoftwareDeliveryMachine,
-): CommandHandlerRegistration<ResetGoalsParameters> {
+    repoTargets: Maker<RepoTargets> = GitHubRepoTargets,
+): CommandHandlerRegistration<ResetGoalsParameters & RepoTargetingParameters> {
 
     return {
         name: "ResetGoalsOnCommit",
         description: "Plan goals on a commit",
-        paramsMaker: ResetGoalsParameters,
+        paramsMaker: toRepoTargetingParametersMaker(ResetGoalsParameters, repoTargets),
         listener: resetGoalsOnCommit(sdm),
         intent: [
             `reset goals ${sdm.configuration.name.replace("@", "")}`,
@@ -91,8 +80,8 @@ export function resetGoalsCommand(
     };
 }
 
-function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<ResetGoalsParameters> {
-    return async (cli: CommandListenerInvocation<ResetGoalsParameters>) => {
+function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<ResetGoalsParameters & RepoTargetingParameters> {
+    return async (cli: CommandListenerInvocation<ResetGoalsParameters & RepoTargetingParameters>) => {
 
         const rules = {
             projectLoader: sdm.configuration.sdm.projectLoader,
@@ -103,22 +92,22 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
             preferencesFactory: sdm.configuration.sdm.preferenceStoreFactory,
         };
 
-        const slug = `${cli.parameters.owner}/${cli.parameters.repo}`;
+        const slug = `${cli.parameters.targets.repoRef.owner}/${cli.parameters.targets.repoRef.repo}`;
         let repoData;
         try {
             repoData = await fetchBranchTips(cli.context, {
                 providerId: cli.parameters.providerId,
-                owner: cli.parameters.owner,
-                repo: cli.parameters.repo,
+                owner: cli.parameters.targets.repoRef.owner,
+                repo: cli.parameters.targets.repoRef.repo,
             });
         } catch (e) {
             const text = `Repository ${bold(slug)} not found`;
             return cli.context.messageClient.respond(slackWarningMessage("Set Goal State", text, cli.context));
         }
-        const branch = cli.parameters.branch || repoData.defaultBranch;
+        const branch = cli.parameters.targets.repoRef.branch || repoData.defaultBranch;
         let sha;
         try {
-            sha = cli.parameters.sha || tipOfBranch(repoData, branch);
+            sha = cli.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
         } catch (e) {
             return cli.context.messageClient.respond(
                 slackWarningMessage(
@@ -128,8 +117,8 @@ function resetGoalsOnCommit(sdm: SoftwareDeliveryMachine): CommandListener<Reset
         }
 
         const id = GitHubRepoRef.from({
-            owner: cli.parameters.owner,
-            repo: cli.parameters.repo,
+            owner: cli.parameters.targets.repoRef.owner,
+            repo: cli.parameters.targets.repoRef.repo,
             sha,
             branch,
         });

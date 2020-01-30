@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,18 @@ import {
     buttonForCommand,
     menuForCommand,
 } from "@atomist/automation-client/lib/spi/message/MessageClient";
+import { Maker } from "@atomist/automation-client/lib/util/constructionUtils";
 import { fetchGoalsForCommit } from "@atomist/sdm/lib/api-helper/goal/fetchGoalsOnCommit";
 import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
+import { toRepoTargetingParametersMaker } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
+import { RepoTargetingParameters } from "@atomist/sdm/lib/api-helper/machine/RepoTargetingParameters";
 import {
     slackFooter,
     slackSuccessMessage,
     slackWarningMessage,
 } from "@atomist/sdm/lib/api-helper/misc/slack/messages";
-import {
-    GitBranchRegExp,
-    GitShaRegExp,
-} from "@atomist/sdm/lib/api/command/support/commonValidationPatterns";
+import { GitHubRepoTargets } from "@atomist/sdm/lib/api/command/target/GitHubRepoTargets";
+import { RepoTargets } from "@atomist/sdm/lib/api/machine/RepoTargets";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import {
@@ -70,20 +71,8 @@ enum SdmGoalStateOrder {
 @Parameters()
 class SetGoalStateParameters {
 
-    @MappedParameter(MappedParameters.GitHubOwner)
-    public owner: string;
-
-    @MappedParameter(MappedParameters.GitHubRepository)
-    public repo: string;
-
     @MappedParameter(MappedParameters.GitHubRepositoryProvider)
     public providerId: string;
-
-    @Parameter({ description: "Ref", ...GitShaRegExp, required: false })
-    public sha: string;
-
-    @Parameter({ description: "Branch", ...GitBranchRegExp, required: false })
-    public branch: string;
 
     @Parameter({ required: false })
     public goal: string;
@@ -98,13 +87,14 @@ class SetGoalStateParameters {
     public cancel: boolean;
 }
 
-export function setGoalStateCommand(sdm: SoftwareDeliveryMachine)
-    : CommandHandlerRegistration<SetGoalStateParameters> {
+export function setGoalStateCommand(sdm: SoftwareDeliveryMachine,
+                                    repoTargets: Maker<RepoTargets> = GitHubRepoTargets)
+    : CommandHandlerRegistration<SetGoalStateParameters & RepoTargetingParameters> {
     return {
         name: "SetGoalState",
         description: "Set state of a particular goal",
         intent: [`set goal state ${sdm.configuration.name.replace("@", "")}`],
-        paramsMaker: SetGoalStateParameters,
+        paramsMaker: toRepoTargetingParametersMaker(SetGoalStateParameters, repoTargets),
         listener: async chi => {
             if (!chi.parameters.msgId) {
                 chi.parameters.msgId = guid();
@@ -113,34 +103,34 @@ export function setGoalStateCommand(sdm: SoftwareDeliveryMachine)
             try {
                 repoData = await fetchBranchTips(chi.context, {
                     providerId: chi.parameters.providerId,
-                    owner: chi.parameters.owner,
-                    repo: chi.parameters.repo,
+                    owner: chi.parameters.targets.repoRef.owner,
+                    repo: chi.parameters.targets.repoRef.repo,
                 });
             } catch (e) {
                 return chi.context.messageClient.respond(
                     slackWarningMessage(
                         "Set Goal State",
                         `Repository ${bold(`${
-                            chi.parameters.owner}/${chi.parameters.repo}`)} not found`,
+                            chi.parameters.targets.repoRef.owner}/${chi.parameters.targets.repoRef.repo}`)} not found`,
                         chi.context),
                     { id: chi.parameters.msgId });
             }
-            const branch = chi.parameters.branch || repoData.defaultBranch;
+            const branch = chi.parameters.targets.repoRef.branch || repoData.defaultBranch;
             let sha;
             try {
-                sha = chi.parameters.sha || tipOfBranch(repoData, branch);
+                sha = chi.parameters.targets.repoRef.sha || tipOfBranch(repoData, branch);
             } catch (e) {
                 return chi.context.messageClient.respond(
                     slackWarningMessage(
                         "Set Goal State",
                         `Branch ${bold(branch)} not found on ${bold(`${
-                            chi.parameters.owner}/${chi.parameters.repo}`)}`,
+                            chi.parameters.targets.repoRef.owner}/${chi.parameters.targets.repoRef.repo}`)}`,
                         chi.context),
                     { id: chi.parameters.msgId });
             }
             const id = GitHubRepoRef.from({
-                owner: chi.parameters.owner,
-                repo: chi.parameters.repo,
+                owner: chi.parameters.targets.repoRef.owner,
+                repo: chi.parameters.targets.repoRef.repo,
                 sha,
                 branch,
             });
