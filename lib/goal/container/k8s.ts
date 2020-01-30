@@ -20,6 +20,7 @@ import { GitCommandGitProject } from "@atomist/automation-client/lib/project/git
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import { minimalClone } from "@atomist/sdm/lib/api-helper/goal/minimalClone";
 import { RepoContext } from "@atomist/sdm/lib/api/context/SdmContext";
+import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import {
     ExecuteGoal,
     GoalProjectListenerEvent,
@@ -499,22 +500,22 @@ export function executeK8sJob(): ExecuteGoal {
 
         const status = { code: 0, message: `Container '${containerName}' completed successfully` };
         try {
-            const podStatus = await containerWatch(container);
+            const timeout: number = _.get(configuration, "sdm.goal.timeout", 10 * 60 * 1000);
+            const podStatus = await containerWatch(container, timeout);
             progressLog.write(`Container '${containerName}' exited: ${stringify(podStatus)}`);
         } catch (e) {
             const message = `Container '${containerName}' failed: ${e.message}`;
             progressLog.write(message);
             status.code++;
             status.message = message;
-        } finally {
-            // Give the logs some time to be delivered
-            await sleep(1000);
-            log.abort();
         }
+        // Give the logs some time to be delivered
+        await sleep(1000);
+        log.abort();
 
         const outputFile = path.join(outputDir, "result.json");
-        let outputResult;
-        if ((await fs.pathExists(outputFile)) && status.code === 0) {
+        let outputResult: ExecuteGoalResult;
+        if (status.code === 0 && (await fs.pathExists(outputFile))) {
             try {
                 outputResult = await processResult(await fs.readJson(outputFile), gi);
             } catch (e) {
@@ -578,7 +579,7 @@ const containerExecutor: ExecuteGoal = gi => (process.env.ATOMIST_ISOLATED_GOAL)
 const containerFulfillerCacheRestore: GoalProjectListenerRegistration = {
     name: "cache restore",
     events: [GoalProjectListenerEvent.before],
-    listener: async (project, gi, event) => {
+    listener: async (project, gi) => {
         const data = parseGoalEventData(gi.goalEvent);
         if (!data[ContainerRegistrationGoalDataKey]) {
             throw new Error(`Goal ${gi.goal.uniqueName} has no Kubernetes container registration: ${gi.goalEvent.data}`);
@@ -666,7 +667,7 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
  * @param container Information about container to watch
  * @return Status of pod after container terminates
  */
-function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
+function containerWatch(container: K8sContainer, timeout: number): Promise<k8s.V1PodStatus> {
     return new Promise((resolve, reject) => {
         let watch: k8s.Watch;
         try {
@@ -676,13 +677,22 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
             container.log.write(e.message);
             reject(e);
         }
-        const watchPath = `/api/v1/watch/namespaces/${container.ns}/pods/${container.pod}`;
         let watcher: any;
+        const timeoutTimer = setTimeout(() => {
+            if (watcher) {
+                watcher.abort();
+            }
+            reject(new Error(`Goal timeout '${timeout}' exceeded`));
+        }, timeout);
+        const watchPath = `/api/v1/watch/namespaces/${container.ns}/pods/${container.pod}`;
         watcher = watch.watch(watchPath, {}, (phase, obj) => {
             const pod = obj as k8s.V1Pod;
             if (pod && pod.status && pod.status.containerStatuses) {
                 const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
-                if (containerStatus && containerStatus.state && containerStatus.state.terminated) {
+                if (containerStatus?.state?.terminated) {
+                    if (timeoutTimer) {
+                        clearTimeout(timeoutTimer);
+                    }
                     const exitCode: number = _.get(containerStatus, "state.terminated.exitCode");
                     if (exitCode === 0) {
                         const msg = `Container '${container.name}' exited with status 0`;
@@ -703,6 +713,9 @@ function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
             }
             container.log.write(`Container '${container.name}' still running`);
         }, err => {
+            if (timeoutTimer) {
+                clearTimeout(timeoutTimer);
+            }
             err.message = `Container watcher failed: ${err.message}`;
             container.log.write(err.message);
             reject(err);

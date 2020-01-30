@@ -1648,6 +1648,9 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
             },
             configuration: {
                 sdm: {
+                    goal: {
+                        timeout: 2000,
+                    },
                     projectLoader: {
                         doWithProject: (o, a) => a(project),
                     },
@@ -1822,8 +1825,7 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                 try {
                     const body: k8s.V1DeleteOptions = { gracePeriodSeconds: 0, propagationPolicy: "Background" };
                     await k8sCore.deleteNamespacedPod(p.metadata.name, ns, undefined, undefined, undefined, undefined, undefined, body);
-                } catch (e) { /* ignore */
-                }
+                } catch (e) { /* ignore */ }
                 return egr;
             }
 
@@ -1952,6 +1954,28 @@ dGe21S9sMOqyEp9D8geeXkg3VAItxuXbLIBfKL45kwSvB6fEFtQnJEOrT4YXSRDY
                 const x = egr as ExecuteGoalResult;
                 assert(x.code === 0);
                 assert(x.message === "Container 'alpine0' completed successfully");
+            }).timeout(10000);
+
+            it("should timeout", async () => {
+                const r = {
+                    containers: [
+                        {
+                            args: ["sleep", "20"],
+                            image: containerTestImage,
+                            name: "alpine0",
+                        },
+                        {
+                            args: ["sleep", "20"],
+                            image: containerTestImage,
+                            name: "alpine1",
+                        },
+                    ],
+                };
+                const egr = await execK8sJobTest(r);
+                assert(egr, "ExecuteGoal did not return a value");
+                const x = egr as ExecuteGoalResult;
+                assert(x.code === 1);
+                assert(x.message === "Container 'alpine0' failed: Goal timeout '2000' exceeded");
             }).timeout(10000);
 
             it("should capture the container output in the log", async () => {
