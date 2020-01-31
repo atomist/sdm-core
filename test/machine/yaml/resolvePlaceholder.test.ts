@@ -109,6 +109,31 @@ describe("machine/yaml/resolvePlaceholder", () => {
             assert.deepStrictEqual(result, undefined);
         });
 
+        it("should replace skill configuration parameters", async () => {
+            const value = "${skill.configuration.image}";
+            const result = await resolvePlaceholder(value, {
+                sha: "sfsfsafdsf",
+                branch: "master",
+                repo: { owner: "foo", name: "bla" },
+                push: { after: { sha: "sfsfsafdsf" }, repo: { owner: "atomist", name: "sdm" } },
+            } as any, {
+                configuration: {},
+                context: {
+                    graphClient: {
+                        query: async () => {
+                            return {};
+                        },
+                    },
+                    trigger: {
+                        configuration: {
+                            parameters: [{ name: "image", value: "foo:latest" }],
+                        },
+                    },
+                },
+            } as any, {});
+            assert.deepStrictEqual(result, "foo:latest");
+        });
+
     });
 
 });
