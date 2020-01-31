@@ -25,7 +25,6 @@ import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machi
 import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { CommandHandlerRegistration } from "@atomist/sdm/lib/api/registration/CommandHandlerRegistration";
 import { EventHandlerRegistration } from "@atomist/sdm/lib/api/registration/EventHandlerRegistration";
-import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
 import * as fg from "fast-glob";
 import * as fs from "fs-extra";
@@ -250,14 +249,14 @@ async function createGoalData<G extends DeliveryGoals>(patterns: string | string
         for (const config of configs) {
 
             if (!!config.configuration) {
-                _.merge(sdm.configuration, camelcaseKeys(config.configuration, { deep: true }));
+                _.merge(sdm.configuration, camelCase(config.configuration));
             }
 
             if (!!config.skill) {
-                _.merge(sdm.configuration, camelcaseKeys(config.skill, { deep: true }));
+                _.merge(sdm.configuration, camelCase(config.skill));
 
-                sdm.configuration.name = config.skill.id || config.skill.name;
-                (sdm as any).name = config.skill.name;
+                sdm.configuration.name = config.skill.name;
+                (sdm as any).name = config.skill.title || config.skill.name;
             }
 
             for (const k in config) {
