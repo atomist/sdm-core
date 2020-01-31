@@ -31,6 +31,10 @@ export async function resolvePlaceholder(value: string,
     if (!placeholderExpression.test(value)) {
         return value;
     }
+
+    const skillConfiguration = {};
+    (((ctx.context as any)?.trigger as any)?.configuration?.parameters || []).forEach(p => skillConfiguration[p.name] = p.value);
+
     placeholderExpression.lastIndex = 0;
     let currentValue = value;
     let result: RegExpExecArray;
@@ -45,7 +49,10 @@ export async function resolvePlaceholder(value: string,
             _.get(ctx.context, placeholder) ||
             _.get(ctx.context, camelCase(placeholder)) ||
             _.get({ parameters }, placeholder) ||
-            _.get({ parameters }, camelCase(placeholder));
+            _.get({ parameters }, camelCase(placeholder)) ||
+            _.get({ skill: { configuration: skillConfiguration } }, placeholder) ||
+            _.get({ skill: { configuration: skillConfiguration } }, camelCase(placeholder));
+        ;
         if (placeholder === "home") {
             envValue = os.userInfo().homedir;
         } else if (placeholder === "push.after.version" && !!goal) {
