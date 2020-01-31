@@ -64,9 +64,9 @@
     "@atomist/tree-path": "^1.0.3"
   },
   "devDependencies": {
-    "@atomist/automation-client": "2.0.0-remove-index.20200117153458",
+    "@atomist/automation-client": "2.0.0-master.20200131202342",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "2.0.0-remove-index.20200120225927",
+    "@atomist/sdm": "2.0.0-master.20200131203114",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/lodash": "^4.14.144",
@@ -112,8 +112,7 @@
     "lint:ts": "tslint --config tslint.json --format verbose --project .",
     "lint:ts:fix": "npm run lint:ts -- --fix",
     "test": "mocha --require espower-typescript/guess \"test/**/*.test.ts\"",
-    "test:one": "mocha --require espower-typescript/guess \"test/**/${TEST:-*.test.ts}\"",
-    "typedoc": "npm run doc"
+    "test:one": "mocha --require espower-typescript/guess \"test/**/${TEST:-*.test.ts}\""
   },
   "engines": {
     "node": ">=8.2.0",
