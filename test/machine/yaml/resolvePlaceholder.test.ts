@@ -110,6 +110,7 @@ describe("machine/yaml/resolvePlaceholder", () => {
         });
 
         it("should replace skill configuration parameters", async () => {
+            // tslint:disable-next-line:no-invalid-template-strings
             const value = "${skill.configuration.image}";
             const result = await resolvePlaceholder(value, {
                 sha: "sfsfsafdsf",
