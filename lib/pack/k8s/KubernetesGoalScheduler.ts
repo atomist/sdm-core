@@ -188,7 +188,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
         }
 
         if (configuration.cluster.enabled === false || cluster.isMaster) {
-            const cleanupInterval = _.get(configuration, "sdm.k8s.job.cleanupInterval", 1000 * 60 * 10);
+            const cleanupInterval = configuration.sdm.k8s?.job?.cleanupInterval || 1000 * 60 * 10;
             setInterval(async () => {
                 try {
                     await this.cleanUp(configuration);
@@ -220,12 +220,12 @@ async function cleanupJobs(configuration: Configuration): Promise<void> {
         logger.debug("No scheduled goal Kubernetes jobs found");
     }
     const ttl: number = configuration.sdm.k8s?.job?.ttl || configuration.sdm.goal?.timeout * 2 || 1000 * 60 * 30;
-    const now = new Date().getMilliseconds();
+    const now = Date.now();
     const oldJobs = jobs.filter(j => {
         if (!j.status?.startTime) {
             return false;
         }
-        const jobAge = now - j.status.startTime.getMilliseconds();
+        const jobAge = now - j.status.startTime.getTime();
         return jobAge > ttl;
     });
     if (oldJobs.length < 1) {
