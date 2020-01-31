@@ -22,6 +22,7 @@ import * as os from "os";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
 import { camelCase } from "./util";
 
+// tslint:disable-next-line:cyclomatic-complexity
 export async function resolvePlaceholder(value: string,
                                          goal: SdmGoalEvent,
                                          ctx: Pick<RepoContext, "configuration" | "context">,
@@ -33,7 +34,7 @@ export async function resolvePlaceholder(value: string,
     }
 
     const skillConfiguration = {};
-    (((ctx.context as any)?.trigger as any)?.configuration?.parameters || []).forEach(p => skillConfiguration[p.name] = p.value);
+    ((ctx.context as any)?.trigger?.configuration?.parameters || []).forEach(p => skillConfiguration[p.name] = p.value);
 
     placeholderExpression.lastIndex = 0;
     let currentValue = value;
@@ -52,7 +53,7 @@ export async function resolvePlaceholder(value: string,
             _.get({ parameters }, camelCase(placeholder)) ||
             _.get({ skill: { configuration: skillConfiguration } }, placeholder) ||
             _.get({ skill: { configuration: skillConfiguration } }, camelCase(placeholder));
-        ;
+
         if (placeholder === "home") {
             envValue = os.userInfo().homedir;
         } else if (placeholder === "push.after.version" && !!goal) {
