@@ -19,12 +19,12 @@ import { cancelableGoal } from "@atomist/sdm/lib/api-helper/listener/cancelGoals
 import { GoalCompletionListener } from "@atomist/sdm/lib/api/listener/GoalCompletionListener";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
 import * as _ from "lodash";
+import { k8sErrMsg } from "../../goal/container/k8s";
 import { SdmGoalState } from "../../typings/types";
 import {
     deleteJob,
     deletePods,
     listJobs,
-    prettyPrintError,
     sanitizeName,
 } from "./KubernetesGoalScheduler";
 
@@ -57,13 +57,12 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
             try {
                 jobs = await listJobs(selector);
             } catch (e) {
-                logger.warn(`Failed to read k8s jobs: ${prettyPrintError(e)}`);
+                logger.warn(`Failed to read k8s jobs: ${k8sErrMsg(e)}`);
                 return;
             }
 
-            logger.debug(
-                `Found k8s jobs for goal set '${goalEvent.goalSetId}': '${
-                    jobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
+            logger.debug(`Found k8s jobs for goal set '${goalEvent.goalSetId}': '` +
+                jobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ") + "'");
 
             const goalJobs = jobs.filter(j => {
                 const annotations = j.metadata.annotations;
@@ -76,7 +75,7 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
             logger.debug(
                 `Matching k8s job for goal '${goalEvent.uniqueName}' found: '${
-                    goalJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
+                goalJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}'`);
 
             const ttl: number = _.get(this.sdm.configuration, "sdm.k8s.job.ttl", 1000 * 60 * 2);
 
@@ -94,19 +93,19 @@ export class KubernetesJobDeletingGoalCompletionListenerFactory {
 
     private initialize(): void {
         setInterval(async () => {
-                const now = Date.now();
-                for (const uid of this.cache.keys()) {
-                    const job = this.cache.get(uid);
-                    if (job.ttl <= now) {
-                        logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
-                        await deleteJob(job);
+            const now = Date.now();
+            for (const uid of this.cache.keys()) {
+                const job = this.cache.get(uid);
+                if (job.ttl <= now) {
+                    logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
+                    await deleteJob(job);
 
-                        logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
-                        await deletePods(job);
-                        this.cache.delete(uid);
-                    }
+                    logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
+                    await deletePods(job);
+                    this.cache.delete(uid);
                 }
-            },
+            }
+        },
             _.get(this.sdm.configuration, "sdm.k8s.job.ttlCheckInterval", 15000));
     }
 }

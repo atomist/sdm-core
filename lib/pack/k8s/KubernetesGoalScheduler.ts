@@ -38,6 +38,7 @@ import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
+import { k8sErrMsg } from "../../goal/container/k8s";
 import { toArray } from "../../util/misc/array";
 import {
     loadKubeClusterConfig,
@@ -113,7 +114,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
                 logger.error(`Failed to delete ${jobDesc}: ${stringify(e.body)}`);
                 return {
                     code: 1,
-                    message: `Failed to delete ${jobDesc}: ${prettyPrintError(e)}`,
+                    message: `Failed to delete ${jobDesc}: ${k8sErrMsg(e)}`,
                 };
             }
         } catch (e) {
@@ -135,7 +136,7 @@ export class KubernetesGoalScheduler implements GoalScheduler {
             logger.error(`Failed to schedule ${jobDesc}: ${stringify(e.body)}`);
             return {
                 code: 1,
-                message: `Failed to schedule ${jobDesc}: ${prettyPrintError(e)}`,
+                message: `Failed to schedule ${jobDesc}: ${k8sErrMsg(e)}`,
             };
         }
         await gi.progressLog.flush();
@@ -177,30 +178,33 @@ export class KubernetesGoalScheduler implements GoalScheduler {
 
             this.podSpec = (await core.readNamespacedPod(podName, podNs)).body;
         } catch (e) {
-            logger.error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+            logger.error(`Failed to obtain parent pod spec from k8s: ${k8sErrMsg(e)}`);
 
             if (!!this.options.podSpec) {
                 this.podSpec = this.options.podSpec;
             } else {
-                throw new Error(`Failed to obtain parent pod spec from k8s: ${prettyPrintError(e)}`);
+                throw new Error(`Failed to obtain parent pod spec from k8s: ${k8sErrMsg(e)}`);
             }
         }
 
         if (configuration.cluster.enabled === false || cluster.isMaster) {
-            setInterval(() => {
-                return this.cleanUp()
-                    .then(() => {
-                        logger.debug("Finished cleaning scheduled goal jobs");
-                    });
-            }, _.get(configuration, "sdm.k8s.job.cleanupInterval", 1000 * 60 * 60 * 2)).unref();
+            const cleanupInterval = _.get(configuration, "sdm.k8s.job.cleanupInterval", 1000 * 60 * 10);
+            setInterval(async () => {
+                try {
+                    await this.cleanUp(configuration);
+                    logger.debug("Finished cleaning scheduled goal Kubernetes jobs");
+                } catch (e) {
+                    logger.warn(`Failed cleaning scheduled goal Kubernetes jobs: ${e.message}`);
+                }
+            }, cleanupInterval).unref();
         }
     }
 
     /**
      * Extension point to allow for custom clean up logic.
      */
-    protected async cleanUp(): Promise<void> {
-        return cleanCompletedJobs();
+    protected async cleanUp(configuration: Configuration): Promise<void> {
+        return cleanupJobs(configuration);
     }
 }
 
@@ -208,25 +212,32 @@ export class KubernetesGoalScheduler implements GoalScheduler {
  * Cleanup scheduled k8s goal jobs
  * @returns {Promise<void>}
  */
-export async function cleanCompletedJobs(): Promise<void> {
-    const selector = `atomist.com/creator=${sanitizeName(configurationValue<string>("name"))}`;
+async function cleanupJobs(configuration: Configuration): Promise<void> {
+    const selector = `atomist.com/creator=${sanitizeName(configuration.name)}`;
 
     const jobs = await listJobs(selector);
-    const completedJobs =
-        jobs.filter(j => j.status && j.status.completionTime && j.status.succeeded && j.status.succeeded > 0);
-
-    if (completedJobs.length > 0) {
-        logger.debug(`Deleting the following k8s jobs: ${
-            completedJobs.map(j => `${j.metadata.namespace}:${j.metadata.name}`).join(", ")}`);
-
-        for (const completedSdmJob of completedJobs) {
-            const job = { name: completedSdmJob.metadata.name, namespace: completedSdmJob.metadata.namespace };
-            logger.debug(`Deleting k8s job '${job.namespace}:${job.name}'`);
-            await deleteJob(job);
-
-            logger.debug(`Deleting k8s pods for job '${job.namespace}:${job.name}'`);
-            await deletePods(job);
+    if (jobs.length < 1) {
+        logger.debug("No scheduled goal Kubernetes jobs found");
+    }
+    const ttl: number = configuration.sdm.k8s?.job?.ttl || configuration.sdm.goal?.timeout * 2 || 1000 * 60 * 30;
+    const now = new Date().getMilliseconds();
+    const oldJobs = jobs.filter(j => {
+        if (!j.status?.startTime) {
+            return false;
         }
+        const jobAge = now - j.status.startTime.getMilliseconds();
+        return jobAge > ttl;
+    });
+    if (oldJobs.length < 1) {
+        logger.debug(`No schedules goal Kubernetes jobs were older than TTL '${ttl}'`);
+        return;
+    }
+    logger.debug("Deleting old scheduled goal Kubernetes jobs: " +
+        oldJobs.map(j => `${j.metadata.namespace}/${j.metadata.name}`).join(","));
+    for (const oldJob of oldJobs) {
+        const job = { name: oldJob.metadata.name, namespace: oldJob.metadata.namespace };
+        await deleteJob(job);
+        await deletePods(job);
     }
 }
 
@@ -521,24 +532,28 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
     const kc = loadKubeConfig();
     const batch = kc.makeApiClient(k8s.BatchV1Api);
 
-    if (configurationValue<boolean>("sdm.k8s.job.singleNamespace", true)) {
-        const podNs = await readNamespace();
-        return (await batch.listNamespacedJob(
-            podNs,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            labelSelector,
-        )).body.items;
-    } else {
-        return (await batch.listJobForAllNamespaces(
-            undefined,
-            undefined,
-            undefined,
-            labelSelector,
-        )).body.items;
+    const jobs: k8s.V1Job[] = [];
+    let continu: string | undefined;
+    try {
+        if (configurationValue<boolean>("sdm.k8s.job.singleNamespace", true)) {
+            const podNs = await readNamespace();
+            do {
+                const listJobResponse = await batch.listNamespacedJob(podNs, undefined, undefined, continu, undefined, labelSelector);
+                jobs.push(...listJobResponse.body.items);
+                continu = listJobResponse.body.metadata?._continue;
+            } while (continu);
+        } else {
+            do {
+                const listJobResponse = await batch.listJobForAllNamespaces(continu, undefined, undefined, labelSelector);
+                jobs.push(...listJobResponse.body.items);
+                continu = listJobResponse.body.metadata?._continue;
+            } while (continu);
+        }
+    } catch (e) {
+        e.message = `Failed to list scheduled goal Kubernetes jobs: ${k8sErrMsg(e)}`;
+        throw e;
     }
+    return jobs;
 }
 
 /**
@@ -562,14 +577,6 @@ export async function readNamespace(): Promise<string> {
     return "default";
 }
 
-export function prettyPrintError(e: any): string {
-    if (!!e.body) {
-        return e.body.message;
-    } else {
-        return e.message;
-    }
-}
-
 export async function deleteJob(job: { name: string, namespace: string }): Promise<void> {
     try {
         const kc = loadKubeConfig();
@@ -577,13 +584,10 @@ export async function deleteJob(job: { name: string, namespace: string }): Promi
 
         await batch.readNamespacedJob(job.name, job.namespace);
         try {
-            await batch.deleteNamespacedJob(
-                job.name,
-                job.namespace,
-                { propagationPolicy: "Foreground" } as any);
+            await batch.deleteNamespacedJob(job.name, job.namespace, undefined, undefined, undefined, undefined,
+                undefined, { propagationPolicy: "Foreground" });
         } catch (e) {
-            logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${
-                prettyPrintError(e)}`);
+            logger.warn(`Failed to delete k8s jobs '${job.namespace}:${job.name}': ${k8sErrMsg(e)}`);
         }
     } catch (e) {
         // This is ok to ignore because the job doesn't exist any more
@@ -596,27 +600,18 @@ export async function deletePods(job: { name: string, namespace: string }): Prom
         const core = kc.makeApiClient(k8s.CoreV1Api);
 
         const selector = `job-name=${job.name}`;
-        const pods = await core.listNamespacedPod(
-            job.namespace,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            selector);
+        const pods = await core.listNamespacedPod(job.namespace, undefined, undefined, undefined, undefined, selector);
         if (pods.body && pods.body.items) {
             for (const pod of pods.body.items) {
                 try {
                     await core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
                 } catch (e) {
                     // Probably ok because pod might be gone already
-                    logger.debug(
-                        `Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${
-                        prettyPrintError(e)}`);
+                    logger.debug(`Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${k8sErrMsg(e)}`);
                 }
             }
         }
     } catch (e) {
-        logger.warn(`Failed to list pods for k8s job '${job.namespace}:${job.name}': ${
-            prettyPrintError(e)}`);
+        logger.warn(`Failed to list pods for k8s job '${job.namespace}:${job.name}': ${k8sErrMsg(e)}`);
     }
 }

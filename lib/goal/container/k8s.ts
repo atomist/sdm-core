@@ -748,7 +748,7 @@ function followK8sLog(container: K8sContainer): request.Request {
 }
 
 /** Try to find a Kubernetes API error message. */
-function k8sErrMsg(e: any): string {
+export function k8sErrMsg(e: any): string {
     if (e.message && typeof e.message === "string") {
         return e.message;
     } else if (e.body && typeof e.body === "string") {
