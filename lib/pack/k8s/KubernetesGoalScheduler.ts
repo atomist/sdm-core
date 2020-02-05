@@ -217,7 +217,8 @@ async function cleanupJobs(configuration: Configuration): Promise<void> {
 
     const jobs = await listJobs(selector);
     if (jobs.length < 1) {
-        logger.debug("No scheduled goal Kubernetes jobs found");
+        logger.debug(`No scheduled goal Kubernetes jobs found for label selector '${selector}'`);
+        return;
     }
     const ttl: number = configuration.sdm.k8s?.job?.ttl || configuration.sdm.goal?.timeout * 2 || 1000 * 60 * 30;
     const now = Date.now();
@@ -229,7 +230,7 @@ async function cleanupJobs(configuration: Configuration): Promise<void> {
         return jobAge > ttl;
     });
     if (oldJobs.length < 1) {
-        logger.debug(`No schedules goal Kubernetes jobs were older than TTL '${ttl}'`);
+        logger.debug(`No scheduled goal Kubernetes jobs were older than TTL '${ttl}'`);
         return;
     }
     logger.debug("Deleting old scheduled goal Kubernetes jobs: " +
