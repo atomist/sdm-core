@@ -35,10 +35,10 @@ import {
     not,
     or,
 } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
-import * as camelcaseKeys from "camelcase-keys";
 import * as changeCase from "change-case";
 import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
+import { camelCase } from "./util";
 
 export type PushTestMaker<G extends Record<string, any> = any> =
     (params: G) => ((pli: StatefulPushListenerInvocation) => Promise<boolean>) | Promise<PushTest> | PushTest;
@@ -48,7 +48,7 @@ export async function mapTests(tests: any,
                                extensionTests: Record<string, PushTestMaker>): Promise<PushTest | PushTest[]> {
     const newTests = [];
     for (const t of toArray(tests || [])) {
-        const test = typeof t !== "string" && !Array.isArray(t) ? camelcaseKeys(t, { deep: true }) : t as any;
+        const test = typeof t !== "string" && !Array.isArray(t) ? camelCase(t) : t as any;
         newTests.push(await mapTest(test, additionalTests, extensionTests));
     }
     return newTests;
@@ -87,15 +87,14 @@ const IsDefaultBranch: CreatePushTest = async test => {
 };
 
 const IsGoal: CreatePushTest = async (test, additionalTests, extensionTests) => {
-    if (test.isGoal) {
-        return isGoal(
-            {
-                name: typeof test.isGoal.name === "string" ? new RegExp(test.isGoal.name) : test.isGoal.name,
-                state: test.isGoal.state || SdmGoalState.success,
-                pushTest: test.isGoal.test ? await mapTest(test.isGoal.test, additionalTests, extensionTests) : undefined,
-                output: typeof test.isGoal.output === "string" ? new RegExp(test.isGoal.output) : test.isGoal.output,
-                data: typeof test.isGoal.data === "string" ? new RegExp(test.isGoal.data) : test.isGoal.data,
-            });
+    if (!!test.isGoal) {
+        return isGoal({
+            name: getStringOrRegexp(test.isGoal.name),
+            state: test.isGoal.state || SdmGoalState.success,
+            pushTest: test.isGoal.test ? await mapTest(test.isGoal.test, additionalTests, extensionTests) : undefined,
+            output: getStringOrRegexp(test.isGoal.output),
+            data: getStringOrRegexp(test.isGoal.data),
+        });
     }
     return undefined;
 };
@@ -223,4 +222,16 @@ export async function mapTest(test: any,
 function getGlobPatterns(test: any): string[] {
     const pattern = test.globPattern || test.pattern || test.globPatterns || test.patterns;
     return toArray(pattern);
+}
+
+function getStringOrRegexp(toTest: string | { regexp: string }): string | RegExp | undefined {
+    if (!toTest) {
+        return undefined;
+    } else if (typeof toTest === "string") {
+        return toTest;
+    } else if (toTest.regexp !== undefined) {
+        return new RegExp(toTest.regexp);
+    } else {
+        return undefined;
+    }
 }
