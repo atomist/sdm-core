@@ -180,7 +180,7 @@ async function populateSecrets(parameters: any, metadata: CommandHandlerMetadata
                         await ci.addressChannels(
                             slackInfoMessage(
                                 "Link GitHub Account",
-                                `In order to run this command Atomist needs to link your GitHub identity to your Slack user.\n\nPlease ${url(orgUrl, "click here")} to start link your account.`));
+                                `In order to run this command Atomist needs to link your GitHub identity to your Slack user.\n\nPlease ${url(orgUrl, "click here")} to link your account.`));
                         throw new CommandListenerExecutionInterruptError("Sending token collection message");
                     }
                 }
