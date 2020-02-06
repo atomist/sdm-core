@@ -36,7 +36,7 @@ export interface GoalCacheArchiveStore {
      * @param classifier The classifier of the cache
      * @param archivePath The path of the archive to be stored.
      */
-    store(gi: GoalInvocation, classifier: string, archivePath: string): Promise<void>;
+    store(gi: GoalInvocation, classifier: string, archivePath: string): Promise<string>;
 
     /**
      * Remove a compressed goal archive
@@ -69,7 +69,10 @@ export class CompressingGoalCache implements GoalCache {
                        private readonly method: CompressionMethod = CompressionMethod.TAR) {
     }
 
-    public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
+    public async put(gi: GoalInvocation,
+                     project: GitProject,
+                     files: string[],
+                     classifier?: string): Promise<string> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
         const slug = `${gi.id.owner}/${gi.id.repo}`;
@@ -83,12 +86,12 @@ export class CompressingGoalCache implements GoalCache {
             const tarResult = await spawnLog("tar", ["-cf", teamArchiveFileName, ...files], spawnLogOpts);
             if (tarResult.code) {
                 gi.progressLog.write(`Failed to create tar archive '${teamArchiveFileName}' for ${slug}`);
-                return;
+                return undefined;
             }
             const gzipResult = await spawnLog("gzip", ["-3", teamArchiveFileName], spawnLogOpts);
             if (gzipResult.code) {
                 gi.progressLog.write(`Failed to gzip tar archive '${teamArchiveFileName}' for ${slug}`);
-                return;
+                return undefined;
             }
             teamArchiveFileNameWithSuffix += ".gz";
         } else if (this.method === CompressionMethod.ZIP) {
@@ -130,7 +133,7 @@ export class CompressingGoalCache implements GoalCache {
             }
         }
         const resolvedClassifier = await resolveClassifierPath(classifier, gi);
-        await this.store.store(gi, resolvedClassifier, teamArchiveFileNameWithSuffix);
+        return await this.store.store(gi, resolvedClassifier, teamArchiveFileNameWithSuffix);
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
