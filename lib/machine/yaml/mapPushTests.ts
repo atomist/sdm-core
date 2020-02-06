@@ -105,7 +105,7 @@ const IsOutput: CreatePushTest = async (test, additionalTests, extensionTests) =
         return isOutput({
             classifier: getStringOrRegexp(test.isOutput.classifier),
             type: test.isOutput.type,
-            pushTest: test.isGoal.test ? await mapTest(test.isGoal.test, additionalTests, extensionTests) : undefined,
+            pushTest: test.isOutput.test ? await mapTest(test.isOutput.test, additionalTests, extensionTests) : undefined,
         });
     }
     return undefined;
