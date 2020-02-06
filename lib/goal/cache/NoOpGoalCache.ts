@@ -24,8 +24,9 @@ import { GoalCache } from "./goalCaching";
  * Cache implementation that doesn't cache anything and will always trigger the fallback.
  */
 export class NoOpGoalCache implements GoalCache {
-    public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<void> {
+    public async put(gi: GoalInvocation, project: GitProject, files: string[], classifier?: string): Promise<string> {
         logger.warn(`No-Op goal cache in use; no cache will be preserved!`);
+        return undefined;
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
