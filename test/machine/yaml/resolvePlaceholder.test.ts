@@ -111,7 +111,7 @@ describe("machine/yaml/resolvePlaceholder", () => {
 
         it("should replace skill configuration parameters", async () => {
             // tslint:disable-next-line:no-invalid-template-strings
-            const value = "${skill.configuration.image}";
+            const value = "${skill.configuration.parameters.image}/${skill.configuration.name}";
             const result = await resolvePlaceholder(value, {
                 sha: "sfsfsafdsf",
                 branch: "master",
@@ -131,8 +131,14 @@ describe("machine/yaml/resolvePlaceholder", () => {
                         },
                     },
                 },
+                skill: {
+                    configuration: {
+                        name: "bar",
+                        parameters: { image: "foo:latest" },
+                    },
+                },
             } as any, {});
-            assert.deepStrictEqual(result, "foo:latest");
+            assert.deepStrictEqual(result, "foo:latest/bar");
         });
 
     });

@@ -26,7 +26,7 @@
   "dependencies": {
     "@google-cloud/storage": "^4.0.0",
     "@kubernetes/client-node": "^0.11.1",
-    "@types/fast-json-stable-stringify": "^2.0.0",
+    "@types/fast-json-stable-stringify": "2.0.0",
     "@types/flat": "0.0.28",
     "@types/fs-extra": "^8.0.0",
     "@types/json-stringify-safe": "^5.0.0",
@@ -40,7 +40,7 @@
     "chalk": "^2.4.2",
     "change-case": "^3.1.0",
     "fast-glob": "^3.1.0",
-    "fast-json-stable-stringify": "^2.0.0",
+    "fast-json-stable-stringify": "2.0.0",
     "flat": "^4.1.0",
     "fs-extra": "^8.1.0",
     "js-yaml": "^3.13.1",
@@ -65,7 +65,7 @@
   "devDependencies": {
     "@atomist/automation-client": "2.0.0-master.20200131202342",
     "@atomist/microgrammar": "^1.2.1",
-    "@atomist/sdm": "2.0.0-master.20200201162131",
+    "@atomist/sdm": "2.0.0-skill-output.20200208122908",
     "@atomist/slack-messages": "^1.1.1",
     "@atomist/tree-path": "^1.0.3",
     "@types/mocha": "^5.2.7",

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,13 @@ import { FunctionalUnit } from "@atomist/sdm/lib/api/machine/FunctionalUnit";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
 import * as _ from "lodash";
+import { SkillOutputGoalExecutionListener } from "../../goal/skillOutput";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnGoal } from "../../handlers/events/delivery/goals/SetGoalsOnGoal";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
+import { SetGoalsOnSkillOutput } from "../../handlers/events/delivery/goals/SetGoalsOnSkillOutput";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
 import { VoteOnGoalApprovalRequest } from "../../handlers/events/delivery/goals/VoteOnGoalApprovalRequest";
 import { ClosedIssueHandler } from "../../handlers/events/issue/ClosedIssueHandler";
@@ -70,17 +72,28 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     private get goalSetting(): FunctionalUnit {
         if (this.pushMapping) {
             return {
-                eventHandlers: [() => new SetGoalsOnPush(
-                    this.configuration.sdm.projectLoader,
-                    this.configuration.sdm.repoRefResolver,
-                    this.pushMapping,
-                    this.goalsSetListeners,
-                    this.goalFulfillmentMapper,
-                    this.configuration.sdm.credentialsResolver,
-                    this.configuration.sdm.preferenceStoreFactory,
-                    this.configuration.sdm.enrichGoal,
-                    this.configuration.sdm.tagGoalSet),
+                eventHandlers: [
+                    () => new SetGoalsOnPush(
+                        this.configuration.sdm.projectLoader,
+                        this.configuration.sdm.repoRefResolver,
+                        this.pushMapping,
+                        this.goalsSetListeners,
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory,
+                        this.configuration.sdm.enrichGoal,
+                        this.configuration.sdm.tagGoalSet),
                     () => new SetGoalsOnGoal(
+                        this.configuration.sdm.projectLoader,
+                        this.configuration.sdm.repoRefResolver,
+                        this.pushMapping,
+                        this.goalsSetListeners,
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory,
+                        this.configuration.sdm.enrichGoal,
+                        this.configuration.sdm.tagGoalSet),
+                    () => new SetGoalsOnSkillOutput(
                         this.configuration.sdm.projectLoader,
                         this.configuration.sdm.repoRefResolver,
                         this.pushMapping,
@@ -238,6 +251,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 configuration: Configuration & SoftwareDeliveryMachineConfiguration,
                 goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
+        this.addGoalExecutionListener(SkillOutputGoalExecutionListener);
     }
 
 }

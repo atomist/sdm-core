@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import { DefaultExcludes } from "@atomist/automation-client/lib/project/fileGlobs";
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import { Project } from "@atomist/automation-client/lib/project/Project";
@@ -27,6 +28,7 @@ import {
 import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as _ from "lodash";
+import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { toArray } from "../../util/misc/array";
 import { CompressingGoalCache } from "./CompressingGoalCache";
 
@@ -46,8 +48,9 @@ export interface GoalCache {
      * @param p The project where the files (or directories) reside.
      * @param files The files (or directories) to be cached.
      * @param classifier An optional classifier to identify the set of files (or directories to be cached).
+     * @param type An optional output type
      */
-    put(gi: GoalInvocation, p: GitProject, files: string | string[], classifier?: string): Promise<void>;
+    put(gi: GoalInvocation, p: GitProject, files: string | string[], classifier?: string): Promise<string>;
 
     /**
      * Retrieve files from the cache.
@@ -109,7 +112,7 @@ export interface GoalCacheOptions extends GoalCacheCoreOptions {
      * files need to be cached between goal invocations, possibly
      * excluding paths using regular expressions.
      */
-    entries: CacheEntry[];
+    entries: Array<CacheEntry & { type?: string }>;
 }
 
 /**
@@ -146,9 +149,11 @@ export function cachePut(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
+            const { goalEvent } = gi;
             if (!!isCacheEnabled(gi) && !process.env.ATOMIST_ISOLATED_GOAL_INIT) {
+                const cloneEntries = _.cloneDeep(entries);
                 const goalCache = cacheStore(gi);
-                for (const entry of entries) {
+                for (const entry of cloneEntries) {
                     const files = [];
                     if (isGlobFilePattern(entry.pattern)) {
                         files.push(...(await getFilePathsThroughPattern(p, entry.pattern.globPattern)));
@@ -156,17 +161,21 @@ export function cachePut(options: GoalCacheOptions,
                         files.push(entry.pattern.directory);
                     }
                     if (!_.isEmpty(files)) {
-                        await goalCache.put(gi, p, files, entry.classifier);
+                        const resolvedClassifier = await resolveClassifierPath(entry.classifier, gi);
+                        const uri = await goalCache.put(gi, p, files, resolvedClassifier);
+                        if (!!resolvedClassifier && !!uri) {
+                            entry.classifier = resolvedClassifier;
+                            (entry as any).uri = uri;
+                        }
                     }
                 }
 
                 // Set outputs on the goal data
-                const { goalEvent } = gi;
                 const data = JSON.parse(goalEvent.data || "{}");
                 const newData = {
                     [CacheOutputGoalDataKey]: [
                         ...(data[CacheOutputGoalDataKey] || []),
-                        ...entries,
+                        ...cloneEntries,
                     ],
                 };
                 goalEvent.data = JSON.stringify({
@@ -198,6 +207,7 @@ async function pushTestSucceeds(pushTest: PushTest, gi: GoalInvocation, p: GitPr
         context: gi.context,
         preferences: gi.preferences,
         credentials: gi.credentials,
+        skill: gi.skill,
     });
 }
 
@@ -259,7 +269,8 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
                 const goalCache = cacheStore(gi);
                 for (const c of classifiersToBeRestored) {
                     try {
-                        await goalCache.retrieve(gi, p, c);
+                        const resolvedClassifier = await resolveClassifierPath(c, gi);
+                        await goalCache.retrieve(gi, p, resolvedClassifier);
                     } catch (e) {
                         await invokeCacheMissListeners(optsToUse, p, gi, event);
                     }
@@ -320,7 +331,8 @@ export function cacheRemove(options: GoalCacheOptions,
                 const goalCache = cacheStore(gi);
 
                 for (const c of classifiersToBeRemoved) {
-                    await goalCache.remove(gi, c);
+                    const resolvedClassifier = await resolveClassifierPath(c, gi);
+                    await goalCache.remove(gi, resolvedClassifier);
                 }
             }
         },
@@ -345,4 +357,26 @@ function isCacheEnabled(gi: GoalInvocation): boolean {
 
 function cacheStore(gi: GoalInvocation): GoalCache {
     return _.get(gi.configuration, "sdm.cache.store", DefaultGoalCache);
+}
+
+/**
+ * Interpolate information from goal invocation into the classifier.
+ */
+export async function resolveClassifierPath(classifier: string | undefined, gi: GoalInvocation): Promise<string> {
+    if (!classifier) {
+        return gi.context.workspaceId;
+    }
+    const wrapper = { classifier };
+    await resolvePlaceholders(wrapper, v => resolvePlaceholder(v, gi.goalEvent, gi, {}));
+    return gi.context.workspaceId + "/" + sanitizeClassifier(wrapper.classifier);
+}
+
+/**
+ * Sanitize classifier for use in path.  Replace any characters
+ * which might cause problems on POSIX or MS Windows with "_",
+ * including path separators.  Ensure resulting file is not "hidden".
+ */
+export function sanitizeClassifier(classifier: string): string {
+    return classifier.replace(/[^-.0-9A-Za-z_+]/g, "_")
+        .replace(/^\.+/, ""); // hidden
 }

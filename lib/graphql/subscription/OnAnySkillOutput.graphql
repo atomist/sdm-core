@@ -1,0 +1,17 @@
+subscription OnAnySkillOutput {
+  SkillOutput {
+    ownerId
+    repoId
+    classifier
+    content
+    skill {
+      name
+      version
+    }
+    type
+    uri
+    push {
+      ...PushFields
+    }
+  }
+}
