@@ -18,6 +18,7 @@ import { hasCommit } from "@atomist/sdm/lib/api-helper/pushtest/commit";
 import { isMaterialChange } from "@atomist/sdm/lib/api-helper/pushtest/materialChangeTest";
 import { StatefulPushListenerInvocation } from "@atomist/sdm/lib/api/dsl/goalContribution";
 import { isGoal } from "@atomist/sdm/lib/api/mapping/goalTest";
+import { isOutput } from "@atomist/sdm/lib/api/mapping/outputTest";
 import {
     pushTest,
     PushTest,
@@ -94,6 +95,17 @@ const IsGoal: CreatePushTest = async (test, additionalTests, extensionTests) => 
             pushTest: test.isGoal.test ? await mapTest(test.isGoal.test, additionalTests, extensionTests) : undefined,
             output: getStringOrRegexp(test.isGoal.output),
             data: getStringOrRegexp(test.isGoal.data),
+        });
+    }
+    return undefined;
+};
+
+const IsOutput: CreatePushTest = async (test, additionalTests, extensionTests) => {
+    if (!!test.isOutput) {
+        return isOutput({
+            classifier: getStringOrRegexp(test.isOutput.classifier),
+            type: test.isOutput.type,
+            pushTest: test.isGoal.test ? await mapTest(test.isGoal.test, additionalTests, extensionTests) : undefined,
         });
     }
     return undefined;
@@ -195,6 +207,7 @@ export const CreatePushTests = [
     IsBranch,
     IsDefaultBranch,
     IsGoal,
+    IsOutput,
     IsMaterialChange,
     HasFileContaining,
     HasResourceProvider,
