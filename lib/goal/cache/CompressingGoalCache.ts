@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import { Deferred } from "@atomist/automation-client/lib/internal/util/Deferred";
 import { guid } from "@atomist/automation-client/lib/internal/util/string";
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
@@ -25,7 +24,6 @@ import * as fs from "fs-extra";
 import * as JSZip from "jszip";
 import * as os from "os";
 import * as path from "path";
-import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import { FileSystemGoalCacheArchiveStore } from "./FileSystemGoalCacheArchiveStore";
 import { GoalCache } from "./goalCaching";
 
@@ -132,20 +130,17 @@ export class CompressingGoalCache implements GoalCache {
                 await defer.promise;
             }
         }
-        const resolvedClassifier = await resolveClassifierPath(classifier, gi);
-        return await this.store.store(gi, resolvedClassifier, teamArchiveFileNameWithSuffix);
+        return await this.store.store(gi, classifier, teamArchiveFileNameWithSuffix);
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
-        const resolvedClassifier = await resolveClassifierPath(classifier, gi);
-        await this.store.delete(gi, resolvedClassifier);
+        await this.store.delete(gi, classifier);
     }
 
     public async retrieve(gi: GoalInvocation, project: GitProject, classifier?: string): Promise<void> {
         const archiveName = "atomist-cache";
         const teamArchiveFileName = path.join(os.tmpdir(), `${archiveName}.${guid().slice(0, 7)}`);
-        const resolvedClassifier = await resolveClassifierPath(classifier, gi);
-        await this.store.retrieve(gi, resolvedClassifier, teamArchiveFileName);
+        await this.store.retrieve(gi, classifier, teamArchiveFileName);
         if (fs.existsSync(teamArchiveFileName)) {
             if (this.method === CompressionMethod.TAR) {
                 await spawnLog("tar", ["-xzf", teamArchiveFileName], {
@@ -170,26 +165,4 @@ export class CompressingGoalCache implements GoalCache {
         }
     }
 
-}
-
-/**
- * Interpolate information from goal invocation into the classifier.
- */
-export async function resolveClassifierPath(classifier: string | undefined, gi: GoalInvocation): Promise<string> {
-    if (!classifier) {
-        return gi.context.workspaceId;
-    }
-    const wrapper = { classifier };
-    await resolvePlaceholders(wrapper, v => resolvePlaceholder(v, gi.goalEvent, gi, {}));
-    return gi.context.workspaceId + "/" + sanitizeClassifier(wrapper.classifier);
-}
-
-/**
- * Sanitize classifier for use in path.  Replace any characters
- * which might cause problems on POSIX or MS Windows with "_",
- * including path separators.  Ensure resulting file is not "hidden".
- */
-export function sanitizeClassifier(classifier: string): string {
-    return classifier.replace(/[^-.0-9A-Za-z_+]/g, "_")
-        .replace(/^\.+/, ""); // hidden
 }
