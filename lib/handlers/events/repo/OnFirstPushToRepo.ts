@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import {
     AddressNoChannels,
 } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillContext";
 import {
     PushListener,
     PushListenerInvocation,
@@ -98,6 +99,7 @@ export class OnFirstPushToRepo
             credentials,
             project,
             push,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.actions
             .map(l => l(invocation)),

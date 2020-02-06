@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import { logger } from "@atomist/automation-client/lib/util/logger";
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillContext";
 import {
     NewIssueListener,
     NewIssueListenerInvocation,
@@ -80,6 +81,7 @@ export class NewIssueHandler implements HandleEvent<schema.OnIssueAction.Subscri
             context,
             issue,
             credentials,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.newIssueListeners
             .map(l => l(inv)));
