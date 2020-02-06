@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import {
 } from "@atomist/automation-client/lib/HandlerResult";
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
@@ -72,6 +73,7 @@ export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningCha
             credentials,
             joinEvent,
             repos,
+            skill: createSkillContext(context),
         };
 
         await Promise.all(this.listeners

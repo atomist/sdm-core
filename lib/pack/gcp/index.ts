@@ -30,7 +30,7 @@ import { GoogleCloudStorageGoalCacheArchiveStore } from "./cache";
  */
 export function gcpSupport(options: { compression?: CompressionMethod } = {}): ExtensionPack {
     return {
-        ...metadata(),
+        ...metadata("gcp-caching"),
         configure: sdm => {
             _.defaultsDeep(sdm.configuration, {
                 sdm: {
