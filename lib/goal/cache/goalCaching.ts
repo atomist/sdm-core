@@ -154,6 +154,7 @@ export function cachePut(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
+            const { goalEvent, context, configuration } = gi;
             if (!!isCacheEnabled(gi) && !process.env.ATOMIST_ISOLATED_GOAL_INIT) {
                 const goalCache = cacheStore(gi);
                 for (const entry of entries) {
@@ -168,7 +169,6 @@ export function cachePut(options: GoalCacheOptions,
                         const uri = await goalCache.put(gi, p, files, resolvedClassifier);
 
                         if (!!resolvedClassifier && !!entry.type && !!uri) {
-                            const { goalEvent, context, configuration } = gi;
                             const skillOutput: CustomSkillOutputInput = {
                                 _branch: goalEvent.branch,
                                 _sha: goalEvent.sha,
@@ -195,7 +195,6 @@ export function cachePut(options: GoalCacheOptions,
                 }
 
                 // Set outputs on the goal data
-                const { goalEvent } = gi;
                 const data = JSON.parse(goalEvent.data || "{}");
                 const newData = {
                     [CacheOutputGoalDataKey]: [

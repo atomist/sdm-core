@@ -130,7 +130,7 @@ export class CompressingGoalCache implements GoalCache {
                 await defer.promise;
             }
         }
-        return await this.store.store(gi, classifier, teamArchiveFileNameWithSuffix);
+        return this.store.store(gi, classifier, teamArchiveFileNameWithSuffix);
     }
 
     public async remove(gi: GoalInvocation, classifier?: string): Promise<void> {
