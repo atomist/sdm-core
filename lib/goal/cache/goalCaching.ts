@@ -182,7 +182,7 @@ export function cachePut(options: GoalCacheOptions,
                                 },
                             };
                             await context.graphClient.mutate<IngestSkillOutputMutation, IngestSkillOutputMutationVariables>({
-                                name: "IngestCustomSkillOutput",
+                                name: "IngestSkillOutput",
                                 variables: {
                                     output: skillOutput,
                                 },
