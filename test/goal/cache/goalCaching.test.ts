@@ -43,7 +43,7 @@ class TestGoalArtifactCache implements GoalCache {
     private cacheFiles: File[];
     private classifier: string;
 
-    public async put(gi: GoalInvocation, project: Project, files: string[], classifier: string = "default"): Promise<void> {
+    public async put(gi: GoalInvocation, project: Project, files: string[], classifier: string = "default"): Promise<string> {
         this.id = gi.id;
         this.cacheFiles = await Promise.all(files.map(async f => project.getFile(f)));
         this.classifier = classifier;
