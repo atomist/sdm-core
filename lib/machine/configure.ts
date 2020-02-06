@@ -30,7 +30,7 @@ import {
 import { GoalWithFulfillment } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import { PushListenerInvocation } from "@atomist/sdm/lib/api/listener/PushListener";
 import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachine";
-import { notGoalTest } from "@atomist/sdm/lib/api/mapping/goalTest";
+import { notGoalOrOutputTest } from "@atomist/sdm/lib/api/mapping/goalTest";
 import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import { allSatisfied } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
@@ -296,7 +296,7 @@ function wrapTest(test: PushTest): PushTest {
     if (!!(test as any).pushTest) {
         return test;
     } else {
-        return notGoalTest(test);
+        return notGoalOrOutputTest(test);
     }
 }
 
