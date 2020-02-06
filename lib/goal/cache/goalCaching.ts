@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { resolvePlaceholders } from "@atomist/automation-client/lib/configuration";
 import { DefaultExcludes } from "@atomist/automation-client/lib/project/fileGlobs";
 import { GitProject } from "@atomist/automation-client/lib/project/git/GitProject";
 import { Project } from "@atomist/automation-client/lib/project/Project";
@@ -27,6 +28,7 @@ import {
 import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as _ from "lodash";
+import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
 import {
     CustomSkillOutputInput,
     IngestSkillOutputMutation,
@@ -162,16 +164,17 @@ export function cachePut(options: GoalCacheOptions,
                         files.push(entry.pattern.directory);
                     }
                     if (!_.isEmpty(files)) {
-                        const uri = await goalCache.put(gi, p, files, entry.classifier);
+                        const resolvedClassifier = await resolveClassifierPath(entry.classifier, gi);
+                        const uri = await goalCache.put(gi, p, files, resolvedClassifier);
 
-                        if (!!entry.classifier && !!entry.type && !!uri) {
+                        if (!!resolvedClassifier && !!entry.type && !!uri) {
                             const { goalEvent, context, configuration } = gi;
                             const skillOutput: CustomSkillOutputInput = {
                                 _branch: goalEvent.branch,
                                 _sha: goalEvent.sha,
                                 _owner: goalEvent.repo.owner,
                                 _repo: goalEvent.repo.name,
-                                classifier: entry.classifier,
+                                classifier: resolvedClassifier,
                                 type: entry.type,
                                 uri,
                                 content: undefined,
@@ -290,7 +293,8 @@ export function cacheRestore(options: GoalCacheRestoreOptions,
                 const goalCache = cacheStore(gi);
                 for (const c of classifiersToBeRestored) {
                     try {
-                        await goalCache.retrieve(gi, p, c);
+                        const resolvedClassifier = await resolveClassifierPath(c, gi);
+                        await goalCache.retrieve(gi, p, resolvedClassifier);
                     } catch (e) {
                         await invokeCacheMissListeners(optsToUse, p, gi, event);
                     }
@@ -351,7 +355,8 @@ export function cacheRemove(options: GoalCacheOptions,
                 const goalCache = cacheStore(gi);
 
                 for (const c of classifiersToBeRemoved) {
-                    await goalCache.remove(gi, c);
+                    const resolvedClassifier = await resolveClassifierPath(c, gi);
+                    await goalCache.remove(gi, resolvedClassifier);
                 }
             }
         },
@@ -376,4 +381,26 @@ function isCacheEnabled(gi: GoalInvocation): boolean {
 
 function cacheStore(gi: GoalInvocation): GoalCache {
     return _.get(gi.configuration, "sdm.cache.store", DefaultGoalCache);
+}
+
+/**
+ * Interpolate information from goal invocation into the classifier.
+ */
+export async function resolveClassifierPath(classifier: string | undefined, gi: GoalInvocation): Promise<string> {
+    if (!classifier) {
+        return gi.context.workspaceId;
+    }
+    const wrapper = { classifier };
+    await resolvePlaceholders(wrapper, v => resolvePlaceholder(v, gi.goalEvent, gi, {}));
+    return gi.context.workspaceId + "/" + sanitizeClassifier(wrapper.classifier);
+}
+
+/**
+ * Sanitize classifier for use in path.  Replace any characters
+ * which might cause problems on POSIX or MS Windows with "_",
+ * including path separators.  Ensure resulting file is not "hidden".
+ */
+export function sanitizeClassifier(classifier: string): string {
+    return classifier.replace(/[^-.0-9A-Za-z_+]/g, "_")
+        .replace(/^\.+/, ""); // hidden
 }
