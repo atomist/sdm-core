@@ -88,24 +88,26 @@ const IsDefaultBranch: CreatePushTest = async test => {
 };
 
 const IsGoal: CreatePushTest = async (test, additionalTests, extensionTests) => {
-    if (!!test.isGoal) {
+    const onGoal = test.isGoal || test.onGoal;
+    if (!!onGoal) {
         return isGoal({
-            name: getStringOrRegexp(test.isGoal.name),
-            state: test.isGoal.state || SdmGoalState.success,
-            pushTest: test.isGoal.test ? await mapTest(test.isGoal.test, additionalTests, extensionTests) : undefined,
-            output: getStringOrRegexp(test.isGoal.output),
-            data: getStringOrRegexp(test.isGoal.data),
+            name: getStringOrRegexp(onGoal.name),
+            state: onGoal.state || SdmGoalState.success,
+            pushTest: onGoal.test ? await mapTest(onGoal.test, additionalTests, extensionTests) : undefined,
+            output: getStringOrRegexp(onGoal.output),
+            data: getStringOrRegexp(onGoal.data),
         });
     }
     return undefined;
 };
 
 const IsOutput: CreatePushTest = async (test, additionalTests, extensionTests) => {
-    if (!!test.isOutput) {
+    const onOutput = test.isOutput || test.onOutput;
+    if (!!onOutput) {
         return isOutput({
-            classifier: getStringOrRegexp(test.isOutput.classifier),
-            type: test.isOutput.type,
-            pushTest: test.isOutput.test ? await mapTest(test.isOutput.test, additionalTests, extensionTests) : undefined,
+            classifier: getStringOrRegexp(onOutput.classifier),
+            type: onOutput.type,
+            pushTest: onOutput.test ? await mapTest(onOutput.test, additionalTests, extensionTests) : undefined,
         });
     }
     return undefined;
