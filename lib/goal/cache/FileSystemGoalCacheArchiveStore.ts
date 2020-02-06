@@ -28,13 +28,14 @@ import { GoalCacheArchiveStore } from "./CompressingGoalCache";
 export class FileSystemGoalCacheArchiveStore implements GoalCacheArchiveStore {
     private static readonly archiveName: string = "cache.tar.gz";
 
-    public async store(gi: GoalInvocation, classifier: string, archivePath: string): Promise<void> {
+    public async store(gi: GoalInvocation, classifier: string, archivePath: string): Promise<string> {
         const cacheDir = await FileSystemGoalCacheArchiveStore.getCacheDirectory(gi, classifier);
         const archiveName = FileSystemGoalCacheArchiveStore.archiveName;
         const archiveFileName = path.join(cacheDir, archiveName);
         await spawnLog("mv", [archivePath, archiveFileName], {
             log: gi.progressLog,
         });
+        return archiveFileName;
     }
 
     public async delete(gi: GoalInvocation, classifier: string): Promise<void> {

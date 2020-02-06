@@ -28,6 +28,7 @@ import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/deliv
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
 import { SetGoalsOnGoal } from "../../handlers/events/delivery/goals/SetGoalsOnGoal";
 import { SetGoalsOnPush } from "../../handlers/events/delivery/goals/SetGoalsOnPush";
+import { SetGoalsOnSkillOutput } from "../../handlers/events/delivery/goals/SetGoalsOnSkillOutput";
 import { SkipDownstreamGoalsOnGoalFailure } from "../../handlers/events/delivery/goals/SkipDownstreamGoalsOnGoalFailure";
 import { VoteOnGoalApprovalRequest } from "../../handlers/events/delivery/goals/VoteOnGoalApprovalRequest";
 import { ClosedIssueHandler } from "../../handlers/events/issue/ClosedIssueHandler";
@@ -70,17 +71,28 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
     private get goalSetting(): FunctionalUnit {
         if (this.pushMapping) {
             return {
-                eventHandlers: [() => new SetGoalsOnPush(
-                    this.configuration.sdm.projectLoader,
-                    this.configuration.sdm.repoRefResolver,
-                    this.pushMapping,
-                    this.goalsSetListeners,
-                    this.goalFulfillmentMapper,
-                    this.configuration.sdm.credentialsResolver,
-                    this.configuration.sdm.preferenceStoreFactory,
-                    this.configuration.sdm.enrichGoal,
-                    this.configuration.sdm.tagGoalSet),
+                eventHandlers: [
+                    () => new SetGoalsOnPush(
+                        this.configuration.sdm.projectLoader,
+                        this.configuration.sdm.repoRefResolver,
+                        this.pushMapping,
+                        this.goalsSetListeners,
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory,
+                        this.configuration.sdm.enrichGoal,
+                        this.configuration.sdm.tagGoalSet),
                     () => new SetGoalsOnGoal(
+                        this.configuration.sdm.projectLoader,
+                        this.configuration.sdm.repoRefResolver,
+                        this.pushMapping,
+                        this.goalsSetListeners,
+                        this.goalFulfillmentMapper,
+                        this.configuration.sdm.credentialsResolver,
+                        this.configuration.sdm.preferenceStoreFactory,
+                        this.configuration.sdm.enrichGoal,
+                        this.configuration.sdm.tagGoalSet),
+                    () => new SetGoalsOnSkillOutput(
                         this.configuration.sdm.projectLoader,
                         this.configuration.sdm.repoRefResolver,
                         this.pushMapping,

@@ -27,6 +27,11 @@ import {
 import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as _ from "lodash";
+import {
+    CustomSkillOutputInput,
+    IngestSkillOutputMutation,
+    IngestSkillOutputMutationVariables,
+} from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import { CompressingGoalCache } from "./CompressingGoalCache";
 
@@ -46,8 +51,9 @@ export interface GoalCache {
      * @param p The project where the files (or directories) reside.
      * @param files The files (or directories) to be cached.
      * @param classifier An optional classifier to identify the set of files (or directories to be cached).
+     * @param type An optional output type
      */
-    put(gi: GoalInvocation, p: GitProject, files: string | string[], classifier?: string): Promise<void>;
+    put(gi: GoalInvocation, p: GitProject, files: string | string[], classifier?: string): Promise<string>;
 
     /**
      * Retrieve files from the cache.
@@ -109,7 +115,7 @@ export interface GoalCacheOptions extends GoalCacheCoreOptions {
      * files need to be cached between goal invocations, possibly
      * excluding paths using regular expressions.
      */
-    entries: CacheEntry[];
+    entries: Array<CacheEntry & { type?: string }>;
 }
 
 /**
@@ -156,7 +162,32 @@ export function cachePut(options: GoalCacheOptions,
                         files.push(entry.pattern.directory);
                     }
                     if (!_.isEmpty(files)) {
-                        await goalCache.put(gi, p, files, entry.classifier);
+                        const uri = await goalCache.put(gi, p, files, entry.classifier);
+
+                        if (!!entry.classifier && !!entry.type && !!uri) {
+                            const { goalEvent, context, configuration } = gi;
+                            const skillOutput: CustomSkillOutputInput = {
+                                _branch: goalEvent.branch,
+                                _sha: goalEvent.sha,
+                                _owner: goalEvent.repo.owner,
+                                _repo: goalEvent.repo.name,
+                                classifier: entry.classifier,
+                                type: entry.type,
+                                uri,
+                                content: undefined,
+                                correlationId: context.correlationId,
+                                skill: {
+                                    name: configuration.name,
+                                    version: configuration.version,
+                                },
+                            };
+                            await context.graphClient.mutate<IngestSkillOutputMutation, IngestSkillOutputMutationVariables>({
+                                name: "IngestCustomSkillOutput",
+                                variables: {
+                                    output: skillOutput,
+                                },
+                            });
+                        }
                     }
                 }
 
