@@ -37,6 +37,7 @@ import {
     or,
 } from "@atomist/sdm/lib/api/mapping/support/pushTestUtils";
 import * as changeCase from "change-case";
+import { isSkillConfigured } from "../../mapping/pushtest/skillConfiguration";
 import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import { camelCase } from "./util";
@@ -60,21 +61,21 @@ type CreatePushTest = (test: any,
                        extensionTests: Record<string, PushTestMaker>) => Promise<PushTest | undefined>;
 
 const HasFile: CreatePushTest = async test => {
-    if (test.hasFile) {
+    if (!!test.hasFile) {
         return hasFile(test.hasFile);
     }
     return undefined;
 };
 
 const IsRepo: CreatePushTest = async test => {
-    if (test.isRepo) {
+    if (!!test.isRepo) {
         return isRepo(typeof test.isRepo === "string" ? new RegExp(test.isRepo) : test.isRepo);
     }
     return undefined;
 };
 
 const IsBranch: CreatePushTest = async test => {
-    if (test.isBranch) {
+    if (!!test.isBranch) {
         return isBranch(typeof test.isBranch === "string" ? new RegExp(test.isBranch) : test.isBranch);
     }
     return undefined;
@@ -83,6 +84,19 @@ const IsBranch: CreatePushTest = async test => {
 const IsDefaultBranch: CreatePushTest = async test => {
     if (["isDefaultBranch", "toDefaultBranch"].includes(changeCase.camel(test))) {
         return ToDefaultBranch;
+    }
+    return undefined;
+};
+
+const IsSkillConfigured: CreatePushTest = async test => {
+    if (!!test.isSkillConfigured) {
+        const sc = test.isSkillConfigured;
+        return isSkillConfigured({
+            hasCommit: sc.hasCommit,
+            hasFile: sc.hasFile,
+            isBranch: sc.isBranch,
+            isDefaultBranch: sc.isDefaultBranch,
+        });
     }
     return undefined;
 };
@@ -114,7 +128,7 @@ const IsOutput: CreatePushTest = async (test, additionalTests, extensionTests) =
 };
 
 const IsMaterialChange: CreatePushTest = async test => {
-    if (test.isMaterialChange) {
+    if (!!test.isMaterialChange) {
         return isMaterialChange({
             directories: toArray(test.isMaterialChange.directories),
             extensions: toArray(test.isMaterialChange.extensions),
@@ -126,7 +140,7 @@ const IsMaterialChange: CreatePushTest = async test => {
 };
 
 const HasFileContaining: CreatePushTest = async test => {
-    if (test.hasFileContaining) {
+    if (!!test.hasFileContaining) {
         if (!test.hasFileContaining.content) {
             throw new Error("Push test 'hasFileContaining' can't be used without 'content' property");
         }
@@ -138,7 +152,7 @@ const HasFileContaining: CreatePushTest = async test => {
 };
 
 const HasResourceProvider: CreatePushTest = async test => {
-    if (test.hasResourceProvider) {
+    if (!!test.hasResourceProvider) {
         if (!test.hasResourceProvider.type) {
             throw new Error("Push test 'hasResourceProvider' can't be used without 'type' property");
         }
@@ -148,28 +162,28 @@ const HasResourceProvider: CreatePushTest = async test => {
 };
 
 const HasCommit: CreatePushTest = async test => {
-    if (test.hasCommit) {
+    if (!!test.hasCommit) {
         return hasCommit(typeof test.hasCommit === "string" ? new RegExp(test.hasCommit) : test.hasCommit);
     }
     return undefined;
 };
 
 const Not: CreatePushTest = async (test, additionalTests, extensionTests) => {
-    if (test.not) {
+    if (!!test.not) {
         return not(await mapTest(test.not, additionalTests, extensionTests));
     }
     return undefined;
 };
 
 const And: CreatePushTest = async (test, additionalTests, extensionTests) => {
-    if (test.and) {
+    if (!!test.and) {
         return and(...toArray(await mapTests(test.and, additionalTests, extensionTests)));
     }
     return undefined;
 };
 
 const Or: CreatePushTest = async (test, additionalTests, extensionTests) => {
-    if (test.or) {
+    if (!!test.or) {
         return or(...toArray(await mapTests(test.or, additionalTests, extensionTests)));
     }
     return undefined;
@@ -210,6 +224,7 @@ export const CreatePushTests = [
     IsDefaultBranch,
     IsGoal,
     IsOutput,
+    IsSkillConfigured,
     IsMaterialChange,
     HasFileContaining,
     HasResourceProvider,
