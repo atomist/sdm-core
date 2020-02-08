@@ -33,6 +33,7 @@ import { logger } from "@atomist/automation-client/lib/util/logger";
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     UpdatedIssueListener,
     UpdatedIssueListenerInvocation,
@@ -80,6 +81,7 @@ export class UpdatedIssueHandler implements HandleEvent<schema.OnIssueAction.Sub
             context,
             issue,
             credentials,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.updatedIssueListeners
             .map(l => l(inv)));

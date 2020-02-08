@@ -32,6 +32,7 @@ import {
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     ClosedIssueListener,
     ClosedIssueListenerInvocation,
@@ -74,6 +75,7 @@ export class ClosedIssueHandler implements HandleEvent<schema.OnClosedIssue.Subs
             context,
             issue,
             credentials,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.closedIssueListeners
             .map(l => l(inv)));

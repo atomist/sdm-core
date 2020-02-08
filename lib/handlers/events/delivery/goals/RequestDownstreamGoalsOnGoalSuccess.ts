@@ -39,6 +39,7 @@ import {
 import { updateGoal } from "@atomist/sdm/lib/api-helper/goal/storeGoals";
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import {
     SdmGoalFulfillmentMethod,
@@ -121,6 +122,7 @@ export class RequestDownstreamGoalsOnGoalSuccess implements HandleEvent<OnAnySuc
                             configuration: this.configuration,
                             credentials,
                             context,
+                            skill: createSkillContext(context),
                         });
                 }
                 return updateGoal(context, g, {

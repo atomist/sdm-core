@@ -32,6 +32,7 @@ import {
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     PullRequestListener,
     PullRequestListenerInvocation,
@@ -85,6 +86,7 @@ export class OnPullRequest implements HandleEvent<schema.OnPullRequest.Subscript
                 credentials,
                 project,
                 pullRequest,
+                skill: createSkillContext(context),
             };
             await Promise.all(this.listeners
                 .map(l => l(prli)),

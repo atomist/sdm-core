@@ -36,6 +36,7 @@ import {
     addressChannelsFor,
 } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     ProjectListener,
     ProjectListenerInvocation,
@@ -76,6 +77,7 @@ export class OnRepoOnboarded implements HandleEvent<schema.OnRepoOnboarded.Subsc
             configuration: this.configuration,
             credentials,
             project,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.actions
             .map(l => l(invocation)),

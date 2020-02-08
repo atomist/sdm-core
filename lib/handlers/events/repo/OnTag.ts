@@ -32,6 +32,7 @@ import {
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     TagListener,
     TagListenerInvocation,
@@ -72,6 +73,7 @@ export class OnTag implements HandleEvent<schema.OnTag.Subscription> {
             context,
             tag,
             credentials,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.listeners.map(l => l(invocation)));
         return Success;

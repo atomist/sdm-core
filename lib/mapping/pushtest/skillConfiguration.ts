@@ -51,9 +51,8 @@ export function isSkillConfigured(keys?: SkillConfiguredOptions): PushTest {
     };
 
     return pushTest("is skill configured", async pli => {
-        const skillConfiguration = {};
-        ((pli.context as any)?.trigger?.configuration?.parameters || [])
-            .forEach(p => skillConfiguration[p.name] = p.value);
+
+        const skillConfiguration = pli.skill?.configuration?.parameters || {};
 
         if (!!skillConfiguration[keysToUse.hasFile]) {
             if (!(await hasFile(skillConfiguration[keysToUse.hasFile]).mapping(pli))) {

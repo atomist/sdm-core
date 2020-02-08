@@ -231,6 +231,7 @@ async function pushTestSucceeds(pushTest: PushTest, gi: GoalInvocation, p: GitPr
         context: gi.context,
         preferences: gi.preferences,
         credentials: gi.credentials,
+        skill: gi.skill,
     });
 }
 
