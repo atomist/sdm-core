@@ -36,6 +36,7 @@ import {
     NoPreferenceStore,
     PreferenceStoreFactory,
 } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import { EnrichGoal } from "@atomist/sdm/lib/api/goal/enrichGoal";
 import { GoalImplementationMapper } from "@atomist/sdm/lib/api/goal/support/GoalImplementationMapper";
 import { TagGoalSet } from "@atomist/sdm/lib/api/goal/tagGoalSet";
@@ -107,6 +108,7 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
             addressChannels,
             configuration,
             preferences: preferences || NoPreferenceStore,
+            skill: createSkillContext(context),
         };
 
         const matches = await this.goalSetter.mapping(pli);

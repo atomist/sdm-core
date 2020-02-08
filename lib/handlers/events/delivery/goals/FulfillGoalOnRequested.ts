@@ -45,6 +45,7 @@ import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/h
 import { formatDate } from "@atomist/sdm/lib/api-helper/misc/dateFormat";
 import { serializeResult } from "@atomist/sdm/lib/api-helper/misc/result";
 import { addressChannelsFor } from "@atomist/sdm/lib/api/context/addressChannels";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import { ExecuteGoalResult } from "@atomist/sdm/lib/api/goal/ExecuteGoalResult";
 import { GoalInvocation } from "@atomist/sdm/lib/api/goal/GoalInvocation";
 import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
@@ -143,6 +144,7 @@ export class FulfillGoalOnRequested implements HandleEvent<OnAnyRequestedSdmGoal
             preferences,
             id,
             credentials,
+            skill: createSkillContext(ctx),
             parameters: !!event.data.SdmGoal[0].parameters ? JSON.parse(event.data.SdmGoal[0].parameters) : {},
         };
 

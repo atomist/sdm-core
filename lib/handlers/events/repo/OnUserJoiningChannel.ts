@@ -31,6 +31,7 @@ import {
 } from "@atomist/automation-client/lib/HandlerResult";
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     UserJoiningChannelListener,
     UserJoiningChannelListenerInvocation,
@@ -72,6 +73,7 @@ export class OnUserJoiningChannel implements HandleEvent<schema.OnUserJoiningCha
             credentials,
             joinEvent,
             repos,
+            skill: createSkillContext(context),
         };
 
         await Promise.all(this.listeners

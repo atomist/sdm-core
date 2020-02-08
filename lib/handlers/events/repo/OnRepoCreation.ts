@@ -32,6 +32,7 @@ import {
 import { resolveCredentialsPromise } from "@atomist/sdm/lib/api-helper/machine/handlerRegistrations";
 import { AddressNoChannels } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     RepoCreationListener,
     RepoCreationListenerInvocation,
@@ -73,6 +74,7 @@ export class OnRepoCreation implements HandleEvent<schema.OnRepoCreation.Subscri
             context,
             repo,
             credentials,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.newRepoActions.map(a => a(invocation)));
         return Success;

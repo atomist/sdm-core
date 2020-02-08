@@ -25,16 +25,13 @@ import { camelCase } from "./util";
 // tslint:disable-next-line:cyclomatic-complexity
 export async function resolvePlaceholder(value: string,
                                          goal: SdmGoalEvent,
-                                         ctx: Pick<RepoContext, "configuration" | "context">,
+                                         ctx: Pick<RepoContext, "configuration" | "context" | "skill">,
                                          parameters: Record<string, any>,
                                          raiseError: boolean = true): Promise<string> {
     const placeholderExpression = /\$\{([!.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
     if (!placeholderExpression.test(value)) {
         return value;
     }
-
-    const skillConfiguration = {};
-    ((ctx.context as any)?.trigger?.configuration?.parameters || []).forEach(p => skillConfiguration[p.name] = p.value);
 
     placeholderExpression.lastIndex = 0;
     let currentValue = value;
@@ -51,8 +48,8 @@ export async function resolvePlaceholder(value: string,
             _.get(ctx.context, camelCase(placeholder)) ||
             _.get({ parameters }, placeholder) ||
             _.get({ parameters }, camelCase(placeholder)) ||
-            _.get({ skill: { configuration: skillConfiguration } }, placeholder) ||
-            _.get({ skill: { configuration: skillConfiguration } }, camelCase(placeholder));
+            _.get({ skill: ctx.skill }, placeholder) ||
+            _.get({ skill: ctx.skill}, camelCase(placeholder));
 
         if (placeholder === "home") {
             envValue = os.userInfo().homedir;

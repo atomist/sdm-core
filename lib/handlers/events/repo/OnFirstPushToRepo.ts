@@ -37,6 +37,7 @@ import {
     AddressNoChannels,
 } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     PushListener,
     PushListenerInvocation,
@@ -98,6 +99,7 @@ export class OnFirstPushToRepo
             credentials,
             project,
             push,
+            skill: createSkillContext(context),
         };
         await Promise.all(this.actions
             .map(l => l(invocation)),

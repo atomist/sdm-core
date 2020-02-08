@@ -35,6 +35,7 @@ import {
     addressChannelsFor,
 } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillConfiguration";
 import {
     ChannelLinkListener,
     ChannelLinkListenerInvocation,
@@ -86,6 +87,7 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
                 project,
                 newlyLinkedChannelName,
                 addressNewlyLinkedChannel: (msg, opts) => context.messageClient.addressChannels(msg, newlyLinkedChannelName, opts),
+                skill: createSkillContext(context),
             };
             await Promise.all(this.listeners
                 .map(l => l(invocation)),
