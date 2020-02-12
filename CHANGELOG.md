@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Merge pod affinity rather than overwrite. [#229](https://github.com/atomist/sdm-core/issues/229)
 -   Prepare for GCF to k8s goal scheduling. [#230](https://github.com/atomist/sdm-core/issues/230)
 -   Have beforeCreation return job spec. [#234](https://github.com/atomist/sdm-core/issues/234)
+-   Update @kubernetes/client-node. [#239](https://github.com/atomist/sdm-core/issues/239)
 
 ### Fixed
 
