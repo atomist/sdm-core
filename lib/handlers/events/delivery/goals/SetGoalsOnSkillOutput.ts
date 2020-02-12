@@ -138,9 +138,13 @@ export class SetGoalsOnSkillOutput implements HandleEvent<OnAnySkillOutput.Subsc
 function addSkillOutputAsInputEnrichGoal(skillOutput: SkillOutput,
                                          delegate: EnrichGoal = async g => g): EnrichGoal {
     return async (goal, pli) => {
-        const input: Array<{ classifier: string }> = (goal.parameters || {})[CacheInputGoalDataKey] || [];
+        const parameters = !!goal.parameters ? JSON.parse(goal.parameters) : {};
+
+        const input: Array<{ classifier: string }> = parameters[CacheInputGoalDataKey] || [];
         input.push({ classifier: skillOutput.classifier });
-        goal.parameters[CacheInputGoalDataKey] = input;
+
+        parameters[CacheInputGoalDataKey] = input;
+        goal.parameters = JSON.stringify(parameters);
         return delegate(goal, pli);
     }
 }
