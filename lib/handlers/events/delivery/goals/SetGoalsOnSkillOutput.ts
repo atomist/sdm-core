@@ -131,7 +131,9 @@ export class SetGoalsOnSkillOutput implements HandleEvent<OnAnySkillOutput.Subsc
 }
 
 /**
- * Add a SkillOutput to the scheduled goals input
+ * Add a SkillOutput to the scheduled goal's input
+ *
+ * This makes outputs of previous skills into inputs of newly scheduled goals.
  */
 function addSkillOutputAsInputEnrichGoal(skillOutput: SkillOutput,
                                          delegate: EnrichGoal = async g => g): EnrichGoal {
