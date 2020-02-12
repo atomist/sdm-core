@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^4.0.0",
-    "@kubernetes/client-node": "^0.10.2",
+    "@kubernetes/client-node": "^0.11.1",
     "@types/fast-json-stable-stringify": "^2.0.0",
     "@types/flat": "0.0.28",
     "@types/fs-extra": "^8.0.0",

@@ -108,7 +108,8 @@ export class KubernetesGoalScheduler implements GoalScheduler {
             await batch.readNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace);
             logger.debug(`${jobDesc} already exists. Deleting...`);
             try {
-                await batch.deleteNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace, {} as any);
+                await batch.deleteNamespacedJob(jobSpec.metadata.name, jobSpec.metadata.namespace, undefined, undefined,
+                    undefined, undefined, undefined, { propagationPolicy: "Foreground" });
                 logger.debug(`${jobDesc} deleted`);
             } catch (e) {
                 logger.error(`Failed to delete ${jobDesc}: ${stringify(e.body)}`);
@@ -545,7 +546,7 @@ export async function listJobs(labelSelector?: string): Promise<k8s.V1Job[]> {
             } while (continu);
         } else {
             do {
-                const listJobResponse = await batch.listJobForAllNamespaces(continu, undefined, undefined, labelSelector);
+                const listJobResponse = await batch.listJobForAllNamespaces(undefined, continu, undefined, labelSelector);
                 jobs.push(...listJobResponse.body.items);
                 continu = listJobResponse.body.metadata?._continue;
             } while (continu);
@@ -605,7 +606,8 @@ export async function deletePods(job: { name: string, namespace: string }): Prom
         if (pods.body && pods.body.items) {
             for (const pod of pods.body.items) {
                 try {
-                    await core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, {} as any);
+                    await core.deleteNamespacedPod(pod.metadata.name, pod.metadata.namespace, undefined, undefined,
+                        undefined, undefined, undefined, { propagationPolicy: "Foreground" });
                 } catch (e) {
                     // Probably ok because pod might be gone already
                     logger.debug(`Failed to delete k8s pod '${pod.metadata.namespace}:${pod.metadata.name}': ${k8sErrMsg(e)}`);
