@@ -46,7 +46,11 @@ import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
 import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
 import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
-import { OnAnySkillOutput } from "../../../../typings/types";
+import { CacheInputGoalDataKey } from "../../../../goal/cache/goalCaching";
+import {
+    OnAnySkillOutput,
+    SkillOutput,
+} from "../../../../typings/types";
 
 /**
  * Set up goalSet on a goal (e.g. for delivery).
@@ -114,7 +118,7 @@ export class SetGoalsOnSkillOutput implements HandleEvent<OnAnySkillOutput.Subsc
                 goalSetter: this.goalSetter,
                 implementationMapping: this.implementationMapping,
                 preferencesFactory: this.preferenceStoreFactory,
-                enrichGoal: this.enrichGoal,
+                enrichGoal: addSkillOutputAsInputEnrichGoal(output, this.enrichGoal),
                 tagGoalSet: this.tagGoalSet,
             }, {
                 context,
@@ -123,5 +127,18 @@ export class SetGoalsOnSkillOutput implements HandleEvent<OnAnySkillOutput.Subsc
             });
         }
         return Success;
+    }
+}
+
+/**
+ * Add a SkillOutput to the scheduled goals input
+ */
+function addSkillOutputAsInputEnrichGoal(skillOutput: SkillOutput,
+                                         delegate: EnrichGoal = async g => g): EnrichGoal {
+    return async (goal, pli) => {
+        const input: Array<{ classifier: string }> = goal.parameters[CacheInputGoalDataKey] || [];
+        input.push({ classifier: skillOutput.classifier });
+        goal.parameters[CacheInputGoalDataKey] = input;
+        return delegate(goal, pli);
     }
 }
