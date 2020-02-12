@@ -28,7 +28,7 @@ export async function resolvePlaceholder(value: string,
                                          ctx: Pick<RepoContext, "configuration" | "context" | "skill">,
                                          parameters: Record<string, any>,
                                          raiseError: boolean = true): Promise<string> {
-    const placeholderExpression = /\$\{([!.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]+)*\}/g;
+    const placeholderExpression = /\$\{([!.a-zA-Z_-]+)([.:0-9a-zA-Z-_ \" ]*)\}/g;
     if (!placeholderExpression.test(value)) {
         return value;
     }
