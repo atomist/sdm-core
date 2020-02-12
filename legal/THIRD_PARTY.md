@@ -20,7 +20,7 @@ This page details all runtime OSS dependencies of `@atomist/sdm-core`.
 |[GPL-3.0](#gpl-30)|1|
 |[ISC](#isc)|21|
 |[MIT AND Zlib](#mit-and-zlib)|1|
-|[MIT](#mit)|246|
+|[MIT](#mit)|247|
 |[Unlicense](#unlicense)|1|
 
 #### AFLv2.1
@@ -45,7 +45,7 @@ Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apa
 |`@google-cloud/projectify`|`1.0.4`|Google Inc.|[https://github.com/googleapis/nodejs-projectify](https://github.com/googleapis/nodejs-projectify)|
 |`@google-cloud/promisify`|`1.0.4`|Google Inc.|[https://github.com/googleapis/nodejs-promisify](https://github.com/googleapis/nodejs-promisify)|
 |`@google-cloud/storage`|`4.3.0`|Google Inc.|[https://github.com/googleapis/nodejs-storage](https://github.com/googleapis/nodejs-storage)|
-|`@kubernetes/client-node`|`0.10.3`|Kubernetes Authors|[https://github.com/kubernetes-client/javascript](https://github.com/kubernetes-client/javascript)|
+|`@kubernetes/client-node`|`0.11.1`|Kubernetes Authors|[https://github.com/kubernetes-client/javascript](https://github.com/kubernetes-client/javascript)|
 |`aws-sign2`|`0.7.0`|Mikeal Rogers|[https://github.com/mikeal/aws-sign](https://github.com/mikeal/aws-sign)|
 |`caseless`|`0.12.0`|Mikeal Rogers|[https://github.com/mikeal/caseless](https://github.com/mikeal/caseless)|
 |`ecdsa-sig-formatter`|`1.0.11`|D2L Corporation|[https://github.com/Brightspace/node-ecdsa-sig-formatter](https://github.com/Brightspace/node-ecdsa-sig-formatter)|
@@ -345,6 +345,7 @@ MIT License - [https://opensource.org/licenses/MIT](https://opensource.org/licen
 |`retry-request`|`4.1.1`|Stephen Sawchuk|[https://github.com/stephenplusplus/retry-request](https://github.com/stephenplusplus/retry-request)|
 |`retry`|`0.12.0`|Tim Koschützki|[https://github.com/tim-kos/node-retry](https://github.com/tim-kos/node-retry)|
 |`reusify`|`1.0.4`|Matteo Collina|[https://github.com/mcollina/reusify](https://github.com/mcollina/reusify)|
+|`rfc4648`|`1.3.0`|William Swanson|[https://github.com/swansontec/rfc4648.js](https://github.com/swansontec/rfc4648.js)|
 |`run-parallel`|`1.1.9`|Feross Aboukhadijeh|[https://github.com/feross/run-parallel](https://github.com/feross/run-parallel)|
 |`safe-buffer`|`5.1.2`|Feross Aboukhadijeh|[https://github.com/feross/safe-buffer](https://github.com/feross/safe-buffer)|
 |`safer-buffer`|`2.1.2`|Nikita Skovoroda|[https://github.com/ChALkeR/safer-buffer](https://github.com/ChALkeR/safer-buffer)|
