@@ -668,7 +668,7 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
  * @return Status of pod after container terminates
  */
 function containerWatch(container: K8sContainer, timeout: number): Promise<k8s.V1PodStatus> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         let watch: k8s.Watch;
         try {
             watch = new k8s.Watch(container.config);
@@ -679,15 +679,15 @@ function containerWatch(container: K8sContainer, timeout: number): Promise<k8s.V
         }
         let watcher: any;
         const timeoutTimer = setTimeout(() => {
-            if (watcher) {
+            if (watcher?.abort) {
                 watcher.abort();
             }
             reject(new Error(`Goal timeout '${timeout}' exceeded`));
         }, timeout);
         const watchPath = `/api/v1/watch/namespaces/${container.ns}/pods/${container.pod}`;
-        watcher = watch.watch(watchPath, {}, (phase, obj) => {
+        watcher = await watch.watch(watchPath, {}, (phase, obj) => {
             const pod = obj as k8s.V1Pod;
-            if (pod && pod.status && pod.status.containerStatuses) {
+            if (pod?.status?.containerStatuses) {
                 const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
                 if (containerStatus?.state?.terminated) {
                     if (timeoutTimer) {
@@ -705,7 +705,7 @@ function containerWatch(container: K8sContainer, timeout: number): Promise<k8s.V
                         (err as any).podStatus = pod.status;
                         reject(err);
                     }
-                    if (watcher) {
+                    if (watcher?.abort) {
                         watcher.abort();
                     }
                     return;
