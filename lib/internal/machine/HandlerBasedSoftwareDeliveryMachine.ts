@@ -23,6 +23,7 @@ import { FunctionalUnit } from "@atomist/sdm/lib/api/machine/FunctionalUnit";
 import { SoftwareDeliveryMachineConfiguration } from "@atomist/sdm/lib/api/machine/SoftwareDeliveryMachineOptions";
 import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
 import * as _ from "lodash";
+import { SkillOutputGoalExecutionListener } from "../../goal/skillOutput";
 import { FulfillGoalOnRequested } from "../../handlers/events/delivery/goals/FulfillGoalOnRequested";
 import { RequestDownstreamGoalsOnGoalSuccess } from "../../handlers/events/delivery/goals/RequestDownstreamGoalsOnGoalSuccess";
 import { RespondOnGoalCompletion } from "../../handlers/events/delivery/goals/RespondOnGoalCompletion";
@@ -250,6 +251,7 @@ export class HandlerBasedSoftwareDeliveryMachine extends AbstractSoftwareDeliver
                 configuration: Configuration & SoftwareDeliveryMachineConfiguration,
                 goalSetters: Array<GoalSetter | GoalSetter[]>) {
         super(name, configuration, goalSetters);
+        this.addGoalExecutionListener(SkillOutputGoalExecutionListener);
     }
 
 }

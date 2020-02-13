@@ -278,7 +278,6 @@ export async function invokeConfigurer(sdm: SoftwareDeliveryMachine,
     }
 }
 
-// TODO CD fix the following
 function convertPushTest(test: PushTest | PushTest[]): PushTest {
     if (Array.isArray(test)) {
         const goalPushTests = test.filter(t => !!(t as any).pushTest);

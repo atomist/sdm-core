@@ -33,7 +33,6 @@ import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as path from "path";
 import * as trace from "stack-trace";
-import { SkillOutputGoalExecutionListener } from "../../goal/skillOutput";
 import { githubGoalStatusSupport } from "../../pack/github-goal-status/github";
 import { goalStateSupport } from "../../pack/goal-state/goalState";
 import { toArray } from "../../util/misc/array";
@@ -118,9 +117,6 @@ async function createExtensions(cwd: string,
                                 options: ConfigureYamlOptions<any>,
                                 cfg: YamlSoftwareDeliveryMachineConfiguration,
                                 sdm: SoftwareDeliveryMachine): Promise<void> {
-
-    sdm.addGoalExecutionListener(SkillOutputGoalExecutionListener);
-
     const commandCallback = async (c, k) => {
         let registration: CommandHandlerRegistration;
         try {
