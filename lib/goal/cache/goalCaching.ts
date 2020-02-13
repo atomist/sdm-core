@@ -29,11 +29,6 @@ import { PushTest } from "@atomist/sdm/lib/api/mapping/PushTest";
 import { AnyPush } from "@atomist/sdm/lib/api/mapping/support/commonPushTests";
 import * as _ from "lodash";
 import { resolvePlaceholder } from "../../machine/yaml/resolvePlaceholder";
-import {
-    CustomSkillOutputInput,
-    IngestSkillOutputMutation,
-    IngestSkillOutputMutationVariables,
-} from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import { CompressingGoalCache } from "./CompressingGoalCache";
 
@@ -154,10 +149,11 @@ export function cachePut(options: GoalCacheOptions,
         name: listenerName,
         listener: async (p: GitProject,
                          gi: GoalInvocation): Promise<void | ExecuteGoalResult> => {
-            const { goalEvent, context, configuration } = gi;
+            const { goalEvent } = gi;
             if (!!isCacheEnabled(gi) && !process.env.ATOMIST_ISOLATED_GOAL_INIT) {
+                const cloneEntries = _.cloneDeep(entries);
                 const goalCache = cacheStore(gi);
-                for (const entry of entries) {
+                for (const entry of cloneEntries) {
                     const files = [];
                     if (isGlobFilePattern(entry.pattern)) {
                         files.push(...(await getFilePathsThroughPattern(p, entry.pattern.globPattern)));
@@ -167,29 +163,9 @@ export function cachePut(options: GoalCacheOptions,
                     if (!_.isEmpty(files)) {
                         const resolvedClassifier = await resolveClassifierPath(entry.classifier, gi);
                         const uri = await goalCache.put(gi, p, files, resolvedClassifier);
-
-                        if (!!resolvedClassifier && !!entry.type && !!uri) {
-                            const skillOutput: CustomSkillOutputInput = {
-                                _branch: goalEvent.branch,
-                                _sha: goalEvent.sha,
-                                _owner: goalEvent.repo.owner,
-                                _repo: goalEvent.repo.name,
-                                classifier: resolvedClassifier.slice(`${gi.context.workspaceId}/`.length),
-                                type: entry.type,
-                                uri,
-                                content: undefined,
-                                correlationId: context.correlationId,
-                                skill: {
-                                    name: configuration.name,
-                                    version: configuration.version,
-                                },
-                            };
-                            await context.graphClient.mutate<IngestSkillOutputMutation, IngestSkillOutputMutationVariables>({
-                                name: "IngestSkillOutput",
-                                variables: {
-                                    output: skillOutput,
-                                },
-                            });
+                        if (!!resolvedClassifier && !!uri) {
+                            entry.classifier = resolvedClassifier;
+                            (entry as any).uri = uri;
                         }
                     }
                 }
@@ -199,7 +175,7 @@ export function cachePut(options: GoalCacheOptions,
                 const newData = {
                     [CacheOutputGoalDataKey]: [
                         ...(data[CacheOutputGoalDataKey] || []),
-                        ...entries,
+                        ...cloneEntries,
                     ],
                 };
                 goalEvent.data = JSON.stringify({
