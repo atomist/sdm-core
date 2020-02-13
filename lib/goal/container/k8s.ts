@@ -59,6 +59,7 @@ import {
 import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import {
+    CacheEntry,
     CacheOutputGoalDataKey,
     cachePut,
     cacheRestore,
@@ -374,7 +375,10 @@ export const scheduleK8sJob: ExecuteGoal = async gi => {
         const schedulableGoalEvent = await k8sFulfillmentCallback(gi.goal as Container, containerReg)(goalEvent, gi);
         const scheduleResult = await k8sScheduler.schedule({ ...gi, goalEvent: schedulableGoalEvent });
         if (scheduleResult.code) {
-            return { ...scheduleResult, message: `Failed to schedule container goal ${uniqueName}: ${scheduleResult.message}` };
+            return {
+                ...scheduleResult,
+                message: `Failed to schedule container goal ${uniqueName}: ${scheduleResult.message}`,
+            };
         }
         schedulableGoalEvent.state = SdmGoalState.in_process;
         return schedulableGoalEvent;
@@ -526,7 +530,7 @@ export function executeK8sJob(): ExecuteGoal {
             }
         }
 
-        const cacheEntriesToPut = [
+        const cacheEntriesToPut: CacheEntry[] = [
             ...(registration.output || []),
             ...((gi.parameters || {})[CacheOutputGoalDataKey] || []),
         ];
@@ -534,7 +538,19 @@ export function executeK8sJob(): ExecuteGoal {
             try {
                 const project = GitCommandGitProject.fromBaseDir(id, projectDir, credentials, async () => {
                 });
-                const cp = cachePut({ entries: cacheEntriesToPut });
+                const cp = cachePut({
+                    entries: cacheEntriesToPut.map(e => {
+                        // Prevent the type on the entry to get passed along when goal actually failed
+                        if (status.code !== 0) {
+                            return {
+                                classifier: e.classifier,
+                                pattern: e.pattern,
+                            };
+                        } else {
+                            return e;
+                        }
+                    }),
+                });
                 await cp.listener(project, gi, GoalProjectListenerEvent.after);
             } catch (e) {
                 const message = `Failed to put cache output from container: ${e.message}`;
