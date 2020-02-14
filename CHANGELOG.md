@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Provide more context when requiring fails. [#224](https://github.com/atomist/sdm-core/issues/224)
 -   Add goal to fulfill scheduled container goals. [#231](https://github.com/atomist/sdm-core/issues/231)
 -   Move the GCP pack into sdm-core. [#237](https://github.com/atomist/sdm-core/issues/237)
+-   Add support for skill output. [#240](https://github.com/atomist/sdm-core/issues/240)
 
 ### Changed
 
