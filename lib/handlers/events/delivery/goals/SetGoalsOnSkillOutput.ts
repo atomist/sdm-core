@@ -46,19 +46,20 @@ import { GoalSetter } from "@atomist/sdm/lib/api/mapping/GoalSetter";
 import { CredentialsResolver } from "@atomist/sdm/lib/spi/credentials/CredentialsResolver";
 import { ProjectLoader } from "@atomist/sdm/lib/spi/project/ProjectLoader";
 import { RepoRefResolver } from "@atomist/sdm/lib/spi/repo-ref/RepoRefResolver";
+import { CacheInputGoalDataKey } from "../../../../goal/cache/goalCaching";
 import {
-    OnAnyCompletedSdmGoal,
-    SdmGoalState,
+    OnAnySkillOutput,
+    SkillOutput,
 } from "../../../../typings/types";
 
 /**
  * Set up goalSet on a goal (e.g. for delivery).
  */
-@EventHandler("Set up goalSet on Goal", subscription({
-    name: "OnAnyCompletedSdmGoal",
+@EventHandler("Set up goalSet on SkillOutput", subscription({
+    name: "OnAnySkillOutput",
     variables: { registration: undefined },
 }))
-export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscription> {
+export class SetGoalsOnSkillOutput implements HandleEvent<OnAnySkillOutput.Subscription> {
 
     /**
      * Configure goal setting
@@ -81,16 +82,11 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
                 private readonly tagGoalSet: TagGoalSet) {
     }
 
-    public async handle(event: EventFired<OnAnyCompletedSdmGoal.Subscription>,
+    public async handle(event: EventFired<OnAnySkillOutput.Subscription>,
                         context: HandlerContext): Promise<HandlerResult> {
-        const goal = event.data.SdmGoal[0];
+        const output = event.data.SkillOutput[0];
 
-        // Don't pass in_process goals down into the tests
-        if (goal.state === SdmGoalState.in_process) {
-            return Success;
-        }
-
-        const push = goal.push;
+        const push = output.push;
         const id: RemoteRepoRef = this.repoRefResolver.toRemoteRepoRef(push.repo, {});
         const credentials = await resolveCredentialsPromise(this.credentialsFactory.eventHandlerCredentials(context, id));
 
@@ -122,7 +118,7 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
                 goalSetter: this.goalSetter,
                 implementationMapping: this.implementationMapping,
                 preferencesFactory: this.preferenceStoreFactory,
-                enrichGoal: this.enrichGoal,
+                enrichGoal: addSkillOutputAsInputEnrichGoal(output, this.enrichGoal),
                 tagGoalSet: this.tagGoalSet,
             }, {
                 context,
@@ -132,4 +128,23 @@ export class SetGoalsOnGoal implements HandleEvent<OnAnyCompletedSdmGoal.Subscri
         }
         return Success;
     }
+}
+
+/**
+ * Add a SkillOutput to the scheduled goal's input
+ *
+ * This makes outputs of previous skills into inputs of newly scheduled goals.
+ */
+function addSkillOutputAsInputEnrichGoal(skillOutput: SkillOutput,
+                                         delegate: EnrichGoal = async g => g): EnrichGoal {
+    return async (goal, pli) => {
+        const parameters = !!goal.parameters ? JSON.parse(goal.parameters) : {};
+
+        const input: Array<{ classifier: string }> = parameters[CacheInputGoalDataKey] || [];
+        input.push({ classifier: skillOutput.classifier });
+
+        parameters[CacheInputGoalDataKey] = input;
+        goal.parameters = JSON.stringify(parameters);
+        return delegate(goal, pli);
+    };
 }

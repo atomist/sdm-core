@@ -1,0 +1,14 @@
+subscription OnAnySkillOutput {
+  SkillOutput {
+    classifier
+    skill {
+      name
+      version
+    }
+    type
+    uri
+    push {
+      ...PushFields
+    }
+  }
+}

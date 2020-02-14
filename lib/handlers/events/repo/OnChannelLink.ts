@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import {
     addressChannelsFor,
 } from "@atomist/sdm/lib/api/context/addressChannels";
 import { PreferenceStoreFactory } from "@atomist/sdm/lib/api/context/preferenceStore";
+import { createSkillContext } from "@atomist/sdm/lib/api/context/skillContext";
 import {
     ChannelLinkListener,
     ChannelLinkListenerInvocation,
@@ -86,6 +87,7 @@ export class OnChannelLink implements HandleEvent<schema.OnChannelLink.Subscript
                 project,
                 newlyLinkedChannelName,
                 addressNewlyLinkedChannel: (msg, opts) => context.messageClient.addressChannels(msg, newlyLinkedChannelName, opts),
+                skill: createSkillContext(context),
             };
             await Promise.all(this.listeners
                 .map(l => l(invocation)),
