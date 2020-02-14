@@ -14,4 +14,24 @@
  * limitations under the License.
  */
 
-export const K8sNamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
+import * as assert from "power-assert";
+import { cleanName } from "../../../../lib/pack/k8s/support/name";
+
+describe("support/name", () => {
+
+    describe("cleanName", () => {
+
+        it("should remove the leading '@'", () => {
+            const n = cleanName("@atomist/k8s-sdm");
+            assert(n === "atomist/k8s-sdm");
+        });
+
+        it("should leave a clean name alone", () => {
+            const c = "atomist/k8s-sdm_somewhere@else";
+            const n = cleanName(c);
+            assert(n === c);
+        });
+
+    });
+
+});

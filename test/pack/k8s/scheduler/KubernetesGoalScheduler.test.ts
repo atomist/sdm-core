@@ -23,7 +23,7 @@ import {
     isConfiguredInEnv,
     k8sJobEnv,
     k8sJobName,
-} from "../../../lib/pack/k8s/KubernetesGoalScheduler";
+} from "../../../../lib/pack/k8s/scheduler/KubernetesGoalScheduler";
 
 /* tslint:disable:max-file-line-count */
 

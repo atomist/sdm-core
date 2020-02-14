@@ -44,8 +44,8 @@ import {
     K8sContainerRegistration,
     k8sFulfillmentCallback,
 } from "../../../lib/goal/container/k8s";
-import { loadKubeConfig } from "../../../lib/pack/k8s/config";
-import { KubernetesGoalScheduler } from "../../../lib/pack/k8s/KubernetesGoalScheduler";
+import { loadKubeConfig } from "../../../lib/pack/k8s/kubernetes/config";
+import { KubernetesGoalScheduler } from "../../../lib/pack/k8s/scheduler/KubernetesGoalScheduler";
 import { SdmGoalState } from "../../../lib/typings/types";
 import { containerTestImage } from "./util";
 

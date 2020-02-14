@@ -46,16 +46,16 @@ import {
     DeepPartial,
     Merge,
 } from "ts-essentials";
-import { loadKubeConfig } from "../../pack/k8s/config";
+import { loadKubeConfig } from "../../pack/k8s/kubernetes/config";
 import {
     k8sJobEnv,
     KubernetesGoalScheduler,
     readNamespace,
-} from "../../pack/k8s/KubernetesGoalScheduler";
+} from "../../pack/k8s/scheduler/KubernetesGoalScheduler";
 import {
     K8sServiceRegistrationType,
     K8sServiceSpec,
-} from "../../pack/k8s/service";
+} from "../../pack/k8s/scheduler/service";
 import { SdmGoalState } from "../../typings/types";
 import { toArray } from "../../util/misc/array";
 import {

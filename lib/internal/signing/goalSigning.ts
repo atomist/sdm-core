@@ -30,8 +30,8 @@ import {
     GoalSigningScope,
     GoalVerificationKey,
 } from "@atomist/sdm/lib/api/machine/SigningKeys";
-import * as stringify from "fast-json-stable-stringify";
 import * as fs from "fs-extra";
+import * as stringify from "json-stable-stringify";
 import * as path from "path";
 import { DeepPartial } from "ts-essentials";
 import { SdmGoalState } from "../../typings/types";
@@ -91,8 +91,8 @@ export class GoalSigningAutomationEventListener implements GraphClientListener {
  * @param ctx
  */
 export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin>,
-                                 gsc: GoalSigningConfiguration,
-                                 ctx: HandlerContext): Promise<void> {
+    gsc: GoalSigningConfiguration,
+    ctx: HandlerContext): Promise<void> {
     if (!!gsc && gsc.enabled === true && !!goal && isInScope(gsc.scope, ctx) && !isGoalRejected(goal)) {
         if (!!goal.signature) {
 
@@ -109,7 +109,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
             if (!!verifiedWith) {
                 logger.debug(
                     `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${
-                        verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
+                    verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
             } else {
                 await rejectGoal("signature invalid", goal, ctx);
                 throw new Error("SDM goal signature invalid. Rejecting goal!");
@@ -128,7 +128,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
  * @param gsc
  */
 export function signGoal(goal: SdmGoalMessage,
-                         gsc: GoalSigningConfiguration): SdmGoalMessage & SignatureMixin {
+    gsc: GoalSigningConfiguration): SdmGoalMessage & SignatureMixin {
     if (!!gsc && gsc.enabled === true && !!gsc.signingKey) {
         (goal as any).signature = findAlgorithm(gsc.signingKey, gsc).sign(normalizeGoal(goal), gsc.signingKey);
         logger.debug(`Signed goal '${goal.uniqueName}' of '${goal.goalSetId}'`);
@@ -139,8 +139,8 @@ export function signGoal(goal: SdmGoalMessage,
 }
 
 async function rejectGoal(reason: string,
-                          sdmGoal: SdmGoalEvent,
-                          ctx: HandlerContext): Promise<void> {
+    sdmGoal: SdmGoalEvent,
+    ctx: HandlerContext): Promise<void> {
     await updateGoal(
         ctx,
         sdmGoal,
@@ -152,7 +152,7 @@ async function rejectGoal(reason: string,
 }
 
 function findAlgorithm(key: GoalVerificationKey<any> | GoalSigningKey<any>,
-                       gsc: GoalSigningConfiguration): GoalSigningAlgorithm<any> {
+    gsc: GoalSigningConfiguration): GoalSigningAlgorithm<any> {
     const algorithm = [...toArray(gsc.algorithms || []), DefaultGoalSigningAlgorithm]
         .find(a => a.name.toLowerCase() === (key.algorithm || DefaultGoalSigningAlgorithm.name).toLowerCase());
     if (!algorithm) {

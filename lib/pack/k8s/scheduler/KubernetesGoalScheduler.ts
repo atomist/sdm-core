@@ -38,17 +38,17 @@ import * as fs from "fs-extra";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
-import { k8sErrMsg } from "../../goal/container/k8s";
-import { toArray } from "../../util/misc/array";
+import { k8sErrMsg } from "../../../goal/container/k8s";
+import { toArray } from "../../../util/misc/array";
 import {
     loadKubeClusterConfig,
     loadKubeConfig,
-} from "./config";
+} from "../kubernetes/config";
+import { K8sNamespaceFile } from "../support/namespace";
 import {
     K8sServiceRegistrationType,
     K8sServiceSpec,
 } from "./service";
-import { K8sNamespaceFile } from "./util";
 
 /**
  * Options to configure the k8s goal scheduling support
