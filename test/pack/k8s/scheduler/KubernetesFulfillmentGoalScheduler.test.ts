@@ -19,12 +19,12 @@ import { goal } from "@atomist/sdm/lib/api/goal/GoalWithFulfillment";
 import { SdmGoalEvent } from "@atomist/sdm/lib/api/goal/SdmGoalEvent";
 import { SdmGoalFulfillmentMethod } from "@atomist/sdm/lib/api/goal/SdmGoalMessage";
 import * as assert from "assert";
-import { container } from "../../../lib/goal/container/container";
-import { K8sContainerFulfillerName } from "../../../lib/goal/container/k8s";
-import { KubernetesFulfillmentGoalScheduler } from "../../../lib/pack/k8s/KubernetesFulfillmentGoalScheduler";
-import { SdmGoalState } from "../../../lib/typings/types";
+import { container } from "../../../../lib/goal/container/container";
+import { K8sContainerFulfillerName } from "../../../../lib/goal/container/k8s";
+import { KubernetesFulfillmentGoalScheduler } from "../../../../lib/pack/k8s/scheduler/KubernetesFulfillmentGoalScheduler";
+import { SdmGoalState } from "../../../../lib/typings/types";
 
-describe("KubernetesFulfillmentGoalScheduler", () => {
+describe("pack/k8s/scheduler/KubernetesFulfillmentGoalScheduler", () => {
 
     describe("supports", () => {
 

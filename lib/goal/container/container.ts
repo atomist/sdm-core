@@ -33,7 +33,7 @@ import { SoftwareDeliveryMachine } from "@atomist/sdm/lib/api/machine/SoftwareDe
 import {
     KubernetesFulfillmentGoalScheduler,
     KubernetesFulfillmentOptions,
-} from "../../pack/k8s/KubernetesFulfillmentGoalScheduler";
+} from "../../pack/k8s/scheduler/KubernetesFulfillmentGoalScheduler";
 import { toArray } from "../../util/misc/array";
 import {
     CacheEntry,
@@ -269,12 +269,12 @@ export class Container extends FulfillableGoalWithRegistrations<ContainerRegistr
         const goalSchedulers = toArray(sdm.configuration.sdm.goalScheduler) || [];
         if (runningInK8s()) {
             // load lazily to prevent early and unwanted initialization of expensive K8s api
-            const kgs = require("../../pack/k8s/KubernetesGoalScheduler");
+            const kgs = require("../../pack/k8s/scheduler/KubernetesGoalScheduler");
             // Make sure that the KubernetesGoalScheduler gets added if needed
             if (!goalSchedulers.some(gs => gs instanceof kgs.KubernetesGoalScheduler)) {
                 if (!process.env.ATOMIST_ISOLATED_GOAL && kgs.isConfiguredInEnv("kubernetes", "kubernetes-all")) {
                     sdm.configuration.sdm.goalScheduler = [...goalSchedulers, new kgs.KubernetesGoalScheduler()];
-                    const kjdgcl = require("../../pack/k8s/KubernetesJobDeletingGoalCompletionListener");
+                    const kjdgcl = require("../../pack/k8s/scheduler/KubernetesJobDeletingGoalCompletionListener");
                     sdm.addGoalCompletionListener(new kjdgcl.KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
                 }
             }
