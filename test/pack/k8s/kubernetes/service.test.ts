@@ -21,7 +21,7 @@ import {
     upsertService,
 } from "../../../../lib/pack/k8s/kubernetes/service";
 
-describe("kubernetes/service", () => {
+describe("pack/k8s/kubernetes/service", () => {
 
     describe("serviceTemplate", () => {
 

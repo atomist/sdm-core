@@ -21,7 +21,7 @@ import {
     reqString,
 } from "../../../../lib/pack/k8s/kubernetes/request";
 
-describe("kubernetes/request", () => {
+describe("pack/k8s/kubernetes/request", () => {
 
     describe("isKubernetesApplication", () => {
 

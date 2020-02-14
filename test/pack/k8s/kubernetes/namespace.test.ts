@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { namespaceTemplate } from "../../../../lib/pack/k8s/kubernetes/namespace";
 
-describe("kubernetes/namespace", () => {
+describe("pack/k8s/kubernetes/namespace", () => {
 
     describe("namespaceTemplate", () => {
 

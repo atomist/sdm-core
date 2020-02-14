@@ -20,7 +20,7 @@ import {
     validSyncOptions,
 } from "../../../lib/pack/k8s/config";
 
-describe("config", () => {
+describe("pack/k8s/config", () => {
 
     describe("validSyncOptions", () => {
 

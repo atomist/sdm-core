@@ -21,7 +21,7 @@ import {
 } from "../../../../lib/pack/k8s/kubernetes/ingress";
 import { KubernetesResourceRequest } from "../../../../lib/pack/k8s/kubernetes/request";
 
-describe("kubernetes/ingress", () => {
+describe("pack/k8s/kubernetes/ingress", () => {
 
     describe("ingressTemplate", () => {
 

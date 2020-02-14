@@ -18,7 +18,7 @@ import { Configuration } from "@atomist/automation-client/lib/configuration";
 import * as assert from "power-assert";
 import { commitTag } from "../../../../lib/pack/k8s/sync/tag";
 
-describe("sync/tag", () => {
+describe("pack/k8s/sync/tag", () => {
 
     describe("commitTag", () => {
 

@@ -20,7 +20,7 @@ import {
     encrypt,
 } from "../../../../lib/pack/k8s/support/crypto";
 
-describe("support/crypt", () => {
+describe("pack/k8s/support/crypt", () => {
 
     describe("decrypt", () => {
 

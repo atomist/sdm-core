@@ -34,7 +34,7 @@ import {
 
 /* tslint:disable:max-file-line-count */
 
-describe("kubernetes/api", () => {
+describe("pack/k8s/kubernetes/api", () => {
 
     describe("appendName", () => {
 

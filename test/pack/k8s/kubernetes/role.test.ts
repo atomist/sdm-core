@@ -22,7 +22,7 @@ import {
 
 /* tslint:disable:max-file-line-count */
 
-describe("kubernetes/role", () => {
+describe("pack/k8s/kubernetes/role", () => {
 
     describe("roleTemplate", () => {
 

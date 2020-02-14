@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { serviceAccountTemplate } from "../../../../lib/pack/k8s/kubernetes/serviceAccount";
 
-describe("kubernetes/serviceAccount", () => {
+describe("pack/k8s/kubernetes/serviceAccount", () => {
 
     describe("serviceAccountTemplate", () => {
 

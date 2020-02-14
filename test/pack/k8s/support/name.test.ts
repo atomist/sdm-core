@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { cleanName } from "../../../../lib/pack/k8s/support/name";
 
-describe("support/name", () => {
+describe("pack/k8s/support/name", () => {
 
     describe("cleanName", () => {
 

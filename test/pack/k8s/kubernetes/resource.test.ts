@@ -23,7 +23,7 @@ import {
     logObject,
 } from "../../../../lib/pack/k8s/kubernetes/resource";
 
-describe("kubernetes/resource", () => {
+describe("pack/k8s/kubernetes/resource", () => {
 
     describe("appObject", () => {
 

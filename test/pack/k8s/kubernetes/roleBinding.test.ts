@@ -20,7 +20,7 @@ import {
     roleBindingTemplate,
 } from "../../../../lib/pack/k8s/kubernetes/roleBinding";
 
-describe("kubernetes/roleBinding", () => {
+describe("pack/k8s/kubernetes/roleBinding", () => {
 
     describe("roleBindingTemplate", () => {
 

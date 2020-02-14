@@ -32,7 +32,7 @@ import {
 import { PushDiff } from "../../../../lib/pack/k8s/sync/diff";
 import * as prv from "../../../../lib/pack/k8s/sync/previousSpecVersion";
 
-describe("sync/change", () => {
+describe("pack/k8s/sync/change", () => {
 
     let originalAutomationClient: any;
     before(() => {

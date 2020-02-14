@@ -23,7 +23,7 @@ import {
     secretTemplate,
 } from "../../../../lib/pack/k8s/kubernetes/secret";
 
-describe("kubernetes/secret", () => {
+describe("pack/k8s/kubernetes/secret", () => {
 
     describe("secretTemplate", () => {
 

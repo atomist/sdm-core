@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { logRetry } from "../../../../lib/pack/k8s/support/retry";
 
-describe("support/retry", () => {
+describe("pack/k8s/support/retry", () => {
 
     describe("logRetry", () => {
 

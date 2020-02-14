@@ -28,7 +28,7 @@ import {
     sortSpecs,
 } from "../../../../lib/pack/k8s/sync/sync";
 
-describe("sync/sync", () => {
+describe("pack/k8s/sync/sync", () => {
 
     describe("kubernetesSync", () => {
 

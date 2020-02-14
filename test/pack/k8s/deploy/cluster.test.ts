@@ -26,7 +26,7 @@ import {
     getClusterLabel,
 } from "../../../../lib/pack/k8s/deploy/cluster";
 
-describe("deploy/cluster", () => {
+describe("pack/k8s/deploy/cluster", () => {
 
     describe("getCluster", () => {
 

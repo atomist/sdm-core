@@ -24,7 +24,7 @@ import { K8sContainerFulfillerName } from "../../../../lib/goal/container/k8s";
 import { KubernetesFulfillmentGoalScheduler } from "../../../../lib/pack/k8s/scheduler/KubernetesFulfillmentGoalScheduler";
 import { SdmGoalState } from "../../../../lib/typings/types";
 
-describe("KubernetesFulfillmentGoalScheduler", () => {
+describe("pack/k8s/scheduler/KubernetesFulfillmentGoalScheduler", () => {
 
     describe("supports", () => {
 

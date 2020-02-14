@@ -27,7 +27,7 @@ import {
 
 /* tslint:disable:max-file-line-count */
 
-describe("KubernetesGoalScheduler", () => {
+describe("pack/k8s/scheduler/KubernetesGoalScheduler", () => {
 
     describe("isConfiguredInEnv", () => {
 

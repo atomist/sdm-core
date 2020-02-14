@@ -37,7 +37,7 @@ import {
     rng,
 } from "../k8s";
 
-describe("kubernetes/delete", function(): void {
+describe("pack/k8s/kubernetes/delete", function(): void {
 
     // tslint:disable-next-line:no-invalid-this
     this.timeout(5000);

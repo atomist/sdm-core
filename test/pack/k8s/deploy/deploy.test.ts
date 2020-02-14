@@ -21,7 +21,7 @@ import {
 } from "../../../../lib/pack/k8s/deploy/deploy";
 import { KubernetesApplication } from "../../../../lib/pack/k8s/kubernetes/request";
 
-describe("deploy/deploy", () => {
+describe("pack/k8s/deploy/deploy", () => {
 
     describe("deployDescription", () => {
 

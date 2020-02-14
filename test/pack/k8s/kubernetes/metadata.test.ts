@@ -23,7 +23,7 @@ import {
 } from "../../../../lib/pack/k8s/kubernetes/metadata";
 import { KubernetesDelete } from "../../../../lib/pack/k8s/kubernetes/request";
 
-describe("kubernetes/metadata", () => {
+describe("pack/k8s/kubernetes/metadata", () => {
 
     describe("metadataTemplate", () => {
 

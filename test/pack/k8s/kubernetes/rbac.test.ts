@@ -18,7 +18,7 @@ import * as assert from "power-assert";
 import { upsertRbac } from "../../../../lib/pack/k8s/kubernetes/rbac";
 import { KubernetesResourceRequest } from "../../../../lib/pack/k8s/kubernetes/request";
 
-describe("kubernetes/rbac", () => {
+describe("pack/k8s/kubernetes/rbac", () => {
 
     describe("upsertRbac", () => {
 

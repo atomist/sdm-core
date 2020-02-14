@@ -21,7 +21,7 @@ import {
     validName,
 } from "../../../../lib/pack/k8s/kubernetes/name";
 
-describe("kubernetes/name", () => {
+describe("pack/k8s/kubernetes/name", () => {
 
     describe("validName", () => {
 

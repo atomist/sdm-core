@@ -18,7 +18,7 @@ import * as cp from "@atomist/automation-client/lib/util/child_process";
 import * as assert from "power-assert";
 import * as prv from "../../../../lib/pack/k8s/sync/previousSpecVersion";
 
-describe("previousSpecVersion", () => {
+describe("pack/k8s/previousSpecVersion", () => {
 
     let originalExecPromise: any;
     before(() => {

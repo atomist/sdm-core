@@ -30,7 +30,7 @@ import {
 } from "../../../../lib/pack/k8s/sync/application";
 import { k8sSpecGlob } from "../../../../lib/pack/k8s/sync/diff";
 
-describe("sync/application", () => {
+describe("pack/k8s/sync/application", () => {
 
     describe("sameObject", () => {
 

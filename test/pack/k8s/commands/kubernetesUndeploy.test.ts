@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { kubernetesUndeploy } from "../../../../lib/pack/k8s/commands/kubernetesUndeploy";
 
-describe("commands/kubernetesUndeploy", () => {
+describe("pack/k8s/commands/kubernetesUndeploy", () => {
 
     describe("kubernetesUndeploy", () => {
 

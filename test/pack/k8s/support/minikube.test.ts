@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { processMinikubeDockeEnv } from "../../../../lib/pack/k8s/support/minikube";
 
-describe("support/minikube", () => {
+describe("pack/k8s/support/minikube", () => {
 
     describe("parseMinikubeDockerEnv", () => {
 

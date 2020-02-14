@@ -21,7 +21,7 @@ import * as _ from "lodash";
 import * as assert from "power-assert";
 import { isSyncRepoCommit } from "../../../../lib/pack/k8s/sync/goals";
 
-describe("sync/goals", () => {
+describe("pack/k8s/sync/goals", () => {
 
     describe("isSyncRepoCommit", () => {
 

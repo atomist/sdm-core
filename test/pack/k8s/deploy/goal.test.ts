@@ -21,7 +21,7 @@ import {
     KubernetesDeployRegistration,
 } from "../../../../lib/pack/k8s/deploy/goal";
 
-describe("deploy/goal", () => {
+describe("pack/k8s/deploy/goal", () => {
 
     describe("kubernetesGoalDataSources", () => {
 

@@ -24,7 +24,7 @@ import {
     safeLabelValue,
 } from "../../../../lib/pack/k8s/kubernetes/labels";
 
-describe("kubernetes/labels", () => {
+describe("pack/k8s/kubernetes/labels", () => {
 
     describe("safeLabelValue", () => {
 

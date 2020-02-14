@@ -41,7 +41,7 @@ import {
 
 /* tslint:disable:max-file-line-count */
 
-describe("kubernetes/fetch", () => {
+describe("pack/k8s/kubernetes/fetch", () => {
 
     const client: any = {
         resource: async (apiVersion: string, kind: string): Promise<k8s.V1APIResource | undefined> => {

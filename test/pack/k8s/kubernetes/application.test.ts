@@ -28,7 +28,7 @@ import {
     rng,
 } from "../k8s";
 
-describe("kubernetes/application", () => {
+describe("pack/k8s/kubernetes/application", () => {
 
     describe("upsertApplication", () => {
 

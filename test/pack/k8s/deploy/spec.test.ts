@@ -21,7 +21,7 @@ import {
     parseKubernetesSpec,
 } from "../../../../lib/pack/k8s/deploy/spec";
 
-describe("deploy/spec", () => {
+describe("pack/k8s/deploy/spec", () => {
 
     describe("loadKubernetesSpec", () => {
 

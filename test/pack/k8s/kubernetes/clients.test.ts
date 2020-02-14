@@ -17,7 +17,7 @@
 import * as assert from "power-assert";
 import { makeNoOpApiClients } from "../../../../lib/pack/k8s/kubernetes/clients";
 
-describe("kubernetes/clients", () => {
+describe("pack/k8s/kubernetes/clients", () => {
 
     describe("makeNoOpApiClients", () => {
 

@@ -19,7 +19,7 @@ import { deploymentTemplate } from "../../../../lib/pack/k8s/kubernetes/deployme
 
 /* tslint:disable:max-file-line-count */
 
-describe("kubernetes/deployment", () => {
+describe("pack/k8s/kubernetes/deployment", () => {
 
     describe("deploymentTemplate", () => {
 

@@ -38,7 +38,7 @@ import { KubernetesApplication } from "../../../../lib/pack/k8s/kubernetes/reque
 
 /* tslint:disable:max-file-line-count */
 
-describe("deploy/data", () => {
+describe("pack/k8s/deploy/data", () => {
 
     describe("dockerPort", () => {
 

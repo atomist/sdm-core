@@ -36,7 +36,7 @@ import {
     ScmProviders,
 } from "../../../../lib/typings/types";
 
-describe("sync/repo", () => {
+describe("pack/k8s/sync/repo", () => {
 
     describe("isRemoteRepo", () => {
 

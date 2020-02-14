@@ -26,7 +26,7 @@ import {
 
 /* tslint:disable:max-file-line-count */
 
-describe("kubernetes/spec", () => {
+describe("pack/k8s/kubernetes/spec", () => {
 
     describe("kubernetesSpecFileBasename", () => {
 

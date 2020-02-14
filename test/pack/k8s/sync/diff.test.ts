@@ -25,7 +25,7 @@ import {
     PushDiff,
 } from "../../../../lib/pack/k8s/sync/diff";
 
-describe("sync/diff", () => {
+describe("pack/k8s/sync/diff", () => {
 
     describe("parseNameStatusDiff", () => {
 

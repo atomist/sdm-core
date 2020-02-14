@@ -22,7 +22,7 @@ import {
     requestError,
 } from "../../../../lib/pack/k8s/support/error";
 
-describe("support/error", () => {
+describe("pack/k8s/support/error", () => {
 
     describe("errMsg", () => {
 
