@@ -496,8 +496,7 @@ describe("sync/repo", () => {
             const rc = repoCredentials(m, s);
             assert(rc, "no RepoCredentials returned");
             assert((rc.credentials as TokenCredentials).token === "Frankenstein");
-            // GitlabReporef overrides apiBase to include the scheme and not strip any trailing slash
-            assert((rc.repo as GitlabRepoRef).apiBase === "http://gitlab.nydolls.com/api/v4/");
+            assert((rc.repo as GitlabRepoRef).apiBase === "gitlab.nydolls.com/api/v4");
             assert(rc.repo.branch === "too-much-too-soon");
             assert(rc.repo.owner === "NewYorkDolls");
             assert(rc.repo.path === undefined);
@@ -954,7 +953,7 @@ describe("sync/repo", () => {
                 repo: "double-nickels-on-the-dime",
             });
             assert.deepStrictEqual(ss.repo, re);
-            assert(ss.repo.apiBase === "https://gitlab.minutemen.org/api/v4");
+            assert(ss.repo.apiBase === "gitlab.minutemen.org/api/v4");
             assert(ss.repo.branch === "toadies");
             assert(ss.repo.owner === "minutemen");
             assert(ss.repo.path === "04/cohesion");
