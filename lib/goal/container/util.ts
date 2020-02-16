@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import * as _ from "lodash";
 import * as path from "path";
 import { SdmVersion } from "../../ingesters/sdmVersionIngester";
 import { getGoalVersion } from "../../internal/delivery/build/local/projectVersioner";
-import { K8sNamespaceFile } from "../../pack/k8s/util";
+import { K8sNamespaceFile } from "../../pack/k8s/support/namespace";
 import {
     OnBuildCompleteForDryRun,
     PushFields,

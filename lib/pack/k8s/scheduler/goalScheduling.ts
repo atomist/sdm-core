@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import {
     isConfiguredInEnv,
     KubernetesGoalScheduler,
 } from "./KubernetesGoalScheduler";
-import { KubernetesJobDeletingGoalCompletionListenerFactory } from "./KubernetesJobDeletingGoalCompletionListener";
 
 /**
  * Extension pack to schedule goals as k8s jobs when marked as isolated = true.
@@ -31,15 +30,7 @@ export function k8sGoalSchedulingSupport(): ExtensionPack {
         configure: sdm => {
             if (!process.env.ATOMIST_ISOLATED_GOAL && isConfiguredInEnv("kubernetes", "kubernetes-all")) {
                 sdm.configuration.sdm.goalScheduler = [new KubernetesGoalScheduler()];
-                sdm.addGoalCompletionListener(new KubernetesJobDeletingGoalCompletionListenerFactory(sdm).create());
             }
         },
     };
-}
-
-/**
- * @deprecated use k8sGoalSchedulingSupport
- */
-export function goalScheduling(): ExtensionPack {
-    return k8sGoalSchedulingSupport();
 }

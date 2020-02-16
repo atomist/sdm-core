@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import {
     GoalSigningScope,
     GoalVerificationKey,
 } from "@atomist/sdm/lib/api/machine/SigningKeys";
-import * as stringify from "fast-json-stable-stringify";
 import * as fs from "fs-extra";
+import * as stringify from "json-stable-stringify";
 import * as path from "path";
 import { DeepPartial } from "ts-essentials";
 import { SdmGoalState } from "../../typings/types";
@@ -109,7 +109,7 @@ export async function verifyGoal(goal: SdmGoalEvent & DeepPartial<SignatureMixin
             if (!!verifiedWith) {
                 logger.debug(
                     `Verified signature for incoming goal '${goal.uniqueName}' of '${goal.goalSetId}' with key '${
-                        verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
+                    verifiedWith.name}' and algorithm '${verifiedWith.algorithm || DefaultGoalSigningAlgorithm.name}'`);
             } else {
                 await rejectGoal("signature invalid", goal, ctx);
                 throw new Error("SDM goal signature invalid. Rejecting goal!");

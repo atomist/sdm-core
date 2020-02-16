@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,11 @@
  * limitations under the License.
  */
 
-export const K8sNamespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
+import { CloneOptions } from "@atomist/automation-client/lib/spi/clone/DirectoryManager";
+
+export const defaultCloneOptions: CloneOptions = {
+    alwaysDeep: false,
+    depth: 1,
+    detachHead: false,
+    keep: false,
+};
