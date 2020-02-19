@@ -500,11 +500,9 @@ export function executeK8sJob(): ExecuteGoal {
             return { code: 1, message };
         }
 
-        const log = followK8sLog(container);
-
         const status = { code: 0, message: `Container '${containerName}' completed successfully` };
         try {
-            const timeout: number = _.get(configuration, "sdm.goal.timeout", 10 * 60 * 1000);
+            const timeout: number = configuration.sdm?.goal?.timeout || 10 * 60 * 1000;
             const podStatus = await containerWatch(container, timeout);
             progressLog.write(`Container '${containerName}' exited: ${stringify(podStatus)}`);
         } catch (e) {
@@ -513,9 +511,6 @@ export function executeK8sJob(): ExecuteGoal {
             status.code++;
             status.message = message;
         }
-        // Give the logs some time to be delivered
-        await sleep(1000);
-        log.abort();
 
         const outputFile = path.join(outputDir, "result.json");
         let outputResult: ExecuteGoalResult;
@@ -662,7 +657,7 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
             continue;
         }
         const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
-        if (containerStatus && (!!_.get(containerStatus, "state.running.startedAt") || !!_.get(containerStatus, "state.terminated"))) {
+        if (containerStatus && (!!containerStatus.state?.running?.startedAt || !!containerStatus.state?.terminated)) {
             const message = `Container '${container.name}' started`;
             container.log.write(message);
             return;
@@ -674,93 +669,124 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
     throw new Error(errMsg);
 }
 
+/** Items used to in watching main container and its logs. */
+interface ContainerDetritus {
+    logStream?: Writable;
+    logRequest?: request.Request;
+    watcher?: any;
+    timeout?: NodeJS.Timeout;
+}
+
 /**
- * Watch pod until container `container.name` exits.  Resolve promise
- * with status if container `container.name` exits with status 0.
- * Reject promise otherwise, including pod status in the `podStatus`
- * property of the error.
+ * Watch pod until container `container.name` exits and its log stream
+ * is done being written to.  Resolve promise with status if container
+ * `container.name` exits with status 0.  If container exits with
+ * non-zero status, reject promise and includ pod status in the
+ * `podStatus` property of the error.  If any other error occurs,
+ * e.g., a watch or log error or timeout exceeded, reject immediately
+ * upon receipt of error.
  *
  * @param container Information about container to watch
+ * @param timeout Milliseconds to allow container to run
  * @return Status of pod after container terminates
  */
 function containerWatch(container: K8sContainer, timeout: number): Promise<k8s.V1PodStatus> {
     return new Promise(async (resolve, reject) => {
+        const clean: ContainerDetritus = {};
+        const k8sLog = new k8s.Log(container.config);
+        clean.logStream = new Writable({
+            write: (chunk, encoding, callback) => {
+                container.log.write(chunk.toString());
+                callback();
+            },
+        });
+        let logDone = false;
+        let podStatus: k8s.V1PodStatus | undefined;
+        let podError: Error | undefined;
+        const doneCallback = (e: any) => {
+            logDone = true;
+            if (e) {
+                e.message = `Container logging error: ${k8sErrMsg(e)}`;
+                container.log.write(e.message);
+                containerCleanup(clean);
+                reject(e);
+            }
+            if (podStatus) {
+                containerCleanup(clean);
+                resolve(podStatus);
+            } else if (podError) {
+                containerCleanup(clean);
+                reject(podError);
+            }
+        };
+        const logOptions: k8s.LogOptions = { follow: true };
+        clean.logRequest = k8sLog.log(container.ns, container.pod, container.name, clean.logStream, doneCallback, logOptions);
+
         let watch: k8s.Watch;
         try {
             watch = new k8s.Watch(container.config);
         } catch (e) {
             e.message = `Failed to create Kubernetes watch client: ${e.message}`;
             container.log.write(e.message);
+            containerCleanup(clean);
             reject(e);
         }
-        let watcher: any;
-        const timeoutTimer = setTimeout(() => {
-            if (watcher?.abort) {
-                watcher.abort();
-            }
+        clean.timeout = setTimeout(() => {
+            containerCleanup(clean);
             reject(new Error(`Goal timeout '${timeout}' exceeded`));
         }, timeout);
         const watchPath = `/api/v1/watch/namespaces/${container.ns}/pods/${container.pod}`;
-        watcher = await watch.watch(watchPath, {}, (phase, obj) => {
+        clean.watcher = await watch.watch(watchPath, {}, async (phase, obj) => {
             const pod = obj as k8s.V1Pod;
             if (pod?.status?.containerStatuses) {
                 const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
                 if (containerStatus?.state?.terminated) {
-                    if (timeoutTimer) {
-                        clearTimeout(timeoutTimer);
-                    }
-                    const exitCode: number = _.get(containerStatus, "state.terminated.exitCode");
+                    const exitCode: number = containerStatus.state.terminated.exitCode;
                     if (exitCode === 0) {
+                        podStatus = pod.status;
                         const msg = `Container '${container.name}' exited with status 0`;
                         container.log.write(msg);
-                        resolve(pod.status);
+                        if (logDone) {
+                            containerCleanup(clean);
+                            resolve(podStatus);
+                        }
                     } else {
                         const msg = `Container '${container.name}' exited with status ${exitCode}`;
                         container.log.write(msg);
-                        const err = new Error(msg);
-                        (err as any).podStatus = pod.status;
-                        reject(err);
-                    }
-                    if (watcher?.abort) {
-                        watcher.abort();
+                        podError = new Error(msg);
+                        (podError as any).podStatus = pod.status;
+                        if (logDone) {
+                            containerCleanup(clean);
+                            reject(podError);
+                        }
                     }
                     return;
                 }
             }
-            container.log.write(`Container '${container.name}' still running`);
+            container.log.write(`Container '${container.name}' phase: ${phase}`);
         }, err => {
-            if (timeoutTimer) {
-                clearTimeout(timeoutTimer);
-            }
             err.message = `Container watcher failed: ${err.message}`;
             container.log.write(err.message);
+            containerCleanup(clean);
             reject(err);
         });
     });
 }
 
-/**
- * Set up log follower for container.
- */
-function followK8sLog(container: K8sContainer): request.Request {
-    const k8sLog = new k8s.Log(container.config);
-    const logStream = new Writable({
-        write: (chunk, encoding, callback) => {
-            container.log.write(chunk.toString());
-            callback();
-        },
-    });
-    const doneCallback = e => {
-        if (e) {
-            if (e.message) {
-                container.log.write(e.message);
-            } else {
-                container.log.write(stringify(e));
-            }
-        }
-    };
-    const logOptions: k8s.LogOptions = { follow: true };
-    return k8sLog.log(container.ns, container.pod, container.name, logStream, doneCallback, logOptions);
+/** Clean up resources used to watch running container. */
+function containerCleanup(c: ContainerDetritus): void {
+    if (c.timeout) {
+        clearTimeout(c.timeout);
+    }
+    if (c.logRequest?.abort) {
+        c.logRequest.abort();
+    }
+    if (c.logStream?.end) {
+        c.logStream.end();
+    }
+    if (c.watcher?.abort) {
+        c.watcher.abort();
+    }
 }
 
 /** Try to find a Kubernetes API error message. */
