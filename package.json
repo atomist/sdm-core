@@ -1,7 +1,7 @@
 {
   "name": "@atomist/sdm-core",
   "version": "2.0.0",
-  "description": "Atomist Software Delivery Machine - Implementation",
+  "description": "Test branch of Atomist Software Delivery Machine - Implementation",
   "author": {
     "name": "Atomist",
     "email": "support@atomist.com",
