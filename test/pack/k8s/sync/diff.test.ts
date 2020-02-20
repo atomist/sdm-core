@@ -98,24 +98,24 @@ describe("pack/k8s/sync/diff", () => {
             const push: SdmGoalEvent["push"] = {
                 commits: [
                     {
-                        sha: "958c655ef5b6436fbe5ae430a878ff14b75d39ce",
+                        sha: "7ffbb06b4c048c975211468e043f8b9db5a11489",
                         message: "Senseless changes to test diffPush",
                     },
                     {
-                        sha: "7708d44678164ab41d35014c7743ab1fad877a22",
+                        sha: "12eebb9d510839512654ea1eb870763c8426fd2c",
                         message: `Autofix: TypeScript header
 
 [atomist:generated] [atomist:autofix=typescript_header]`,
                     },
                     {
-                        sha: "af496fa1e04c3471a0ded9cc2e406bcdbfd528ee",
+                        sha: "3a00d2e66a6df267e41be9a5ea382ed1db8c4625",
                         message: `Change package description
 
 [atomist:generated] [atomist:commit:test]
 `,
                     },
                     {
-                        sha: "778197e3c3bd128ebd36a20f212bad2a9613ca15",
+                        sha: "bda8af958fdd6b4b5af6c774769de258d269fb8b",
                         message: "Update, add, delete files, plus ignored changes",
                     },
                 ],
@@ -127,14 +127,14 @@ describe("pack/k8s/sync/diff", () => {
             } as any;
             const c = await diffPush(p, push, t, l);
             const e = [
-                { change: "delete", path: "package-lock.json", sha: "958c655ef5b6436fbe5ae430a878ff14b75d39ce" },
-                { change: "apply", path: "test.json", sha: "958c655ef5b6436fbe5ae430a878ff14b75d39ce" },
-                { change: "apply", path: "tslint.json", sha: "958c655ef5b6436fbe5ae430a878ff14b75d39ce" },
-                { change: "apply", path: "package-lock.json", sha: "7708d44678164ab41d35014c7743ab1fad877a22" },
-                { change: "delete", path: "package-lock.json", sha: "778197e3c3bd128ebd36a20f212bad2a9613ca15" },
-                { change: "delete", path: "package.json", sha: "778197e3c3bd128ebd36a20f212bad2a9613ca15" },
-                { change: "apply", path: "blaml.yaml", sha: "778197e3c3bd128ebd36a20f212bad2a9613ca15" },
-                { change: "apply", path: "test.json", sha: "778197e3c3bd128ebd36a20f212bad2a9613ca15" },
+                { change: "delete", path: "package-lock.json", sha: "7ffbb06b4c048c975211468e043f8b9db5a11489" },
+                { change: "apply", path: "test.json", sha: "7ffbb06b4c048c975211468e043f8b9db5a11489" },
+                { change: "apply", path: "tslint.json", sha: "7ffbb06b4c048c975211468e043f8b9db5a11489" },
+                { change: "apply", path: "package-lock.json", sha: "12eebb9d510839512654ea1eb870763c8426fd2c" },
+                { change: "delete", path: "package-lock.json", sha: "bda8af958fdd6b4b5af6c774769de258d269fb8b" },
+                { change: "delete", path: "package.json", sha: "bda8af958fdd6b4b5af6c774769de258d269fb8b" },
+                { change: "apply", path: "blaml.yaml", sha: "bda8af958fdd6b4b5af6c774769de258d269fb8b" },
+                { change: "apply", path: "test.json", sha: "bda8af958fdd6b4b5af6c774769de258d269fb8b" },
             ];
             assert.deepStrictEqual(c, e);
         });
