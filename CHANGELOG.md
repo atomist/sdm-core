@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 -   Dynamic goals don't carry forward preConditions. [#786](https://github.com/atomist/sdm-core/issues/786)
+-   Wait on container log to close. [#242](https://github.com/atomist/sdm-core/issues/242)
 
 ## [1.8.0](https://github.com/atomist/sdm-core/compare/1.7.0...1.8.0) - 2019-12-06
 
