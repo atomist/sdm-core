@@ -53,7 +53,7 @@ describe("GitHubReleaseArtifactStore", () => {
                     await rm(da.cwd);
                 }
             }
-        }).timeout(10000);
+        }).timeout(20000);
 
         it("should checkout existing file and parse AppInfo", async () => {
             const ghras = new GitHubReleaseArtifactStore();
@@ -72,7 +72,7 @@ describe("GitHubReleaseArtifactStore", () => {
                     await rm(da.cwd);
                 }
             }
-        }).timeout(10000);
+        }).timeout(30000);
     });
 
 });
