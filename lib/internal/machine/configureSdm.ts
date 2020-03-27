@@ -74,21 +74,21 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
                              options: ConfigureOptions = {}): ConfigurationPostProcessor<LocalSoftwareDeliveryMachineConfiguration> {
 
     return async (config: Configuration) => {
-        let mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
+        const mergedConfig = config as LocalSoftwareDeliveryMachineConfiguration;
 
         // Configure the local SDM
-        mergedConfig = await doWithSdmLocal<LocalSoftwareDeliveryMachineConfiguration>(local => {
+        await doWithSdmLocal<LocalSoftwareDeliveryMachineConfiguration>(local => {
             return local.configureLocal()(mergedConfig);
-        }) || mergedConfig;
+        });
 
         const defaultSdmConfiguration = defaultSoftwareDeliveryMachineConfiguration(config);
-        mergedConfig = _.merge(defaultSdmConfiguration, mergedConfig);
+        _.defaultsDeep(mergedConfig, defaultSdmConfiguration);
 
         validateConfigurationValues(mergedConfig, options);
         const sdm = await machineMaker(mergedConfig);
 
         await doWithSdmLocal<void>(local =>
-            sdm.addExtensionPacks(local.LocalLifecycle, local.LocalSdmConfig),
+          sdm.addExtensionPacks(local.LocalLifecycle, local.LocalSdmConfig),
         );
 
         // Configure the job forking ability
@@ -99,16 +99,16 @@ export function configureSdm(machineMaker: SoftwareDeliveryMachineMaker,
 
         // Register startup message detail
         _.update(mergedConfig, "logging.banner.contributors",
-            old => !!old ? old : []);
+          old => !!old ? old : []);
         mergedConfig.logging.banner.contributors.push(
-            sdmStartupMessage(sdm),
-            sdmExtensionPackStartupMessage(sdm));
+          sdmStartupMessage(sdm),
+          sdmExtensionPackStartupMessage(sdm));
 
         _.update(mergedConfig, "listeners",
-            old => !!old ? old : []);
+          old => !!old ? old : []);
         mergedConfig.listeners.push(
-            new InvokeSdmStartupListenersAutomationEventListener(sdm),
-            new SdmGoalMetricReportingAutomationEventListener());
+          new InvokeSdmStartupListenersAutomationEventListener(sdm),
+          new SdmGoalMetricReportingAutomationEventListener());
 
         return mergedConfig;
     };
