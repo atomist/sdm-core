@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { Project } from "@atomist/automation-client";
+import { Project } from "@atomist/automation-client/lib/project/Project";
 import {
-    CodeTransform,
-    ExtensionPack,
-    GeneratorRegistration,
-    metadata,
-    ParametersObject,
+  CodeTransform,
+  ExtensionPack,
+  GeneratorRegistration,
+  metadata,
+  ParametersObject,
 } from "@atomist/sdm";
+import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
 import { universalGenerator } from "./generator";
 
@@ -34,7 +35,7 @@ export interface UniversalTransform<PARAMS = any> {
     /** CodeTransforms to execute */
     transforms: CodeTransform<PARAMS> | Array<CodeTransform<PARAMS>>;
     /** Additional parameters the CodeTransforms need */
-    parameters?: ParametersObject<PARAMS>;
+    parameters?: ((params: any) => ParametersObject<PARAMS>) | ParametersObject<PARAMS>;
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Atomist, Inc.
+ * Copyright © 2020 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import {
-    GitHubRepoRef,
-} from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { GeneratorRegistration } from "@atomist/sdm";
 import * as assert from "assert";
 import { UniversalTransform } from "../../../lib/pack/universal-generator/generatorSupport";
 import {
-    AssertGeneratorResult,
-    assertUniversalGenerator,
+  AssertGeneratorResult,
+  assertUniversalGenerator,
 } from "../../../lib/pack/universal-generator/test/assertGenerator";
 
 const SpringGeneratorRegistration: GeneratorRegistration<{ name: string }> = {
@@ -44,6 +42,24 @@ const Trans1UniversalTransform: UniversalTransform<{ firstName: string }> = {
     test: async p => true,
     transforms: async (p, papi: any) => {
         await p.addFile("trans1", `${papi.parameters.firstName} ${papi.parameters.name} was here`);
+    },
+};
+
+const Trans2UniversalTransform: UniversalTransform<{ middleName: string } | {}> = {
+    parameters: params => {
+        if (params.firstName === "Mickey") {
+            return {
+                middleName: {
+                    required: true,
+                },
+            }
+        } else {
+            return {};
+        }
+    },
+    test: async p => true,
+    transforms: async (p, papi: any) => {
+        await p.addFile("trans2", `${papi.parameters.middleName} was here`);
     },
 };
 
@@ -124,11 +140,12 @@ describe("universalGenerator", () => {
 
         const promptForParams = {
             firstName: "Mickey",
+            middleName: "Foo",
         };
 
         const result = await assertUniversalGenerator(
             SpringGeneratorRegistration,
-            Trans1UniversalTransform,
+            [Trans1UniversalTransform, Trans2UniversalTransform],
             params,
             promptForParams);
 
