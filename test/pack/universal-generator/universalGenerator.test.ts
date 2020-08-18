@@ -17,7 +17,7 @@
 import { GitHubRepoRef } from "@atomist/automation-client/lib/operations/common/GitHubRepoRef";
 import { GeneratorRegistration } from "@atomist/sdm";
 import * as assert from "assert";
-import { UniversalTransform } from "../../../lib/pack/universal-generator/generatorSupport";
+import { UniversalTransform } from "../../..";
 import {
   AssertGeneratorResult,
   assertUniversalGenerator,
@@ -46,13 +46,13 @@ const Trans1UniversalTransform: UniversalTransform<{ firstName: string }> = {
 };
 
 const Trans2UniversalTransform: UniversalTransform<{ middleName: string } | {}> = {
-    parameters: params => {
+    parameters: async params => {
         if (params.firstName === "Mickey") {
             return {
                 middleName: {
                     required: true,
                 },
-            }
+            };
         } else {
             return {};
         }

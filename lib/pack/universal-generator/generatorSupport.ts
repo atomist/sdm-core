@@ -22,7 +22,6 @@ import {
   metadata,
   ParametersObject,
 } from "@atomist/sdm";
-import * as _ from "lodash";
 import { toArray } from "../../util/misc/array";
 import { universalGenerator } from "./generator";
 
@@ -35,7 +34,7 @@ export interface UniversalTransform<PARAMS = any> {
     /** CodeTransforms to execute */
     transforms: CodeTransform<PARAMS> | Array<CodeTransform<PARAMS>>;
     /** Additional parameters the CodeTransforms need */
-    parameters?: ((params: any) => ParametersObject<PARAMS>) | ParametersObject<PARAMS>;
+    parameters?: ((params: any) => Promise<ParametersObject<PARAMS>>) | ParametersObject<PARAMS>;
 }
 
 /**
