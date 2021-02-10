@@ -19,9 +19,14 @@ import {
     GitProject,
     guid,
 } from "@atomist/automation-client";
+import {
+    Configuration,
+    configurationValue,
+} from "@atomist/automation-client/lib/configuration";
 import { sleep } from "@atomist/automation-client/lib/internal/util/poll";
 import {
     ExecuteGoal,
+    ExecuteGoalResult,
     GoalProjectListenerEvent,
     GoalProjectListenerRegistration,
     GoalScheduler,
@@ -488,11 +493,10 @@ export function executeK8sJob(): ExecuteGoal {
             return { code: 1, message: e.message };
         }
 
-        const log = followK8sLog(container);
-
         const status = { code: 0, message: `Container '${containerName}' completed successfully` };
         try {
-            const podStatus = await containerWatch(container);
+            const timeout = sdmGoalTimeout(configuration);
+            const podStatus = await containerWatch(container, timeout);
             progressLog.write(`Container '${containerName}' exited: ${stringify(podStatus)}`);
         } catch (e) {
             const message = `Container '${containerName}' failed: ${e.message}`;
@@ -502,11 +506,10 @@ export function executeK8sJob(): ExecuteGoal {
         } finally {
             // Give the logs some time to be delivered
             await sleep(1000);
-            log.abort();
         }
 
         const outputFile = path.join(outputDir, "result.json");
-        let outputResult;
+        let outputResult: ExecuteGoalResult;
         if ((await fs.pathExists(outputFile)) && status.code === 0) {
             try {
                 outputResult = await processResult(await fs.readJson(outputFile), gi);
@@ -571,7 +574,7 @@ const containerExecutor: ExecuteGoal = gi => (process.env.ATOMIST_ISOLATED_GOAL)
 const containerFulfillerCacheRestore: GoalProjectListenerRegistration = {
     name: "ContainerFulfillerCacheRestore",
     events: [GoalProjectListenerEvent.before],
-    listener: async (project, gi, event) => {
+    listener: async (project, gi) => {
         const data = parseGoalEventData(gi.goalEvent);
         if (!data[ContainerRegistrationGoalDataKey]) {
             throw new Error(`Goal ${gi.goal.uniqueName} has no Kubernetes container registration: ${gi.goalEvent.data}`);
@@ -639,79 +642,139 @@ async function containerStarted(container: K8sContainer, attempts: number = 240)
     throw new Error(errMsg);
 }
 
+/** Items used to in watching main container and its logs. */
+interface ContainerDetritus {
+    logStream?: Writable;
+    logRequest?: request.Request;
+    watcher?: any;
+    timeout?: NodeJS.Timeout;
+}
+
 /**
- * Watch pod until container `container.name` exits.  Resolve promise
- * with status if container `container.name` exits with status 0.
- * Reject promise otherwise, including pod status in the `podStatus`
- * property of the error.
+ * Watch pod until container `container.name` exits and its log stream
+ * is done being written to.  Resolve promise with status if container
+ * `container.name` exits with status 0.  If container exits with
+ * non-zero status, reject promise and includ pod status in the
+ * `podStatus` property of the error.  If any other error occurs,
+ * e.g., a watch or log error or timeout exceeded, reject immediately
+ * upon receipt of error.
  *
  * @param container Information about container to watch
+ * @param timeout Milliseconds to allow container to run
  * @return Status of pod after container terminates
  */
-function containerWatch(container: K8sContainer): Promise<k8s.V1PodStatus> {
-    return new Promise((resolve, reject) => {
+function containerWatch(container: K8sContainer, timeout: number): Promise<k8s.V1PodStatus> {
+    return new Promise(async (resolve, reject) => {
+        const clean: ContainerDetritus = {};
+        const k8sLog = new k8s.Log(container.config);
+        clean.logStream = new Writable({
+            write: (chunk, encoding, callback) => {
+                container.log.write(chunk.toString());
+                callback();
+            },
+        });
+        let logDone = false;
+        let podStatus: k8s.V1PodStatus | undefined;
+        let podError: Error | undefined;
+        const doneCallback = (e: any) => {
+            logDone = true;
+            if (e) {
+                e.message = `Container logging error: ${e.message}`;
+                container.log.write(e.message);
+                containerCleanup(clean);
+                reject(e);
+            }
+            if (podStatus) {
+                containerCleanup(clean);
+                resolve(podStatus);
+            } else if (podError) {
+                containerCleanup(clean);
+                reject(podError);
+            }
+        };
+        const logOptions: k8s.LogOptions = { follow: true };
+        clean.logRequest = await k8sLog.log(
+            container.ns,
+            container.pod,
+            container.name,
+            clean.logStream,
+            doneCallback,
+            logOptions,
+        );
+
         let watch: k8s.Watch;
         try {
             watch = new k8s.Watch(container.config);
         } catch (e) {
             e.message = `Failed to create Kubernetes watch client: ${e.message}`;
             container.log.write(e.message);
+            containerCleanup(clean);
             reject(e);
         }
+        clean.timeout = setTimeout(() => {
+            containerCleanup(clean);
+            reject(new Error(`Goal timeout '${timeout}' exceeded`));
+        }, timeout);
         const watchPath = `/api/v1/watch/namespaces/${container.ns}/pods/${container.pod}`;
-        let watcher: any;
-        watcher = watch.watch(watchPath, {}, (phase, obj) => {
-            const pod = obj as k8s.V1Pod;
-            if (pod && pod.status && pod.status.containerStatuses) {
-                const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
-                if (containerStatus && containerStatus.state && containerStatus.state.terminated) {
-                    const exitCode: number = _.get(containerStatus, "state.terminated.exitCode");
-                    if (exitCode === 0) {
-                        const msg = `Container '${container.name}' exited with status 0`;
-                        container.log.write(msg);
-                        resolve(pod.status);
-                    } else {
-                        const msg = `Container '${container.name}' exited with status ${exitCode}`;
-                        container.log.write(msg);
-                        const err = new Error(msg);
-                        (err as any).podStatus = pod.status;
-                        reject(err);
+        clean.watcher = await watch.watch(
+            watchPath,
+            {},
+            async (phase, obj) => {
+                const pod = obj as k8s.V1Pod;
+                if (pod?.status?.containerStatuses) {
+                    const containerStatus = pod.status.containerStatuses.find(c => c.name === container.name);
+                    if (containerStatus?.state?.terminated) {
+                        const exitCode: number = containerStatus.state.terminated.exitCode;
+                        if (exitCode === 0) {
+                            podStatus = pod.status;
+                            const msg = `Container '${container.name}' exited with status 0`;
+                            container.log.write(msg);
+                            if (logDone) {
+                                containerCleanup(clean);
+                                resolve(podStatus);
+                            }
+                        } else {
+                            const msg = `Container '${container.name}' exited with status ${exitCode}`;
+                            container.log.write(msg);
+                            podError = new Error(msg);
+                            (podError as any).podStatus = pod.status;
+                            if (logDone) {
+                                containerCleanup(clean);
+                                reject(podError);
+                            }
+                        }
+                        return;
                     }
-                    if (watcher) {
-                        watcher.abort();
-                    }
-                    return;
                 }
-            }
-            container.log.write(`Container '${container.name}' still running`);
-        }, err => {
-            err.message = `Container watcher failed: ${err.message}`;
-            container.log.write(err.message);
-            reject(err);
-        });
+                container.log.write(`Container '${container.name}' phase: ${phase}`);
+            },
+            () => containerCleanup(clean),
+            err => {
+                err.message = `Container watcher failed: ${err.message}`;
+                container.log.write(err.message);
+                containerCleanup(clean);
+                reject(err);
+            },
+        );
     });
 }
 
-/**
- * Set up log follower for container.
- */
-function followK8sLog(container: K8sContainer): request.Request {
-    const k8sLog = new k8s.Log(container.config);
-    const logStream = new Writable({
-        write: (chunk, encoding, callback) => {
-            container.log.write(chunk.toString());
-            callback();
-        },
-    });
-    const doneCallback = e => {
-        if (e) {
-            if (e.message) {
-                container.log.write(e.message);
-            } else {
-                container.log.write(stringify(e));
-            }
-        }
-    };
-    const logOptions: k8s.LogOptions = { follow: true };
-    return k8sLog.log(container.ns, container.pod, container.name, logStream, doneCallback, logOptions);
+/** Clean up resources used to watch running container. */
+function containerCleanup(c: ContainerDetritus): void {
+    if (c.timeout) {
+        clearTimeout(c.timeout);
+    }
+    if (c.logRequest?.abort) {
+        c.logRequest.abort();
+    }
+    if (c.logStream?.end) {
+        c.logStream.end();
+    }
+    if (c.watcher?.abort) {
+        c.watcher.abort();
+    }
+}
+
+function sdmGoalTimeout(cfg?: Configuration): number {
+    return cfg?.sdm?.goal?.timeout || configurationValue<number>("sdm.goal.timeout", 1000 * 60 * 10);
 }
